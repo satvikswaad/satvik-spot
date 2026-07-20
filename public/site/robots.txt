@@ -1,0 +1,5 @@
+# Regulatory-Pending Staging Disallow Policy
+User-agent: *
+Disallow: /
+Disallow: /admin/
+Disallow: /api/

@@ -1,0 +1,156 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── HELPER FUNCTIONS ──────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && 
+             request.auth.token.admin == true;
+    }
+
+    function isValidString(str, minLen, maxLen) {
+      return str is string && str.size() >= minLen && str.size() <= maxLen;
+    }
+
+    function isValidInt(val, minVal, maxVal) {
+      return val is int && val >= minVal && val <= maxVal;
+    }
+
+    function isNonNegativeInt(val) {
+      return val is int && val >= 0;
+    }
+
+    function hasOnlyAllowedFields(allowedFields) {
+      return request.resource.data.keys().hasOnly(allowedFields);
+    }
+
+    // Default Deny All Collections and Subcollections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ── PRODUCTS COLLECTION ────────────────────────────────────
+    match /products/{productId} {
+      // Public / Customer: Read active products only
+      allow read: if resource.data.available == true || isAdmin();
+
+      // Admin: Full mutation access with schema validation
+      allow create, update: if isAdmin() &&
+        hasOnlyAllowedFields(['name', 'cat', 'emoji', 'img', 'desc', 'price', 'mrp', 'stock', 'available', 'badge']) &&
+        isValidString(request.resource.data.name, 2, 100) &&
+        isValidString(request.resource.data.desc, 5, 500) &&
+        (request.resource.data.cat in ['achar', 'murabba', 'chawmpras']) &&
+        request.resource.data.price > 0 &&
+        request.resource.data.mrp >= request.resource.data.price &&
+        isNonNegativeInt(request.resource.data.stock) &&
+        request.resource.data.available is bool;
+
+      allow delete: if isAdmin();
+    }
+
+    // ── CATEGORIES COLLECTION ──────────────────────────────────
+    match /categories/{categoryId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── USERS COLLECTION ───────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId) &&
+        hasOnlyAllowedFields(['name', 'phone', 'email', 'address', 'createdAt']) &&
+        isValidString(request.resource.data.name, 2, 100) &&
+        isValidString(request.resource.data.email, 5, 100) &&
+        // Guarantee customers cannot self-assign privileged fields
+        !('admin' in request.resource.data) &&
+        !('role' in request.resource.data) &&
+        !('roles' in request.resource.data) &&
+        !('claims' in request.resource.data);
+
+      allow delete: if isAdmin();
+    }
+
+    // ── ORDERS COLLECTION ──────────────────────────────────────
+    match /orders/{orderId} {
+      // Direct client creation DENIED: Authoritative orders are created by Cloud Functions (Admin SDK)
+      allow create: if false;
+
+      // Customer: Read own orders only. Admin: Read all orders.
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+
+      // Direct client updates and deletions DENIED: Status and payment updates processed by Cloud Functions
+      allow update, delete: if false;
+
+      // Order Events Subcollection
+      match /events/{eventId} {
+        allow read: if isAdmin() || (isSignedIn() && get(/databases/$(database)/documents/orders/$(orderId)).data.userId == request.auth.uid);
+        allow create, update, delete: if false; // Backend Admin SDK writes only
+      }
+    }
+
+    // ── REVIEWS COLLECTION ─────────────────────────────────────
+    match /reviews/{reviewId} {
+      // Public: Read approved reviews only
+      allow read: if resource.data.approved == true || isAdmin();
+
+      // Client Creation: Strictly validated, default approved = false
+      allow create: if isSignedIn() &&
+        hasOnlyAllowedFields(['productId', 'name', 'stars', 'text', 'approved', 'createdAt']) &&
+        isValidString(request.resource.data.text, 5, 500) &&
+        isValidInt(request.resource.data.stars, 1, 5) &&
+        request.resource.data.approved == false; // Must be moderated before public display
+
+      // Admin: Update approval status or delete
+      allow update, delete: if isAdmin();
+    }
+
+    // ── MESSAGES COLLECTION ────────────────────────────────────
+    match /messages/{messageId} {
+      // Direct client submission DENIED: Inquiries sent via Cloud Function endpoint
+      allow create: if false;
+
+      // Admin: Read customer messages
+      allow read: if isAdmin();
+
+      // Direct client updates and deletions DENIED
+      allow update, delete: if false;
+    }
+
+    // ── INTERNAL BACKEND-ONLY COLLECTIONS ───────────────────────
+    // Audit Logs: Append-only via Admin SDK backend
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Idempotency Records: Backend Admin SDK only
+    match /idempotency/{id} {
+      allow read, write: if false;
+    }
+
+    // Rate Limit Buckets: Backend Admin SDK only
+    match /rate_limits/{bucket} {
+      allow read, write: if false;
+    }
+
+    // Admin Metadata Collection (NOT used for authorization)
+    match /admin/{document=**} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Public Settings Collection
+    match /settings/{document} {
+      allow read: if resource.data.isPublic == true;
+      allow write: if false;
+    }
+  }
+}

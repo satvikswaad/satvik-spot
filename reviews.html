@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reviews – Satwik Sweets and Pickels</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --green: #1B6B2E;
+            --green-dark: #0F4A1E;
+            --green-light: #2E8B44;
+            --gold: #C9A227;
+            --gold-light: #E8C84A;
+            --cream: #FAFDF5;
+            --dark: #0D1F12;
+            --mid: #4A7C59;
+            --white: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--cream);
+            color: var(--dark)
+        }
+
+        /* NAV */
+        nav {
+            background: var(--green-dark);
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 100
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none
+        }
+
+        .nav-logo-img {
+            height: 48px;
+            width: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--gold)
+        }
+
+        .nav-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: #fff
+        }
+
+        .nav-brand span {
+            color: var(--gold-light)
+        }
+
+        .back-btn {
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block
+        }
+
+        .back-btn:hover {
+            background: var(--gold-light)
+        }
+
+        /* HERO */
+        .reviews-hero {
+            background: linear-gradient(135deg, var(--green-dark), var(--green));
+            text-align: center;
+            padding: 52px 24px 40px
+        }
+
+        .reviews-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            color: #fff;
+            margin-bottom: 10px
+        }
+
+        .reviews-hero p {
+            color: rgba(255, 255, 255, .75);
+            font-size: 15px
+        }
+
+        .overall-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .25);
+            border-radius: 16px;
+            padding: 18px 36px;
+            margin-top: 24px
+        }
+
+        .big-score {
+            font-size: 52px;
+            font-weight: 700;
+            color: var(--gold-light);
+            line-height: 1
+        }
+
+        .rating-details {
+            text-align: left
+        }
+
+        .rating-stars {
+            font-size: 22px;
+            color: var(--gold-light);
+            letter-spacing: 2px
+        }
+
+        .rating-details p {
+            color: rgba(255, 255, 255, .7);
+            font-size: 13px;
+            margin-top: 4px
+        }
+
+        .write-review-btn {
+            display: inline-block;
+            margin-top: 24px;
+            background: var(--gold);
+            color: var(--dark);
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            padding: 14px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            border: none;
+            transition: background .2s, transform .2s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .write-review-btn:hover {
+            background: var(--gold-light);
+            transform: scale(1.06);
+        }
+
+        /* LAYOUT */
+        .page-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 36px
+        }
+
+        @media(max-width:900px) {
+            .page-wrap {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* FILTER BAR */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 28px
+        }
+
+        .filter-bar label {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--green-dark)
+        }
+
+        .filter-btn {
+            background: #fff;
+            border: 2px solid #C5E8CE;
+            border-radius: 50px;
+            padding: 6px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-dark);
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff
+        }
+
+        /* REVIEW CARDS */
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px
+        }
+
+        .review-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 16px rgba(27, 107, 46, .08);
+            border-left: 5px solid var(--gold);
+            animation: fadeIn .4s ease both
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .rc-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 12px
+        }
+
+        .rc-user {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .rc-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--green);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+            overflow: hidden
+        }
+
+        .rc-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .rc-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--dark)
+        }
+
+        .rc-date {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 2px
+        }
+
+        .rc-stars {
+            font-size: 18px;
+            color: var(--gold);
+            letter-spacing: 1px
+        }
+
+        .rc-product {
+            display: inline-block;
+            background: #e8f5ec;
+            color: var(--green-dark);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 50px;
+            margin-bottom: 10px
+        }
+
+        .rc-text {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.7
+        }
+
+        .rc-photo {
+            margin-top: 14px;
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform .2s
+        }
+
+        .rc-photo:hover {
+            transform: scale(1.02)
+        }
+
+        .helpful-btn {
+            margin-top: 14px;
+            background: none;
+            border: 1px solid #C5E8CE;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            color: var(--mid);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .helpful-btn:hover,
+        .helpful-btn.liked {
+            background: var(--green);
+            color: #fff;
+            border-color: var(--green)
+        }
+
+        .verified {
+            font-size: 11px;
+            color: var(--green);
+            font-weight: 700;
+            margin-left: 8px
+        }
+
+        /* WRITE REVIEW PANEL */
+        .write-panel {
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(27, 107, 46, .1);
+            border-top: 5px solid var(--green);
+            position: sticky;
+            top: 90px;
+            height: fit-content
+        }
+
+        .write-panel h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--green-dark);
+            margin-bottom: 6px
+        }
+
+        .write-panel .sub {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 24px
+        }
+
+        .form-group {
+            margin-bottom: 16px
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--green-dark);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #C5E8CE;
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: 'Lato', sans-serif;
+            color: var(--dark);
+            background: #F7FDF9;
+            transition: border-color .2s
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--green)
+        }
+
+        .form-group textarea {
+            height: 90px;
+            resize: vertical
+        }
+
+        /* STAR PICKER */
+        .star-picker {
+            display: flex;
+            gap: 6px;
+            flex-direction: row-reverse;
+            justify-content: flex-end
+        }
+
+        .star-picker input {
+            display: none
+        }
+
+        .star-picker label {
+            font-size: 32px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color .15s;
+            line-height: 1
+        }
+
+        .star-picker label:hover,
+        .star-picker label:hover~label,
+        .star-picker input:checked~label {
+            color: var(--gold)
+        }
+
+        /* SUGGESTED COMMENTS */
+        .suggestions {
+            margin-bottom: 16px
+        }
+
+        .suggestions p {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--green-dark);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .sugg-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px
+        }
+
+        .chip {
+            background: #e8f5ec;
+            border: 1px solid #C5E8CE;
+            border-radius: 50px;
+            padding: 5px 12px;
+            font-size: 12px;
+            color: var(--green-dark);
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .chip:hover {
+            background: var(--green);
+            color: #fff
+        }
+
+        /* PHOTO UPLOAD */
+        .photo-upload {
+            border: 2px dashed #C5E8CE;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .2s;
+            background: #F7FDF9;
+            position: relative
+        }
+
+        .photo-upload:hover {
+            border-color: var(--green)
+        }
+
+        .photo-upload input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%
+        }
+
+        .photo-upload .icon {
+            font-size: 28px;
+            margin-bottom: 6px
+        }
+
+        .photo-upload p {
+            font-size: 12px;
+            color: #888
+        }
+
+        .photo-preview {
+            display: none !important;
+            margin-top: 10px;
+            width: 100%;
+            border-radius: 10px;
+            max-height: 140px;
+            object-fit: cover
+        }
+
+        /* SUBMIT */
+        .submit-btn {
+            width: 100%;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s;
+            margin-top: 4px
+        }
+
+        .submit-btn:hover {
+            background: var(--green-dark)
+        }
+
+        /* SUCCESS MSG */
+        #submit-success {
+            display: none !important;
+            background: #e6f9ee;
+            color: #1a6b2e;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center
+        }
+
+        /* PHOTO LIGHTBOX */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer
+        }
+
+        #lightbox.open {
+            display: flex
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 0 60px rgba(0, 0, 0, .5)
+        }
+
+        /* RATING BARS */
+        .rating-bars {
+            margin: 24px 0 28px
+        }
+
+        .rating-bars h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-dark);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px
+        }
+
+        .bar-label {
+            font-size: 12px;
+            color: #555;
+            width: 40px;
+            text-align: right;
+            flex-shrink: 0
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 8px;
+            background: #e0f0e4;
+            border-radius: 50px;
+            overflow: hidden
+        }
+
+        .bar-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--gold);
+            border-radius: 50px;
+            transition: width .6s ease
+        }
+
+        .bar-count {
+            font-size: 11px;
+            color: #aaa;
+            width: 24px
+        }
+
+        footer {
+            background: var(--green-dark);
+            color: rgba(255, 255, 255, .6);
+            text-align: center;
+            padding: 24px;
+            font-size: 13px;
+            border-top: 3px solid var(--gold);
+            margin-top: 60px
+        }
+
+        footer strong {
+            color: var(--gold-light)
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a class="nav-logo" href="index.html">
+            <img src="assets/logo.png" alt="Logo" class="nav-logo-img" />
+            <span class="nav-brand">Satwik <span>Sweets and Pickels</span></span>
+        </a>
+        <a class="back-btn" href="index.html">← Back to Shop</a>
+    </nav>
+
+    <!-- HERO -->
+    <div class="reviews-hero">
+        <h1>Customer Reviews</h1>
+        <p>Real people, real taste — see what our customers are saying</p>
+        <div class="overall-rating">
+            <div class="big-score" id="avgScore">4.7</div>
+            <div class="rating-details">
+                <div class="rating-stars" id="avgStars">★★★★★</div>
+                <p id="totalCount">Based on <strong class="text-white">4 reviews</strong></p>
+            </div>
+        </div>
+        <br>
+        <a class="write-review-btn" href="#write-review">✍️ Write Your Review</a>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="page-wrap">
+
+        <!-- LEFT: Filter + Reviews -->
+        <div>
+            <!-- Rating Bars -->
+            <div class="rating-bars">
+                <h3>Rating Breakdown</h3>
+                <div class="bar-row"><span class="bar-label">5 ★</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar5"></div>
+                    </div><span class="bar-count" id="cnt5">0</span>
+                </div>
+                <div class="bar-row"><span class="bar-label">4 ★</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar4"></div>
+                    </div><span class="bar-count" id="cnt4">0</span>
+                </div>
+                <div class="bar-row"><span class="bar-label">3 ★</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar3"></div>
+                    </div><span class="bar-count" id="cnt3">0</span>
+                </div>
+                <div class="bar-row"><span class="bar-label">2 ★</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar2"></div>
+                    </div><span class="bar-count" id="cnt2">0</span>
+                </div>
+                <div class="bar-row"><span class="bar-label">1 ★</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar1"></div>
+                    </div><span class="bar-count" id="cnt1">0</span>
+                </div>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-bar">
+                <label>Filter:</label>
+                <button class="filter-btn active" onclick="filterReviews(0,this)">All ★</button>
+                <button class="filter-btn" onclick="filterReviews(5,this)">5 ★</button>
+                <button class="filter-btn" onclick="filterReviews(4,this)">4 ★</button>
+                <button class="filter-btn" onclick="filterReviews(3,this)">3 ★</button>
+                <button class="filter-btn" onclick="filterReviews(2,this)">2 ★</button>
+                <button class="filter-btn" onclick="filterReviews(1,this)">1 ★</button>
+            </div>
+
+            <!-- Reviews List -->
+            <div class="reviews-list" id="reviewsList"></div>
+        </div>
+
+        <!-- RIGHT: Write Review -->
+        <div>
+            <div class="write-panel" id="write-review">
+                <h2>Write a Review</h2>
+                <p class="sub">Share your experience with Satwik Sweets and Pickels!</p>
+
+                <div class="form-group">
+                    <label for="r-name">Your Name</label>
+                    <input type="text" id="r-name" placeholder="e.g. Priya Sharma" />
+                </div>
+
+                <div class="form-group">
+                    <label for="r-product">Product</label>
+                    <select id="r-product">
+                        <option>Aam ka Achar</option>
+                        <option>Nimbu Mirchi Achar</option>
+                        <option>Mixed Veg Achar</option>
+                        <option>Lahsun Achar</option>
+                        <option>Amla Murabba</option>
+                        <option>Gajjar Murabba</option>
+                        <option>Kaju Murabba</option>
+                        <option>Satvik Chawmpras</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Rating</label>
+                    <div class="star-picker" id="starPicker">
+                        <input type="radio" name="stars" id="s5" value="5" /><label for="s5">★</label>
+                        <input type="radio" name="stars" id="s4" value="4" /><label for="s4">★</label>
+                        <input type="radio" name="stars" id="s3" value="3" /><label for="s3">★</label>
+                        <input type="radio" name="stars" id="s2" value="2" /><label for="s2">★</label>
+                        <input type="radio" name="stars" id="s1" value="1" /><label for="s1">★</label>
+                    </div>
+                </div>
+
+                <!-- Suggested Comments -->
+                <div class="suggestions">
+                    <p>Quick suggestions (tap to add)</p>
+                    <div class="sugg-chips">
+                        <span class="chip" onclick="addSuggestion(this)">Tastes just like homemade! 🏡</span>
+                        <span class="chip" onclick="addSuggestion(this)">No preservatives, love it! 🌿</span>
+                        <span class="chip" onclick="addSuggestion(this)">Perfect with parathas 🫓</span>
+                        <span class="chip" onclick="addSuggestion(this)">Fast delivery 🚀</span>
+                        <span class="chip" onclick="addSuggestion(this)">Beautifully packed 🎁</span>
+                        <span class="chip" onclick="addSuggestion(this)">Will order again! ❤️</span>
+                        <span class="chip" onclick="addSuggestion(this)">Great value for money 💯</span>
+                        <span class="chip" onclick="addSuggestion(this)">Authentic flavour 👌</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="r-text">Your Review</label>
+                    <textarea id="r-text" placeholder="Tell others what you think…"></textarea>
+                </div>
+
+                <!-- Photo Upload -->
+                <div class="form-group">
+                    <label for="r-photo">Add Photo (optional)</label>
+                    <div class="photo-upload" id="uploadBox">
+                        <input type="file" accept="image/*" id="r-photo" onchange="previewPhoto(this)" />
+                        <div class="icon">📷</div>
+                        <p>Tap to upload a photo</p>
+                    </div>
+                    <img id="photoPreview" class="photo-preview" />
+                </div>
+
+                <button class="submit-btn" onclick="submitReview()">Post My Review →</button>
+                <div id="submit-success">✅ Review posted! Thank you 🌿</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox" onclick="document.getElementById('lightbox').classList.remove('open')">
+        <img id="lightbox-img" src="" alt="Review photo" />
+    </div>
+
+    <footer>
+        <p><strong>Satwik Sweets and Pickels</strong> — Pure Taste of Tradition | शुद्ध पारंपरिक स्वाद</p>
+    </footer>
+
+    <script>
+        // ── SEED REVIEWS ────────────────────────────────
+        let reviews = [
+            { id: 1, name: "Priya S.", product: "Aam ka Achar", stars: 5, text: "Tastes exactly like what my nani used to make. Absolutely authentic and no preservatives! Will order again every month.", date: "Feb 10, 2026", photo: null, helpful: 3, verified: true },
+            { id: 2, name: "Rahul M.", product: "Amla Murabba", stars: 5, text: "Ordered for my father. He called me twice to say how good it was! Fast delivery and beautifully packed.", date: "Feb 12, 2026", photo: null, helpful: 7, verified: true },
+            { id: 3, name: "Seema K.", product: "Dhania Chawmpras", stars: 4, text: "Incredible with parathas. Flavour is very fresh and natural. The only thing I'd love is a slightly larger jar!", date: "Feb 14, 2026", photo: null, helpful: 2, verified: false },
+            { id: 4, name: "Amit T.", product: "Nimbu Mirchi Achar", stars: 5, text: "Perfect balance of sour and spicy. Great value for money. This is now a permanent staple in our house 😄", date: "Feb 15, 2026", photo: null, helpful: 5, verified: true },
+        ];
+
+        let activeFilter = 0;
+
+        // ── RENDER ────────────────────────────────────
+        function renderReviews(filter = 0) {
+            activeFilter = filter;
+            const list = document.getElementById('reviewsList');
+            let filtered = [...reviews].sort((a, b) => b.stars - a.stars);
+            if (filter > 0) filtered = filtered.filter(r => r.stars === filter);
+
+            list.innerHTML = '';
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray p-0-40">No reviews for this rating yet.</p>';
+                return;
+            }
+
+            filtered.forEach(r => {
+                const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+                const initials = r.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                card.innerHTML = `
+      <div class="rc-header">
+        <div class="rc-user">
+          <div class="rc-avatar">${r.photo ? `<img src="${r.photo}"/>` : initials}</div>
+          <div>
+            <div class="rc-name">${r.name}${r.verified ? '<span class="verified">✔ Verified</span>' : ''}</div>
+            <div class="rc-date">${r.date}</div>
+          </div>
+        </div>
+        <div class="rc-stars">${stars}</div>
+      </div>
+      <span class="rc-product">🫙 ${r.product}</span>
+      <p class="rc-text">${r.text}</p>
+      ${r.photo ? `<img class="rc-photo" src="${r.photo}" onclick="openLightbox('${r.photo}')"/>` : ''}
+      <button class="helpful-btn" id="h${r.id}" onclick="markHelpful(${r.id})">👍 Helpful (${r.helpful})</button>`;
+                list.appendChild(card);
+            });
+
+            updateStats();
+        }
+
+        // ── FILTER ────────────────────────────────────
+        function filterReviews(stars, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderReviews(stars);
+        }
+
+        // ── STATS ─────────────────────────────────────
+        function updateStats() {
+            const total = reviews.length;
+            if (total === 0) return;
+            const avg = (reviews.reduce((a, r) => a + r.stars, 0) / total).toFixed(1);
+            document.getElementById('avgScore').textContent = avg;
+            document.getElementById('avgStars').textContent = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+            document.getElementById('totalCount').innerHTML = `Based on <strong class="text-white">${total} reviews</strong>`;
+
+            [1, 2, 3, 4, 5].forEach(s => {
+                const cnt = reviews.filter(r => r.stars === s).length;
+                document.getElementById(`cnt${s}`).textContent = cnt;
+                document.getElementById(`bar${s}`).style.width = total > 0 ? (cnt / total * 100) + '%' : '0%';
+            });
+        }
+
+        // ── SUGGESTIONS ───────────────────────────────
+        function addSuggestion(el) {
+            const ta = document.getElementById('r-text');
+            const txt = el.textContent.replace(/[^\w\s!?.,'"🏡🌿🫓🚀🎁❤️💯👌😄]/g, '').trim();
+            ta.value = ta.value ? ta.value + ' ' + txt : txt;
+            ta.focus();
+            el.classList.add('active'); // active class already defined for .filter-btn, let's see if it works for .chip
+            // Actually, let's use a class that exists or add it.
+        }
+
+        // ── PHOTO PREVIEW ─────────────────────────────
+        function previewPhoto(input) {
+            if (!input.files || !input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.getElementById('photoPreview');
+                img.src = e.target.result;
+                img.classList.remove('d-none'); // I'll ensure it has d-none initially
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        // ── SUBMIT REVIEW ─────────────────────────────
+        function submitReview() {
+            const name = document.getElementById('r-name').value.trim();
+            const product = document.getElementById('r-product').value;
+            const text = document.getElementById('r-text').value.trim();
+            const starred = document.querySelector('input[name="stars"]:checked');
+
+            if (!name) { alert('Please enter your name'); return; }
+            if (!starred) { alert('Please select a star rating'); return; }
+            if (!text) { alert('Please write something about the product'); return; }
+
+            const photoEl = document.getElementById('photoPreview');
+            const photo = photoEl.style.display !== 'none' && photoEl.src ? photoEl.src : null;
+
+            const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            reviews.unshift({
+                id: Date.now(),
+                name, product,
+                stars: parseInt(starred.value),
+                text, date: today,
+                photo, helpful: 0, verified: false
+            });
+
+            // Reset form
+            document.getElementById('r-name').value = '';
+            document.getElementById('r-text').value = '';
+            document.getElementById('r-photo').value = '';
+            photoEl.style.display = 'none';
+            document.querySelectorAll('input[name="stars"]').forEach(i => i.checked = false);
+            document.querySelectorAll('.chip').forEach(c => { c.style.background = ''; c.style.color = ''; });
+
+            document.getElementById('submit-success').style.display = 'block';
+            setTimeout(() => document.getElementById('submit-success').style.display = 'none', 3000);
+
+            renderReviews(activeFilter);
+        }
+
+        // ── HELPFUL ───────────────────────────────────
+        function markHelpful(id) {
+            const r = reviews.find(x => x.id === id);
+            if (!r) return;
+            const btn = document.getElementById('h' + id);
+            if (btn.classList.contains('liked')) return;
+            r.helpful++;
+            btn.classList.add('liked');
+            btn.textContent = `👍 Helpful (${r.helpful})`;
+        }
+
+        // ── LIGHTBOX ──────────────────────────────────
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.add('open');
+        }
+
+        // ── INIT ──────────────────────────────────────
+        renderReviews();
+    </script>
+    <!-- Firebase SDK -->
+    <script type="module" src="./firebase-config.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Satwik Sweets and Pickels – Pure Taste of Tradition</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- ── CART BUTTON ── -->
+    <!-- ── CART BUTTON REMOVED (Moved to Nav) ── -->
+
+    <!-- ── CART DRAWER ── -->
+    <div id="cart-drawer">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button id="close-cart" onclick="toggleCart()">✕</button>
+        </div>
+        <div id="cart-items">
+            <p id="empty-msg">Your cart is empty 🫙</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total"><span>Total</span><span id="cart-total">₹0</span></div>
+            <button id="checkout-btn" onclick="openCheckout()">Proceed to Checkout →</button>
+        </div>
+    </div>
+
+    <!-- ── NAVIGATION WITH LOGO ── -->
+    <nav>
+        <a class="nav-logo" href="#">
+            <img src="assets/logo.png" onerror="this.src='https://placehold.co/100x100?text=Logo'"
+                alt="Satwik Sweets and Pickels Logo" class="nav-logo-img" />
+            <span class="nav-brand">Satwik <span>Sweets and Pickels</span></span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#products">Shop</a></li>
+            <li><a href="#why">Why Us</a></li>
+            <li><a href="reviews.html">Reviews</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <div class="nav-search">
+                <input type="text" id="searchInput" placeholder="Search products…"
+                    oninput="searchProducts(this.value)" />
+                <span>🔍</span>
+            </div>
+            <button class="nav-cart-btn" onclick="toggleCart()">🛒 Cart <span id="cart-count">0</span></button>
+            <button class="nav-user-btn" id="user-nav-btn" onclick="window.location.href='user-login.html'">👤
+                Login</button>
+        </div>
+    </nav>
+
+    <!-- ── HERO SLIDER ── -->
+    <div class="hero-slider" id="heroSlider">
+
+        <!-- Slide 1 — Brand Image -->
+        <!-- Slide 1 — Brand Image -->
+        <div class="slide active hero-bg-1">
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+                <span class="hero-tag">🌿 Pure Taste of Tradition</span>
+                <h1>शुद्ध पारंपरिक स्वाद</h1>
+                <p>Handcrafted Aachar, Amla Murabba & Chyawanprash<br />made with love & family recipes</p>
+                <a class="hero-cta" href="#products">Shop Now →</a>
+            </div>
+        </div>
+
+        <!-- Slide 2 — Achar -->
+        <div class="slide hero-bg-2">
+            <div class="slide-overlay slide-overlay-green">
+            </div>
+            <div class="slide-content">
+                <span class="hero-tag">🥭 Achars</span>
+                <h1>Authentic<br /><em>Aachar</em> Collection</h1>
+                <p>Mango, Lemon, Garlic & Mixed — all handmade in mustard oil with no preservatives</p>
+                <a class="hero-cta" href="#products">Explore Achars →</a>
+            </div>
+        </div>
+
+        <!-- Slide 3 — Murabba -->
+        <div class="slide hero-bg-3">
+            <div class="slide-overlay slide-overlay-orange">
+            </div>
+            <div class="slide-content">
+                <span class="hero-tag">🍈 Murabbe</span>
+                <h1>Nourishing<br /><em>Amla Murabba</em></h1>
+                <p>Rich in Vitamin C, made from farm-fresh Amla the traditional way</p>
+                <a class="hero-cta" href="#products">Explore Murabbe →</a>
+            </div>
+        </div>
+
+        <!-- Slider Controls -->
+        <button class="slider-arrow left" onclick="changeSlide(-1)">&#8592;</button>
+        <button class="slider-arrow right" onclick="changeSlide(1)">&#8594;</button>
+
+        <!-- Dots -->
+        <div class="slider-dots">
+            <span class="dot active" onclick="goToSlide(0)"></span>
+            <span class="dot" onclick="goToSlide(1)"></span>
+            <span class="dot" onclick="goToSlide(2)"></span>
+        </div>
+    </div>
+
+    <!-- ── PRODUCTS SECTION ── -->
+    <section id="products">
+        <h2 class="section-title">Our Handmade Products</h2>
+        <p class="section-sub">Every jar tells a story of tradition and taste</p>
+        <div class="divider"></div>
+        <div class="categories">
+            <button class="cat-btn active" onclick="filterProducts('all',this)">All</button>
+            <button class="cat-btn" onclick="filterProducts('achar',this)">🥭 Achars</button>
+            <button class="cat-btn" onclick="filterProducts('murabba',this)">🍑 Murabbe</button>
+            <button class="cat-btn" onclick="filterProducts('chawmpras',this)">🌿 Chyawanprash</button>
+        </div>
+        <div class="product-grid" id="product-grid"></div>
+    </section>
+
+    <!-- ── WHY US ── -->
+    <section id="why">
+        <h2 class="section-title">Why Choose Satwik Sweets and Pickels</h2>
+        <p class="section-sub">Quality you can taste, trust you can feel</p>
+        <div class="divider"></div>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon">🌿</div>
+                <h3>No Preservatives</h3>
+                <p>Pure ingredients, traditional methods. Nothing artificial — ever.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">👩🍳</div>
+                <h3>Family Recipes</h3>
+                <p>Recipes passed down for generations, made with the same love.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">🚀</div>
+                <h3>Fast Delivery</h3>
+                <p>Shipped within 24 hours, carefully packed to preserve freshness.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon">💯</div>
+                <h3>100% Satisfaction</h3>
+                <p>Don't love it? We'll make it right. No questions asked.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── REVIEWS ── -->
+    <div class="testimonials-bg" id="reviews">
+        <div class="testimonials-inner">
+            <h2 class="section-title">What Customers Say</h2>
+            <p class="section-sub">Thousands of happy jars delivered across India</p>
+            <div class="divider divider-gold"></div>
+            <div class="reviews" id="homepage-reviews"></div>
+            <div class="text-center mt-32">
+                <a href="reviews.html" class="hero-cta cta-gold-dark">
+                    Read All Reviews →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── CONTACT ── -->
+    <section id="contact">
+        <div class="order-section">
+            <h2>Custom Order? Ask Us!</h2>
+            <p>Want bulk orders, gift hampers, or a special flavour? Drop us a message.</p>
+            <form id="contact-form">
+                <div class="form-group"><label>Your Name</label><input type="text" placeholder="e.g. Ravi Sharma"
+                        required /></div>
+                <div class="form-group"><label>Phone / WhatsApp</label><input type="tel" placeholder="+91 98765 43210"
+                        required /></div>
+                <div class="form-group"><label>Email</label><input type="email" placeholder="you@email.com" /></div>
+                <div class="form-group"><label for="inquiry-type">What are you looking for?</label>
+                    <select id="inquiry-type">
+                        <option>Bulk Order (10+ jars)</option>
+                        <option>Gift Hamper</option>
+                        <option>Custom Flavour</option>
+                        <option>General Enquiry</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Message</label><textarea placeholder="Tell us more…"></textarea></div>
+                <button type="button" class="form-submit" onclick="sendContactMessage()">Send Message 📩</button>
+                <div id="form-success">✅ Message sent! We'll WhatsApp you within 2 hours.</div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ── CHECKOUT MODAL ── -->
+    <div id="checkout-modal">
+        <div class="modal-box">
+            <button id="close-modal" onclick="closeCheckout()">✕</button>
+            <div id="checkout-form-wrapper">
+                <h2>Complete Your Order</h2>
+                <div class="form-group"><label>Full Name</label><input id="co-name" type="text" placeholder="Your Name"
+                        required /></div>
+                <div class="form-group"><label>Phone / WhatsApp</label><input id="co-phone" type="tel"
+                        placeholder="+91 …" required /></div>
+                <div class="form-group"><label>Delivery Address</label><textarea id="co-address" class="textarea-h80"
+                        placeholder="House No, Street, City, PIN…" required></textarea></div>
+                <div class="form-group"><label for="co-payment">Payment Method</label>
+                    <select id="co-payment">
+                        <option>Cash on Delivery</option>
+                        <option>UPI / GPay / PhonePe</option>
+                        <option>Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="bg-light-green-box mt-18 text-muted">
+                    <strong>Order Total: </strong><span id="modal-total">₹0</span>
+                </div>
+                <button class="form-submit" onclick="placeOrder()">Place Order 🎉</button>
+            </div>
+            <div id="order-success">
+                <div class="big-icon">🎉</div>
+                <h3>Order Placed!</h3>
+                <p>Thank you! We'll confirm on WhatsApp within 30 minutes.<br />Happy eating! 🫙</p>
+                <button class="form-submit mt-20" onclick="closeCheckout()">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+        <img src="assets/logo.png" alt="Satwik Sweets and Pickels" class="footer-logo-img" />
+        <p><strong>Satwik Sweets and Pickels</strong> — Pure Taste of Tradition | शुद्ध पारंपरिक स्वाद</p>
+        <p class="mt-8">📞 +91 98765 43210 &nbsp;|&nbsp; ✉️ satviksewacontact@gmail.com &nbsp;|&nbsp; Made
+            with ❤️ in
+            India</p>
+        <p class="mt-12">
+            <a href="https://tripuresh.rf.gd/" target="_blank" rel="noopener"
+                class="footer-link-sub">⚡ Crafted by
+                Tripuresh</a>
+        </p>
+    </footer>
+
+    <div id="toast"></div>
+    <script src="script.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module" src="./firebase-config.js"></script>
+</body>
+
+</html>

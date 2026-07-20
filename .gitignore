@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build and compilation outputs
+dist/
+lib/
+build/
+.firebase/
+
+# Environment files and credentials
+.env
+.env.local
+.env.staging
+.env.production
+.env.*.local
+service-account*.json
+firebase-service-account*.json
+firebase_config_temp.json
+*.pem
+*.key
+amazon-credentials.json
+flipkart-credentials.json
+/etc/secrets/
+
+# Firebase & Emulator logs / exports
+firestore-debug.log
+ui-debug.log
+firebase-debug.log
+.emulator/
+emulator-data/
+backup-data/
+exports/
+
+# Testing artifacts
+screenshots/
+*.png.tmp
+
+# System and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

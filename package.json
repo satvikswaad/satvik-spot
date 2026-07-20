@@ -1,0 +1,30 @@
+{
+  "name": "satwik-spot",
+  "version": "1.0.0",
+  "description": "Satwik Sweets and Pickels - Authentic Indian Homemade Sweets & Pickles",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix backend run build",
+    "type-check": "tsc --noEmit --project backend/tsconfig.json && tsc --noEmit --project functions/tsconfig.json",
+    "test": "npm --prefix backend run test && npm --prefix functions run test",
+    "test:unit": "npm --prefix backend run test",
+    "test:render": "npm --prefix backend run test",
+    "test:rules": "jest --config functions/jest.config.js functions/tests/firestoreRules.spec.ts",
+    "test:security": "jest --config functions/jest.config.js functions/tests/phase4Security.spec.ts",
+    "test:sync": "jest --config functions/jest.config.js functions/tests/phase5Sync.spec.ts",
+    "test:admin": "jest --config functions/jest.config.js functions/tests/phase6AdminDashboard.spec.ts",
+    "test:visual": "jest --config functions/jest.config.js functions/tests/phase7VisualA11y.spec.ts",
+    "test:e2e": "jest --config functions/jest.config.js functions/tests/e2eBrowser.spec.ts",
+    "seed": "npx ts-node scripts/seed-products.ts",
+    "backup": "npx ts-node scripts/backup-emulator.ts",
+    "restore": "npx ts-node scripts/restore-emulator.ts",
+    "preflight": "npx ts-node scripts/deploy-preflight.ts",
+    "verify": "npm run type-check && npm run test && npm run preflight"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

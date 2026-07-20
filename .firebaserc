@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "satwiksweetsandpickels",
+    "staging": "satvik-spot-staging"
+  }
+}
