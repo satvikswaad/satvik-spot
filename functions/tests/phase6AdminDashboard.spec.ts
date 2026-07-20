@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 if (!admin.apps.length) {
-  admin.initializeApp({ projectId: 'satwiksweetsandpickels' });
+  admin.initializeApp({ projectId: 'satvik-spot-test' });
 }
 
 const db = admin.firestore();

@@ -2,5 +2,18 @@
   "projects": {
     "default": "satwiksweetsandpickels",
     "staging": "satvik-spot-staging"
-  }
+  },
+  "targets": {
+    "satvik-spot-staging": {
+      "hosting": {
+        "site": [
+          "satvik-spot-staging"
+        ],
+        "admin": [
+          "satvik-spot-staging-admin"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

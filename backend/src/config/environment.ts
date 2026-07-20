@@ -64,8 +64,10 @@ export function validateStartupConfig(): { valid: boolean; errors: string[] } {
   // In non-emulator staging/production environments, ensure Firebase credentials path exists if specified
   if (!isEmulator && (process.env.NODE_ENV === 'staging' || process.env.NODE_ENV === 'production')) {
     const credPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-    if (credPath && !fs.existsSync(credPath)) {
-      errors.push(`Specified GOOGLE_APPLICATION_CREDENTIALS file does not exist at '${credPath}'`);
+    if (!credPath || credPath === 'undefined') {
+      errors.push('GOOGLE_APPLICATION_CREDENTIALS environment variable is missing or invalid.');
+    } else if (!fs.existsSync(credPath)) {
+      errors.push('Specified GOOGLE_APPLICATION_CREDENTIALS file does not exist.');
     }
   }
 

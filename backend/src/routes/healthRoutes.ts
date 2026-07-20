@@ -50,7 +50,7 @@ healthRouter.get('/ready', async (_req: Request, res: Response) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Readiness check failed', { error: (error as Error).message });
+    logger.error('Readiness check failed', { error: 'Database connectivity unavailable' });
     return res.status(503).json({
       status: 'not_ready',
       error: 'Firestore database connectivity unavailable',

@@ -19,7 +19,7 @@ import * as path from 'path';
 import * as admin from 'firebase-admin';
 
 if (!admin.apps.length) {
-  admin.initializeApp({ projectId: 'satwiksweetsandpickels' });
+  admin.initializeApp({ projectId: 'satvik-spot-test' });
 }
 process.env.FUNCTIONS_EMULATOR = 'true';
 

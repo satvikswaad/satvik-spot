@@ -5,7 +5,7 @@ import * as admin from 'firebase-admin';
 import { envConfig } from '../src/config/environment';
 
 if (!admin.apps.length) {
-  admin.initializeApp({ projectId: 'satwiksweetsandpickels' });
+  admin.initializeApp({ projectId: 'satvik-spot-test' });
 }
 
 const db = admin.firestore();

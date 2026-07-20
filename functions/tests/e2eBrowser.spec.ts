@@ -64,7 +64,7 @@ describe('Phase 8 — End-to-End Customer & Admin Browser Verification Suite', (
       .send({
         name: 'Test',
         phone: '9876543210',
-        address: 'Addr',
+        address: '123 Main Street',
         paymentMethod: 'Cash on Delivery',
         idempotencyKey: 'idem_oos_' + Date.now(),
         items: [{ productId: 'test_out_of_stock', qty: 1 }]

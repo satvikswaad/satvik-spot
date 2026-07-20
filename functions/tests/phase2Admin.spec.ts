@@ -6,7 +6,7 @@ import * as path from 'path';
 import { requireAdmin } from '../src/auth/adminMiddleware';
 
 if (!admin.apps.length) {
-  admin.initializeApp({ projectId: 'satwiksweetsandpickels' });
+  admin.initializeApp({ projectId: 'satvik-spot-test' });
 }
 
 describe('Phase 2 — Firebase Authentication, Administrator Provisioning, MFA & Session Security Tests', () => {

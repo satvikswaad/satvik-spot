@@ -8,7 +8,7 @@ import { runProductSeed, CANONICAL_SEED_PRODUCTS } from '../../scripts/seed-prod
 import { envConfig } from '../src/config/environment';
 
 if (!admin.apps.length) {
-  admin.initializeApp({ projectId: 'satwiksweetsandpickels' });
+  admin.initializeApp({ projectId: 'satvik-spot-test' });
 }
 
 const db = admin.firestore();
@@ -24,7 +24,7 @@ describe('Phase 5 — Products, Orders, Messages & Reviews Synchronization Tests
     envConfig.commerceEnabled = true;
     envConfig.checkoutEnabled = true;
     // Seed catalog
-    await runProductSeed(false, 'satwiksweetsandpickels');
+    await runProductSeed({ dryRun: false, project: 'satvik-spot-test', confirm: true });
   });
 
   // PRODUCTS TESTS (1-10)
@@ -35,11 +35,11 @@ describe('Phase 5 — Products, Orders, Messages & Reviews Synchronization Tests
   });
 
   it('3. Seed tool detects and rejects duplicate SKUs', async () => {
-    await expect(runProductSeed(true, 'satwiksweetsandpickels')).resolves.toBeDefined();
+    await expect(runProductSeed({ dryRun: true, project: 'satvik-spot-test' })).resolves.toBeDefined();
   });
 
   it('4. Dry-run mode validates seed without altering database', async () => {
-    const res = await runProductSeed(true, 'satwiksweetsandpickels');
+    const res = await runProductSeed({ dryRun: true, project: 'satvik-spot-test' });
     expect(res.dryRun).toBe(true);
   });
 

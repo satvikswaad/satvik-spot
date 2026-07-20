@@ -14,7 +14,7 @@ beforeAll(async () => {
   const rules = fs.readFileSync(rulesPath, 'utf8');
 
   testEnv = await initializeTestEnvironment({
-    projectId: 'satwiksweetsandpickels',
+    projectId: 'satvik-spot-test',
     firestore: {
       rules,
       host: '127.0.0.1',

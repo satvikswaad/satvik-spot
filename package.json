@@ -6,25 +6,30 @@
   "scripts": {
     "build": "npm --prefix backend run build",
     "type-check": "tsc --noEmit --project backend/tsconfig.json && tsc --noEmit --project functions/tsconfig.json",
-    "test": "npm --prefix backend run test && npm --prefix functions run test",
+    "test": "npm run test:backend && npm run test:emulator",
+    "test:backend": "npm --prefix backend run test",
     "test:unit": "npm --prefix backend run test",
-    "test:render": "npm --prefix backend run test",
-    "test:rules": "jest --config functions/jest.config.js functions/tests/firestoreRules.spec.ts",
-    "test:security": "jest --config functions/jest.config.js functions/tests/phase4Security.spec.ts",
-    "test:sync": "jest --config functions/jest.config.js functions/tests/phase5Sync.spec.ts",
-    "test:admin": "jest --config functions/jest.config.js functions/tests/phase6AdminDashboard.spec.ts",
-    "test:visual": "jest --config functions/jest.config.js functions/tests/phase7VisualA11y.spec.ts",
-    "test:e2e": "jest --config functions/jest.config.js functions/tests/e2eBrowser.spec.ts",
+    "test:emulator": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js --runInBand\"",
+    "test:rules": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/firestoreRules.spec.ts\"",
+    "test:security": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/phase4Security.spec.ts\"",
+    "test:sync": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/phase5Sync.spec.ts\"",
+    "test:admin": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/phase6AdminDashboard.spec.ts\"",
+    "test:visual": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/phase7VisualA11y.spec.ts\"",
+    "test:e2e": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/e2eBrowser.spec.ts\"",
     "seed": "npx ts-node scripts/seed-products.ts",
     "backup": "npx ts-node scripts/backup-emulator.ts",
     "restore": "npx ts-node scripts/restore-emulator.ts",
     "preflight": "npx ts-node scripts/deploy-preflight.ts",
-    "verify": "npm run type-check && npm run test && npm run preflight"
+    "verify": "npm run type-check && npm run test:backend && npm run test:emulator && npm run preflight"
   },
   "engines": {
     "node": "22"
   },
   "devDependencies": {
+    "firebase-admin": "^12.7.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.0.0"
   }
 }

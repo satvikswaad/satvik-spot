@@ -1,4 +1,5 @@
-import * as admin from 'firebase-admin';
+import { initializeApp, getApps } from 'firebase-admin/app';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
 export interface CatalogProductSeed {
   id: string;
@@ -128,7 +129,14 @@ export const CANONICAL_SEED_PRODUCTS: CatalogProductSeed[] = [
   }
 ];
 
-function parseArgs() {
+export interface SeedOptions {
+  dryRun?: boolean;
+  project?: string;
+  confirm?: boolean;
+  confirmProduction?: boolean;
+}
+
+export function parseArgs() {
   const args = process.argv.slice(2);
   const parsed: Record<string, string | boolean> = {};
 
@@ -148,14 +156,44 @@ function parseArgs() {
   return parsed;
 }
 
-export async function runProductSeed(dryRun = false, project = 'satwiksweetsandpickels') {
+export async function runProductSeed(options: SeedOptions = {}) {
+  const dryRun = options.dryRun !== false; // Default to dry-run mode for safety
+  const project = (options.project || '').trim();
+  const confirm = options.confirm === true;
+  const confirmProduction = options.confirmProduction === true;
+
   console.log('====================================================');
   console.log('      SATWIK SPOT — PRODUCT SEED MIGRATION TOOL     ');
   console.log('====================================================');
-  console.log(`📌 Target Project: [ ${project} ]`);
-  console.log(`🔍 Dry-Run Mode: [ ${dryRun ? 'YES (No DB Writes)' : 'NO (Live Emulator Migration)'} ]`);
+  console.log(`📌 Target Project: [ ${project || 'UNSPECIFIED'} ]`);
+  console.log(`🔍 Dry-Run Mode: [ ${dryRun ? 'YES (No DB Writes)' : 'NO (Live Firestore Migration)'} ]`);
 
-  // 1. Detect Duplicate SKUs
+  // 1. Refuse empty project ID
+  if (!project) {
+    throw new Error('Target project ID is required. Pass --project <project_id> explicitly.');
+  }
+
+  // 2. Refuse legacy project
+  if (project === 'satwiksweetsandpickels') {
+    throw new Error('Legacy project satwiksweetsandpickels is rejected. Use satvik-spot-staging or satvik-spot-test.');
+  }
+
+  // 3. Refuse production projects unless explicitly confirmed
+  if (project.includes('prod') && !confirmProduction) {
+    throw new Error(`Production seeding on project '${project}' requires explicit --confirm-production flag.`);
+  }
+
+  // 4. Refuse live writes during automated tests without emulator host
+  if (!dryRun) {
+    if (process.env.NODE_ENV === 'test' && !process.env.FIRESTORE_EMULATOR_HOST) {
+      throw new Error('Live database writes are forbidden in test environment without FIRESTORE_EMULATOR_HOST.');
+    }
+    if (!process.env.FIRESTORE_EMULATOR_HOST && !confirm) {
+      throw new Error(`Non-emulator database write to '${project}' requires explicit --confirm flag.`);
+    }
+  }
+
+  // 5. Detect Duplicate SKUs
   const skuSet = new Set<string>();
   for (const prod of CANONICAL_SEED_PRODUCTS) {
     if (skuSet.has(prod.sku)) {
@@ -164,7 +202,7 @@ export async function runProductSeed(dryRun = false, project = 'satwiksweetsandp
     skuSet.add(prod.sku);
   }
 
-  // 2. Validate Schema
+  // 6. Validate Schema
   for (const p of CANONICAL_SEED_PRODUCTS) {
     if (!p.id || !p.name || p.price <= 0 || p.mrp < p.price || p.stock < 0) {
       throw new Error(`Validation failed for product ID ${p.id}`);
@@ -178,34 +216,37 @@ export async function runProductSeed(dryRun = false, project = 'satwiksweetsandp
     return { success: true, count: CANONICAL_SEED_PRODUCTS.length, dryRun: true };
   }
 
-  // 3. Initialize Admin SDK
-  if (!admin.apps.length) {
-    admin.initializeApp({ projectId: project });
-  }
+  // 7. Initialize Admin SDK
+  const apps = getApps();
+  const app = apps.length ? apps[0] : initializeApp({ projectId: project });
 
-  const db = admin.firestore();
+  const db = getFirestore(app);
   const batch = db.batch();
 
   for (const prod of CANONICAL_SEED_PRODUCTS) {
     const docRef = db.collection('products').doc(prod.id);
     batch.set(docRef, {
       ...prod,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      testData: true,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp()
     });
   }
 
   await batch.commit();
-  console.log(`🎉 Successfully seeded ${CANONICAL_SEED_PRODUCTS.length} products to Firestore '/products' collection.`);
+  console.log(`🎉 Successfully seeded ${CANONICAL_SEED_PRODUCTS.length} products to Firestore '/products' collection in project '${project}'.`);
   return { success: true, count: CANONICAL_SEED_PRODUCTS.length, dryRun: false };
 }
 
-if (require.main === module) {
+// Main entry guard for CLI execution only
+if (typeof require !== 'undefined' && require.main === module) {
   const flags = parseArgs();
-  const dryRun = flags['dry-run'] === true;
-  const project = (flags.project as string) || process.env.FIREBASE_PROJECT_ID || 'satwiksweetsandpickels';
+  const dryRun = flags['dry-run'] !== false && flags.live !== true;
+  const project = (typeof flags.project === 'string' ? flags.project : process.env.FIREBASE_PROJECT_ID) || '';
+  const confirm = flags.confirm === true;
+  const confirmProduction = flags['confirm-production'] === true;
 
-  runProductSeed(dryRun, project).catch(err => {
+  runProductSeed({ dryRun, project, confirm, confirmProduction }).catch(err => {
     console.error('❌ Fatal Migration Error:', err.message);
     process.exit(1);
   });
