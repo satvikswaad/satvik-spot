@@ -661,9 +661,7 @@ footer.site-footer {
     .form-row-2 { grid-template-columns: 1fr; }
 }
 
-/* REDUCED MOTION OVERRIDE */
+/* ACCESSIBILITY: REDUCED MOTION SAFEGUARDS */
 @media (prefers-reduced-motion: reduce) {
-    * { animation: none !important; transition: none !important; }
-    .announcement-track { animation: none !important; transform: none !important; white-space: normal; flex-wrap: wrap; }
-    .hero-slide { transition: none !important; }
+    .announcement-track { animation-duration: 60s; }
 }
