@@ -7,7 +7,7 @@ let touchStartX = 0;
 let touchEndX = 0;
 const AUTOPLAY_DELAY = 5000; // 5 seconds autoplay duration
 
-document.addEventListener('DOMContentLoaded', () => {
+function runInitializers() {
     initUI();
     initHeroSlider();
     initScrollReveal();
@@ -17,7 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initProductsSort();
     initReviewsData();
     renderCart();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runInitializers);
+} else {
+    runInitializers();
+}
 
 function initUI() {
     const btnOpenCart = document.getElementById('btn-open-cart');
@@ -180,18 +186,7 @@ function initHeroSlider() {
         });
     });
 
-    // PAUSE ON HOVER & RESUME ON LEAVE
-    sliderContainer.addEventListener('mouseenter', stopAutoplay);
-    sliderContainer.addEventListener('mouseleave', startAutoplay);
-
-    // TAB VISIBILITY HANDLER
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            stopAutoplay();
-        } else {
-            startAutoplay();
-        }
-    });
+    // Autoplay will now run continuously without pausing on hover
 
     // MOBILE TOUCH SWIPE
     sliderContainer.addEventListener('touchstart', (e) => {
