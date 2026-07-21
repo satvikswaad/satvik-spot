@@ -71,7 +71,6 @@ function initUI() {
         });
     });
 
-    updateCartCount();
 }
 
 /* MOBILE NAVIGATION DRAWER HANDLERS */
