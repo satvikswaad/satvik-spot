@@ -4,62 +4,77 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Satwik Spot – Secure Admin Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Satvik Swaad – Secure Admin Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
     <style>
         :root {
-            --green: #1B6B2E;
-            --green-dark: #0F4A1E;
-            --gold: #C9A227;
-            --dark: #0D1F12;
-            --cream: #FAFDF5;
-            --red: #c0392b;
+            --maroon: #7A1C1C;
+            --maroon-dark: #541212;
+            --gold: #D4A017;
+            --saffron: #C8521A;
+            --saffron-dark: #AA3E0C;
+            --dark: #2A211D;
+            --cream: #FAF7F2;
+            --green: #2C5E3B;
+            --red: #C0392B;
+            --border: #E8E1D7;
+            --card-bg: #FFFFFF;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Lato', sans-serif; background: #F0F4F1; color: var(--dark); min-height: 100vh; }
+        body { font-family: 'Lato', system-ui, sans-serif; background: #F6F3ED; color: var(--dark); min-height: 100vh; }
 
-        /* LOGIN VIEW */
+        /* AUTH VIEW */
         #auth-container {
             display: flex; align-items: center; justify-content: center; min-height: 100vh;
-            background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%); padding: 24px;
+            background: linear-gradient(135deg, var(--maroon-dark) 0%, var(--maroon) 100%); padding: 24px;
         }
 
         .login-card {
-            background: #fff; border-radius: 20px; padding: 40px; width: 100%; max-width: 420px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, .3); text-align: center;
+            background: #FFFFFF; border-radius: 20px; padding: 40px; width: 100%; max-width: 440px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); text-align: center; border: 1px solid var(--gold);
         }
 
-        .login-card h1 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--green-dark); margin-bottom: 6px; }
-        .login-card p.sub { color: #888; font-size: 13px; margin-bottom: 24px; }
-        .admin-badge { display: inline-block; background: #e8f5ec; color: var(--green); font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 50px; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+        .login-card h1 { font-family: 'Playfair Display', serif; font-size: 1.75rem; color: var(--maroon); margin-bottom: 6px; }
+        .login-card p.sub { color: #665B55; font-size: 0.9rem; margin-bottom: 24px; }
+        .admin-badge {
+            display: inline-block; background: #FDF4F0; color: var(--saffron); font-size: 0.75rem;
+            font-weight: 800; padding: 6px 16px; border-radius: 50px; margin-bottom: 16px;
+            text-transform: uppercase; letter-spacing: 1px; border: 1px solid #F5D3C3;
+        }
 
-        .form-group { margin-bottom: 16px; text-align: left; }
-        .form-group label { display: block; font-size: 11px; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .5px; }
-        .form-group input { width: 100%; padding: 12px 14px; border: 2px solid #C5E8CE; border-radius: 10px; font-size: 14px; background: #F7FDF9; }
-        .form-group input:focus { outline: none; border-color: var(--green); }
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--maroon); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input { width: 100%; padding: 12px 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: #FFFDF9; color: var(--dark); }
+        .form-group input:focus { outline: none; border-color: var(--saffron); }
 
-        .btn-primary { width: 100%; background: var(--green); color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .2s; }
-        .btn-primary:hover { background: var(--green-dark); }
+        .btn-primary {
+            width: 100%; background: linear-gradient(135deg, var(--saffron) 0%, var(--saffron-dark) 100%);
+            color: #FFFFFF; border: none; padding: 14px; border-radius: 10px; font-size: 1rem;
+            font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(200, 82, 26, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(200, 82, 26, 0.4); }
 
-        .error-msg { display: none; background: #fde8e8; color: var(--red); border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 700; margin-top: 14px; }
-        .info-msg { display: none; background: #e8f5ec; color: var(--green-dark); border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 700; margin-top: 14px; }
+        .error-msg { display: none; background: #FDE8E8; color: var(--red); border-radius: 10px; padding: 12px; font-size: 0.85rem; font-weight: 700; margin-top: 16px; border: 1px solid #F8B4B4; }
+        .info-msg { display: none; background: #EAF5ED; color: var(--green); border-radius: 10px; padding: 12px; font-size: 0.85rem; font-weight: 700; margin-top: 16px; border: 1px solid #B8E1C2; }
 
         /* PORTAL VIEW */
         #portal-container { display: none; flex-direction: column; min-height: 100vh; }
-        .topbar { background: var(--green-dark); color: #fff; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--gold); }
-        .topbar h2 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); }
-        .user-info { display: flex; align-items: center; gap: 16px; font-size: 13px; }
+        .topbar { background: var(--maroon-dark); color: #FFFFFF; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--gold); }
+        .topbar h2 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--gold); }
+        .user-info { display: flex; align-items: center; gap: 16px; font-size: 0.9rem; }
 
-        .btn-logout { background: rgba(255, 0, 0, .2); color: #ffcccc; border: 1px solid rgba(255, 0, 0, .4); padding: 6px 14px; border-radius: 6px; cursor: pointer; }
-        .btn-logout:hover { background: rgba(255, 0, 0, .4); color: #fff; }
+        .btn-logout { background: rgba(192, 57, 43, 0.2); color: #FFCCCC; border: 1px solid rgba(192, 57, 43, 0.5); padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .btn-logout:hover { background: rgba(192, 57, 43, 0.5); color: #FFFFFF; }
 
         .content { padding: 32px; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 24px; }
+        .card { background: #FFFFFF; border-radius: 16px; padding: 28px; box-shadow: 0 8px 30px rgba(122, 28, 28, 0.06); margin-bottom: 28px; border: 1px solid var(--border); }
+        .card h3 { font-family: 'Playfair Display', serif; color: var(--maroon); font-size: 1.3rem; margin-bottom: 8px; }
 
         /* INACTIVITY MODAL */
-        #inactivity-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-box { background: #fff; border-radius: 16px; padding: 32px; max-width: 400px; text-align: center; }
+        #inactivity-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 3000; align-items: center; justify-content: center; }
+        .modal-box { background: #FFFFFF; border-radius: 16px; padding: 32px; max-width: 420px; text-align: center; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .d-none { display: none !important; }
     </style>
 </head>
@@ -69,33 +84,33 @@
     <!-- AUTH CONTAINER -->
     <div id="auth-container">
         <div class="login-card">
-            <span class="admin-badge">🔐 Private Admin Portal</span>
+            <span class="admin-badge">🔐 Satvik Swaad Private Admin Portal</span>
             <h1>Administrator Login</h1>
             <p class="sub">Sign in with authorized Firebase credentials</p>
 
             <div id="login-form">
                 <div class="form-group">
-                    <label>Admin Email</label>
-                    <input type="email" id="a-email" placeholder="admin@domain.com" autocomplete="username" />
+                    <label for="a-email">Admin Email</label>
+                    <input type="email" id="a-email" placeholder="admin@satvikswaad.com" autocomplete="username" />
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
+                    <label for="a-pass">Password</label>
                     <input type="password" id="a-pass" placeholder="••••••••" autocomplete="current-password" />
                 </div>
                 <button class="btn-primary" id="btn-login">Sign In →</button>
-                <p style="margin-top: 14px; font-size: 12px; color: #888;">
-                    <a href="#" id="link-forgot" style="color: var(--green); text-decoration: none;">Forgot password?</a>
+                <p style="margin-top: 14px; font-size: 0.85rem;">
+                    <a href="#" id="link-forgot" style="color: var(--saffron); text-decoration: none; font-weight: 700;">Forgot password?</a>
                 </p>
             </div>
 
             <div id="reset-form" class="d-none">
                 <div class="form-group">
-                    <label>Enter Registered Email</label>
-                    <input type="email" id="reset-email" placeholder="admin@domain.com" />
+                    <label for="reset-email">Enter Registered Email</label>
+                    <input type="email" id="reset-email" placeholder="admin@satvikswaad.com" />
                 </div>
                 <button class="btn-primary" id="btn-reset">Send Reset Link</button>
-                <p style="margin-top: 14px; font-size: 12px;">
-                    <a href="#" id="link-back" style="color: var(--green); text-decoration: none;">← Back to login</a>
+                <p style="margin-top: 14px; font-size: 0.85rem;">
+                    <a href="#" id="link-back" style="color: var(--saffron); text-decoration: none; font-weight: 700;">← Back to login</a>
                 </p>
             </div>
 
@@ -107,7 +122,7 @@
     <!-- PORTAL CONTAINER -->
     <div id="portal-container">
         <div class="topbar">
-            <h2>Satwik Spot Admin Panel</h2>
+            <h2>Satvik Swaad Admin Panel</h2>
             <div class="user-info">
                 <span id="admin-user-display">👤 Admin</span>
                 <span id="admin-claims-badge" class="admin-badge" style="margin:0;">admin: true</span>
@@ -118,10 +133,10 @@
         <div class="content">
             <div class="card">
                 <h3>📊 Administrative Overview & Verified Claims</h3>
-                <p style="margin-top: 8px; color: #666; font-size: 14px;">
-                    Access authorized via Verified Firebase Auth ID Token. Custom claims verified server-side.
+                <p style="margin-top: 6px; color: #665B55; font-size: 0.95rem;">
+                    Access authorized via Verified Firebase Auth ID Token. Custom claim <code>admin: true</code> verified server-side.
                 </p>
-                <div style="margin-top: 16px; background: #F7FDF9; border: 1px solid #C5E8CE; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px;">
+                <div style="margin-top: 16px; background: #FFFDF9; border: 1px solid var(--border); padding: 18px; border-radius: 10px; font-family: monospace; font-size: 0.9rem;">
                     <div><strong>UID:</strong> <span id="dbg-uid">Loading...</span></div>
                     <div><strong>Email:</strong> <span id="dbg-email">Loading...</span></div>
                     <div><strong>Admin Claim:</strong> <span id="dbg-admin-claim">true</span></div>
@@ -131,8 +146,8 @@
 
             <div class="card">
                 <h3>📦 Realtime Orders Management</h3>
-                <p style="color: #666; font-size: 14px; margin-top: 6px;">Orders loaded dynamically via Cloud Firestore Security Rules guarded by <code>request.auth.token.admin == true</code>.</p>
-                <div id="admin-orders-stream" style="margin-top: 16px;"><p style="color: #888;">Connecting to Firestore...</p></div>
+                <p style="color: #665B55; font-size: 0.95rem; margin-top: 6px;">Orders loaded dynamically via Cloud Firestore Security Rules guarded by <code>request.auth.token.admin == true</code>.</p>
+                <div id="admin-orders-stream" style="margin-top: 18px;"><p style="color: #888;">Connecting to Firestore...</p></div>
             </div>
         </div>
     </div>
@@ -140,8 +155,8 @@
     <!-- INACTIVITY WARNING MODAL -->
     <div id="inactivity-modal">
         <div class="modal-box">
-            <h3 style="color: var(--green-dark);">⚠️ Session Timeout Warning</h3>
-            <p style="margin: 12px 0; font-size: 14px; color: #555;">You have been inactive. You will be automatically logged out in <strong id="timer-sec">120</strong> seconds.</p>
+            <h3 style="color: var(--maroon); font-family: 'Playfair Display', serif; font-size: 1.3rem;">⚠️ Session Timeout Warning</h3>
+            <p style="margin: 14px 0; font-size: 0.95rem; color: #555;">You have been inactive. You will be automatically logged out in <strong id="timer-sec" style="color: var(--saffron);">120</strong> seconds.</p>
             <button class="btn-primary" id="btn-stay">Stay Logged In</button>
         </div>
     </div>

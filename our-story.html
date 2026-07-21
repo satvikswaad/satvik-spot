@@ -5,16 +5,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Customer Reviews & Feedback – Satvik Swaad</title>
-    <meta name="description" content="Read authentic customer reviews and ratings for Satvik Swaad homemade pickles, amla murabbas, and traditional sweets." />
-    <link rel="canonical" href="https://satwikspot.web.app/reviews.html" />
+    <title>Our Story & Heritage – Satvik Swaad</title>
+    <meta name="description" content="Read the story of Satvik Swaad: preserving authentic Indian taste through traditional homemade raw mango pickles, amla murabbas, amla laddus, and immunity preserves." />
+    <link rel="canonical" href="https://satwikspot.web.app/our-story.html" />
 
     <!-- Open Graph Metadata -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Satvik Swaad" />
-    <meta property="og:title" content="Customer Reviews & Feedback – Satvik Swaad" />
-    <meta property="og:description" content="Read authentic customer reviews and ratings for Satvik Swaad homemade pickles, amla murabbas, and traditional sweets." />
-    <meta property="og:url" content="https://satwikspot.web.app/reviews.html" />
+    <meta property="og:title" content="Our Story & Heritage – Satvik Swaad" />
+    <meta property="og:description" content="Preserving authentic Indian taste through traditional homemade raw mango pickles, amla murabbas, amla laddus, and immunity preserves." />
+    <meta property="og:url" content="https://satwikspot.web.app/our-story.html" />
     <meta property="og:image" content="https://satwikspot.web.app/assets/logo.png" />
 
     <!-- Google Fonts -->
@@ -68,8 +68,8 @@
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="products.html" class="nav-link">Products</a>
                 <a href="why-us.html" class="nav-link">Why Us</a>
-                <a href="our-story.html" class="nav-link">Our Story</a>
-                <a href="reviews.html" class="nav-link active">Reviews</a>
+                <a href="our-story.html" class="nav-link active">Our Story</a>
+                <a href="reviews.html" class="nav-link">Reviews</a>
                 <a href="faq.html" class="nav-link">FAQ</a>
             </nav>
 
@@ -91,35 +91,54 @@
             <a href="index.html" class="mobile-nav-link">Home</a>
             <a href="products.html" class="mobile-nav-link">Products (15)</a>
             <a href="why-us.html" class="mobile-nav-link">Why Us</a>
-            <a href="our-story.html" class="mobile-nav-link">Our Story</a>
-            <a href="reviews.html" class="mobile-nav-link active">Reviews</a>
+            <a href="our-story.html" class="mobile-nav-link active">Our Story</a>
+            <a href="reviews.html" class="mobile-nav-link">Reviews</a>
             <a href="faq.html" class="mobile-nav-link">FAQ</a>
         </div>
     </div>
 
     <!-- BREADCRUMBS -->
     <div class="breadcrumbs" aria-label="Breadcrumbs">
-        <a href="index.html">Home</a> <span>/</span> <strong>Reviews</strong>
+        <a href="index.html">Home</a> <span>/</span> <strong>Our Story</strong>
     </div>
 
     <main id="main-content" class="page-container" role="main">
 
-        <section aria-label="Customer Reviews">
+        <section id="about" aria-label="Our Story">
             <div class="section-title-wrapper">
-                <span class="section-subtitle">Authentic Customer Feedback</span>
-                <h1 class="section-title">Verified Customer Reviews</h1>
+                <span class="section-subtitle">Heritage & Passion</span>
+                <h1 class="section-title">The Satvik Swaad Journey</h1>
             </div>
 
-            <!-- DYNAMIC REVIEWS CONTAINER (POPULATED BY SCRIPT FROM FIRESTORE/API) -->
-            <div id="public-reviews-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; margin-top: 32px;">
-                <!-- Skeleton Loading State -->
-                <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: var(--radius-card); padding: 32px; text-align: center;">
-                    <p style="color: var(--color-sub); font-size: 1rem;">⏳ Loading verified reviews from secure server...</p>
+            <!-- STORY HERO BOX -->
+            <div style="background: linear-gradient(135deg, var(--color-maroon-dark) 0%, #2A0909 100%); color: #FFFFFF; border-radius: 24px; padding: 56px 40px; border: 2px solid var(--color-gold); box-shadow: var(--shadow-modal); margin-bottom: 64px; text-align: center;">
+                <span style="background: var(--color-gold); color: var(--color-dark); font-weight: 900; font-size: 0.85rem; padding: 6px 18px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px;">👵 Traditional Household Recipes</span>
+                <h2 style="color: #FFFFFF; font-size: 2.4rem; margin: 20px 0 16px;">Preserving the Soul of Indian Kitchens</h2>
+                <p style="font-size: 1.15rem; color: #F8E8C9; max-width: 800px; margin: 0 auto; line-height: 1.8;">
+                    In an era of mass factory production and chemical preservatives, <strong>Satvik Swaad</strong> was born out of a simple desire: to bring back the nostalgic, unadulterated taste of homemade pickles and amla preserves crafted in traditional Indian homes.
+                </p>
+            </div>
+
+            <!-- STORY SECTIONS -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 64px;">
+                <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: var(--radius-card); padding: 36px; box-shadow: var(--shadow-soft);">
+                    <h3 style="color: var(--color-maroon); font-size: 1.5rem; margin-bottom: 14px;">🪔 Small-Batch Artisanal Care</h3>
+                    <p style="font-size: 1rem; color: var(--color-sub); line-height: 1.7;">
+                        Instead of high-speed industrial machinery, our products are crafted in small artisanal batches. Raw mangoes are sliced with care, bitter gourds are salted to remove excess bitterness naturally, and wild amla is hand-picked at peak ripeness.
+                    </p>
+                </div>
+
+                <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: var(--radius-card); padding: 36px; box-shadow: var(--shadow-soft);">
+                    <h3 style="color: var(--color-maroon); font-size: 1.5rem; margin-bottom: 14px;">☀️ The Magic of Sun Curing</h3>
+                    <p style="font-size: 1rem; color: var(--color-sub); line-height: 1.7;">
+                        Sunlight is nature's finest curing agent. By placing our spice-marinated pickles under direct sunlight in traditional glass and ceramic jars, the natural mustard oil absorbs the rich essential oils of fenugreek, nigella, and fennel seeds.
+                    </p>
                 </div>
             </div>
 
-            <div style="text-align: center; margin-top: 48px;">
-                <a href="products.html" class="btn-hero">Explore Our 15 Products →</a>
+            <div style="text-align: center;">
+                <a href="products.html" class="btn-hero" style="margin-right: 16px;">Browse Our 15 Products →</a>
+                <a href="why-us.html" class="nav-link" style="font-size: 1.1rem; font-weight: 900;">Discover Why Customers Trust Us →</a>
             </div>
         </section>
 

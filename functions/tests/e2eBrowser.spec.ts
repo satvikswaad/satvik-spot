@@ -47,7 +47,7 @@ describe('Phase 8 — End-to-End Customer & Admin Browser Verification Suite', (
   // CUSTOMER BROWSER JOURNEY TESTS (1-27)
   it('C1. Homepage loads correctly with valid title and structure', () => {
     const html = fs.readFileSync(path.join(__dirname, '../../public/site/index.html'), 'utf8');
-    expect(html).toContain('<title>Satwik Spot');
+    expect(html).toContain('<title>Satvik Swaad');
     expect(html).toContain('role="banner"');
   });
 

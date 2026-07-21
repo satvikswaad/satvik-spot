@@ -40,7 +40,7 @@ describe('Phase 7 — UI/UX, Accessibility (WCAG 2.2 AA), Responsive Design & SE
   it('8. All product images have descriptive non-empty alt text', () => {
     const html = fs.readFileSync(path.join(__dirname, '../../public/site/index.html'), 'utf8');
     expect(html).toContain('alt="Traditional Aam ka Achar"');
-    expect(html).toContain('alt="Satwik Spot Logo"');
+    expect(html).toContain('alt="Satvik Swaad Logo"');
   });
 
   // TEST 9: Heading hierarchy

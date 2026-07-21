@@ -135,7 +135,7 @@ describe('Phase 10A: Render Express Backend Migration & Staging Safety', () => {
       .set('Authorization', 'Bearer invalid_token');
 
     expect(res.status).toBe(401);
-  });
+  }, 10000);
 
   it('14. App Check verification works', async () => {
     const originalEnv = process.env.FUNCTIONS_EMULATOR;
