@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBFoQ6FcsUWiPYenUD81ATp2Lpj_uYsgKU",
@@ -24,9 +24,11 @@ window.db = getFirestore(app);
 window.auth = getAuth(app);
 try { window.analytics = getAnalytics(app); } catch (e) {}
 
+const RECAPTCHA_SITE_KEY = '6Ld2X2ItAAAAAE0c7CP47UyRzRAojxIfBEYEhCAY';
+
 try {
   const appCheck = initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider('6Ld_M-0qAAAAABBBB_placeholder_site_key'),
+    provider: new ReCaptchaEnterpriseProvider(RECAPTCHA_SITE_KEY),
     isTokenAutoRefreshEnabled: true
   });
   window.appCheck = appCheck;
