@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+    <title>Product Details – Satvik Swaad</title>
+    <meta name="description" content="View handcrafted Indian pickle, murabba, laddu, and health drink details, ingredients, weight variants, and verified customer reviews." />
+    <link rel="canonical" href="https://satwikspot.web.app/product-details.html" />
+
+    <!-- Open Graph Metadata -->
+    <meta property="og:type" content="product" />
+    <meta property="og:site_name" content="Satvik Swaad" />
+    <meta property="og:title" content="Product Details – Satvik Swaad" />
+    <meta property="og:description" content="Pure traditional homemade Indian pickles and preserves prepared with cold-pressed mustard oil." />
+    <meta property="og:url" content="https://satwikspot.web.app/product-details.html" />
+    <meta property="og:image" content="https://satwikspot.web.app/assets/logo.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+
+    <!-- TOP ANNOUNCEMENT TICKER -->
+    <div class="announcement-ticker" aria-label="Satvik Swaad announcements">
+        <div class="announcement-track">
+            <div class="announcement-group">
+                <span>✨ 100% HOMEMADE PICKLES & PRESERVES</span>
+                <span>☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL</span>
+                <span>👵 ANCESTRAL FAMILY RECIPES</span>
+                <span>🌿 ZERO ARTIFICIAL PRESERVATIVES</span>
+                <span>🪔 PURE TRADITIONAL DESI TASTE</span>
+                <span>📦 FRESH BATCHES PREPARED WEEKLY</span>
+            </div>
+            <div class="announcement-group" aria-hidden="true">
+                <span>✨ 100% HOMEMADE PICKLES & PRESERVES</span>
+                <span>☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL</span>
+                <span>👵 ANCESTRAL FAMILY RECIPES</span>
+                <span>🌿 ZERO ARTIFICIAL PRESERVATIVES</span>
+                <span>🪔 PURE TRADITIONAL DESI TASTE</span>
+                <span>📦 FRESH BATCHES PREPARED WEEKLY</span>
+            </div>
+        </div>
+    </div>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- SITE HEADER -->
+    <header class="site-header" role="banner">
+        <div class="header-container">
+            <div class="logo-group" onclick="window.location.href='index.html'">
+                <div class="logo-img-wrapper">
+                    <img src="assets/logo.png" alt="Satvik Swaad Logo" class="logo-img" />
+                </div>
+                <div>
+                    <span class="brand-title">Satvik Swaad</span>
+                    <span class="brand-sub">शुद्ध पारंपरिक स्वाद</span>
+                </div>
+            </div>
+
+            <nav class="main-nav" role="navigation" aria-label="Main Navigation">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link active">Products</a>
+                <a href="why-us.html" class="nav-link">Why Us</a>
+                <a href="our-story.html" class="nav-link">Our Story</a>
+                <a href="reviews.html" class="nav-link">Reviews</a>
+                <a href="faq.html" class="nav-link">FAQ</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+
+            <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Mobile Menu" aria-expanded="false">☰</button>
+
+            <button class="btn-profile-trigger" id="btn-open-profile" aria-label="Account Profile">
+                👤 <span id="header-profile-label">Profile</span>
+            </button>
+
+            <button class="btn-cart-trigger" id="btn-open-cart" aria-label="Open Shopping Cart">
+                🛒 Cart <span class="cart-badge" id="cart-count-badge">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MOBILE NAVIGATION DRAWER -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay">
+        <div class="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-border); padding-bottom: 12px;">
+                <span class="brand-title" style="font-size: 1.3rem;">Satvik Swaad</span>
+                <button id="mobile-menu-close" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
+            </div>
+            <a href="index.html" class="mobile-nav-link">Home</a>
+            <a href="products.html" class="mobile-nav-link">Products (15)</a>
+            <a href="why-us.html" class="mobile-nav-link">Why Us</a>
+            <a href="our-story.html" class="mobile-nav-link">Our Story</a>
+            <a href="reviews.html" class="mobile-nav-link">Reviews</a>
+            <a href="faq.html" class="mobile-nav-link">FAQ</a>
+            <a href="contact.html" class="mobile-nav-link">Contact</a>
+            <a href="#" id="mobile-nav-profile" class="mobile-nav-link" style="border-top: 1px solid var(--color-border); margin-top: 8px; padding-top: 12px; color: var(--color-maroon); font-weight: 800;">👤 My Profile & Saved Addresses</a>
+        </div>
+    </div>
+
+    <!-- BREADCRUMBS -->
+    <nav class="breadcrumb-container" aria-label="Breadcrumb">
+        <div class="breadcrumb-inner">
+            <a href="index.html">Home</a>
+            <span class="separator">›</span>
+            <a href="products.html">Products</a>
+            <span class="separator">›</span>
+            <span class="current" id="pd-breadcrumb-title">Product Details</span>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main id="main-content" class="page-container" role="main" style="max-width: 1200px; margin: 0 auto; padding: 20px 20px 80px;">
+
+        <!-- ERROR / NOT FOUND CONTAINER -->
+        <div id="pd-error-container" style="display: none; text-align: center; padding: 60px 20px; background: #ffffff; border: 2px solid var(--color-border); border-radius: 12px; margin-bottom: 40px;">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+            <h2 id="pd-error-heading" style="font-family: 'Playfair Display', serif; color: var(--color-maroon); font-size: 1.8rem; margin-bottom: 12px;">Product Not Found</h2>
+            <p id="pd-error-message" style="color: var(--color-sub); max-width: 500px; margin: 0 auto 24px;">This product could not be loaded. Please return to Products and try again.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <a href="products.html" class="btn-primary" style="text-decoration: none; padding: 12px 24px;">Browse Catalogue (15 Products)</a>
+                <button id="pd-btn-retry" class="btn-secondary" style="display: none; padding: 12px 24px; cursor: pointer;">Retry Request</button>
+            </div>
+        </div>
+
+        <!-- MAIN PRODUCT DETAILS SECTION -->
+        <div id="pd-main-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 50px;">
+            
+            <!-- LEFT: PRODUCT GALLERY -->
+            <div class="pd-gallery-wrapper">
+                <div class="pd-main-image-box" style="position: relative; background: var(--color-cream); border: 2px solid var(--color-border); border-radius: 16px; overflow: hidden; padding: 24px; text-align: center; min-height: 380px; display: flex; align-items: center; justify-content: center;">
+                    <span id="pd-badge" class="product-badge" style="position: absolute; top: 12px; left: 12px; display: none; font-size: 0.75rem; padding: 4px 10px;"></span>
+                    <img id="pd-main-img" src="assets/logo.png" alt="Product Image" style="max-width: 100%; max-height: 380px; object-fit: contain; border-radius: 8px; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" />
+                </div>
+                <!-- Stock status as a small pill below the image, not overlapping -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+                    <span id="pd-stock-badge" style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 700; color: #ffffff; background: #52c41a; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.3px;">● In Stock</span>
+                    <span style="font-size: 0.78rem; color: var(--color-sub);">Swipe or click thumbnails to browse</span>
+                </div>
+                <div id="pd-thumbnails-container" style="display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; padding-bottom: 8px;">
+                    <!-- Thumbnails dynamically rendered -->
+                </div>
+            </div>
+
+            <!-- RIGHT: PRODUCT INFO & VARIANT SELECTOR -->
+            <div class="pd-info-wrapper" style="display: flex; flex-direction: column;">
+                <span id="pd-hindi-title" style="font-size: 1.1rem; color: var(--color-ochre); font-weight: 700; margin-bottom: 4px;"></span>
+                <h1 id="pd-title" style="font-family: 'Playfair Display', serif; color: var(--color-maroon); font-size: 2.2rem; margin-bottom: 8px; line-height: 1.2;"></h1>
+                
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <div style="background: #fff8e7; border: 1px solid #ffd591; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; color: #d48806;">
+                        <span id="pd-rating-val">★ 4.9</span>
+                    </div>
+                    <span id="pd-review-count-text" style="color: var(--color-sub); font-size: 0.9rem;">(28 verified reviews)</span>
+                </div>
+
+                <p id="pd-short-desc" style="color: var(--color-text); line-height: 1.6; margin-bottom: 20px; font-size: 1.05rem;"></p>
+
+                <!-- WEIGHT / PACK-SIZE VARIANT SELECTOR -->
+                <div style="background: linear-gradient(135deg, #fffaf0 0%, #fff5e6 100%); border: 2px solid var(--color-border); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(139,69,19,0.06);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <label style="font-weight: 800; color: var(--color-maroon); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">⚖️ Select Pack Size / Weight:</label>
+                        <span id="pd-sku-display" style="font-size: 0.78rem; color: var(--color-sub); font-family: monospace; background: #f5f0eb; padding: 3px 8px; border-radius: 6px;"></span>
+                    </div>
+                    <div id="pd-variants-container" style="display: flex; gap: 10px; flex-wrap: wrap;" role="radiogroup" aria-label="Select Product Weight Variant">
+                        <!-- Variant pill buttons dynamically rendered -->
+                    </div>
+
+                    <!-- PRICE DISPLAY ROW -->
+                    <div style="display: flex; align-items: baseline; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 2px solid rgba(139,69,19,0.1);">
+                        <span id="pd-price-val" style="font-size: 2.2rem; font-weight: 900; color: var(--color-maroon); letter-spacing: -0.5px;">₹0</span>
+                        <span id="pd-mrp-val" style="font-size: 1.15rem; text-decoration: line-through; color: var(--color-sub);"></span>
+                        <span id="pd-savings-tag" class="savings-tag" style="display: none; background: linear-gradient(135deg, #52c41a, #389e0d); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;"></span>
+                    </div>
+                </div>
+
+                <!-- QUANTITY & ADD TO CART CONTROLS -->
+                <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px; flex-wrap: wrap;">
+                    <div class="pd-qty-control" style="display: flex; align-items: center; border: 2px solid var(--color-border); border-radius: 8px; background: #ffffff;">
+                        <button id="pd-qty-minus" aria-label="Decrease quantity" style="width: 44px; height: 44px; background: none; border: none; font-size: 1.4rem; cursor: pointer; font-weight: bold; color: var(--color-maroon);">-</button>
+                        <span id="pd-qty-val" style="width: 40px; text-align: center; font-weight: 700; font-size: 1.1rem;">1</span>
+                        <button id="pd-qty-plus" aria-label="Increase quantity" style="width: 44px; height: 44px; background: none; border: none; font-size: 1.4rem; cursor: pointer; font-weight: bold; color: var(--color-maroon);">+</button>
+                    </div>
+                    <button id="pd-btn-add-cart" class="btn-add-cart" style="flex: 1; height: 48px; font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer;">Add to Cart 🛒</button>
+                </div>
+
+                <!-- BUY NOW (DISABLED STATUS NOTICE) -->
+                <div style="background: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; padding: 14px 16px; font-size: 0.88rem; color: #873800; display: flex; align-items: flex-start; gap: 10px;">
+                    <span style="font-size: 1.2rem;">🔒</span>
+                    <div>
+                        <strong>Buy Now Status:</strong> Direct online checkout is currently disabled (`COMMERCE_ENABLED=false`). You can freely add items to your local cart to preview totals or contact us for inquiries.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- VERIFIED DETAILS TABS / ACCORDION -->
+        <section class="pd-details-tabs-section" style="background: #ffffff; border: 2px solid var(--color-border); border-radius: 12px; padding: 30px; margin-bottom: 50px;">
+            <div style="border-bottom: 2px solid var(--color-border); margin-bottom: 20px; display: flex; gap: 24px; flex-wrap: wrap;">
+                <h2 style="font-family: 'Playfair Display', serif; color: var(--color-maroon); font-size: 1.4rem; margin-bottom: 0; padding-bottom: 12px; border-bottom: 3px solid var(--color-maroon);">Verified Product Specifications</h2>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="font-size: 1.1rem; color: var(--color-maroon); margin-bottom: 8px;">📋 Full Description</h3>
+                    <p id="pd-full-desc" style="color: var(--color-text); line-height: 1.6; margin-bottom: 20px;"></p>
+
+                    <h3 style="font-size: 1.1rem; color: var(--color-maroon); margin-bottom: 8px;">🌿 Authentic Ingredients</h3>
+                    <p id="pd-ingredients" style="color: var(--color-text); line-height: 1.6; margin-bottom: 20px;"></p>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 1.1rem; color: var(--color-maroon); margin-bottom: 8px;">🪔 Storage Instructions & Shelf Life</h3>
+                    <p id="pd-storage-info" style="color: var(--color-text); line-height: 1.6; margin-bottom: 6px;"></p>
+                    <p style="color: var(--color-sub); font-size: 0.9rem; margin-bottom: 20px;"><strong>Verified Shelf Life:</strong> <span id="pd-shelf-life"></span></p>
+
+                    <h3 style="font-size: 1.1rem; color: var(--color-maroon); margin-bottom: 8px;">⚠️ Allergen & Packaging Information</h3>
+                    <p style="color: var(--color-text); line-height: 1.6; margin-bottom: 6px;"><strong>Allergen Notice:</strong> <span id="pd-allergens"></span></p>
+                    <p style="color: var(--color-text); line-height: 1.6;"><strong>Packaging Type:</strong> <span id="pd-packaging"></span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUCT-SPECIFIC REVIEWS SECTION -->
+        <section class="pd-reviews-section" style="background: #ffffff; border: 2px solid var(--color-border); border-radius: 12px; padding: 30px; margin-bottom: 50px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-border); padding-bottom: 16px; margin-bottom: 24px;">
+                <div>
+                    <h2 style="font-family: 'Playfair Display', serif; color: var(--color-maroon); font-size: 1.5rem; margin-bottom: 4px;">Verified Customer Reviews</h2>
+                    <p style="color: var(--color-sub); font-size: 0.9rem; margin: 0;">Showing only approved public reviews for this product.</p>
+                </div>
+                <a href="reviews.html" class="btn-secondary" style="text-decoration: none; padding: 8px 16px; font-size: 0.88rem;">All Site Reviews →</a>
+            </div>
+
+            <div id="pd-reviews-container">
+                <!-- Reviews rendered dynamically -->
+                <p style="text-align: center; color: var(--color-sub); padding: 20px;">Loading customer reviews...</p>
+            </div>
+        </section>
+
+        <!-- RELATED PRODUCTS SECTION -->
+        <section class="pd-related-section">
+            <h2 style="font-family: 'Playfair Display', serif; color: var(--color-maroon); font-size: 1.5rem; margin-bottom: 20px;">You Might Also Like</h2>
+            <div class="product-grid" id="pd-related-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">
+                <!-- Related product cards rendered dynamically -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SHOPPING CART DRAWER -->
+    <div class="cart-drawer-overlay" id="cart-drawer-overlay">
+        <div class="cart-drawer" role="dialog" aria-modal="true" aria-label="Shopping Cart">
+            <div class="cart-header">
+                <h3>Shopping Cart 🛒</h3>
+                <button class="btn-close-drawer" id="btn-close-cart" aria-label="Close Shopping Cart">✕</button>
+            </div>
+            <div class="cart-body" id="cart-items-container">
+                <p style="text-align: center; color: var(--color-sub); margin-top: 40px;">Your cart is currently empty.</p>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total-row">
+                    <span>Total Amount:</span>
+                    <span id="cart-total-display">₹0</span>
+                </div>
+                <button class="btn-add-cart" id="btn-checkout">Proceed to Checkout →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SITE FOOTER -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                <div class="footer-brand">Satvik Swaad</div>
+                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and traditional preserves prepared with pure mustard oil and ancestral recipes.</p>
+            </div>
+            <div>
+                <h4 class="footer-heading">Quick Navigation</h4>
+                <ul class="footer-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">15 Products Catalogue</a></li>
+                    <li><a href="why-us.html">Why Satvik Swaad</a></li>
+                    <li><a href="our-story.html">Our Story & Values</a></li>
+                    <li><a href="reviews.html">Verified Reviews</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-heading">Legal & Privacy</h4>
+                <ul class="footer-list">
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-and-conditions.html">Terms and Conditions</a></li>
+                    <li><a href="shipping-delivery-policy.html">Shipping & Delivery Policy</a></li>
+                    <li><a href="cancellation-refund-policy.html">Cancellation & Refund Policy</a></li>
+                    <li><a href="contact.html">Data Subject Request</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-heading">Quality & Trust</h4>
+                <ul class="footer-list">
+                    <li>FSSAI Licence: <strong>PENDING</strong></li>
+                    <li>GSTIN: <strong>PENDING</strong></li>
+                    <li>Pure Cold-Pressed Mustard Oil</li>
+                    <li>100% Chemical Free</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Satvik Swaad. All rights reserved.</span>
+            <span>Crafted with ❤️ in India | Pure Taste of Tradition</span>
+        </div>
+    </footer>
+
+    <button id="btn-scroll-top" aria-label="Scroll to top">↑</button>
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./script.js"></script>
+</body>
+</html>

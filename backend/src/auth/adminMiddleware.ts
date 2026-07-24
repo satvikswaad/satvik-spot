@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from './verifyAuth';
-import { AuthenticationError, AuthorizationError } from '../errors/AppError';
+import { AuthenticationError, AuthorizationError, ReauthenticationRequiredError } from '../errors/AppError';
 
 export const ENABLE_MFA_ENFORCEMENT = false; // Feature flag: Set true when Firebase console TOTP active
 
@@ -27,17 +27,29 @@ export function requireAdmin(req: AuthenticatedRequest, _res: Response, next: Ne
   return next();
 }
 
-export function requireRecentAuthentication(req: AuthenticatedRequest, _res: Response, next: NextFunction) {
-  if (!req.user) {
-    return next(new AuthenticationError('Authentication required'));
-  }
+/**
+  * Enforces recent authentication (auth_time within maxAgeSeconds).
+  * Returns HTTP 428 REAUTHENTICATION_REQUIRED if authentication is older than maxAge.
+  */
+export function requireRecentAuthentication(maxAgeSeconds = 900) {
+  return (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
+    if (!req.user || !req.user.uid) {
+      return next(new AuthenticationError('Authentication required'));
+    }
 
-  // Expect client to pass fresh ID token issued recently
-  return next();
+    const nowSec = Math.floor(Date.now() / 1000);
+    const authAgeSec = nowSec - (req.user.authTime || nowSec);
+
+    if (authAgeSec > maxAgeSeconds) {
+      return next(new ReauthenticationRequiredError(`Recent authentication required. Authentication age (${authAgeSec}s) exceeds limit (${maxAgeSeconds}s).`));
+    }
+
+    return next();
+  };
 }
 
 export function requireAppCheck(req: AuthenticatedRequest, _res: Response, next: NextFunction) {
-  const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true' || process.env.FIRESTORE_EMULATOR_HOST !== undefined;
+  const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true' || process.env.FIRESTORE_EMULATOR_HOST !== undefined || (process.env.NODE_ENV === 'test' && process.env.FUNCTIONS_EMULATOR !== 'false');
   if (!req.isAppCheckVerified && !isEmulator) {
     return next(new AuthorizationError('App Check token verification failed'));
   }

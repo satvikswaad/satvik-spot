@@ -9,13 +9,14 @@ export interface CreateOrderPayload {
   name: string;
   phone: string;
   address: string;
-  paymentMethod: 'Cash on Delivery' | 'UPI / GPay / PhonePe' | 'Bank Transfer';
+  pincode?: string;
+  paymentMethod: 'WhatsApp-Assisted Ordering';
   items: OrderItemInput[];
   idempotencyKey: string;
 }
 
-const ALLOWED_PAYMENT_METHODS = ['Cash on Delivery', 'UPI / GPay / PhonePe', 'Bank Transfer'];
-const ALLOWED_TOP_LEVEL_KEYS = new Set(['name', 'phone', 'address', 'paymentMethod', 'items', 'idempotencyKey']);
+const ALLOWED_PAYMENT_METHODS = ['WhatsApp-Assisted Ordering'];
+const ALLOWED_TOP_LEVEL_KEYS = new Set(['name', 'phone', 'address', 'pincode', 'paymentMethod', 'items', 'idempotencyKey']);
 
 export function validateCreateOrderPayload(body: any): CreateOrderPayload {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
@@ -46,7 +47,7 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
   }
 
   if (!ALLOWED_PAYMENT_METHODS.includes(paymentMethod)) {
-    throw new ValidationError('Invalid payment method selected');
+    throw new ValidationError("Invalid payment method. Only 'WhatsApp-Assisted Ordering' is allowed");
   }
 
   if (typeof idempotencyKey !== 'string' || idempotencyKey.trim().length < 8 || idempotencyKey.trim().length > 64) {

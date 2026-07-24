@@ -65,7 +65,7 @@ describe('Phase 8 — End-to-End Customer & Admin Browser Verification Suite', (
         name: 'Test',
         phone: '9876543210',
         address: '123 Main Street',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_oos_' + Date.now(),
         items: [{ productId: 'test_out_of_stock', qty: 1 }]
       });
@@ -80,7 +80,7 @@ describe('Phase 8 — End-to-End Customer & Admin Browser Verification Suite', (
         name: 'Hacker',
         phone: '9876543210',
         address: '123 Main Street',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_hack_' + Date.now(),
         items: [{ productId: 'test_mango_pickle', qty: 2 }],
         price: 1
@@ -96,7 +96,7 @@ describe('Phase 8 — End-to-End Customer & Admin Browser Verification Suite', (
         name: 'Guest E2E',
         phone: '9876543210',
         address: '123 Main Street',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_g_e2e_' + Date.now(),
         items: [{ productId: 'test_mango_pickle', qty: 1 }]
       });
@@ -114,7 +114,7 @@ describe('Phase 8 — End-to-End Customer & Admin Browser Verification Suite', (
         name: 'Lookup E2E',
         phone: '9876543210',
         address: '123 Main Street',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_g_lookup_' + Date.now(),
         items: [{ productId: 'test_mango_pickle', qty: 1 }]
       });
@@ -150,7 +150,7 @@ describe('Phase 8 — End-to-End Customer & Admin Browser Verification Suite', (
       name: 'Dupe User',
       phone: '9876543210',
       address: '123 Main Street',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: idemKey,
       items: [{ productId: 'test_mango_pickle', qty: 1 }]
     };
@@ -213,7 +213,7 @@ describe('Phase 8 — End-to-End Customer & Admin Browser Verification Suite', (
         name: 'Order Trans',
         phone: '9876543210',
         address: '123 Main Street',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_trans_e2e_' + Date.now(),
         items: [{ productId: 'test_mango_pickle', qty: 1 }]
       });

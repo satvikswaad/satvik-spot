@@ -4,31 +4,30 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>15 Artisanal Products Catalogue – Satvik Swaad</title>
-    <meta name="description" content="Explore all 15 authentic Satvik Swaad products: traditional raw mango pickles, amla murabbas, amla laddus, and immunity chyawanprash prepared with pure mustard oil." />
+    <meta name="robots" content="index, follow" />
+    <title>All 15 Handcrafted Products – Satvik Swaad</title>
+    <meta name="description" content="Explore all 15 authentic homemade Indian pickles, murabbas, laddus, and health drinks prepared with pure cold-pressed mustard oil and ancestral recipes." />
     <link rel="canonical" href="https://satwikspot.web.app/products.html" />
 
     <!-- Open Graph Metadata -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Satvik Swaad" />
-    <meta property="og:title" content="15 Artisanal Products Catalogue – Satvik Swaad" />
-    <meta property="og:description" content="Explore all 15 authentic Satvik Swaad products: traditional raw mango pickles, amla murabbas, amla laddus, and immunity chyawanprash." />
+    <meta property="og:title" content="All 15 Handcrafted Products – Satvik Swaad" />
+    <meta property="og:description" content="Pure traditional homemade Indian pickles, murabbas, laddus, and traditional preserves prepared with cold-pressed mustard oil." />
     <meta property="og:url" content="https://satwikspot.web.app/products.html" />
     <meta property="og:image" content="https://satwikspot.web.app/assets/logo.png" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
 
-    <!-- Stylesheet -->
     <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
 
-    <!-- TOP ANNOUNCEMENT TICKER (RIGHT TO LEFT 32S SCROLL) -->
+    <!-- TOP ANNOUNCEMENT TICKER -->
     <div class="announcement-ticker" aria-label="Satvik Swaad announcements">
         <div class="announcement-track">
             <div class="announcement-group">
@@ -50,7 +49,6 @@
         </div>
     </div>
 
-    <!-- ACCESSIBILITY: SKIP LINK -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <!-- SITE HEADER -->
@@ -67,15 +65,20 @@
             </div>
 
             <nav class="main-nav" role="navigation" aria-label="Main Navigation">
-                <a href="index.html#hero" class="nav-link">Home</a>
+                <a href="index.html" class="nav-link">Home</a>
                 <a href="products.html" class="nav-link active">Products</a>
                 <a href="why-us.html" class="nav-link">Why Us</a>
                 <a href="our-story.html" class="nav-link">Our Story</a>
                 <a href="reviews.html" class="nav-link">Reviews</a>
                 <a href="faq.html" class="nav-link">FAQ</a>
+                <a href="contact.html" class="nav-link">Contact</a>
             </nav>
 
             <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Mobile Menu" aria-expanded="false">☰</button>
+
+            <button class="btn-profile-trigger" id="btn-open-profile" aria-label="Account Profile">
+                👤 <span id="header-profile-label">Profile</span>
+            </button>
 
             <button class="btn-cart-trigger" id="btn-open-cart" aria-label="Open Shopping Cart">
                 🛒 Cart <span class="cart-badge" id="cart-count-badge">0</span>
@@ -96,37 +99,41 @@
             <a href="our-story.html" class="mobile-nav-link">Our Story</a>
             <a href="reviews.html" class="mobile-nav-link">Reviews</a>
             <a href="faq.html" class="mobile-nav-link">FAQ</a>
+            <a href="contact.html" class="mobile-nav-link">Contact</a>
+            <a href="#" id="mobile-nav-profile" class="mobile-nav-link" style="border-top: 1px solid var(--color-border); margin-top: 8px; padding-top: 12px; color: var(--color-maroon); font-weight: 800;">👤 My Profile & Saved Addresses</a>
         </div>
     </div>
 
     <!-- BREADCRUMBS -->
-    <div class="breadcrumbs" aria-label="Breadcrumbs">
-        <a href="index.html">Home</a> <span>/</span> <strong>Products</strong>
-    </div>
+    <nav class="breadcrumb-container" aria-label="Breadcrumb">
+        <div class="breadcrumb-inner">
+            <a href="index.html">Home</a>
+            <span class="separator">›</span>
+            <span class="current">Products</span>
+        </div>
+    </nav>
 
     <!-- MAIN CONTENT AREA -->
-    <main id="main-content" class="page-container" role="main">
+    <main id="main-content" class="page-container" role="main" style="max-width: 1200px; margin: 0 auto; padding: 20px 20px 80px;">
 
         <section id="catalog" aria-label="Products Catalogue">
-            <div class="section-title-wrapper">
-                <span class="section-subtitle">Genuine Satvik Swaad Catalogue</span>
-                <h1 class="section-title">All 15 Handcrafted Products</h1>
+            <div class="section-title-wrapper" style="text-align: center; margin-bottom: 30px;">
+                <span class="section-subtitle" style="color: var(--color-ochre); font-weight: 700; text-transform: uppercase; font-size: 0.9rem;">Genuine Satvik Swaad Catalogue</span>
+                <h1 class="section-title" style="font-family: 'Playfair Display', serif; color: var(--color-maroon); font-size: 2.2rem; margin-top: 6px;">All 15 Handcrafted Products</h1>
             </div>
 
-            <div class="catalog-controls">
-                <div class="search-box">
-                    <label for="search-input" class="visually-hidden" style="position:absolute; width:1px; height:1px; overflow:hidden;">Search Products</label>
-                    <input type="text" id="search-input" class="search-input" placeholder="🔍 Search Aam, Amla, Mirch, Murabba, Laddu..." />
+            <div class="catalog-controls" style="margin-bottom: 30px; display: flex; flex-direction: column; gap: 20px;">
+                <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                    <input type="text" id="search-input" class="search-input" placeholder="🔍 Search Aam, Amla, Mirch, Murabba, Laddu..." style="flex: 1; padding: 12px 16px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 1rem;" />
+                    <select id="sort-select" class="sort-select" aria-label="Sort Products" style="padding: 12px 16px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; font-weight: 700; color: var(--color-maroon);">
+                        <option value="default">Sort By: Featured</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="name-asc">Name: A to Z</option>
+                    </select>
                 </div>
 
-                <select id="sort-select" class="sort-select" aria-label="Sort Products">
-                    <option value="default">Sort By: Featured</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="name-asc">Name: A to Z</option>
-                </select>
-
-                <div class="category-tabs" role="tablist" aria-label="Product Categories">
+                <div class="category-tabs" role="tablist" aria-label="Product Categories" style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button class="category-tab active" data-category="all" role="tab" aria-selected="true">All (15)</button>
                     <button class="category-tab" data-category="achar" role="tab" aria-selected="false">Pickles (9)</button>
                     <button class="category-tab" data-category="murabba" role="tab" aria-selected="false">Murabba (2)</button>
@@ -136,284 +143,419 @@
             </div>
 
             <!-- PRODUCT GRID (ALL 15 PRODUCTS) -->
-            <div class="product-grid" id="product-grid-container">
+            <div class="product-grid" id="product-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
 
                 <!-- 1. Aam ka Achar -->
-                <div class="product-card" data-category="achar">
+                <div class="product-card" data-category="achar" data-product-id="prod_aam_achar">
                     <div class="product-card-top">
                         <span class="product-badge">Bestseller</span>
                         <span class="stock-status-badge">In Stock</span>
                         <img src="assets/mango_pickle.jpg" alt="Traditional Aam ka Achar" class="product-img" />
                     </div>
-                    <span class="product-hindi-title">पारंपरिक आम का अचार</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">पारंपरिक आम का अचार</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.9 (28)</span>
+                    </div>
                     <h3 class="product-title">Aam ka Achar</h3>
                     <p class="product-desc">Authentic raw mango pickle marinated in pure cold-pressed mustard oil, fennel, fenugreek, and nigella seeds.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g, 1 kg
+                    </div>
                     <div class="product-price-row">
                         <span class="price-val">₹249</span>
                         <span class="mrp-val">₹320</span>
                         <span class="savings-tag">Save 22%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_aam_achar" data-product-name="Aam ka Achar" data-product-price="249">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_aam_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_aam_achar" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
                 <!-- 2. Kareli ka Achar -->
-                <div class="product-card" data-category="achar">
+                <div class="product-card" data-category="achar" data-product-id="prod_kareli_achar">
                     <div class="product-card-top">
                         <span class="product-badge">Healthy Choice</span>
                         <span class="stock-status-badge">In Stock</span>
                         <img src="assets/mix_veg_pickle.jpg" alt="Kareli ka Achar" class="product-img" />
                     </div>
-                    <span class="product-hindi-title">मसालेदार करेली का अचार</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">मसालेदार करेली का अचार</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.7 (16)</span>
+                    </div>
                     <h3 class="product-title">Kareli ka Achar</h3>
                     <p class="product-desc">Sun-cured bitter gourd pickle seasoned with amchur, bishop's weed, black salt, and pure mustard oil.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g, 1 kg
+                    </div>
                     <div class="product-price-row">
                         <span class="price-val">₹269</span>
                         <span class="mrp-val">₹340</span>
                         <span class="savings-tag">Save 21%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_kareli_achar" data-product-name="Kareli ka Achar" data-product-price="269">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_kareli_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_kareli_achar" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
                 <!-- 3. Amla ka Achar -->
-                <div class="product-card" data-category="achar">
+                <div class="product-card" data-category="achar" data-product-id="prod_amla_achar">
                     <div class="product-card-top">
                         <span class="product-badge">Immunity Booster</span>
                         <span class="stock-status-badge">In Stock</span>
                         <img src="assets/amla_murabba.jpg" alt="Amla ka Achar" class="product-img" />
                     </div>
-                    <span class="product-hindi-title">चटपटा आंवला का अचार</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">चटपटा आंवला का अचार</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.8 (22)</span>
+                    </div>
                     <h3 class="product-title">Amla ka Achar</h3>
                     <p class="product-desc">Spicy Indian gooseberry pickle rich in Vitamin C, preserved with roasted cumin, mustard, and asafoetida.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g, 1 kg
+                    </div>
                     <div class="product-price-row">
                         <span class="price-val">₹259</span>
                         <span class="mrp-val">₹330</span>
                         <span class="savings-tag">Save 21%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_achar" data-product-name="Amla ka Achar" data-product-price="259">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_amla_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_amla_achar" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
                 <!-- 4. Amla ki Chutney -->
-                <div class="product-card" data-category="achar">
+                <div class="product-card" data-category="achar" data-product-id="prod_amla_chutney">
                     <div class="product-card-top">
                         <span class="product-badge">Tangy Special</span>
                         <span class="stock-status-badge">In Stock</span>
                         <img src="assets/green_chutney.jpg" alt="Amla ki Chutney" class="product-img" />
                     </div>
-                    <span class="product-hindi-title">मसालेदार आंवला की चटनी</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">चटपटी आंवला चटनी</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.6 (14)</span>
+                    </div>
                     <h3 class="product-title">Amla ki Chutney</h3>
-                    <p class="product-desc">Freshly ground amla chutney blended with green chillies, coriander, ginger, and rock salt.</p>
+                    <p class="product-desc">Sweet & sour Indian gooseberry relish cooked with jaggery, black salt, cumin, and mint notes.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g
+                    </div>
                     <div class="product-price-row">
-                        <span class="price-val">₹219</span>
-                        <span class="mrp-val">₹280</span>
+                        <span class="price-val">₹239</span>
+                        <span class="mrp-val">₹310</span>
                         <span class="savings-tag">Save 22%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_chatni" data-product-name="Amla ki Chutney" data-product-price="219">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_amla_chutney" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_amla_chutney" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
-                <!-- 5. Hari Mirch ka Achar -->
-                <div class="product-card" data-category="achar">
+                <!-- 5. Laal Mirch ka Achar -->
+                <div class="product-card" data-category="achar" data-product-id="prod_laal_mirch_achar">
+                    <div class="product-card-top">
+                        <span class="product-badge">Banarasi Special</span>
+                        <span class="stock-status-badge">In Stock</span>
+                        <img src="assets/red_chilli_pickle.jpg" alt="Laal Mirch ka Achar" class="product-img" />
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">भरवां लाल मिर्च का अचार</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.9 (31)</span>
+                    </div>
+                    <h3 class="product-title">Laal Mirch ka Achar</h3>
+                    <p class="product-desc">Stuffed red chilli pickle filled with roasted aromatic spices and sun-cured in pure mustard oil.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g, 1 kg
+                    </div>
+                    <div class="product-price-row">
+                        <span class="price-val">₹299</span>
+                        <span class="mrp-val">₹380</span>
+                        <span class="savings-tag">Save 21%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_laal_mirch_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_laal_mirch_achar" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
+                </div>
+
+                <!-- 6. Hari Mirch ka Achar -->
+                <div class="product-card" data-category="achar" data-product-id="prod_hari_mirch_achar">
                     <div class="product-card-top">
                         <span class="product-badge">Spicy Favorite</span>
                         <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/lemon_chilli_pickle.jpg" alt="Hari Mirch ka Achar" class="product-img" />
+                        <img src="assets/green_chutney.jpg" alt="Hari Mirch ka Achar" class="product-img" />
                     </div>
-                    <span class="product-hindi-title">तीखा हरा मिर्च अचार</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">चटपटी हरी मिर्च का अचार</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.7 (19)</span>
+                    </div>
                     <h3 class="product-title">Hari Mirch ka Achar</h3>
-                    <p class="product-desc">Fresh green chillies slit and stuffed with rai, saunf, turmeric, lemon juice, and pure mustard oil.</p>
+                    <p class="product-desc">Sliced green chillies tempered with lemon juice, mustard seeds, and turmeric in cold-pressed oil.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g
+                    </div>
                     <div class="product-price-row">
                         <span class="price-val">₹229</span>
                         <span class="mrp-val">₹290</span>
                         <span class="savings-tag">Save 21%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_hara_mirch_achar" data-product-name="Hari Mirch ka Achar" data-product-price="229">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_hari_mirch_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_hari_mirch_achar" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
-                <!-- 6. Lal Mirch ka Achar -->
-                <div class="product-card" data-category="achar">
+                <!-- 7. Nimbu Achar -->
+                <div class="product-card" data-category="achar" data-product-id="prod_nimbu_achar">
                     <div class="product-card-top">
-                        <span class="product-badge">Banarasi Classic</span>
+                        <span class="product-badge">Digestive Remedy</span>
                         <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/red_chilli_pickle.png" alt="Lal Mirch ka Achar" class="product-img" />
+                        <img src="assets/mango_pickle.jpg" alt="Nimbu Achar" class="product-img" />
                     </div>
-                    <span class="product-hindi-title">भरवा लाल मिर्च का अचार</span>
-                    <h3 class="product-title">Lal Mirch ka Achar</h3>
-                    <p class="product-desc">Traditional Banarasi stuffed red chilli pickle filled with aromatic roasted spices and mustard oil.</p>
-                    <div class="product-price-row">
-                        <span class="price-val">₹289</span>
-                        <span class="mrp-val">₹370</span>
-                        <span class="savings-tag">Save 22%</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">खट्टा मीठा नींबू अचार</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.8 (25)</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_laal_mirch_achar" data-product-name="Lal Mirch ka Achar" data-product-price="289">Add to Cart 🛒</button>
-                </div>
-
-                <!-- 7. Kathal ka Achar -->
-                <div class="product-card" data-category="achar">
-                    <div class="product-card-top">
-                        <span class="product-badge">Artisanal Special</span>
-                        <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/mix_veg_pickle.jpg" alt="Kathal ka Achar" class="product-img" />
+                    <h3 class="product-title">Khatta Meetha Nimbu Achar</h3>
+                    <p class="product-desc">Oil-free sweet & sour lemon pickle aged with jaggery, ajwain, black salt, and warm spices.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g, 1 kg
                     </div>
-                    <span class="product-hindi-title">देसी कटहल का अचार</span>
-                    <h3 class="product-title">Kathal ka Achar</h3>
-                    <p class="product-desc">Tender jackfruit pieces sun-dried and seasoned with panch phoron, turmeric, and mustard oil.</p>
-                    <div class="product-price-row">
-                        <span class="price-val">₹279</span>
-                        <span class="mrp-val">₹350</span>
-                        <span class="savings-tag">Save 20%</span>
-                    </div>
-                    <button class="btn-add-cart" data-product-id="prod_kathal_achar" data-product-name="Kathal ka Achar" data-product-price="279">Add to Cart 🛒</button>
-                </div>
-
-                <!-- 8. Nimbu Mirch ka Achar -->
-                <div class="product-card" data-category="achar">
-                    <div class="product-card-top">
-                        <span class="product-badge">Sweet & Sour</span>
-                        <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/lemon_chilli_pickle.jpg" alt="Nimbu Mirch ka Achar" class="product-img" />
-                    </div>
-                    <span class="product-hindi-title">खट्टा मीठा नींबू मिर्च अचार</span>
-                    <h3 class="product-title">Nimbu Mirch ka Achar</h3>
-                    <p class="product-desc">Juicy lemon chunks and green chillies sun-cured with black salt, ajwain, and pure spices.</p>
                     <div class="product-price-row">
                         <span class="price-val">₹239</span>
-                        <span class="mrp-val">₹300</span>
-                        <span class="savings-tag">Save 20%</span>
+                        <span class="mrp-val">₹310</span>
+                        <span class="savings-tag">Save 22%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_nimbu_mirch_achar" data-product-name="Nimbu Mirch ka Achar" data-product-price="239">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_nimbu_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_nimbu_achar" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
-                <!-- 9. Amda ka Achar -->
-                <div class="product-card" data-category="achar">
+                <!-- 8. Lahsun ka Achar -->
+                <div class="product-card" data-category="achar" data-product-id="prod_lhsun_achar">
                     <div class="product-card-top">
-                        <span class="product-badge">Rare Heritage</span>
+                        <span class="product-badge">Heart Healthy</span>
                         <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/garlic_pickle.jpg" alt="Amda ka Achar" class="product-img" />
+                        <img src="assets/mix_veg_pickle.jpg" alt="Lahsun ka Achar" class="product-img" />
                     </div>
-                    <span class="product-hindi-title">पारंपरिक आमड़ा का अचार</span>
-                    <h3 class="product-title">Amda ka Achar</h3>
-                    <p class="product-desc">Authentic Indian hog plum pickle with a unique tangy-sour flavor, seasoned with whole mustard and fennel.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">मसालेदार लहसुन का अचार</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.8 (18)</span>
+                    </div>
+                    <h3 class="product-title">Lahsun ka Achar</h3>
+                    <p class="product-desc">Peeled whole garlic cloves marinated in spicy mustard oil, methi, saunf, and amchur.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g
+                    </div>
                     <div class="product-price-row">
-                        <span class="price-val">₹279</span>
+                        <span class="price-val">₹289</span>
                         <span class="mrp-val">₹360</span>
-                        <span class="savings-tag">Save 22%</span>
-                    </div>
-                    <button class="btn-add-cart" data-product-id="prod_amda_achar" data-product-name="Amda ka Achar" data-product-price="279">Add to Cart 🛒</button>
-                </div>
-
-                <!-- 10. Amla Murabba – Sugar -->
-                <div class="product-card" data-category="murabba">
-                    <div class="product-card-top">
-                        <span class="product-badge">Traditional Preserve</span>
-                        <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/amla_murabba.jpg" alt="Amla Murabba Sugar" class="product-img" />
-                    </div>
-                    <span class="product-hindi-title">आंवला मुरब्बा (चीनी चाशनी)</span>
-                    <h3 class="product-title">Amla Murabba – Sugar</h3>
-                    <p class="product-desc">Whole fresh Indian gooseberries simmered in pure cardamom sugar syrup. Soft, juicy, and Vitamin C rich.</p>
-                    <div class="product-price-row">
-                        <span class="price-val">₹299</span>
-                        <span class="mrp-val">₹390</span>
-                        <span class="savings-tag">Save 23%</span>
-                    </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_murabba_sugar" data-product-name="Amla Murabba – Sugar" data-product-price="299">Add to Cart 🛒</button>
-                </div>
-
-                <!-- 11. Amla Murabba – Jaggery -->
-                <div class="product-card" data-category="murabba">
-                    <div class="product-card-top">
-                        <span class="product-badge">Organic Jaggery</span>
-                        <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/amla_murabba.jpg" alt="Amla Murabba Jaggery" class="product-img" />
-                    </div>
-                    <span class="product-hindi-title">आंवला मुरब्बा (देसी गुड़)</span>
-                    <h3 class="product-title">Amla Murabba – Jaggery</h3>
-                    <p class="product-desc">Nutritious amla preserved in 100% pure organic desi gur syrup with ginger and cardamom notes.</p>
-                    <div class="product-price-row">
-                        <span class="price-val">₹329</span>
-                        <span class="mrp-val">₹420</span>
-                        <span class="savings-tag">Save 22%</span>
-                    </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_murabba_jaggery" data-product-name="Amla Murabba – Jaggery" data-product-price="329">Add to Cart 🛒</button>
-                </div>
-
-                <!-- 12. Amla Laddu – Sugar -->
-                <div class="product-card" data-category="sweets">
-                    <div class="product-card-top">
-                        <span class="product-badge">Sweet Delight</span>
-                        <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/amla_laddu.png" alt="Amla Laddu Sugar" class="product-img" />
-                    </div>
-                    <span class="product-hindi-title">स्वादिष्ट आंवला लड्डू (चीनी)</span>
-                    <h3 class="product-title">Amla Laddu – Sugar</h3>
-                    <p class="product-desc">Hand-rolled amla laddus made with grated gooseberries, pure ghee, dry fruits, and refined sugar.</p>
-                    <div class="product-price-row">
-                        <span class="price-val">₹319</span>
-                        <span class="mrp-val">₹400</span>
                         <span class="savings-tag">Save 20%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_laddu_sugar" data-product-name="Amla Laddu – Sugar" data-product-price="319">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_lhsun_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_lhsun_achar" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
-                <!-- 13. Amla Laddu – Jaggery -->
-                <div class="product-card" data-category="sweets">
+                <!-- 9. Mix Veg Achar -->
+                <div class="product-card" data-category="achar" data-product-id="prod_mix_veg_achar">
                     <div class="product-card-top">
-                        <span class="product-badge">Healthy Sweet</span>
+                        <span class="product-badge">Winter Classic</span>
                         <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/amla_laddu.png" alt="Amla Laddu Jaggery" class="product-img" />
+                        <img src="assets/mix_veg_pickle.jpg" alt="Mix Veg Achar" class="product-img" />
                     </div>
-                    <span class="product-hindi-title">पौष्टिक आंवला लड्डू (गुड़)</span>
-                    <h3 class="product-title">Amla Laddu – Jaggery</h3>
-                    <p class="product-desc">Wholesome laddus crafted with fresh amla, organic desi jaggery, roasted nuts, and A2 Gir cow ghee.</p>
-                    <div class="product-price-row">
-                        <span class="price-val">₹349</span>
-                        <span class="mrp-val">₹450</span>
-                        <span class="savings-tag">Save 22%</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">स्वादिष्ट मिक्स वेज अचार</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.7 (15)</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_laddu_jaggery" data-product-name="Amla Laddu – Jaggery" data-product-price="349">Add to Cart 🛒</button>
-                </div>
-
-                <!-- 14. Chyawanprash -->
-                <div class="product-card" data-category="health">
-                    <div class="product-card-top">
-                        <span class="product-badge">Ayurvedic Rasayana</span>
-                        <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/chyawanprash.jpg" alt="Chyawanprash" class="product-img" />
+                    <h3 class="product-title">Mix Veg Achar</h3>
+                    <p class="product-desc">Crunchy carrot, turnip, cauliflower, and green chilli pickle in cold-pressed mustard oil.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 250 g, 500 g
                     </div>
-                    <span class="product-hindi-title">विशेष देसी च्यवनप्राश</span>
-                    <h3 class="product-title">Chyawanprash</h3>
-                    <p class="product-desc">Cooked with fresh amla, 40+ wild Ayurvedic herbs, raw forest honey, saffron, and pure A2 cow ghee.</p>
-                    <div class="product-price-row">
-                        <span class="price-val">₹499</span>
-                        <span class="mrp-val">₹650</span>
-                        <span class="savings-tag">Save 23%</span>
-                    </div>
-                    <button class="btn-add-cart" data-product-id="prod_chyawanprash" data-product-name="Chyawanprash" data-product-price="499">Add to Cart 🛒</button>
-                </div>
-
-                <!-- 15. Amla Juice -->
-                <div class="product-card" data-category="health">
-                    <div class="product-card-top">
-                        <span class="product-badge">100% Pure Drink</span>
-                        <span class="stock-status-badge">In Stock</span>
-                        <img src="assets/amla_juice.png" alt="Amla Juice" class="product-img" />
-                    </div>
-                    <span class="product-hindi-title">शुद्ध ताजा आंवला जूस</span>
-                    <h3 class="product-title">Amla Juice</h3>
-                    <p class="product-desc">Cold-extracted 100% pure wild amla juice without added water, sugar, or artificial preservatives.</p>
                     <div class="product-price-row">
                         <span class="price-val">₹249</span>
                         <span class="mrp-val">₹320</span>
                         <span class="savings-tag">Save 22%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_juice" data-product-name="Amla Juice" data-product-price="249">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_mix_veg_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_mix_veg_achar" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
+                </div>
+
+                <!-- 10. Amla Murabba -->
+                <div class="product-card" data-category="murabba" data-product-id="prod_amla_murabba">
+                    <div class="product-card-top">
+                        <span class="product-badge">Rasayana Classic</span>
+                        <span class="stock-status-badge">In Stock</span>
+                        <img src="assets/amla_murabba.jpg" alt="Amla Murabba" class="product-img" />
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">शाही आंवला मुरब्बा</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.9 (34)</span>
+                    </div>
+                    <h3 class="product-title">Amla Murabba</h3>
+                    <p class="product-desc">Whole green gooseberries simmered in cardamom-infused sugar syrup. Rich in Vitamin C.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 500 g, 1 kg
+                    </div>
+                    <div class="product-price-row">
+                        <span class="price-val">₹279</span>
+                        <span class="mrp-val">₹350</span>
+                        <span class="savings-tag">Save 20%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_amla_murabba" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_amla_murabba" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
+                </div>
+
+                <!-- 11. Seb ka Murabba -->
+                <div class="product-card" data-category="murabba" data-product-id="prod_seb_murabba">
+                    <div class="product-card-top">
+                        <span class="product-badge">Premium Preserve</span>
+                        <span class="stock-status-badge">In Stock</span>
+                        <img src="assets/amla_murabba.jpg" alt="Seb ka Murabba" class="product-img" />
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">स्वादिष्ट सेब का मुरब्बा</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.8 (12)</span>
+                    </div>
+                    <h3 class="product-title">Seb ka Murabba</h3>
+                    <p class="product-desc">Hand-picked Himalayan apples preserved in fragrant clove and cardamom syrup.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 500 g, 1 kg
+                    </div>
+                    <div class="product-price-row">
+                        <span class="price-val">₹349</span>
+                        <span class="mrp-val">₹440</span>
+                        <span class="savings-tag">Save 20%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_seb_murabba" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_seb_murabba" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
+                </div>
+
+                <!-- 12. Gond Laddu -->
+                <div class="product-card" data-category="sweets" data-product-id="prod_gond_laddu">
+                    <div class="product-card-top">
+                        <span class="product-badge">Winter Special</span>
+                        <span class="stock-status-badge">In Stock</span>
+                        <img src="assets/gond_laddu.png" alt="Gond Laddu" class="product-img" />
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">शुद्ध देसी घी गोंद के लड्डू</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 5.0 (42)</span>
+                    </div>
+                    <h3 class="product-title">Shuddh Desi Ghee Gond Laddu</h3>
+                    <p class="product-desc">Edible gum, roasted whole wheat flour, almonds, cashew nuts, and nutmeg bound in pure A2 cow ghee.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 500 g, 1 kg
+                    </div>
+                    <div class="product-price-row">
+                        <span class="price-val">₹499</span>
+                        <span class="mrp-val">₹620</span>
+                        <span class="savings-tag">Save 20%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_gond_laddu" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_gond_laddu" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
+                </div>
+
+                <!-- 13. Besan Laddu -->
+                <div class="product-card" data-category="sweets" data-product-id="prod_besan_laddu">
+                    <div class="product-card-top">
+                        <span class="product-badge">Festive Favorite</span>
+                        <span class="stock-status-badge">In Stock</span>
+                        <img src="assets/amla_laddu.png" alt="Besan Laddu" class="product-img" />
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">बेसन ड्राई फ्रूट लड्डू</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.9 (38)</span>
+                    </div>
+                    <h3 class="product-title">Besan Dry Fruit Laddu</h3>
+                    <p class="product-desc">Slow-roasted coarse gram flour with crushed pistachios, almonds, and aromatic cardamom in pure ghee.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 500 g, 1 kg
+                    </div>
+                    <div class="product-price-row">
+                        <span class="price-val">₹449</span>
+                        <span class="mrp-val">₹560</span>
+                        <span class="savings-tag">Save 20%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_besan_laddu" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_besan_laddu" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
+                </div>
+
+                <!-- 14. Amla Juice -->
+                <div class="product-card" data-category="health" data-product-id="prod_amla_juice">
+                    <div class="product-card-top">
+                        <span class="product-badge">100% Pure</span>
+                        <span class="stock-status-badge">In Stock</span>
+                        <img src="assets/amla_juice.png" alt="Amla Juice" class="product-img" />
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">शुद्ध आंवला रस</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.7 (20)</span>
+                    </div>
+                    <h3 class="product-title">Sun-cured Amla Juice</h3>
+                    <p class="product-desc">Cold-extracted wild amla juice without added water, synthetic color, or artificial flavor.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 500 ml, 1 L
+                    </div>
+                    <div class="product-price-row">
+                        <span class="price-val">₹199</span>
+                        <span class="mrp-val">₹250</span>
+                        <span class="savings-tag">Save 20%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_amla_juice" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_amla_juice" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
+                </div>
+
+                <!-- 15. Chyawanprash -->
+                <div class="product-card" data-category="health" data-product-id="prod_chyawanprash">
+                    <div class="product-card-top">
+                        <span class="product-badge">Ayurvedic Elixir</span>
+                        <span class="stock-status-badge">In Stock</span>
+                        <img src="assets/amla_murabba.jpg" alt="Chyawanprash" class="product-img" />
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span class="product-hindi-title">विशेष वैदिक च्यवनप्राश</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: #d48806;">★ 4.9 (36)</span>
+                    </div>
+                    <h3 class="product-title">Ancestral Chyawanprash</h3>
+                    <p class="product-desc">Prepared with 40+ wild herbs, fresh amla pulp, raw forest honey, and pure A2 cow ghee.</p>
+                    <div style="margin-bottom: 12px; font-size: 0.82rem; color: var(--color-sub); font-weight: 700;">
+                        Available Packs: 500 g, 1 kg
+                    </div>
+                    <div class="product-price-row">
+                        <span class="price-val">₹599</span>
+                        <span class="mrp-val">₹750</span>
+                        <span class="savings-tag">Save 20%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_chyawanprash" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_chyawanprash" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
             </div>
         </section>
     </main>
 
-    <!-- CART DRAWER & CHECKOUT MODAL INCLUDED VIA SCRIPT -->
-    <div class="cart-drawer-overlay" id="cart-drawer-overlay" aria-hidden="true">
+    <!-- SHOPPING CART DRAWER -->
+    <div class="cart-drawer-overlay" id="cart-drawer-overlay">
         <div class="cart-drawer" role="dialog" aria-modal="true" aria-label="Shopping Cart">
             <div class="cart-header">
                 <h3>Shopping Cart 🛒</h3>
@@ -432,95 +574,12 @@
         </div>
     </div>
 
-    <!-- DEDICATED CHECKOUT MODAL -->
-    <div class="modal-overlay" id="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
-        <div class="modal-box checkout-modal-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-gold-light); padding-bottom: 14px;">
-                <div>
-                    <h2 id="checkout-title" style="color: var(--color-maroon); font-size: 1.6rem; margin: 0;">Checkout & Shipping</h2>
-                    <span style="font-size: 0.85rem; color: var(--color-sub); font-weight: 700;">🔒 256-Bit SSL Encrypted & Idempotent Secure Checkout</span>
-                </div>
-                <button type="button" id="btn-close-checkout-icon" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--color-sub);">✕</button>
-            </div>
-
-            <div id="checkout-notice" style="background: #FFF3CD; color: #856404; border: 1px solid #FFEEBA; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-top: 16px; font-weight: 800;">
-                ℹ️ Online ordering will open after required registrations and launch preparations are completed.
-            </div>
-
-            <form id="checkout-form">
-                <div class="checkout-grid">
-                    <div>
-                        <div class="checkout-section-title">📦 1. Delivery & Contact Details</div>
-                        <div class="checkout-form-group">
-                            <label for="co-name">Full Name *</label>
-                            <input type="text" id="co-name" required placeholder="e.g. Ramesh Kumar" autocomplete="name" />
-                        </div>
-                        <div class="form-row-2">
-                            <div class="checkout-form-group">
-                                <label for="co-phone">Phone Number (10 Digits) *</label>
-                                <input type="tel" id="co-phone" required pattern="[0-9]{10,15}" placeholder="e.g. 9876543210" autocomplete="tel" />
-                            </div>
-                            <div class="checkout-form-group">
-                                <label for="co-alt-phone">Alternate Phone (Optional)</label>
-                                <input type="tel" id="co-alt-phone" pattern="[0-9]{10,15}" placeholder="e.g. 9123456789" />
-                            </div>
-                        </div>
-                        <div class="checkout-form-group">
-                            <label for="co-email">Email Address</label>
-                            <input type="email" id="co-email" placeholder="e.g. ramesh@example.com" autocomplete="email" />
-                        </div>
-                        <div class="checkout-form-group">
-                            <label for="co-address">Complete Delivery Address *</label>
-                            <textarea id="co-address" required placeholder="House/Flat No., Street, Area..." autocomplete="shipping street-address"></textarea>
-                        </div>
-                        <div class="form-row-2">
-                            <div class="checkout-form-group">
-                                <label for="co-city">City / Town *</label>
-                                <input type="text" id="co-city" placeholder="e.g. Varanasi" autocomplete="shipping address-level2" />
-                            </div>
-                            <div class="checkout-form-group">
-                                <label for="co-pincode">Pincode (6 Digits) *</label>
-                                <input type="text" id="co-pincode" pattern="[0-9]{6}" placeholder="e.g. 221001" autocomplete="shipping postal-code" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <div class="checkout-section-title">🛒 2. Order Summary & Payment</div>
-                            <div class="order-summary-box">
-                                <div class="summary-items-list" id="checkout-summary-items">
-                                    <p style="font-size: 0.88rem; color: var(--color-sub);">Loading items...</p>
-                                </div>
-                                <div class="summary-row"><span>Items Subtotal:</span><span id="co-subtotal-val">₹0</span></div>
-                                <div class="summary-row"><span>Estimated Delivery:</span><span style="color: var(--color-green); font-weight: 800;">FREE (🎉 Promo)</span></div>
-                                <div class="summary-total-row"><span>Total Payable:</span><span id="co-total-val" style="color: var(--color-maroon);">₹0</span></div>
-                            </div>
-                            <div class="checkout-form-group" style="margin-top: 18px;">
-                                <label for="co-payment">Select Payment Method *</label>
-                                <select id="co-payment">
-                                    <option value="Cash on Delivery">💵 Cash on Delivery (COD)</option>
-                                    <option value="UPI / GPay / PhonePe">📱 Instant UPI / GPay / PhonePe / Paytm</option>
-                                    <option value="Credit / Debit Card">💳 Credit / Debit Card (Vault Protected)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div style="margin-top: 24px;">
-                            <button type="submit" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Place Order 🎉</button>
-                            <button type="button" id="btn-close-checkout" style="width: 100%; margin-top: 10px; background: none; border: none; color: var(--color-sub); cursor: pointer; font-size: 0.9rem; font-weight: 700;">Cancel & Return</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- FOOTER -->
+    <!-- SITE FOOTER -->
     <footer class="site-footer" role="contentinfo">
         <div class="footer-container">
             <div>
                 <div class="footer-brand">Satvik Swaad</div>
-                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and immunity preserves prepared with pure mustard oil and ancestral recipes.</p>
+                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and traditional preserves prepared with pure mustard oil and ancestral recipes.</p>
             </div>
             <div>
                 <h4 class="footer-heading">Quick Navigation</h4>
@@ -531,15 +590,17 @@
                     <li><a href="our-story.html">Our Story & Values</a></li>
                     <li><a href="reviews.html">Verified Reviews</a></li>
                     <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="footer-heading">Categories</h4>
+                <h4 class="footer-heading">Legal & Privacy</h4>
                 <ul class="footer-list">
-                    <li><a href="products.html">Achar (Pickles)</a></li>
-                    <li><a href="products.html">Amla Murabba</a></li>
-                    <li><a href="products.html">Amla Laddus</a></li>
-                    <li><a href="products.html">Health & Drinks</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-and-conditions.html">Terms and Conditions</a></li>
+                    <li><a href="shipping-delivery-policy.html">Shipping & Delivery Policy</a></li>
+                    <li><a href="cancellation-refund-policy.html">Cancellation & Refund Policy</a></li>
+                    <li><a href="contact.html">Data Subject Request</a></li>
                 </ul>
             </div>
             <div>

@@ -1,15 +1,14 @@
 import * as admin from 'firebase-admin';
 import * as fs from 'fs';
-import * as path from 'path';
 
 /**
- * Trusted Local Firebase Admin SDK CLI Tool
+ * Trusted Local Owner-Operated Firebase Admin Provisioning CLI Tool
  *
  * Usage:
- *   npx ts-node scripts/admin-cli.ts --action grant-admin --uid <uid> [--project <projectId>] [--confirm]
- *   npx ts-node scripts/admin-cli.ts --action revoke-admin --uid <uid> [--project <projectId>] [--confirm]
- *   npx ts-node scripts/admin-cli.ts --action inspect-admin --uid <uid> [--project <projectId>]
- *   npx ts-node scripts/admin-cli.ts --action revoke-sessions --uid <uid> [--project <projectId>] [--confirm]
+ *   npx ts-node scripts/admin-cli.ts --action grant-owner --uid <uid> --project <projectId> [--confirm] [--dry-run]
+ *   npx ts-node scripts/admin-cli.ts --action revoke-admin --uid <uid> --project <projectId> [--confirm] [--dry-run]
+ *   npx ts-node scripts/admin-cli.ts --action inspect-admin --uid <uid> --project <projectId>
+ *   npx ts-node scripts/admin-cli.ts --action revoke-sessions --uid <uid> --project <projectId> [--confirm]
  */
 
 function parseArgs() {
@@ -32,20 +31,47 @@ function parseArgs() {
   return parsed;
 }
 
+function redactUid(uid: string): string {
+  if (!uid || uid.length <= 6) return '****';
+  return `${uid.substring(0, 3)}...${uid.substring(uid.length - 3)}`;
+}
+
+function redactEmail(email?: string): string {
+  if (!email || !email.includes('@')) return 'N/A';
+  const parts = email.split('@');
+  const user = parts[0];
+  const domain = parts[1];
+  const redactedUser = user.length > 2 ? `${user.substring(0, 2)}***` : '***';
+  return `${redactedUser}@${domain}`;
+}
+
 async function main() {
   const flags = parseArgs();
   const action = flags.action as string;
   const uid = flags.uid as string;
-  const project = (flags.project as string) || process.env.GCP_PROJECT || process.env.FIREBASE_PROJECT_ID || 'satwiksweetsandpickels';
+  const project = flags.project as string;
   const confirm = flags.confirm === true;
+  const dryRun = flags['dry-run'] === true;
 
   console.log('====================================================');
-  console.log('      SATWIK SPOT — LOCAL ADMIN PROVISIONING CLI     ');
+  console.log('      SATWIK SPOT — OWNER ADMIN PROVISIONING CLI    ');
   console.log('====================================================');
-  console.log(`📌 Selected Target Firebase Project: [ ${project} ]`);
 
-  if (!action || !['grant-admin', 'revoke-admin', 'inspect-admin', 'revoke-sessions'].includes(action)) {
-    console.error('❌ Error: Valid --action required: grant-admin | revoke-admin | inspect-admin | revoke-sessions');
+  if (!project) {
+    console.error('❌ Security Error: Explicit --project <projectId> is required. Default project fallbacks are forbidden.');
+    process.exit(1);
+  }
+
+  if (project === 'satwiksweetsandpickels') {
+    console.error('❌ Security Error: Legacy project ID satwiksweetsandpickels is forbidden.');
+    process.exit(1);
+  }
+
+  console.log(`📌 Target Firebase Project: [ ${project} ]`);
+  console.log(`🔍 Dry-Run Mode: [ ${dryRun ? 'YES (No Mutations)' : 'NO (Live Claim Changes)'} ]`);
+
+  if (!action || !['grant-owner', 'grant-admin', 'revoke-admin', 'inspect-admin', 'revoke-sessions'].includes(action)) {
+    console.error('❌ Error: Valid --action required: grant-owner | revoke-admin | inspect-admin | revoke-sessions');
     process.exit(1);
   }
 
@@ -54,12 +80,7 @@ async function main() {
     process.exit(1);
   }
 
-  // Refuse execution against production without explicit --project flag
-  const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true' || process.env.FIRESTORE_EMULATOR_HOST !== undefined;
-  if (!isEmulator && (!flags.project || flags.project !== 'satwiksweetsandpickels')) {
-    console.error('❌ Security Check Failed: Production execution requires explicit --project <projectId> flag');
-    process.exit(1);
-  }
+  const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true' || process.env.FIRESTORE_EMULATOR_HOST !== undefined || process.env.NODE_ENV === 'test';
 
   // Initialize Admin SDK with emulator host or local credentials
   if (isEmulator) {
@@ -67,7 +88,7 @@ async function main() {
   } else {
     const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
     if (!serviceAccountPath || !fs.existsSync(serviceAccountPath)) {
-      console.error('❌ Error: GOOGLE_APPLICATION_CREDENTIALS environment variable must point to valid service account JSON file');
+      console.error('❌ Security Error: GOOGLE_APPLICATION_CREDENTIALS environment variable must point to valid service account JSON file');
       process.exit(1);
     }
     if (!admin.apps.length) {
@@ -85,9 +106,14 @@ async function main() {
   let userRecord: admin.auth.UserRecord;
   try {
     userRecord = await auth.getUser(uid);
-    console.log(`👤 Target User Confirmed: UID=[ ${userRecord.uid} ], Email=[ ${userRecord.email || 'N/A'} ], Disabled=[ ${userRecord.disabled} ]`);
+    console.log(`👤 Target User Verified: Redacted UID=[ ${redactUid(userRecord.uid)} ], Email=[ ${redactEmail(userRecord.email)} ], Disabled=[ ${userRecord.disabled} ]`);
   } catch (e) {
-    console.error(`❌ Error: User with UID '${uid}' not found in Firebase Auth`);
+    console.error(`❌ Error: User with target UID not found in Firebase Auth`);
+    process.exit(1);
+  }
+
+  if (userRecord.disabled) {
+    console.error('❌ Security Violation: Target user is disabled. Promotion of disabled accounts is forbidden.');
     process.exit(1);
   }
 
@@ -100,49 +126,63 @@ async function main() {
       break;
     }
 
+    case 'grant-owner':
     case 'grant-admin': {
+      if (dryRun) {
+        console.log(`ℹ️ DRY-RUN SUCCESS: Proposed custom claims for UID [ ${redactUid(uid)} ]:`);
+        console.log(JSON.stringify({ admin: true, role: 'admin_owner', schemaVersion: 1 }, null, 2));
+        console.log('ℹ️ No changes written in dry-run mode.');
+        return;
+      }
+
       if (!confirm) {
-        console.warn('⚠️ Safety Warning: Operation requires confirmation flag --confirm');
+        console.warn('⚠️ Safety Warning: Live claim promotion requires confirmation flag --confirm');
         process.exit(1);
       }
-      // Preserve unrelated existing custom claims
+
       const updatedClaims = {
         ...existingClaims,
         admin: true,
-        roles: Array.from(new Set([...(existingClaims.roles || []), 'owner']))
+        role: 'admin_owner',
+        schemaVersion: 1,
+        roles: ['admin_owner', 'admin']
       };
 
       await auth.setCustomUserClaims(uid, updatedClaims);
-      console.log(`✅ SUCCESS: Granted 'admin: true' custom claim to UID [ ${uid} ]`);
+      await auth.revokeRefreshTokens(uid);
+      console.log(`✅ SUCCESS: Granted 'admin_owner' custom claim and forced token refresh for UID [ ${redactUid(uid)} ]`);
 
-      // Write Audit Log Record to Firestore /audit_logs
       await db.collection('audit_logs').add({
-        action: 'ADMIN_GRANTED',
-        actorUid: 'CLI_OPERATOR',
-        targetUid: uid,
-        targetEmail: userRecord.email || 'N/A',
+        action: 'ADMIN_OWNER_GRANTED',
+        actorUid: 'OFFLINE_OWNER_CLI',
+        targetUid: userRecord.uid,
         timestamp: admin.firestore.FieldValue.serverTimestamp()
       });
       break;
     }
 
     case 'revoke-admin': {
+      if (dryRun) {
+        console.log(`ℹ️ DRY-RUN SUCCESS: Proposed claim removal for UID [ ${redactUid(uid)} ]`);
+        return;
+      }
+
       if (!confirm) {
-        console.warn('⚠️ Safety Warning: Destructive operation requires confirmation flag --confirm');
+        console.warn('⚠️ Safety Warning: Destructive revocation requires confirmation flag --confirm');
         process.exit(1);
       }
-      const { admin: _, roles: __, ...preservedClaims } = existingClaims;
-      const updatedClaims = { ...preservedClaims, admin: false };
+
+      const { admin: _, role: __, schemaVersion: ___, roles: ____, ...preservedClaims } = existingClaims;
+      const updatedClaims = { ...preservedClaims, admin: false, role: 'customer' };
 
       await auth.setCustomUserClaims(uid, updatedClaims);
       await auth.revokeRefreshTokens(uid);
-      console.log(`⛔ SUCCESS: Revoked 'admin' custom claim and terminated refresh tokens for UID [ ${uid} ]`);
+      console.log(`⛔ SUCCESS: Revoked administrative claims and terminated refresh tokens for UID [ ${redactUid(uid)} ]`);
 
       await db.collection('audit_logs').add({
         action: 'ADMIN_REVOKED',
-        actorUid: 'CLI_OPERATOR',
-        targetUid: uid,
-        targetEmail: userRecord.email || 'N/A',
+        actorUid: 'OFFLINE_OWNER_CLI',
+        targetUid: userRecord.uid,
         timestamp: admin.firestore.FieldValue.serverTimestamp()
       });
       break;
@@ -150,17 +190,17 @@ async function main() {
 
     case 'revoke-sessions': {
       if (!confirm) {
-        console.warn('⚠️ Safety Warning: Destructive operation requires confirmation flag --confirm');
+        console.warn('⚠️ Safety Warning: Session termination requires confirmation flag --confirm');
         process.exit(1);
       }
+
       await auth.revokeRefreshTokens(uid);
-      console.log(`🔐 SUCCESS: Revoked all active refresh tokens for UID [ ${uid} ]`);
+      console.log(`🔐 SUCCESS: Revoked all active refresh tokens for UID [ ${redactUid(uid)} ]`);
 
       await db.collection('audit_logs').add({
         action: 'SESSIONS_REVOKED',
-        actorUid: 'CLI_OPERATOR',
-        targetUid: uid,
-        targetEmail: userRecord.email || 'N/A',
+        actorUid: 'OFFLINE_OWNER_CLI',
+        targetUid: userRecord.uid,
         timestamp: admin.firestore.FieldValue.serverTimestamp()
       });
       break;

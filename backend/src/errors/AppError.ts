@@ -22,6 +22,12 @@ export class AuthenticationError extends AppError {
   }
 }
 
+export class NotFoundError extends AppError {
+  constructor(message = 'Resource not found') {
+    super(message, 404, 'NOT_FOUND');
+  }
+}
+
 export class AuthorizationError extends AppError {
   constructor(message = 'Access denied') {
     super(message, 403, 'FORBIDDEN');
@@ -49,5 +55,11 @@ export class CommerceNotAvailableError extends AppError {
 export class PaymentsNotAvailableError extends AppError {
   constructor(message = 'Payment processing is currently disabled.') {
     super(message, 503, 'PAYMENTS_NOT_AVAILABLE');
+  }
+}
+
+export class ReauthenticationRequiredError extends AppError {
+  constructor(message = 'Recent authentication required. Please sign in again before proceeding.') {
+    super(message, 428, 'REAUTHENTICATION_REQUIRED');
   }
 }

@@ -43,7 +43,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Ravi Sharma',
       phone: '9876543210',
       address: '123 Park Street, Sector 5, Delhi',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_auth_001_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 2 }]
     };
@@ -64,7 +64,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
     expect(res.body.data.shippingFee).toBe(50);
     expect(res.body.data.total).toBe(548);
     expect(res.body.data.status).toBe('Pending');
-    expect(res.body.data.paymentStatus).toBe('COD_Pending');
+    expect(res.body.data.paymentStatus).toBe('Unpaid');
   });
 
   it('2. Successfully processes valid guest order and returns high-entropy guestAccessSecret once', async () => {
@@ -72,7 +72,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Guest Customer',
       phone: '9876543211',
       address: '456 Civil Lines, Jaipur',
-      paymentMethod: 'UPI / GPay / PhonePe',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_guest_002_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 3 }]
     };
@@ -94,7 +94,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Attacker User',
       phone: '9876543212',
       address: '789 Malicious Way',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_tamper_003_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }],
       price: 1,
@@ -116,7 +116,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Priya Sharma',
       phone: '9876543213',
       address: 'Plot 12, Gandhi Nagar',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_invalid_prod_004_' + Date.now(),
       items: [{ productId: 'non_existent_product_999', qty: 1 }]
     };
@@ -135,7 +135,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Testing User',
       phone: '9876543214',
       address: 'Address Line 1, City',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_variant_005_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1, customDiscount: 100 } as any]
     };
@@ -154,7 +154,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Bulk Purchaser',
       phone: '9876543215',
       address: 'Main Market Road',
-      paymentMethod: 'Bank Transfer',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_excess_006_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 99 }]
     };
@@ -173,7 +173,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Customer B',
       phone: '9876543216',
       address: 'Street 4, Sector 2',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_outofstock_007_' + Date.now(),
       items: [{ productId: 'test_out_of_stock', qty: 1 }]
     };
@@ -193,7 +193,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Repeat Orderer',
       phone: '9876543217',
       address: 'Near City Mall',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: idemKey,
       items: [{ productId: 'test_mango_pickle', qty: 1 }]
     };
@@ -213,7 +213,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'User One',
       phone: '9876543218',
       address: 'Address 1',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: idemKey,
       items: [{ productId: 'test_mango_pickle', qty: 1 }]
     };
@@ -222,7 +222,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'User One',
       phone: '9876543218',
       address: 'Address 1 DIFFERENT', // Different payload!
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: idemKey,
       items: [{ productId: 'test_mango_pickle', qty: 2 }]
     };
@@ -240,7 +240,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Imposter User',
       phone: '9876543219',
       address: 'Sample Address 123',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_userId_009_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }],
       userId: 'victim_user_uid_777'
@@ -260,7 +260,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Cheater User',
       phone: '9876543220',
       address: 'Sample Address 456',
-      paymentMethod: 'UPI / GPay / PhonePe',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_status_010_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }],
       status: 'Delivered',
@@ -291,7 +291,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Guest Lookup Test',
       phone: '9876543221',
       address: 'Lookup Address',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_lookup_012_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }]
     };
@@ -314,7 +314,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'Test',
       phone: '9876543222',
       address: hugeAddress,
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_huge_013_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }]
     };
@@ -333,7 +333,7 @@ describe('Phase 1 — Trusted Backend & Authoritative Order Pipeline Unit Tests 
       name: 'No AppCheck User',
       phone: '9876543223',
       address: 'Prod AppCheck Address',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_test_prod_appcheck_014_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }]
     };

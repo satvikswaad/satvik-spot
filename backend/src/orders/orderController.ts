@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../auth/verifyAuth';
 import { validateCreateOrderPayload } from '../validation/orderSchema';
-import { processAuthoritativeOrder } from './orderService';
+import { processAuthoritativeOrder, processWhatsAppOrderRequest, submitUtrForOrder } from './orderService';
 import { hashGuestSecret } from '../guest/guestService';
 import { db } from '../config/firebase';
 import { ValidationError, AuthorizationError, AppError, CommerceNotAvailableError } from '../errors/AppError';
@@ -38,6 +38,51 @@ export async function createOrderHandler(req: AuthenticatedRequest, res: Respons
 }
 
 export const handleCreateOrder = createOrderHandler;
+
+export async function createWhatsAppOrderHandler(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    // Check feature flag: WHATSAPP_ASSISTED_ORDERING_ENABLED
+    if (!envConfig.whatsappAssistedOrderingEnabled) {
+      throw new CommerceNotAvailableError('WhatsApp-assisted ordering is currently disabled.');
+    }
+
+    const validatedPayload = validateCreateOrderPayload(req.body);
+    const userId = req.user?.uid;
+
+    const result = await processWhatsAppOrderRequest({
+      payload: validatedPayload,
+      userId
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'WhatsApp order request created successfully',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const handleCreateWhatsAppOrder = createWhatsAppOrderHandler;
+
+export async function submitUtrHandler(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const { orderId, utr, guestAccessSecret } = req.body;
+    if (!orderId || typeof orderId !== 'string') {
+      throw new ValidationError('orderId is required');
+    }
+
+    const result = await submitUtrForOrder(orderId, utr, guestAccessSecret);
+    res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 export async function lookupGuestOrderHandler(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {

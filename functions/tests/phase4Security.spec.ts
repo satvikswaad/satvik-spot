@@ -30,7 +30,7 @@ describe('Phase 4 — XSS, CSP, Input Validation & Security Header Automated Tes
 
   // TEST 1: Hardcoded credentials check
   it('1. No hardcoded admin credentials exist anywhere in codebase', () => {
-    const adminLoginPath = path.join(__dirname, '../../admin-login.html');
+    const adminLoginPath = path.join(__dirname, '../../public/admin/index.html');
     const content = fs.readFileSync(adminLoginPath, 'utf8');
     expect(content).not.toContain('satvik123');
   });
@@ -46,7 +46,7 @@ describe('Phase 4 — XSS, CSP, Input Validation & Security Header Automated Tes
   // TEST 3 & 4: eval, new Function, document.write check
   it('3 & 4. No eval, new Function, or document.write in application source code', () => {
     const adminJs = fs.readFileSync(path.join(__dirname, '../../public/admin/admin.js'), 'utf8');
-    const scriptJs = fs.readFileSync(path.join(__dirname, '../../script.js'), 'utf8');
+    const scriptJs = fs.readFileSync(path.join(__dirname, '../../public/site/script.js'), 'utf8');
 
     expect(adminJs).not.toContain('eval(');
     expect(adminJs).not.toContain('new Function(');
@@ -97,7 +97,7 @@ describe('Phase 4 — XSS, CSP, Input Validation & Security Header Automated Tes
       name: '<script>alert("XSS")</script>',
       phone: '9876543210',
       address: '<img src=x onerror=alert(1)>',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_xss_test_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }]
     };
@@ -117,7 +117,7 @@ describe('Phase 4 — XSS, CSP, Input Validation & Security Header Automated Tes
       name: 'Ravi',
       phone: '9876543210',
       address: 'A'.repeat(500),
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_huge_addr_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }]
     };
@@ -137,7 +137,7 @@ describe('Phase 4 — XSS, CSP, Input Validation & Security Header Automated Tes
       name: 'Ravi',
       phone: '9876543210',
       address: 'Address',
-      paymentMethod: 'Cash on Delivery',
+      paymentMethod: 'WhatsApp-Assisted Ordering',
       idempotencyKey: 'idem_tamper_' + Date.now(),
       items: [{ productId: 'test_mango_pickle', qty: 1 }],
       adminFlag: true

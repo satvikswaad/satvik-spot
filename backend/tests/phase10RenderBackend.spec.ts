@@ -139,7 +139,7 @@ describe('Phase 10A: Render Express Backend Migration & Staging Safety', () => {
 
   it('14. App Check verification works', async () => {
     const originalEnv = process.env.FUNCTIONS_EMULATOR;
-    delete process.env.FUNCTIONS_EMULATOR;
+    process.env.FUNCTIONS_EMULATOR = 'false';
 
     const res = await request(app)
       .post('/api/v1/orders/create')
@@ -220,9 +220,14 @@ describe('Phase 10A: Render Express Backend Migration & Staging Safety', () => {
     expect(jsonStr).not.toContain('AIzaSy');
   });
 
-  it('22. Logs contain no credential', () => {
-    const { logger } = require('../src/utils/logger');
+  it('22. Logs contain no credential and redact sensitive fields', () => {
+    const { logger, redactSensitiveData } = require('../src/utils/logger');
     expect(logger).toBeDefined();
+    const redacted = redactSensitiveData({ password: 'mySecretPassword', authorization: 'Bearer 12345', token: 'xyz', safe: 'hello' });
+    expect(redacted.password).toBe('[REDACTED]');
+    expect(redacted.authorization).toBe('[REDACTED]');
+    expect(redacted.token).toBe('[REDACTED]');
+    expect(redacted.safe).toBe('hello');
   });
 
   it('23. Service-account files are absent from Git', () => {
@@ -231,9 +236,12 @@ describe('Phase 10A: Render Express Backend Migration & Staging Safety', () => {
   });
 
   it('24. Public/admin bundles contain no backend credential', () => {
-    const publicConfig = fs.readFileSync(path.join(__dirname, '../../firebase-config.js'), 'utf8');
-    expect(publicConfig).not.toContain('private_key');
-    expect(publicConfig).not.toContain('client_email');
+    const siteConfig = fs.readFileSync(path.join(__dirname, '../../public/site/firebase-config.js'), 'utf8');
+    const adminConfig = fs.readFileSync(path.join(__dirname, '../../public/admin/firebase-config.js'), 'utf8');
+    expect(siteConfig).not.toContain('private_key');
+    expect(siteConfig).not.toContain('client_email');
+    expect(adminConfig).not.toContain('private_key');
+    expect(adminConfig).not.toContain('client_email');
   });
 
   it('25. Firestore Rules remain default-deny', () => {

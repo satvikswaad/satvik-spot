@@ -81,7 +81,7 @@ describe('Regulatory-Pending Launch Gates Tests (10 Test Cases)', () => {
         name: 'Test Customer',
         phone: '9876543210',
         address: '123 Test Street, City',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_reg_gate_004_' + Date.now(),
         items: [{ productId: 'test_mango_pickle', qty: 1 }]
       };
@@ -163,7 +163,7 @@ describe('Regulatory-Pending Launch Gates Tests (10 Test Cases)', () => {
         name: 'Hacker User',
         phone: '9876543210',
         address: '123 Hack Way',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_reg_gate_010_' + Date.now(),
         items: [{ productId: 'test_mango_pickle', qty: 1 }],
         commerceEnabled: true

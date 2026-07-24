@@ -75,6 +75,10 @@
 
             <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Mobile Menu" aria-expanded="false">☰</button>
 
+            <button class="btn-profile-trigger" id="btn-open-profile" aria-label="Account Profile">
+                👤 <span id="header-profile-label">Profile</span>
+            </button>
+
             <button class="btn-cart-trigger" id="btn-open-cart" aria-label="Open Shopping Cart">
                 🛒 Cart <span class="cart-badge" id="cart-count-badge">0</span>
             </button>
@@ -94,6 +98,7 @@
             <a href="our-story.html" class="mobile-nav-link">Our Story</a>
             <a href="reviews.html" class="mobile-nav-link">Reviews</a>
             <a href="faq.html" class="mobile-nav-link">FAQ</a>
+            <a href="#" id="mobile-nav-profile" class="mobile-nav-link" style="border-top: 1px solid var(--color-border); margin-top: 8px; padding-top: 12px; color: var(--color-maroon); font-weight: 800;">👤 My Profile & Saved Addresses</a>
         </div>
     </div>
 
@@ -222,15 +227,18 @@
                                 <div class="summary-total-row"><span>Total Payable:</span><span id="co-total-val" style="color: var(--color-maroon);">₹0</span></div>
                             </div>
                             <div class="checkout-form-group" style="margin-top: 18px;">
-                                <label for="co-payment">Select Payment Method *</label>
-                                <select id="co-payment">
-                                    <option value="Cash on Delivery">💵 Cash on Delivery (COD)</option>
-                                    <option value="UPI / GPay / PhonePe">📱 Instant UPI / GPay / PhonePe / Paytm</option>
-                                </select>
+                                <div style="background: rgba(212,175,55,0.08); border: 1.5px solid var(--color-gold); border-radius: 12px; padding: 14px 16px; margin-top: 6px;">
+                                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--color-maroon); font-size: 0.95rem;">
+                                        <span>💬</span> <span>Order through WhatsApp</span>
+                                    </div>
+                                    <p style="margin: 6px 0 0 0; font-size: 0.83rem; color: #555555; line-height: 1.4;">
+                                        After your order request is created, WhatsApp will open. Send the prepared message to receive the official payment QR and further confirmation.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         <div style="margin-top: 24px;">
-                            <button type="submit" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Place Order 🎉</button>
+                            <button type="submit" id="btn-submit-order" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Continue on WhatsApp 💬</button>
                             <button type="button" id="btn-close-checkout" style="width: 100%; margin-top: 10px; background: none; border: none; color: var(--color-sub); cursor: pointer;">Cancel</button>
                         </div>
                     </div>
@@ -244,7 +252,7 @@
         <div class="footer-container">
             <div>
                 <div class="footer-brand">Satvik Swaad</div>
-                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and immunity preserves prepared with pure mustard oil and ancestral recipes.</p>
+                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and traditional preserves prepared with pure mustard oil and ancestral recipes.</p>
             </div>
             <div>
                 <h4 class="footer-heading">Quick Navigation</h4>
@@ -255,15 +263,17 @@
                     <li><a href="our-story.html">Our Story & Values</a></li>
                     <li><a href="reviews.html">Verified Reviews</a></li>
                     <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="footer-heading">Categories</h4>
+                <h4 class="footer-heading">Legal & Privacy</h4>
                 <ul class="footer-list">
-                    <li><a href="products.html">Achar (Pickles)</a></li>
-                    <li><a href="products.html">Amla Murabba</a></li>
-                    <li><a href="products.html">Amla Laddus</a></li>
-                    <li><a href="products.html">Health & Drinks</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-and-conditions.html">Terms and Conditions</a></li>
+                    <li><a href="shipping-delivery-policy.html">Shipping & Delivery Policy</a></li>
+                    <li><a href="cancellation-refund-policy.html">Cancellation & Refund Policy</a></li>
+                    <li><a href="contact.html">Data Subject Request</a></li>
                 </ul>
             </div>
             <div>

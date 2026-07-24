@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { db, admin } from '../config/firebase';
 import { AuthenticatedRequest } from '../auth/verifyAuth';
 import { ValidationError } from '../errors/AppError';
@@ -16,7 +16,7 @@ export async function handleCreateReview(req: AuthenticatedRequest, res: Respons
     const { productId, name, rating, text } = req.body as CreateReviewPayload;
     const userId = req.user?.uid;
 
-    if (!productId || typeof productId !== 'string') {
+    if (!productId || typeof productId !== 'string' || productId.trim().length === 0) {
       throw new ValidationError('Product ID is required');
     }
 
@@ -69,6 +69,50 @@ export async function handleCreateReview(req: AuthenticatedRequest, res: Respons
     return res.status(201).json({
       success: true,
       data: { reviewId: docRef.id, approved: false, verifiedPurchase, message: 'Review submitted for moderation.' }
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function handleGetApprovedReviews(req: Request, res: Response, next: NextFunction) {
+  try {
+    const productId = req.query.productId ? String(req.query.productId).trim() : null;
+
+    if (productId && (productId.length > 100 || !/^[a-zA-Z0-9_-]+$/.test(productId))) {
+      throw new ValidationError('Invalid product ID format');
+    }
+
+    let query: admin.firestore.Query = db.collection('reviews').where('approved', '==', true);
+
+    if (productId) {
+      query = query.where('productId', '==', productId);
+    }
+
+    const snap = await query.get();
+
+    const reviews = snap.docs.map(doc => {
+      const data = doc.data();
+      const rawName = typeof data.name === 'string' ? data.name.trim() : 'Verified Buyer';
+      const nameParts = rawName.split(' ');
+      const safeName = nameParts.length > 1
+        ? `${nameParts[0]} ${nameParts[nameParts.length - 1][0]}.`
+        : rawName;
+
+      return {
+        id: doc.id,
+        productId: data.productId,
+        name: safeName,
+        rating: typeof data.rating === 'number' ? data.rating : (data.stars || 5),
+        text: data.text || '',
+        verifiedPurchase: Boolean(data.verifiedPurchase),
+        createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt) : new Date().toISOString()
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: { reviews, count: reviews.length }
     });
   } catch (error) {
     return next(error);

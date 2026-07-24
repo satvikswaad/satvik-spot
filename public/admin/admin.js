@@ -57,8 +57,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const idTokenResult = await user.getIdTokenResult(true);
 
                 if (idTokenResult.claims.admin === true) {
-                    showPortalView(user, idTokenResult.claims);
-                    startInactivityTimer();
+                    // Authoritative Backend Authorization Check
+                    const token = idTokenResult.token;
+                    const apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                        ? 'http://localhost:8080' 
+                        : 'https://satvik-spot-backend-staging.onrender.com';
+
+                    const authRes = await fetch(`${apiBase}/api/v1/admin/dashboard-summary`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }).catch(() => null);
+
+                    if (authRes && authRes.status === 200) {
+                        showPortalView(user, idTokenResult.claims);
+                        startInactivityTimer();
+                    } else {
+                        console.warn("Backend API authorization rejected user UID:", user.uid);
+                        await signOut(window.auth);
+                        showError("Access Denied: Administrative privileges rejected by server policy.");
+                    }
                 } else {
                     console.warn("Unauthorized admin portal access attempt by UID:", user.uid);
                     await signOut(window.auth);
@@ -240,30 +256,149 @@ function subscribeToOrdersStream() {
             const container = document.createElement('div');
             container.style.display = 'flex';
             container.style.flexDirection = 'column';
-            container.style.gap = '12px';
+            container.style.gap = '16px';
 
             snap.docs.forEach(d => {
                 const o = d.data();
+                const orderId = d.id;
 
                 const card = document.createElement('div');
-                card.style.background = '#f9fbf9';
-                card.style.border = '1px solid #e0e0e0';
-                card.style.padding = '12px';
-                card.style.borderRadius = '8px';
+                card.style.background = '#FFFFFF';
+                card.style.border = '2px solid #E8E1D7';
+                card.style.padding = '18px';
+                card.style.borderRadius = '12px';
+                card.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+
+                // Top Header Row
+                const headerRow = document.createElement('div');
+                headerRow.style.display = 'flex';
+                headerRow.style.justifyContent = 'space-between';
+                headerRow.style.alignItems = 'center';
+                headerRow.style.marginBottom = '10px';
 
                 const titleStrong = document.createElement('strong');
-                titleStrong.textContent = `Order #${d.id.slice(-6).toUpperCase()}`;
+                titleStrong.style.fontFamily = "'Playfair Display', serif";
+                titleStrong.style.fontSize = '1.1rem';
+                titleStrong.style.color = '#7A1C1C';
+                titleStrong.textContent = `Order #${orderId.slice(-6).toUpperCase()}`;
 
-                const summaryText = document.createTextNode(` - Total: ₹${o.total} (${o.status})`);
+                const badgeSpan = document.createElement('span');
+                badgeSpan.style.padding = '4px 12px';
+                badgeSpan.style.borderRadius = '20px';
+                badgeSpan.style.fontSize = '0.78rem';
+                badgeSpan.style.fontWeight = '800';
 
+                const pStatus = o.paymentStatus || 'PAYMENT_PENDING';
+                if (pStatus === 'PAYMENT_VERIFIED') {
+                    badgeSpan.style.background = '#EAF5ED';
+                    badgeSpan.style.color = '#2C5E3B';
+                    badgeSpan.textContent = '✅ PAYMENT_VERIFIED';
+                } else if (pStatus === 'PAYMENT_REJECTED') {
+                    badgeSpan.style.background = '#FDE8E8';
+                    badgeSpan.style.color = '#C0392B';
+                    badgeSpan.textContent = '❌ PAYMENT_REJECTED';
+                } else {
+                    badgeSpan.style.background = '#FEF3D6';
+                    badgeSpan.style.color = '#C8521A';
+                    badgeSpan.textContent = '⏳ PAYMENT_PENDING';
+                }
+
+                headerRow.appendChild(titleStrong);
+                headerRow.appendChild(badgeSpan);
+
+                // Details Text
                 const detailsDiv = document.createElement('div');
-                detailsDiv.style.fontSize = '12px';
-                detailsDiv.style.color = '#666';
-                detailsDiv.textContent = `Customer: ${o.name || 'N/A'} | Phone: ${o.phone || 'N/A'}`;
+                detailsDiv.style.fontSize = '0.9rem';
+                detailsDiv.style.color = '#555';
+                detailsDiv.style.marginBottom = '8px';
+                detailsDiv.textContent = `Customer: ${o.name || 'N/A'} | Phone: ${o.phone || 'N/A'} | Pincode: ${o.pincode || 'N/A'}`;
 
-                card.appendChild(titleStrong);
-                card.appendChild(summaryText);
+                const totalDiv = document.createElement('div');
+                totalDiv.style.fontSize = '0.95rem';
+                totalDiv.style.fontWeight = '700';
+                totalDiv.style.color = '#2A211D';
+                totalDiv.style.marginBottom = '12px';
+                totalDiv.textContent = `Total: ₹${o.total} (Subtotal: ₹${o.subtotal}, Delivery: ₹${o.shippingFee})`;
+
+                card.appendChild(headerRow);
                 card.appendChild(detailsDiv);
+                card.appendChild(totalDiv);
+
+                // Payment Action Controls (Only for PAYMENT_PENDING)
+                if (pStatus === 'PAYMENT_PENDING' || pStatus === 'Unpaid') {
+                    const actionsBox = document.createElement('div');
+                    actionsBox.style.background = '#FAF7F2';
+                    actionsBox.style.border = '1px dashed #C8521A';
+                    actionsBox.style.padding = '12px';
+                    actionsBox.style.borderRadius = '8px';
+                    actionsBox.style.marginTop = '10px';
+
+                    const confirmLabel = document.createElement('label');
+                    confirmLabel.style.display = 'flex';
+                    confirmLabel.style.alignItems = 'center';
+                    confirmLabel.style.gap = '8px';
+                    confirmLabel.style.fontSize = '0.85rem';
+                    confirmLabel.style.fontWeight = '700';
+                    confirmLabel.style.marginBottom = '10px';
+                    confirmLabel.style.cursor = 'pointer';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `chk-credit-${orderId}`;
+
+                    const checkText = document.createTextNode(`I confirm I have verified the actual credit of ₹${o.total} in official bank account.`);
+                    confirmLabel.appendChild(checkbox);
+                    confirmLabel.appendChild(checkText);
+
+                    const btnRow = document.createElement('div');
+                    btnRow.style.display = 'flex';
+                    btnRow.style.gap = '10px';
+
+                    const btnAccept = document.createElement('button');
+                    btnAccept.textContent = 'Accept Payment ✅';
+                    btnAccept.style.background = '#2C5E3B';
+                    btnAccept.style.color = '#FFF';
+                    btnAccept.style.border = 'none';
+                    btnAccept.style.padding = '8px 16px';
+                    btnAccept.style.borderRadius = '6px';
+                    btnAccept.style.fontWeight = '700';
+                    btnAccept.style.cursor = 'pointer';
+
+                    btnAccept.addEventListener('click', async () => {
+                        if (!checkbox.checked) {
+                            alert('You must check the bank credit verification box before accepting payment.');
+                            return;
+                        }
+                        btnAccept.disabled = true;
+                        btnAccept.textContent = 'Verifying...';
+                        await handleAdminPaymentVerification(orderId, 'ACCEPT', true);
+                    });
+
+                    const btnReject = document.createElement('button');
+                    btnReject.textContent = 'Reject Payment ❌';
+                    btnReject.style.background = '#C0392B';
+                    btnReject.style.color = '#FFF';
+                    btnReject.style.border = 'none';
+                    btnReject.style.padding = '8px 16px';
+                    btnReject.style.borderRadius = '6px';
+                    btnReject.style.fontWeight = '700';
+                    btnReject.style.cursor = 'pointer';
+
+                    btnReject.addEventListener('click', async () => {
+                        const reason = prompt('Enter rejection reason (visible to customer):', 'Payment credit not received');
+                        if (!reason || reason.trim().length < 3) return;
+                        btnReject.disabled = true;
+                        btnReject.textContent = 'Rejecting...';
+                        await handleAdminPaymentVerification(orderId, 'REJECT', false, reason.trim());
+                    });
+
+                    btnRow.appendChild(btnAccept);
+                    btnRow.appendChild(btnReject);
+
+                    actionsBox.appendChild(confirmLabel);
+                    actionsBox.appendChild(btnRow);
+                    card.appendChild(actionsBox);
+                }
 
                 container.appendChild(card);
             });
@@ -278,5 +413,41 @@ function subscribeToOrdersStream() {
         });
     } catch (e) {
         console.error("Stream init error:", e);
+    }
+}
+
+async function handleAdminPaymentVerification(orderId, action, confirmBankCredit, reason, receivedAmount, reasonCode, paymentMethod, utr) {
+    try {
+        const token = await window.auth.currentUser.getIdToken();
+        const apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8080'
+            : 'https://satvik-spot-backend-staging.onrender.com';
+
+        const res = await fetch(`${apiBase}/api/v1/admin/orders/${encodeURIComponent(orderId)}/verify-payment`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action,
+                confirmBankCredit,
+                reason,
+                receivedAmount: receivedAmount !== undefined ? Number(receivedAmount) : undefined,
+                reasonCode,
+                paymentMethod,
+                utr
+            })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            throw new Error(data.error?.message || 'Payment verification action failed');
+        }
+
+        alert(`✅ Payment status updated successfully: ${data.data?.paymentStatus || action}`);
+    } catch (err) {
+        console.error("Payment verification error:", err);
+        alert(`❌ Error: ${err.message}`);
     }
 }

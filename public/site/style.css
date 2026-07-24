@@ -178,6 +178,16 @@ header.site-header {
     cursor: pointer; font-weight: 900;
 }
 
+.btn-profile-trigger {
+    background: #FFFFFF; color: var(--color-maroon); border: 2px solid var(--color-gold);
+    padding: 10px 20px; border-radius: var(--radius-btn);
+    font-weight: 800; font-size: 0.95rem; cursor: pointer; min-height: 48px;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); transition: all var(--transition-fast);
+}
+.btn-profile-trigger:hover { background: rgba(212, 175, 55, 0.15); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); }
+.btn-profile-trigger:active { transform: translateY(0); }
+
 .btn-cart-trigger {
     background: linear-gradient(135deg, var(--color-saffron) 0%, var(--color-saffron-dark) 100%);
     color: #FFFFFF; border: none; padding: 12px 26px; border-radius: var(--radius-btn);

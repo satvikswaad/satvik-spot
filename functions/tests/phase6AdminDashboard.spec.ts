@@ -224,20 +224,20 @@ describe('Phase 6 — Secure Admin Dashboard Overhaul Complete Test Inventory (5
     expect(auditSnap.empty).toBe(false);
   });
 
-  let createdOrderId: string;
+  let createdOrderId = '';
 
   // ORDERS & TRANSITIONS (20-26)
   it('20. Valid order status transition (Pending -> Confirmed) succeeds', async () => {
     const orderRes = await request(app)
-      .post('/api/v1/orders/create')
+      .post('/api/v1/orders/create-whatsapp-request')
       .set('x-firebase-appcheck', 'mock_token')
       .send({
         name: 'State User',
         phone: '9876543210',
         address: 'Address',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_state_' + Date.now(),
-        items: [{ productId: 'prod_mango_achar', qty: 1 }]
+        items: [{ productId: 'test_mango_pickle', qty: 1 }]
       });
 
     createdOrderId = orderRes.body.data.orderId;

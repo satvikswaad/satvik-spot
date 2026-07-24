@@ -1,0 +1,54 @@
+name: Security & Quality Assurance CI
+
+on:
+  push:
+    branches: [ main, staging ]
+  pull_request:
+    branches: [ main, staging ]
+
+jobs:
+  security-and-quality-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment (Node.js 22)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Verify Forbidden Tracked Files
+        run: |
+          echo "🔍 Scanning for forbidden tracked files in repository..."
+          FORBIDDEN=$(git ls-files | grep -E '\.env$|\.env\.local|\.env\.staging|service-account.*\.json|firebase_config_temp\.json|firestore-debug\.log|\.key$|\.pem$|^node_modules/|^backend/dist/' || true)
+          if [ -n "$FORBIDDEN" ]; then
+            echo "❌ CRITICAL SECURITY FAILURE: Prohibited files tracked in Git:"
+            echo "$FORBIDDEN"
+            exit 1
+          fi
+          echo "✅ Zero forbidden files tracked in Git."
+
+      - name: Install Dependencies Cleanly
+        run: |
+          npm ci
+          npm --prefix backend ci
+          npm --prefix functions ci
+
+      - name: Run TypeScript Type Check
+        run: npm run type-check
+
+      - name: Validate Render Backend Express App Initialization
+        run: |
+          node -e "const { app } = require('./backend/dist/app'); if (!app) process.exit(1); console.log('✅ Render Backend app imports cleanly.');"
+
+      - name: Run Backend Unit & Security Tests
+        run: npm run test:backend
+
+      - name: Run Preflight Deployment Validation
+        run: npm run preflight
+
+      - name: Verify Build Artifact Compilation
+        run: npm run build

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Satvik Swaad – Authentic Indian Homemade Sweets & Pickles</title>
-    <meta name="description" content="Pure taste of tradition. Satvik Swaad brings you artisanal homemade mango pickles, amla murabba, amla laddu, and immunity chyawanprash crafted with organic spices and pure mustard oil." />
+    <meta name="description" content="Pure taste of tradition. Satvik Swaad brings you artisanal homemade mango pickles, amla murabba, amla laddu, and traditional chyawanprash crafted with authentic spices and pure mustard oil." />
     <link rel="canonical" href="https://satwikspot.web.app/" />
 
     <!-- Open Graph Metadata -->
@@ -89,6 +89,10 @@
 
             <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Mobile Menu" aria-expanded="false">☰</button>
 
+            <button class="btn-profile-trigger" id="btn-open-profile" aria-label="Account Profile">
+                👤 <span id="header-profile-label">Profile</span>
+            </button>
+
             <button class="btn-cart-trigger" id="btn-open-cart" aria-label="Open Shopping Cart">
                 🛒 Cart <span class="cart-badge" id="cart-count-badge">0</span>
             </button>
@@ -108,6 +112,7 @@
             <a href="our-story.html#about" class="mobile-nav-link">Our Story</a>
             <a href="reviews.html" class="mobile-nav-link">Reviews</a>
             <a href="faq.html" class="mobile-nav-link">FAQ</a>
+            <a href="#" id="mobile-nav-profile" class="mobile-nav-link" style="border-top: 1px solid var(--color-border); margin-top: 8px; padding-top: 12px; color: var(--color-maroon); font-weight: 800;">👤 My Profile & Saved Addresses</a>
         </div>
     </div>
 
@@ -124,7 +129,7 @@
                     <div class="hero-slide-content">
                         <span class="hero-badge">🌿 100% Traditional & Natural</span>
                         <h1 class="hero-title">Pure Taste of Authentic Indian Tradition</h1>
-                        <p class="hero-desc">Handcrafted raw mango pickles, amla murabbas, amla laddus, and immunity chyawanprash prepared with ancestral family recipes and pure cold-pressed mustard oil.</p>
+                        <p class="hero-desc">Handcrafted raw mango pickles, amla murabbas, amla laddus, and traditional chyawanprash prepared with ancestral family recipes and pure cold-pressed mustard oil.</p>
                         <a href="products.html" class="btn-hero">Explore 15 Products →</a>
                     </div>
                 </div>
@@ -134,7 +139,7 @@
                     <img src="assets/SatvikSwaad_hero_2.jpeg" alt="Satvik Swaad Pure Artisanal Preserves and Desi Sweets" class="hero-slide-img" />
                     <div class="hero-slide-overlay"></div>
                     <div class="hero-slide-content">
-                        <span class="hero-badge">☀️ Sun-Cured & Preservative-Free</span>
+                        <span class="hero-badge">☀️ Sun-Cured & Traditional Recipe</span>
                         <h2 class="hero-title">Zero Chemicals, Pure Homemade Goodness</h2>
                         <p class="hero-desc">Prepared in small artisanal batches with organic spices, pure jaggery, and unrefined oils for an authentic taste of home in every bite.</p>
                         <a href="products.html" class="btn-hero">Shop Bestsellers →</a>
@@ -218,7 +223,7 @@
             <div class="product-grid" id="product-grid-container">
 
                 <!-- 1. Aam ka Achar -->
-                <div class="product-card" data-category="achar">
+                <div class="product-card" data-product-id="prod_aam_achar" data-category="achar">
                     <div class="product-card-top">
                         <span class="product-badge">Bestseller</span>
                         <span class="stock-status-badge">In Stock</span>
@@ -232,11 +237,14 @@
                         <span class="mrp-val">₹320</span>
                         <span class="savings-tag">Save 22%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_aam_achar" data-product-name="Aam ka Achar" data-product-price="249">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_aam_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_aam_achar" data-product-name="Aam ka Achar" data-product-price="249" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
                 <!-- 2. Kareli ka Achar -->
-                <div class="product-card" data-category="achar">
+                <div class="product-card" data-product-id="prod_kareli_achar" data-category="achar">
                     <div class="product-card-top">
                         <span class="product-badge">Healthy Choice</span>
                         <span class="stock-status-badge">In Stock</span>
@@ -250,13 +258,16 @@
                         <span class="mrp-val">₹340</span>
                         <span class="savings-tag">Save 21%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_kareli_achar" data-product-name="Kareli ka Achar" data-product-price="269">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_kareli_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_kareli_achar" data-product-name="Kareli ka Achar" data-product-price="269" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
                 <!-- 3. Amla ka Achar -->
-                <div class="product-card" data-category="achar">
+                <div class="product-card" data-product-id="prod_amla_achar" data-category="achar">
                     <div class="product-card-top">
-                        <span class="product-badge">Immunity Booster</span>
+                        <span class="product-badge">Traditional Recipe</span>
                         <span class="stock-status-badge">In Stock</span>
                         <img src="assets/amla_murabba.jpg" alt="Amla ka Achar" class="product-img" />
                     </div>
@@ -268,11 +279,14 @@
                         <span class="mrp-val">₹330</span>
                         <span class="savings-tag">Save 21%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_achar" data-product-name="Amla ka Achar" data-product-price="259">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_amla_achar" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_amla_achar" data-product-name="Amla ka Achar" data-product-price="259" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
                 <!-- 4. Amla ki Chutney -->
-                <div class="product-card" data-category="achar">
+                <div class="product-card" data-product-id="prod_amla_chutney" data-category="achar">
                     <div class="product-card-top">
                         <span class="product-badge">Tangy Special</span>
                         <span class="stock-status-badge">In Stock</span>
@@ -286,7 +300,10 @@
                         <span class="mrp-val">₹280</span>
                         <span class="savings-tag">Save 22%</span>
                     </div>
-                    <button class="btn-add-cart" data-product-id="prod_amla_chatni" data-product-name="Amla ki Chutney" data-product-price="219">Add to Cart 🛒</button>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <a href="product-details.html?id=prod_amla_chutney" class="btn-view-details" style="flex: 1; text-align: center; padding: 10px; border: 2px solid var(--color-maroon); border-radius: 8px; color: var(--color-maroon); text-decoration: none; font-weight: 700; font-size: 0.9rem;">View Details 👁️</a>
+                        <button class="btn-add-cart" data-product-id="prod_amla_chutney" data-product-name="Amla ki Chutney" data-product-price="219" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem;">Add 🛒</button>
+                    </div>
                 </div>
 
             </div>
@@ -422,12 +439,14 @@
                             </div>
 
                             <div class="checkout-form-group" style="margin-top: 18px;">
-                                <label for="co-payment">Select Payment Method *</label>
-                                <select id="co-payment">
-                                    <option value="Cash on Delivery">💵 Cash on Delivery (COD)</option>
-                                    <option value="UPI / GPay / PhonePe">📱 Instant UPI / GPay / PhonePe / Paytm</option>
-                                    <option value="Credit / Debit Card">💳 Credit / Debit Card (Vault Protected)</option>
-                                </select>
+                                <div style="background: rgba(212,175,55,0.08); border: 1.5px solid var(--color-gold); border-radius: 12px; padding: 14px 16px; margin-top: 6px;">
+                                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--color-maroon); font-size: 0.95rem;">
+                                        <span>💬</span> <span>Order through WhatsApp</span>
+                                    </div>
+                                    <p style="margin: 6px 0 0 0; font-size: 0.83rem; color: #555555; line-height: 1.4;">
+                                        After your order request is created, WhatsApp will open. Send the prepared message to receive the official payment QR and further confirmation.
+                                    </p>
+                                </div>
                             </div>
 
                             <div class="security-trust-box">
@@ -437,7 +456,7 @@
                         </div>
 
                         <div style="margin-top: 24px;">
-                            <button type="submit" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Place Order 🎉</button>
+                            <button type="submit" id="btn-submit-order" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Continue on WhatsApp 💬</button>
                             <button type="button" id="btn-close-checkout" style="width: 100%; margin-top: 10px; background: none; border: none; color: var(--color-sub); cursor: pointer; font-size: 0.9rem; font-weight: 700;">Cancel & Return to Store</button>
                         </div>
                     </div>
@@ -447,12 +466,34 @@
         </div>
     </div>
 
+    <!-- WHATSAPP NOTICE OVERLAY MODAL -->
+    <div id="whatsapp-notice-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 32px; max-width: 480px; width: 100%; text-align: center; border: 2px solid var(--color-maroon); box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
+            <div style="font-size: 2.5rem; margin-bottom: 12px;">💬</div>
+            <h3 style="font-family: 'Playfair Display', serif; color: var(--color-maroon); font-size: 1.4rem; margin-bottom: 10px;">WhatsApp Has Opened!</h3>
+            <p style="font-size: 0.95rem; color: #444; margin-bottom: 18px; line-height: 1.5;">
+                Please press <strong>Send</strong> inside WhatsApp to request the official payment QR code from Satvik Swaad.
+            </p>
+            <div style="background: #FAF5EF; border: 1px dashed var(--color-maroon); border-radius: 10px; padding: 12px; margin-bottom: 20px; text-align: left; font-size: 0.88rem;">
+                <div><strong>Order ID:</strong> <span id="wa-modal-order-id">Loading...</span></div>
+                <div><strong>Total Payable:</strong> <span id="wa-modal-total">Loading...</span></div>
+                <div><strong>Status:</strong> <span style="color: var(--color-saffron); font-weight: 800;">AWAITING_PAYMENT</span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button type="button" id="btn-wa-reopen" class="btn-add-cart" style="font-size: 0.95rem; padding: 12px;">📲 Open WhatsApp App</button>
+                <button type="button" id="btn-wa-web" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #2E7D32; padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer;">💻 Open Web WhatsApp (Browser)</button>
+                <button type="button" id="btn-wa-copy" style="background: #F4EBE1; color: var(--color-maroon); border: 1px solid var(--color-maroon); padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer;">📋 Copy Order Summary</button>
+                <button type="button" id="btn-wa-close" style="background: none; border: none; color: var(--color-sub); font-size: 0.9rem; font-weight: 700; cursor: pointer; text-decoration: underline; margin-top: 4px;">✕ Close & Continue Browsing</button>
+            </div>
+        </div>
+    </div>
+
     <!-- RICH 4-COLUMN FOOTER -->
     <footer class="site-footer" role="contentinfo">
         <div class="footer-container">
             <div>
                 <div class="footer-brand">Satvik Swaad</div>
-                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and immunity preserves prepared with pure mustard oil and ancestral recipes.</p>
+                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and traditional preserves prepared with pure mustard oil and ancestral recipes.</p>
             </div>
             <div>
                 <h4 class="footer-heading">Quick Navigation</h4>
@@ -464,15 +505,17 @@
                     <li><a href="#about">Our Story & Values</a></li>
                     <li><a href="reviews.html">Verified Reviews</a></li>
                     <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="footer-heading">Categories</h4>
+                <h4 class="footer-heading">Legal & Privacy</h4>
                 <ul class="footer-list">
-                    <li><a href="products.html">Achar (Pickles)</a></li>
-                    <li><a href="products.html">Amla Murabba</a></li>
-                    <li><a href="products.html">Amla Laddus</a></li>
-                    <li><a href="products.html">Health & Drinks</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-and-conditions.html">Terms and Conditions</a></li>
+                    <li><a href="shipping-delivery-policy.html">Shipping & Delivery Policy</a></li>
+                    <li><a href="cancellation-refund-policy.html">Cancellation & Refund Policy</a></li>
+                    <li><a href="contact.html">Data Subject Request</a></li>
                 </ul>
             </div>
             <div>

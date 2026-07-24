@@ -67,7 +67,7 @@ describe('Phase 5 — Products, Orders, Messages & Reviews Synchronization Tests
         name: 'Tester',
         phone: '9876543210',
         address: 'Test Address',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_archived_' + Date.now(),
         items: [{ productId: 'prod_archived_test', qty: 1 }]
       });
@@ -84,7 +84,7 @@ describe('Phase 5 — Products, Orders, Messages & Reviews Synchronization Tests
         name: 'Price Test User',
         phone: '9876543210',
         address: 'Test Address',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_price_sync_' + Date.now(),
         items: [{ productId: 'prod_mango_achar', qty: 2 }],
         price: 1 // Stale/tampered price rejected by schema!
@@ -111,7 +111,7 @@ describe('Phase 5 — Products, Orders, Messages & Reviews Synchronization Tests
         name: 'Tester',
         phone: '9876543210',
         address: 'Address',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_zero_stock_' + Date.now(),
         items: [{ productId: 'prod_zero_stock', qty: 1 }]
       });
@@ -129,7 +129,7 @@ describe('Phase 5 — Products, Orders, Messages & Reviews Synchronization Tests
         name: 'Snapshot User',
         phone: '9876543210',
         address: 'Address',
-        paymentMethod: 'Cash on Delivery',
+        paymentMethod: 'WhatsApp-Assisted Ordering',
         idempotencyKey: 'idem_snap_' + Date.now(),
         items: [{ productId: 'prod_lemon_achar', qty: 1 }]
       });
