@@ -3,6 +3,7 @@ import { ValidationError } from '../errors/AppError';
 export interface OrderItemInput {
   productId: string;
   qty: number;
+  variantId?: string;
 }
 
 export interface CreateOrderPayload {
@@ -65,7 +66,7 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
     }
     const itemKeys = Object.keys(item);
     for (const ik of itemKeys) {
-      if (ik !== 'productId' && ik !== 'qty') {
+      if (ik !== 'productId' && ik !== 'qty' && ik !== 'variantId') {
         throw new ValidationError(`Forbidden field in item object: '${ik}'`);
       }
     }
@@ -78,9 +79,18 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
       throw new ValidationError('Item quantity must be an integer between 1 and 10');
     }
 
+    let variantId: string | undefined = undefined;
+    if (item.variantId !== undefined && item.variantId !== null) {
+      if (typeof item.variantId !== 'string' || item.variantId.trim().length === 0 || item.variantId.trim().length > 64 || !/^[a-zA-Z0-9_-]+$/.test(item.variantId.trim())) {
+        throw new ValidationError("Invalid 'variantId' format");
+      }
+      variantId = item.variantId.trim();
+    }
+
     validatedItems.push({
       productId: item.productId.trim(),
-      qty: item.qty
+      qty: item.qty,
+      ...(variantId ? { variantId } : {})
     });
   }
 

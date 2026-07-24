@@ -31,7 +31,7 @@ function computePayloadHash(payload: CreateOrderPayload): string {
     phone: payload.phone,
     address: payload.address,
     paymentMethod: payload.paymentMethod,
-    items: payload.items.map(i => ({ productId: i.productId, qty: i.qty })).sort((a, b) => a.productId.localeCompare(b.productId))
+    items: payload.items.map(i => ({ productId: i.productId, variantId: i.variantId || '', qty: i.qty })).sort((a, b) => (a.productId + a.variantId).localeCompare(b.productId + b.variantId))
   });
   return crypto.createHash('sha256').update(canonicalString).digest('hex');
 }
@@ -68,6 +68,7 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
     let subtotal = 0;
     const verifiedOrderItems: Array<{
       productId: string;
+      variantId?: string;
       name: string;
       qty: number;
       unitPrice: number;
@@ -77,7 +78,7 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
     const productUpdates: Array<{ docRef: admin.firestore.DocumentReference; newStock: number }> = [];
 
     for (const itemInput of payload.items) {
-      const product = await getAuthoritativeProductInTransaction(transaction, itemInput.productId);
+      const product = await getAuthoritativeProductInTransaction(transaction, itemInput.productId, itemInput.variantId);
 
       if (product.stock < itemInput.qty) {
         throw new OutOfStockError(
@@ -88,9 +89,14 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       const lineTotal = product.price * itemInput.qty;
       subtotal += lineTotal;
 
+      const itemName = product.selectedVariant
+        ? `${product.name} (${product.selectedVariant.label})`
+        : product.name;
+
       verifiedOrderItems.push({
         productId: product.id,
-        name: product.name,
+        ...(itemInput.variantId ? { variantId: itemInput.variantId } : {}),
+        name: itemName,
         qty: itemInput.qty,
         unitPrice: product.price,
         lineTotal
@@ -247,6 +253,7 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
     let subtotal = 0;
     const verifiedOrderItems: Array<{
       productId: string;
+      variantId?: string;
       name: string;
       qty: number;
       unitPrice: number;
@@ -254,7 +261,7 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
     }> = [];
 
     for (const itemInput of payload.items) {
-      const product = await getAuthoritativeProductInTransaction(transaction, itemInput.productId);
+      const product = await getAuthoritativeProductInTransaction(transaction, itemInput.productId, itemInput.variantId);
 
       if (product.stock < itemInput.qty) {
         throw new OutOfStockError(
@@ -265,9 +272,14 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
       const lineTotal = product.price * itemInput.qty;
       subtotal += lineTotal;
 
+      const itemName = product.selectedVariant
+        ? `${product.name} (${product.selectedVariant.label})`
+        : product.name;
+
       verifiedOrderItems.push({
         productId: product.id,
-        name: product.name,
+        ...(itemInput.variantId ? { variantId: itemInput.variantId } : {}),
+        name: itemName,
         qty: itemInput.qty,
         unitPrice: product.price,
         lineTotal
