@@ -110,6 +110,17 @@ app.post('/api/v1/admin/messages/:messageId/status', requireAdmin, updateMessage
 app.post('/api/v1/admin/reviews/:reviewId/moderate', requireAdmin, moderateReview);
 app.get('/api/v1/admin/audit-events', requireAdmin, requireRecentAuthentication(900), getAuditLogs);
 
+// API 404 JSON Handler for unmatched /api routes
+app.use('/api', (_req: Request, res: Response) => {
+  return res.status(404).json({
+    success: false,
+    error: {
+      code: 'NOT_FOUND',
+      message: 'API route not found'
+    }
+  });
+});
+
 // Centralized Non-Leaking Error Handler
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof AppError) {

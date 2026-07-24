@@ -405,12 +405,12 @@ function initReviewsData() {
 
 async function fetchReviews(container) {
     try {
-        const isEmulator = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const endpoint = isEmulator
-            ? 'http://localhost:5000/api/v1/reviews'
-            : '/api/v1/reviews';
+        const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
+        const endpoint = `${apiBaseUrl}/api/v1/reviews`;
 
         const res = await fetch(endpoint);
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) return renderEmptyReviewsState(container);
         const data = await res.json();
 
         if (res.ok && data.success && Array.isArray(data.data?.reviews) && data.data.reviews.length > 0) {
@@ -836,9 +836,12 @@ async function populateCheckoutAddresses() {
 
     try {
         const token = await window.auth.currentUser.getIdToken();
-        const res = await fetch('/api/v1/customer/addresses', {
+        const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
+        const res = await fetch(`${apiBaseUrl}/api/v1/customer/addresses`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) return;
         const data = await res.json();
 
         if (res.ok && data.success && Array.isArray(data.data) && data.data.length > 0) {
@@ -932,16 +935,19 @@ async function renderProfileContent() {
     try {
         const user = window.auth.currentUser;
         const token = await user.getIdToken();
-        const res = await fetch('/api/v1/customer/profile', {
+        const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
+        const res = await fetch(`${apiBaseUrl}/api/v1/customer/profile`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const data = await res.json();
+        const contentType = res.headers.get('content-type') || '';
+        const data = contentType.includes('application/json') ? await res.json() : {};
         const profile = data.data || { name: user.displayName || 'Valued Customer', phone: user.phoneNumber || '' };
 
-        const addrRes = await fetch('/api/v1/customer/addresses', {
+        const addrRes = await fetch(`${apiBaseUrl}/api/v1/customer/addresses`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const addrData = await addrRes.json();
+        const addrContentType = addrRes.headers.get('content-type') || '';
+        const addrData = addrContentType.includes('application/json') ? await addrRes.json() : {};
         const addresses = addrData.data || [];
 
         container.innerHTML = `
@@ -1413,12 +1419,12 @@ function initProductDetailsPage() {
 
 async function fetchProductReviews(productId, container) {
     try {
-        const isEmulator = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const endpoint = isEmulator
-            ? `http://localhost:5000/api/v1/reviews?productId=${encodeURIComponent(productId)}`
-            : `/api/v1/reviews?productId=${encodeURIComponent(productId)}`;
+        const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
+        const endpoint = `${apiBaseUrl}/api/v1/reviews?productId=${encodeURIComponent(productId)}`;
 
         const res = await fetch(endpoint);
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) return renderEmptyReviewsState(container);
         const data = await res.json();
 
         if (res.ok && data.success && Array.isArray(data.data?.reviews) && data.data.reviews.length > 0) {
@@ -1482,12 +1488,11 @@ export async function placeOrder() {
             items: cartItems.map(i => ({ productId: String(i.productId || i.id), variantId: String(i.variantId || 'var_500g'), qty: i.qty }))
         };
 
-        const isEmulator = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const endpointPath = '/api/v1/orders/create-whatsapp-request';
-
-        const endpoint = isEmulator
-            ? `http://localhost:5000${endpointPath}`
-            : endpointPath;
+        const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
+        if (!apiBaseUrl) {
+            throw new Error('Checkout service URL is not configured.');
+        }
+        const checkoutUrl = `${apiBaseUrl}/api/v1/orders/create-whatsapp-request`;
 
         const headers = { 'Content-Type': 'application/json' };
 
@@ -1513,14 +1518,27 @@ export async function placeOrder() {
             }
         }
 
-        const res = await fetch(endpoint, {
+        const response = await fetch(checkoutUrl, {
             method: 'POST',
             headers,
             body: JSON.stringify(payload)
         });
 
-        const data = await res.json();
-        if (!res.ok || !data.success) {
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const responseText = await response.text();
+            console.error('Non-JSON checkout response', {
+                url: response.url,
+                status: response.status,
+                contentType
+            });
+            throw new Error(
+                'The ordering service returned an invalid response. Please try again shortly.'
+            );
+        }
+
+        const data = await response.json();
+        if (!response.ok || !data.success) {
             throw new Error(data.error?.message || 'Failed to place order');
         }
 
@@ -1626,9 +1644,8 @@ function initContactForm() {
             if (phone) payload.phone = phone;
             if (subject) payload.subject = subject;
 
-            const endpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-                ? 'http://localhost:5000/api/v1/messages'
-                : '/api/v1/messages';
+            const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
+            const endpoint = `${apiBaseUrl}/api/v1/messages`;
 
             const res = await fetch(endpoint, {
                 method: 'POST',
@@ -1636,6 +1653,10 @@ function initContactForm() {
                 body: JSON.stringify(payload)
             });
 
+            const contentType = res.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                throw new Error('Message service returned an invalid response.');
+            }
             const data = await res.json();
             if (!res.ok || !data.success) {
                 throw new Error(data.error?.message || 'Failed to submit message.');
