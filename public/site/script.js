@@ -668,6 +668,29 @@ function closeCart() {
 }
 
 function ensureModalsInDOM() {
+    if (!document.getElementById('cart-drawer-overlay')) {
+        const cartDiv = document.createElement('div');
+        cartDiv.innerHTML = `
+        <div class="cart-drawer-overlay" id="cart-drawer-overlay" role="dialog" aria-modal="true" aria-label="Shopping Cart">
+            <div class="cart-drawer" id="cart-drawer">
+                <div class="cart-header">
+                    <h3>Your Shopping Cart (<span class="cart-count">0</span>)</h3>
+                    <button class="btn-close-cart" id="btn-close-cart" aria-label="Close Shopping Cart">✕</button>
+                </div>
+                <div class="cart-items-container" id="cart-items-container"></div>
+                <div class="cart-footer">
+                    <div class="cart-total-row">
+                        <span>Subtotal:</span>
+                        <span class="cart-total-price" id="cart-total-price">₹0</span>
+                    </div>
+                    <p class="shipping-note">Taxes and shipping calculated at checkout</p>
+                    <button class="btn-checkout" id="btn-checkout">Proceed to Checkout →</button>
+                </div>
+            </div>
+        </div>`;
+        document.body.appendChild(cartDiv.firstElementChild);
+    }
+
     if (!document.getElementById('checkout-modal')) {
         const div = document.createElement('div');
         div.innerHTML = `
@@ -931,21 +954,82 @@ function initProfilePage() {
     const displayPhone = document.getElementById('profile-display-phone');
     const ordersContainer = document.getElementById('profile-orders-list');
 
+    const btnSignIn = document.getElementById('btn-google-signin');
+    const btnSignOut = document.getElementById('btn-google-signout');
+    const authTitle = document.getElementById('auth-status-title');
+    const authDesc = document.getElementById('auth-status-desc');
+
     let savedProfile = {};
     try {
         savedProfile = JSON.parse(localStorage.getItem('satvik_user_profile') || '{}');
     } catch (e) { savedProfile = {}; }
 
-    if (document.getElementById('prof-name')) document.getElementById('prof-name').value = savedProfile.name || '';
-    if (document.getElementById('prof-phone')) document.getElementById('prof-phone').value = savedProfile.phone || '';
-    if (document.getElementById('prof-email')) document.getElementById('prof-email').value = savedProfile.email || '';
-    if (document.getElementById('prof-house')) document.getElementById('prof-house').value = savedProfile.house || '';
-    if (document.getElementById('prof-street')) document.getElementById('prof-street').value = savedProfile.street || '';
-    if (document.getElementById('prof-city')) document.getElementById('prof-city').value = savedProfile.city || '';
-    if (document.getElementById('prof-pincode')) document.getElementById('prof-pincode').value = savedProfile.pincode || '';
+    function fillFormFields(data) {
+        if (document.getElementById('prof-name')) document.getElementById('prof-name').value = data.name || '';
+        if (document.getElementById('prof-phone')) document.getElementById('prof-phone').value = data.phone || '';
+        if (document.getElementById('prof-email')) document.getElementById('prof-email').value = data.email || '';
+        if (document.getElementById('prof-house')) document.getElementById('prof-house').value = data.house || '';
+        if (document.getElementById('prof-street')) document.getElementById('prof-street').value = data.street || '';
+        if (document.getElementById('prof-city')) document.getElementById('prof-city').value = data.city || '';
+        if (document.getElementById('prof-pincode')) document.getElementById('prof-pincode').value = data.pincode || '';
 
-    if (savedProfile.name && displayName) displayName.textContent = `Welcome, ${savedProfile.name}`;
-    if (savedProfile.phone && displayPhone) displayPhone.textContent = `📱 ${savedProfile.phone} | Default Delivery Customer`;
+        if (data.name && displayName) displayName.textContent = `Welcome, ${data.name}`;
+        if (data.email && displayPhone) displayPhone.textContent = `✉️ ${data.email} | Verified Customer`;
+        else if (data.phone && displayPhone) displayPhone.textContent = `📱 ${data.phone} | Default Delivery Customer`;
+    }
+
+    fillFormFields(savedProfile);
+
+    // Google Sign-In Handler
+    if (btnSignIn) {
+        btnSignIn.addEventListener('click', async () => {
+            if (!window.auth || !window.GoogleAuthProvider) {
+                showToast('⚠️ Google Auth service loading, please try in a moment.');
+                return;
+            }
+            try {
+                const provider = new window.GoogleAuthProvider();
+                const result = await window.signInWithPopup(window.auth, provider);
+                const user = result.user;
+                showToast(`✅ Welcome back, ${user.displayName || 'Customer'}!`);
+            } catch (err) {
+                console.error('Google Sign-In Error:', err);
+                showToast(`❌ Sign-in failed: ${err.message || 'Error occurred'}`);
+            }
+        });
+    }
+
+    // Sign-Out Handler
+    if (btnSignOut) {
+        btnSignOut.addEventListener('click', async () => {
+            if (window.auth && window.signOut) {
+                await window.signOut(window.auth);
+                showToast('🚪 Signed out successfully');
+            }
+        });
+    }
+
+    // Auth State Listener for Cloud Sync
+    if (window.auth && window.onAuthStateChanged) {
+        window.onAuthStateChanged(window.auth, async (user) => {
+            if (user) {
+                if (btnSignIn) btnSignIn.style.display = 'none';
+                if (btnSignOut) btnSignOut.style.display = 'inline-flex';
+                if (authTitle) authTitle.innerHTML = `<span>✅ Google Verified:</span> <span>${user.displayName || user.email}</span>`;
+                if (authDesc) authDesc.textContent = 'Your delivery details, saved addresses, and order history are securely backed up in your cloud profile.';
+
+                if (!savedProfile.name && user.displayName) savedProfile.name = user.displayName;
+                if (!savedProfile.email && user.email) savedProfile.email = user.email;
+                fillFormFields(savedProfile);
+                localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
+            } else {
+                if (btnSignIn) btnSignIn.style.display = 'flex';
+                if (btnSignOut) btnSignOut.style.display = 'none';
+                if (authTitle) authTitle.innerHTML = `<span>🔐</span> <span>Cloud Account Backup & Restore</span>`;
+                if (authDesc) authDesc.textContent = 'Sign in with Google to securely store and restore your delivery details, saved addresses, and order history across devices or after clearing browser cache.';
+            }
+        });
+    }
 
     if (formProfile) {
         formProfile.addEventListener('submit', (e) => {
@@ -954,8 +1038,7 @@ function initProfilePage() {
             savedProfile.phone = document.getElementById('prof-phone')?.value.trim();
             savedProfile.email = document.getElementById('prof-email')?.value.trim();
             localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
-            if (displayName && savedProfile.name) displayName.textContent = `Welcome, ${savedProfile.name}`;
-            if (displayPhone && savedProfile.phone) displayPhone.textContent = `📱 ${savedProfile.phone} | Default Delivery Customer`;
+            fillFormFields(savedProfile);
             showToast('✅ Personal Information Saved Successfully!');
         });
     }
@@ -1487,7 +1570,8 @@ function initProductDetailsPage() {
                 window.location.href = `product-details.html?id=${encodeURIComponent(rp.id)}`;
             });
             const topDiv = createSafeElement('div', { className: 'product-card-top' });
-            const img = createSafeElement('img', { src: rp.images[0], alt: rp.name, className: 'product-img' });
+            const imgUrl = (rp.images && rp.images[0]) || rp.img || 'assets/aam-ka-achar.png?v=2';
+            const img = createSafeElement('img', { src: imgUrl, alt: rp.name, className: 'product-img' });
             topDiv.appendChild(img);
 
             const title = createSafeElement('h3', { className: 'product-title', text: rp.name });

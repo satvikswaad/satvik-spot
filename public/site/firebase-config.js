@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, setPersistence, browserLocalPersistence, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
 
@@ -22,6 +22,10 @@ if (isLocalhost) {
 const app = window._firebaseApp = initializeApp(firebaseConfig);
 window.db = getFirestore(app);
 window.auth = getAuth(app);
+window.GoogleAuthProvider = GoogleAuthProvider;
+window.signInWithPopup = signInWithPopup;
+window.signOut = signOut;
+window.onAuthStateChanged = onAuthStateChanged;
 try { window.analytics = getAnalytics(app); } catch (e) {}
 
 const RECAPTCHA_SITE_KEY = '6Ld2X2ItAAAAAE0c7CP47UyRzRAojxIfBEYEhCAY';

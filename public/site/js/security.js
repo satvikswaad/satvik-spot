@@ -14,14 +14,14 @@ export function sanitizeText(input) {
 }
 
 export function validateUrl(url) {
-  if (!url || typeof url !== 'string') return '/assets/logo.png';
+  if (!url || typeof url !== 'string') return 'assets/aam-ka-achar.png';
   const trimmed = url.trim();
 
   // Block dangerous schemes
   const lower = trimmed.toLowerCase();
-  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
+  if (lower.startsWith('javascript:') || lower.startsWith('vbscript:')) {
     console.warn('Blocked dangerous URL scheme:', url);
-    return '/assets/logo.png';
+    return 'assets/aam-ka-achar.png';
   }
 
   // Allow safe relative paths
@@ -32,14 +32,14 @@ export function validateUrl(url) {
   // Allow HTTPS URLs
   try {
     const parsed = new URL(trimmed);
-    if (parsed.protocol === 'https:') {
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
       return parsed.href;
     }
   } catch (e) {
     // Invalid URL
   }
 
-  return '/assets/logo.png';
+  return trimmed;
 }
 
 export function createSafeElement(tag, options = {}) {
@@ -51,6 +51,26 @@ export function createSafeElement(tag, options = {}) {
 
   if (options.className) {
     el.className = options.className;
+  }
+
+  if (options.id) {
+    el.id = options.id;
+  }
+
+  if (options.style) {
+    el.style.cssText = options.style;
+  }
+
+  if (options.src) {
+    el.setAttribute('src', validateUrl(options.src));
+  }
+
+  if (options.alt) {
+    el.setAttribute('alt', sanitizeText(options.alt));
+  }
+
+  if (options.href) {
+    el.setAttribute('href', validateUrl(options.href));
   }
 
   if (options.attributes) {
