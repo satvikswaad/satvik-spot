@@ -1033,18 +1033,39 @@ function initProfilePage() {
                 showToast('⚠️ Google Auth service loading, please try in a moment.');
                 return;
             }
+
+            btnSignIn.disabled = true;
+            btnSignIn.style.opacity = '0.6';
+            const originalHTML = btnSignIn.innerHTML;
+            btnSignIn.innerHTML = `<span>⏳ Signing in...</span>`;
+
             try {
                 const provider = new window.GoogleAuthProvider();
-                const result = await window.signInWithPopup(window.auth, provider);
-                const user = result.user;
-                showToast(`✅ Welcome, ${user.displayName || user.email || 'Customer'}!`);
-            } catch (err) {
-                console.error('Google Sign-In Error:', err);
-                if (err.code === 'auth/popup-closed-by-user') {
-                    showToast('ℹ️ Sign-in window closed. Click Sign in to complete.');
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+                if (isMobile && window.signInWithRedirect) {
+                    await window.signInWithRedirect(window.auth, provider);
                 } else {
-                    showToast(`❌ Sign-in failed: ${err.message || 'Error occurred'}`);
+                    const result = await window.signInWithPopup(window.auth, provider);
+                    if (result && result.user) {
+                        showToast(`✅ Welcome, ${result.user.displayName || result.user.email || 'Customer'}!`);
+                    }
                 }
+            } catch (err) {
+                console.warn('Google Sign-In Exception:', err);
+                if (err.code === 'auth/popup-blocked' && window.signInWithRedirect) {
+                    showToast('ℹ️ Redirecting to Google Sign-In...');
+                    const provider = new window.GoogleAuthProvider();
+                    await window.signInWithRedirect(window.auth, provider);
+                } else if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
+                    console.log('User closed popup or cancelled auth request');
+                } else {
+                    showToast(`❌ Sign-in issue: ${err.message || 'Please try again'}`);
+                }
+            } finally {
+                btnSignIn.disabled = false;
+                btnSignIn.style.opacity = '1';
+                btnSignIn.innerHTML = originalHTML;
             }
         });
     }
@@ -1062,9 +1083,18 @@ function initProfilePage() {
     // Auth State Listener with Retry Safeguard for Module Loading
     function setupAuthListener() {
         if (!window.auth || !window.onAuthStateChanged) {
-            setTimeout(setupAuthListener, 250);
+            setTimeout(setupAuthListener, 200);
             return;
         }
+
+        if (window.getRedirectResult) {
+            window.getRedirectResult(window.auth).then((result) => {
+                if (result && result.user) {
+                    showToast(`✅ Welcome back, ${result.user.displayName || result.user.email}!`);
+                }
+            }).catch((e) => console.warn('Redirect result check:', e));
+        }
+
         window.onAuthStateChanged(window.auth, async (user) => {
             if (user) {
                 if (btnSignIn) btnSignIn.style.setProperty('display', 'none', 'important');
