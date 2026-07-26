@@ -74,15 +74,17 @@
                 <a href="contact.html" class="nav-link">Contact</a>
             </nav>
 
-            <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Mobile Menu" aria-expanded="false">☰</button>
+            <div class="header-right-actions">
+                <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Mobile Menu" aria-expanded="false">☰</button>
 
-            <button class="btn-profile-trigger" id="btn-open-profile" aria-label="Account Profile">
-                👤 <span id="header-profile-label">Profile</span>
-            </button>
+                <button class="btn-profile-trigger" id="btn-open-profile" aria-label="Account Profile">
+                    👤 <span id="header-profile-label">Profile</span>
+                </button>
 
-            <button class="btn-cart-trigger" id="btn-open-cart" aria-label="Open Shopping Cart">
-                🛒 Cart <span class="cart-badge" id="cart-count-badge">0</span>
-            </button>
+                <button class="btn-cart-trigger" id="btn-open-cart" aria-label="Open Shopping Cart">
+                    🛒 <span class="cart-label-text">Cart</span> <span class="cart-badge" id="cart-count-badge">0</span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -319,8 +321,28 @@
         </div>
     </footer>
 
-    <button id="btn-scroll-top" aria-label="Scroll to top">↑</button>
-    <div id="toast" role="status" aria-live="polite"></div>
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Navigation Bar">
+        <a href="index.html" class="bottom-nav-item" id="bottom-nav-home">
+            <span class="bottom-nav-icon">🏠</span>
+            <span class="bottom-nav-label">Home</span>
+        </a>
+        <a href="products.html" class="bottom-nav-item active" id="bottom-nav-products">
+            <span class="bottom-nav-icon">🛍️</span>
+            <span class="bottom-nav-label">Products</span>
+        </a>
+        <button type="button" class="bottom-nav-item" id="bottom-nav-cart" aria-label="Open Shopping Cart">
+            <div class="bottom-nav-icon-wrapper">
+                <span class="bottom-nav-icon">🛒</span>
+                <span class="bottom-cart-badge" id="bottom-cart-count-badge">0</span>
+            </div>
+            <span class="bottom-nav-label">Cart</span>
+        </button>
+        <button type="button" class="bottom-nav-item" id="bottom-nav-profile" aria-label="Open Account Profile">
+            <span class="bottom-nav-icon">👤</span>
+            <span class="bottom-nav-label">Profile</span>
+        </button>
+    </nav>
 
     <script type="module" src="./firebase-config.js"></script>
     <script type="module" src="./script.js"></script>
