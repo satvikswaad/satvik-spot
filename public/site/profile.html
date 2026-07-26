@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile & Saved Addresses | Satvik Swaad</title>
+    <meta name="description" content="Manage your Satvik Swaad account profile, delivery addresses, and order history." />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Outfit:wght@400;600;700;800;900&family=Rozha+One&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- TOP ANNOUNCEMENT MARQUEE BAR -->
+    <div class="top-marquee-bar" role="region" aria-label="Announcement">
+        <div class="marquee-content">
+            <span>🌿 100% Homemade Pure Satvik Pickles & Sweets</span>
+            <span>✨ No Preservatives | Prepared in Pure Cold-Pressed Oils & A2 Ghee</span>
+            <span>📦 Free Delivery on Orders Over ₹499 Across India</span>
+            <span>📲 Express WhatsApp Checkout Active</span>
+        </div>
+    </div>
+
+    <!-- SITE HEADER -->
+    <header class="site-header" role="banner">
+        <div class="header-container">
+            <div class="logo-group" onclick="window.location.href='index.html'">
+                <div>
+                    <span class="brand-title">Satvik Swaad</span>
+                    <span class="brand-sub">शुद्ध पारंपरिक स्वाद</span>
+                </div>
+            </div>
+
+            <nav class="main-nav" role="navigation" aria-label="Main Navigation">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Products</a>
+                <a href="why-us.html" class="nav-link">Why Us</a>
+                <a href="our-story.html" class="nav-link">Our Story</a>
+                <a href="reviews.html" class="nav-link">Reviews</a>
+                <a href="faq.html" class="nav-link">FAQ</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-right-actions">
+                <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Navigation Menu" aria-expanded="false">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE NAVIGATION DRAWER -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay">
+        <div class="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-border); padding-bottom: 12px;">
+                <span class="brand-title" style="font-size: 1.3rem;">Satvik Swaad</span>
+                <button id="mobile-menu-close" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
+            </div>
+            <a href="index.html" class="mobile-nav-link">Home</a>
+            <a href="products.html" class="mobile-nav-link">Products (15)</a>
+            <a href="why-us.html" class="mobile-nav-link">Why Us</a>
+            <a href="our-story.html" class="mobile-nav-link">Our Story</a>
+            <a href="reviews.html" class="mobile-nav-link">Reviews</a>
+            <a href="faq.html" class="mobile-nav-link">FAQ</a>
+            <a href="contact.html" class="mobile-nav-link">Contact</a>
+            <a href="profile.html" class="mobile-nav-link active" style="border-top: 1px solid var(--color-border); margin-top: 8px; padding-top: 12px; color: var(--color-maroon); font-weight: 800;">👤 My Profile & Saved Addresses</a>
+        </div>
+    </div>
+
+    <!-- BREADCRUMBS -->
+    <nav class="breadcrumb-container" aria-label="Breadcrumb">
+        <div class="breadcrumb-inner">
+            <a href="index.html">Home</a>
+            <span>›</span>
+            <span class="current">My Account Profile</span>
+        </div>
+    </nav>
+
+    <!-- MAIN PROFILE CONTENT CONTAINER -->
+    <main style="max-width: 900px; margin: 0 auto; padding: 20px 16px 60px;">
+
+        <!-- USER AVATAR CARD HEADER -->
+        <div style="background: linear-gradient(135deg, var(--color-maroon), #5c1800); border-radius: 16px; padding: 24px; color: #FFFFFF; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-medium); margin-bottom: 24px;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: #FFD700; color: var(--color-maroon); font-size: 2rem; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0; border: 3px solid #FFFFFF;">
+                👤
+            </div>
+            <div style="flex: 1;">
+                <h1 style="margin: 0; font-size: 1.5rem; font-family: 'Rozha One', serif; color: #FFD700;" id="profile-display-name">Welcome to Satvik Swaad</h1>
+                <p style="margin: 4px 0 0; font-size: 0.9rem; opacity: 0.9;" id="profile-display-phone">Manage your delivery details & orders</p>
+            </div>
+        </div>
+
+        <!-- PROFILE TABS / SECTIONS CONTAINER -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+
+            <!-- SECTION 1: PERSONAL INFORMATION FORM -->
+            <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-soft);">
+                <div style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px;">
+                    <span style="font-size: 1.3rem;">📋</span>
+                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--color-maroon);">Personal Information</h2>
+                </div>
+                <form id="form-profile-details">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">Full Name *</label>
+                        <input type="text" id="prof-name" placeholder="Enter your full name" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">WhatsApp Mobile Number *</label>
+                        <input type="tel" id="prof-phone" placeholder="10-digit mobile number" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">Email Address (Optional)</label>
+                        <input type="email" id="prof-email" placeholder="name@example.com" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
+                    </div>
+                    <button type="submit" style="width: 100%; padding: 12px; background: var(--color-maroon); color: #FFFFFF; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer;">Save Profile Info 💾</button>
+                </form>
+            </div>
+
+            <!-- SECTION 2: SAVED DELIVERY ADDRESS -->
+            <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-soft);">
+                <div style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px;">
+                    <span style="font-size: 1.3rem;">🏡</span>
+                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--color-maroon);">Saved Delivery Address</h2>
+                </div>
+                <form id="form-address-details">
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">House / Building / Flat No. *</label>
+                        <input type="text" id="prof-house" placeholder="e.g. Flat 402, Royal Enclave" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">Street / Area / Landmark *</label>
+                        <input type="text" id="prof-street" placeholder="e.g. Near Shiv Temple, Sector 12" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">City / Town *</label>
+                            <input type="text" id="prof-city" placeholder="City" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">Pincode *</label>
+                            <input type="text" id="prof-pincode" placeholder="6-digit Pincode" maxlength="6" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                        </div>
+                    </div>
+                    <button type="submit" style="width: 100%; padding: 12px; background: var(--color-saffron); color: #FFFFFF; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer;">Save Delivery Address 📍</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- SECTION 3: MY ORDERS & QUICK RE-ORDER -->
+        <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: 16px; padding: 20px; margin-top: 24px; box-shadow: var(--shadow-soft);">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.3rem;">📦</span>
+                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--color-maroon);">Recent Orders History</h2>
+                </div>
+                <a href="products.html" style="font-size: 0.85rem; font-weight: 800; color: var(--color-maroon); text-decoration: underline;">Explore Catalogue →</a>
+            </div>
+            <div id="profile-orders-list">
+                <p style="text-align: center; color: var(--color-sub); padding: 20px 0;">No past orders recorded on this device yet. Browse our homemade catalogue and place your first order!</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-container">
+            <div>
+                <h3 class="footer-brand">Satvik Swaad</h3>
+                <p class="footer-desc">Authentic homemade pickles, murabbas, and traditional sweets crafted with zero artificial preservatives in pure mustard oil and A2 cow ghee.</p>
+            </div>
+            <div>
+                <h4 class="footer-heading">Quick Links</h4>
+                <ul class="footer-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">All 15 Products</a></li>
+                    <li><a href="why-us.html">Why Choose Us</a></li>
+                    <li><a href="our-story.html">Our Heritage Story</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-heading">Help & Legal</h4>
+                <ul class="footer-list">
+                    <li><a href="faq.html">FAQ & Help</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="terms-and-conditions.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-heading">Quality & Trust</h4>
+                <ul class="footer-list">
+                    <li>FSSAI Licence: <strong>PENDING</strong></li>
+                    <li>GSTIN: <strong>PENDING</strong></li>
+                    <li>Pure Cold-Pressed Mustard Oil</li>
+                    <li>100% Chemical Free</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Satvik Swaad. All rights reserved.</span>
+            <span>Crafted with ❤️ in India | Pure Taste of Tradition</span>
+        </div>
+    </footer>
+
+    <button id="btn-scroll-top" aria-label="Scroll to top">↑</button>
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Navigation Bar">
+        <a href="index.html" class="bottom-nav-item" id="bottom-nav-home">
+            <span class="bottom-nav-icon">🏠</span>
+            <span class="bottom-nav-label">Home</span>
+        </a>
+        <a href="products.html" class="bottom-nav-item" id="bottom-nav-products">
+            <span class="bottom-nav-icon">🛍️</span>
+            <span class="bottom-nav-label">Products</span>
+        </a>
+        <button type="button" class="bottom-nav-item" id="bottom-nav-cart" aria-label="Open Shopping Cart">
+            <div class="bottom-nav-icon-wrapper">
+                <span class="bottom-nav-icon">🛒</span>
+                <span class="bottom-cart-badge" id="bottom-cart-count-badge">0</span>
+            </div>
+            <span class="bottom-nav-label">Cart</span>
+        </button>
+        <a href="profile.html" class="bottom-nav-item active" id="bottom-nav-profile" aria-label="Open Account Profile">
+            <span class="bottom-nav-icon">👤</span>
+            <span class="bottom-nav-label">Profile</span>
+        </a>
+    </nav>
+
+    <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./script.js"></script>
+</body>
+</html>

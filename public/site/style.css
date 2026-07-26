@@ -942,10 +942,55 @@ html, body {
         color: #FFFFFF;
         font-size: 0.62rem;
         font-weight: 900;
-        padding: 2px 5px;
-        border-radius: 10px;
         line-height: 1;
         border: 1px solid #FFFFFF;
+    }
+
+    /* MOBILE CHECKOUT MODAL PERFECT UI */
+    #checkout-modal .modal-content, #profile-modal .modal-content {
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+        padding: 18px !important;
+        border-radius: 16px !important;
+        width: 92vw !important;
+        box-sizing: border-box !important;
+    }
+    .checkout-modal input, .checkout-modal select, .checkout-modal textarea {
+        font-size: 16px !important; /* Prevents auto-zoom on iOS */
+        min-height: 46px !important;
+        padding: 10px 12px !important;
+        border-radius: 8px !important;
+    }
+
+    /* MOBILE SECONDARY PAGES RESPONSIVENESS (FAQ, REVIEWS, OUR STORY, WHY US) */
+    .page-hero, .section-title-wrapper {
+        padding: 16px 12px !important;
+        text-align: center !important;
+    }
+    .section-title, h1, h2 {
+        font-size: clamp(1.4rem, 5vw, 2rem) !important;
+        line-height: 1.25 !important;
+    }
+    .faq-container, .reviews-grid, .story-grid, .why-us-grid, .values-grid, .stats-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        padding: 12px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .faq-card, .review-card, .story-card, .why-card, .value-card, .stat-card {
+        padding: 16px !important;
+        border-radius: 12px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+    }
+    .story-img, .hero-img, .about-img {
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 250px !important;
+        object-fit: cover !important;
+        border-radius: 12px !important;
     }
 }
 

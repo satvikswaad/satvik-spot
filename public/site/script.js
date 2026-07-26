@@ -84,6 +84,7 @@ function runInitializers() {
     initReviewsData();
     initContactForm();
     initProductDetailsPage();
+    initProfilePage();
     renderCart();
 }
 
@@ -915,18 +916,87 @@ function applyAddressToForm(addr) {
 }
 
 export function openProfileModal() {
-    ensureModalsInDOM();
-    const modal = document.getElementById('profile-modal');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    const closeBtn = document.getElementById('btn-close-profile');
-    if (closeBtn) closeBtn.onclick = closeProfileModal;
-    renderProfileContent();
+    window.location.href = 'profile.html';
 }
 
 export function closeProfileModal() {
     const modal = document.getElementById('profile-modal');
     if (modal) modal.style.display = 'none';
+}
+
+function initProfilePage() {
+    const formProfile = document.getElementById('form-profile-details');
+    const formAddress = document.getElementById('form-address-details');
+    const displayName = document.getElementById('profile-display-name');
+    const displayPhone = document.getElementById('profile-display-phone');
+    const ordersContainer = document.getElementById('profile-orders-list');
+
+    let savedProfile = {};
+    try {
+        savedProfile = JSON.parse(localStorage.getItem('satvik_user_profile') || '{}');
+    } catch (e) { savedProfile = {}; }
+
+    if (document.getElementById('prof-name')) document.getElementById('prof-name').value = savedProfile.name || '';
+    if (document.getElementById('prof-phone')) document.getElementById('prof-phone').value = savedProfile.phone || '';
+    if (document.getElementById('prof-email')) document.getElementById('prof-email').value = savedProfile.email || '';
+    if (document.getElementById('prof-house')) document.getElementById('prof-house').value = savedProfile.house || '';
+    if (document.getElementById('prof-street')) document.getElementById('prof-street').value = savedProfile.street || '';
+    if (document.getElementById('prof-city')) document.getElementById('prof-city').value = savedProfile.city || '';
+    if (document.getElementById('prof-pincode')) document.getElementById('prof-pincode').value = savedProfile.pincode || '';
+
+    if (savedProfile.name && displayName) displayName.textContent = `Welcome, ${savedProfile.name}`;
+    if (savedProfile.phone && displayPhone) displayPhone.textContent = `📱 ${savedProfile.phone} | Default Delivery Customer`;
+
+    if (formProfile) {
+        formProfile.addEventListener('submit', (e) => {
+            e.preventDefault();
+            savedProfile.name = document.getElementById('prof-name')?.value.trim();
+            savedProfile.phone = document.getElementById('prof-phone')?.value.trim();
+            savedProfile.email = document.getElementById('prof-email')?.value.trim();
+            localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
+            if (displayName && savedProfile.name) displayName.textContent = `Welcome, ${savedProfile.name}`;
+            if (displayPhone && savedProfile.phone) displayPhone.textContent = `📱 ${savedProfile.phone} | Default Delivery Customer`;
+            showToast('✅ Personal Information Saved Successfully!');
+        });
+    }
+
+    if (formAddress) {
+        formAddress.addEventListener('submit', (e) => {
+            e.preventDefault();
+            savedProfile.house = document.getElementById('prof-house')?.value.trim();
+            savedProfile.street = document.getElementById('prof-street')?.value.trim();
+            savedProfile.city = document.getElementById('prof-city')?.value.trim();
+            savedProfile.pincode = document.getElementById('prof-pincode')?.value.trim();
+            localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
+            showToast('📍 Delivery Address Saved Successfully!');
+        });
+    }
+
+    // Render Order History if present
+    if (ordersContainer) {
+        let history = [];
+        try {
+            history = JSON.parse(localStorage.getItem('satwik_orders_history') || '[]');
+        } catch (e) { history = []; }
+
+        if (history.length > 0) {
+            const frag = document.createDocumentFragment();
+            history.forEach(order => {
+                const card = createSafeElement('div', { className: 'order-history-card' });
+                card.style.cssText = 'border: 2px solid var(--color-border); border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #fafafa;';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: 800; color: var(--color-maroon);">Order #${order.orderId || 'STK-' + Date.now().toString().slice(-4)}</span>
+                        <span style="font-size: 0.8rem; background: #e6f7ff; color: #1890ff; padding: 4px 8px; border-radius: 6px; font-weight: 700;">${order.status || 'CONFIRMED'}</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--color-sub); margin-bottom: 6px;">Date: ${order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN') : 'Recent'}</div>
+                    <div style="font-weight: 700; margin-bottom: 8px;">Total: ₹${order.totalPrice || order.total || 0}</div>
+                `;
+                frag.appendChild(card);
+            });
+            ordersContainer.replaceChildren(frag);
+        }
+    }
 }
 
 async function renderProfileContent() {
