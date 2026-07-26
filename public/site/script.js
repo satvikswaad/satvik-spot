@@ -578,10 +578,9 @@ function renderCart() {
     const totalQty = items.reduce((acc, item) => acc + item.qty, 0);
     const totalPrice = items.reduce((acc, item) => acc + (item.qty * item.price), 0);
 
-    const bottomCountBadge = document.getElementById('bottom-cart-count-badge');
+    const countBadges = document.querySelectorAll('#cart-count-badge, #header-cart-count, #bottom-cart-count-badge, .cart-count');
+    countBadges.forEach(b => { if (b) b.textContent = String(totalQty); });
 
-    if (countBadge) countBadge.textContent = String(totalQty);
-    if (bottomCountBadge) bottomCountBadge.textContent = String(totalQty);
     if (totalEl) totalEl.textContent = `₹${totalPrice}`;
 
     if (items.length === 0) {
@@ -644,11 +643,13 @@ function renderCart() {
 }
 
 function animateCartBadge() {
-    const countBadge = document.getElementById('cart-count-badge');
-    if (!countBadge) return;
-    countBadge.classList.remove('bump');
-    void countBadge.offsetWidth;
-    countBadge.classList.add('bump');
+    const badges = document.querySelectorAll('#cart-count-badge, #header-cart-count, #bottom-cart-count-badge, .cart-badge, .bottom-cart-badge');
+    badges.forEach(b => {
+        if (!b) return;
+        b.classList.remove('bump');
+        void b.offsetWidth;
+        b.classList.add('bump');
+    });
 }
 
 function openCart() {
