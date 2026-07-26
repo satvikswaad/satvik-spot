@@ -1058,49 +1058,124 @@ html, body {
         justify-content: center !important;
     }
 
-    /* MOBILE CHECKOUT MODAL PERFECT UI */
-    #checkout-modal .modal-content, #profile-modal .modal-content {
-        max-height: 90vh !important;
+    /* MOBILE CHECKOUT MODAL PERFECT 1-COLUMN RESPONSIVE LAYOUT (SCREENSHOT 3 FIX) */
+    #checkout-modal {
+        padding: 10px !important;
+        align-items: flex-start !important;
         overflow-y: auto !important;
-        padding: 18px !important;
-        border-radius: 16px !important;
-        width: 92vw !important;
+    }
+    .checkout-modal-box, #checkout-modal .modal-box {
+        width: 96vw !important;
+        max-width: 96vw !important;
+        max-height: 88vh !important;
+        padding: 16px 12px !important;
+        margin: 10px auto !important;
+        border-radius: 14px !important;
         box-sizing: border-box !important;
     }
-    .checkout-modal input, .checkout-modal select, .checkout-modal textarea {
+    .checkout-grid, #checkout-form .checkout-grid, #checkout-modal div[style*="grid-template-columns"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        width: 100% !important;
+    }
+    .checkout-grid > div {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .form-row-2, #checkout-form .form-row-2 {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    #checkout-form input, #checkout-form select, #checkout-form textarea {
+        width: 100% !important;
+        box-sizing: border-box !important;
         font-size: 16px !important; /* Prevents auto-zoom on iOS */
-        min-height: 46px !important;
+        min-height: 44px !important;
         padding: 10px 12px !important;
-        border-radius: 8px !important;
     }
 
-    /* MOBILE SECONDARY PAGES RESPONSIVENESS (FAQ, REVIEWS, OUR STORY, WHY US) */
+    /* PRODUCT DETAILS PAGE MOBILE PERFECT RESPONSIVE LAYOUT (SCREENSHOT 1 FIX) */
+    #pd-main-section, .pd-main-layout, #pd-main-section[style*="grid-template-columns"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+        margin-bottom: 30px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .pd-gallery-wrapper, .pd-info-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .pd-main-image-box {
+        min-height: 220px !important;
+        max-height: 270px !important;
+        padding: 14px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    #pd-main-img {
+        max-height: 230px !important;
+        width: auto !important;
+    }
+    #pd-title {
+        font-size: 1.4rem !important;
+        line-height: 1.25 !important;
+    }
+    #pd-short-desc {
+        font-size: 0.88rem !important;
+        line-height: 1.45 !important;
+        margin-bottom: 14px !important;
+    }
+    #pd-variants-container {
+        display: flex !important;
+        flex-direction: flex-start !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    /* MOBILE SECONDARY PAGES & BRAND STORY CARDS RESPONSIVENESS (SCREENSHOTS 2, 4, 5 FIX) */
     .page-hero, .section-title-wrapper {
         padding: 16px 12px !important;
         text-align: center !important;
     }
     .section-title, h1, h2 {
-        font-size: clamp(1.4rem, 5vw, 2rem) !important;
+        font-size: clamp(1.3rem, 5vw, 1.8rem) !important;
         line-height: 1.25 !important;
     }
-    .faq-container, .reviews-grid, .story-grid, .why-us-grid, .values-grid, .stats-grid {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
+    .faq-container, .reviews-grid, .story-grid, .why-us-grid, .values-grid, .stats-grid,
+    main section > div[style*="grid-template-columns"] {
+        display: flex !important;
+        flex-direction: column !important;
         gap: 14px !important;
-        padding: 12px !important;
+        padding: 8px 0 !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
     }
-    .faq-card, .review-card, .story-card, .why-card, .value-card, .stat-card {
-        padding: 16px !important;
+    .faq-card, .review-card, .story-card, .why-card, .value-card, .stat-card,
+    .story-grid > div, .why-us-grid > div {
+        padding: 18px 14px !important;
         border-radius: 12px !important;
         box-sizing: border-box !important;
         width: 100% !important;
+        max-width: 100% !important;
+    }
+    .story-card h3, .value-card h3, .why-card h3, .story-grid h3 {
+        font-size: 1.2rem !important;
+        margin-bottom: 8px !important;
+    }
+    .story-card p, .value-card p, .why-card p, .story-grid p {
+        font-size: 0.88rem !important;
+        line-height: 1.45 !important;
     }
     .story-img, .hero-img, .about-img {
         max-width: 100% !important;
         height: auto !important;
-        max-height: 250px !important;
+        max-height: 220px !important;
         object-fit: cover !important;
         border-radius: 12px !important;
     }
