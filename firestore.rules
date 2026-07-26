@@ -66,8 +66,7 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create, update: if isOwner(userId) &&
-        hasOnlyAllowedFields(['name', 'phone', 'email', 'address', 'createdAt']) &&
-        isValidString(request.resource.data.name, 2, 100) &&
+        hasOnlyAllowedFields(['uid', 'name', 'phone', 'email', 'address', 'house', 'street', 'city', 'pincode', 'updatedAt', 'createdAt']) &&
         !('admin' in request.resource.data) &&
         !('role' in request.resource.data) &&
         !('roles' in request.resource.data) &&

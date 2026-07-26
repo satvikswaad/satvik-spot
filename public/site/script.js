@@ -989,6 +989,43 @@ function initProfilePage() {
 
     fillFormFields(savedProfile);
 
+    async function syncProfileToFirestore(data) {
+        const user = window.auth?.currentUser;
+        if (!user || !window.db || !window.firestoreDoc || !window.firestoreSetDoc) return;
+        try {
+            const userRef = window.firestoreDoc(window.db, 'users', user.uid);
+            await window.firestoreSetDoc(userRef, {
+                uid: user.uid,
+                email: user.email || data.email || '',
+                name: data.name || user.displayName || '',
+                phone: data.phone || '',
+                house: data.house || '',
+                street: data.street || '',
+                city: data.city || '',
+                pincode: data.pincode || '',
+                updatedAt: window.firestoreServerTimestamp ? window.firestoreServerTimestamp() : new Date().toISOString()
+            }, { merge: true });
+        } catch (err) {
+            console.warn('Firestore User Sync Warning:', err);
+        }
+    }
+
+    async function loadProfileFromFirestore(user) {
+        if (!user || !window.db || !window.firestoreDoc || !window.firestoreGetDoc) return;
+        try {
+            const userRef = window.firestoreDoc(window.db, 'users', user.uid);
+            const snap = await window.firestoreGetDoc(userRef);
+            if (snap.exists()) {
+                const cloudData = snap.data();
+                savedProfile = { ...savedProfile, ...cloudData };
+                localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
+                fillFormFields(savedProfile);
+            }
+        } catch (err) {
+            console.warn('Failed to load profile from Firestore:', err);
+        }
+    }
+
     // Google Sign-In Handler
     if (btnSignIn) {
         btnSignIn.addEventListener('click', async () => {
@@ -1000,10 +1037,14 @@ function initProfilePage() {
                 const provider = new window.GoogleAuthProvider();
                 const result = await window.signInWithPopup(window.auth, provider);
                 const user = result.user;
-                showToast(`✅ Welcome back, ${user.displayName || 'Customer'}!`);
+                showToast(`✅ Welcome, ${user.displayName || user.email || 'Customer'}!`);
             } catch (err) {
                 console.error('Google Sign-In Error:', err);
-                showToast(`❌ Sign-in failed: ${err.message || 'Error occurred'}`);
+                if (err.code === 'auth/popup-closed-by-user') {
+                    showToast('ℹ️ Sign-in window closed. Click Sign in to complete.');
+                } else {
+                    showToast(`❌ Sign-in failed: ${err.message || 'Error occurred'}`);
+                }
             }
         });
     }
@@ -1024,13 +1065,16 @@ function initProfilePage() {
             if (user) {
                 if (btnSignIn) btnSignIn.style.display = 'none';
                 if (btnSignOut) btnSignOut.style.display = 'inline-flex';
-                if (authTitle) authTitle.innerHTML = `<span>✅ Google Verified:</span> <span>${user.displayName || user.email}</span>`;
+                if (authTitle) authTitle.innerHTML = `<span>✅ Logged in as:</span> <span>${user.email || user.displayName}</span>`;
                 if (authDesc) authDesc.textContent = 'Your delivery details, saved addresses, and order history are securely backed up in your cloud profile.';
 
                 if (!savedProfile.name && user.displayName) savedProfile.name = user.displayName;
                 if (!savedProfile.email && user.email) savedProfile.email = user.email;
                 fillFormFields(savedProfile);
                 localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
+
+                // Restore saved profile & address data from Firestore
+                await loadProfileFromFirestore(user);
             } else {
                 if (btnSignIn) btnSignIn.style.display = 'flex';
                 if (btnSignOut) btnSignOut.style.display = 'none';
@@ -1041,26 +1085,28 @@ function initProfilePage() {
     }
 
     if (formProfile) {
-        formProfile.addEventListener('submit', (e) => {
+        formProfile.addEventListener('submit', async (e) => {
             e.preventDefault();
             savedProfile.name = document.getElementById('prof-name')?.value.trim();
             savedProfile.phone = document.getElementById('prof-phone')?.value.trim();
             savedProfile.email = document.getElementById('prof-email')?.value.trim();
             localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
             fillFormFields(savedProfile);
-            showToast('✅ Personal Information Saved Successfully!');
+            await syncProfileToFirestore(savedProfile);
+            showToast('✅ Personal Information & Cloud Sync Saved!');
         });
     }
 
     if (formAddress) {
-        formAddress.addEventListener('submit', (e) => {
+        formAddress.addEventListener('submit', async (e) => {
             e.preventDefault();
             savedProfile.house = document.getElementById('prof-house')?.value.trim();
             savedProfile.street = document.getElementById('prof-street')?.value.trim();
             savedProfile.city = document.getElementById('prof-city')?.value.trim();
             savedProfile.pincode = document.getElementById('prof-pincode')?.value.trim();
             localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
-            showToast('📍 Delivery Address Saved Successfully!');
+            await syncProfileToFirestore(savedProfile);
+            showToast('📍 Delivery Address & Cloud Sync Saved!');
         });
     }
 
