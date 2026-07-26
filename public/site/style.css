@@ -173,7 +173,7 @@ header.site-header {
 .nav-link.active::after { width: 100%; background: var(--color-maroon); }
 
 .mobile-menu-toggle {
-    display: flex; align-items: center; justify-content: center;
+    display: none; align-items: center; justify-content: center;
     background: #FFFFFF; border: 2px solid var(--color-gold);
     color: var(--color-maroon); font-size: 1.4rem; padding: 6px 14px; border-radius: 10px;
     cursor: pointer; font-weight: 900; min-height: 42px;
@@ -739,24 +739,8 @@ html, body {
         height: 36px !important;
     }
 
-    .btn-profile-trigger {
-        padding: 6px 10px !important;
-        font-size: 0.82rem !important;
-        min-height: 36px !important;
-        height: 36px !important;
-        gap: 4px !important;
-    }
-
-    .btn-cart-trigger {
-        padding: 6px 10px !important;
-        font-size: 0.82rem !important;
-        min-height: 36px !important;
-        height: 36px !important;
-        gap: 4px !important;
-    }
-
-    .cart-label-text {
-        display: none !important; /* Hide 'Cart' text in top header on mobile to fit perfectly */
+    .btn-profile-trigger, .btn-cart-trigger {
+        display: none !important; /* Hide from top header on mobile since fixed bottom nav bar handles them */
     }
 
     /* HERO SLIDER MOBILE ADJUSTMENTS */
