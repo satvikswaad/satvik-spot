@@ -1104,7 +1104,7 @@ function initProfilePage() {
                 if (btnSignIn) btnSignIn.style.setProperty('display', 'none', 'important');
                 if (btnSignOut) btnSignOut.style.setProperty('display', 'inline-flex', 'important');
                 if (authTitle) authTitle.innerHTML = `<span>✅ Logged in as:</span> <span>${user.email || user.displayName}</span>`;
-                if (authDesc) authDesc.textContent = 'Cloud Sync Active. Your delivery details, saved addresses, and order history are securely backed up in Firestore.';
+                if (authDesc) authDesc.textContent = 'Cloud Sync Active. Your delivery details, saved addresses, and order history are securely saved to your Cloud Account.';
 
                 const userHeadingName = user.displayName || (user.email ? user.email.split('@')[0] : 'Customer');
                 if (displayName) displayName.textContent = `Welcome, ${userHeadingName}`;
