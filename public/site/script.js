@@ -112,6 +112,13 @@ function initUI() {
         });
     }
     if (btnCheckout) btnCheckout.addEventListener('click', openCheckout);
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('#btn-checkout, .btn-checkout');
+        if (btn) {
+            e.preventDefault();
+            openCheckout();
+        }
+    });
     if (btnCloseCheckout) btnCloseCheckout.addEventListener('click', closeCheckout);
     if (btnCloseCheckoutIcon) btnCloseCheckoutIcon.addEventListener('click', closeCheckout);
     if (formCheckout) formCheckout.addEventListener('submit', (e) => { e.preventDefault(); placeOrder(); });
@@ -581,7 +588,8 @@ function renderCart() {
     const countBadges = document.querySelectorAll('#cart-count-badge, #header-cart-count, #bottom-cart-count-badge, .cart-count');
     countBadges.forEach(b => { if (b) b.textContent = String(totalQty); });
 
-    if (totalEl) totalEl.textContent = `₹${totalPrice}`;
+    const totalEls = document.querySelectorAll('#cart-total-display, #cart-total-price');
+    totalEls.forEach(el => { if (el) el.textContent = `₹${totalPrice}`; });
 
     if (items.length === 0) {
         const emptyP = createSafeElement('p', {
