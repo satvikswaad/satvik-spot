@@ -1139,16 +1139,107 @@ html, body {
     }
 
     /* MOBILE SECONDARY PAGES & BRAND STORY CARDS RESPONSIVENESS (SCREENSHOTS 2, 4, 5 FIX) */
-    .page-hero, .section-title-wrapper {
+    .page-hero, .section-title-wrapper, .page-header-section {
         padding: 16px 12px !important;
         text-align: center !important;
     }
-    .section-title, h1, h2 {
-        font-size: clamp(1.3rem, 5vw, 1.8rem) !important;
+    .section-title, .page-title, h1, h2 {
+        font-size: clamp(1.3rem, 5vw, 1.75rem) !important;
         line-height: 1.25 !important;
     }
-    .faq-container, .reviews-grid, .story-grid, .why-us-grid, .values-grid, .stats-grid,
-    main section > div[style*="grid-template-columns"] {
+    .page-subtitle {
+        font-size: 0.85rem !important;
+        line-height: 1.4 !important;
+        color: var(--color-sub) !important;
+    }
+
+    /* ALL POLICY PAGES RESPONSIVE 1-COLUMN COLLAPSE (PRIVACY, TERMS, SHIPPING, REFUND, DATA REQUEST) */
+    .policy-wrapper, .content-grid-section,
+    div[style*="grid-template-columns: 260px 1fr"],
+    div[style*="grid-template-columns: 1fr 1fr"],
+    div[style*="grid-template-columns:repeat(2"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        padding: 0 10px 40px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .policy-toc, aside.policy-toc {
+        position: relative !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 14px 12px !important;
+        margin-bottom: 16px !important;
+        border-radius: 12px !important;
+    }
+
+    .policy-toc ol, .policy-toc ul {
+        max-height: 160px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-right: 6px !important;
+    }
+
+    .policy-content, .contact-card-wrapper, article, section > div[style*="background: #ffffff"], section > div[style*="background:#ffffff"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 18px 14px !important;
+        border-radius: 12px !important;
+    }
+
+    .policy-content p, .policy-content li, article p, article li {
+        font-size: 0.88rem !important;
+        line-height: 1.45 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+
+    /* POLICY HUB NAVIGATION TABS HORIZONTAL SCROLL BAR */
+    .policy-nav-tabs-wrapper, .policy-tabs-bar {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 6px !important;
+        padding: 8px 10px !important;
+        margin-bottom: 16px !important;
+        scrollbar-width: none !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        background: #FAF5EF !important;
+        border-bottom: 2px solid var(--color-gold-light) !important;
+    }
+    .policy-nav-tabs-wrapper::-webkit-scrollbar {
+        display: none !important;
+    }
+    .policy-nav-tab {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        padding: 6px 12px !important;
+        font-size: 0.78rem !important;
+        font-weight: 800 !important;
+        border-radius: 50px !important;
+        background: #FFFFFF !important;
+        border: 1.5px solid var(--color-gold) !important;
+        color: var(--color-maroon) !important;
+        text-decoration: none !important;
+        min-height: 32px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+    .policy-nav-tab.active {
+        background: var(--color-maroon) !important;
+        color: #FFFFFF !important;
+        border-color: var(--color-maroon) !important;
+    }
+
+    .faq-container, .reviews-grid, .story-grid, .why-us-grid, .values-grid, .stats-grid {
         display: flex !important;
         flex-direction: column !important;
         gap: 14px !important;
