@@ -1059,30 +1059,39 @@ function initProfilePage() {
         });
     }
 
-    // Auth State Listener for Cloud Sync
-    if (window.auth && window.onAuthStateChanged) {
+    // Auth State Listener with Retry Safeguard for Module Loading
+    function setupAuthListener() {
+        if (!window.auth || !window.onAuthStateChanged) {
+            setTimeout(setupAuthListener, 250);
+            return;
+        }
         window.onAuthStateChanged(window.auth, async (user) => {
             if (user) {
-                if (btnSignIn) btnSignIn.style.display = 'none';
-                if (btnSignOut) btnSignOut.style.display = 'inline-flex';
+                if (btnSignIn) btnSignIn.style.setProperty('display', 'none', 'important');
+                if (btnSignOut) btnSignOut.style.setProperty('display', 'inline-flex', 'important');
                 if (authTitle) authTitle.innerHTML = `<span>✅ Logged in as:</span> <span>${user.email || user.displayName}</span>`;
-                if (authDesc) authDesc.textContent = 'Your delivery details, saved addresses, and order history are securely backed up in your cloud profile.';
+                if (authDesc) authDesc.textContent = 'Cloud Sync Active. Your delivery details, saved addresses, and order history are securely backed up in Firestore.';
 
                 if (!savedProfile.name && user.displayName) savedProfile.name = user.displayName;
                 if (!savedProfile.email && user.email) savedProfile.email = user.email;
                 fillFormFields(savedProfile);
                 localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
 
-                // Restore saved profile & address data from Firestore
+                // 1. Instantly create/upsert Firestore user document on sign in
+                await syncProfileToFirestore(savedProfile);
+
+                // 2. Restore saved profile & address data from Firestore
                 await loadProfileFromFirestore(user);
             } else {
-                if (btnSignIn) btnSignIn.style.display = 'flex';
-                if (btnSignOut) btnSignOut.style.display = 'none';
+                if (btnSignIn) btnSignIn.style.setProperty('display', 'flex', 'important');
+                if (btnSignOut) btnSignOut.style.setProperty('display', 'none', 'important');
                 if (authTitle) authTitle.innerHTML = `<span>🔐</span> <span>Cloud Account Backup & Restore</span>`;
                 if (authDesc) authDesc.textContent = 'Sign in with Google to securely store and restore your delivery details, saved addresses, and order history across devices or after clearing browser cache.';
             }
         });
     }
+
+    setupAuthListener();
 
     if (formProfile) {
         formProfile.addEventListener('submit', async (e) => {
