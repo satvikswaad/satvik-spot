@@ -20,7 +20,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.9,
     reviewCount: 28,
     images: [
-      "assets/mango_pickle.jpg"
+      "assets/aam-ka-achar.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 149, mrp: 190, sku: "SAT-AAM-250G", stock: 50, active: true },
@@ -44,7 +44,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.7,
     reviewCount: 16,
     images: [
-      "assets/mix_veg_pickle.jpg"
+      "assets/karela-ka-achar.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 159, mrp: 200, sku: "SAT-KAR-250G", stock: 40, active: true },
@@ -68,7 +68,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.8,
     reviewCount: 22,
     images: [
-      "assets/amla_murabba.jpg"
+      "assets/amla-ka-achar.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 149, mrp: 190, sku: "SAT-AML-250G", stock: 45, active: true },
@@ -92,7 +92,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.6,
     reviewCount: 14,
     images: [
-      "assets/green_chutney.jpg"
+      "assets/amla-ki-chutney.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 139, mrp: 180, sku: "SAT-ACH-250G", stock: 35, active: true },
@@ -115,7 +115,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.9,
     reviewCount: 31,
     images: [
-      "assets/red_chilli_pickle.png"
+      "assets/lal-mirch-ka-achar.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 179, mrp: 220, sku: "SAT-LMC-250G", stock: 30, active: true },
@@ -139,7 +139,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.7,
     reviewCount: 19,
     images: [
-      "assets/green_chutney.jpg"
+      "assets/hari-mirch-ka-achar.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 129, mrp: 170, sku: "SAT-HMC-250G", stock: 40, active: true },
@@ -162,7 +162,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.8,
     reviewCount: 25,
     images: [
-      "assets/mango_pickle.jpg"
+      "assets/nimbu-mirch-ka-achar.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 139, mrp: 180, sku: "SAT-NIM-250G", stock: 45, active: true },
@@ -186,7 +186,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.8,
     reviewCount: 18,
     images: [
-      "assets/mix_veg_pickle.jpg"
+      "assets/amda-ka-achar.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 169, mrp: 210, sku: "SAT-LHS-250G", stock: 35, active: true },
@@ -209,7 +209,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.7,
     reviewCount: 15,
     images: [
-      "assets/mix_veg_pickle.jpg"
+      "assets/kathal-ka-achar.png"
     ],
     variants: [
       { id: "var_250g", label: "250 g", weightGrams: 250, price: 149, mrp: 190, sku: "SAT-MIX-250G", stock: 40, active: true },
@@ -232,7 +232,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.9,
     reviewCount: 34,
     images: [
-      "assets/amla_murabba.jpg"
+      "assets/amla-murabba-sugar.png"
     ],
     variants: [
       { id: "var_500g", label: "500 g", weightGrams: 500, price: 279, mrp: 350, sku: "SAT-MUR-500G", stock: 30, active: true },
@@ -255,7 +255,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.8,
     reviewCount: 12,
     images: [
-      "assets/amla_murabba.jpg"
+      "assets/amla-murabba-jaggery.png"
     ],
     variants: [
       { id: "var_500g", label: "500 g", weightGrams: 500, price: 349, mrp: 440, sku: "SAT-SEB-500G", stock: 25, active: true },
@@ -278,7 +278,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 5.0,
     reviewCount: 42,
     images: [
-      "assets/gond_laddu.png"
+      "assets/amla-laddu-jaggery.png"
     ],
     variants: [
       { id: "var_500g", label: "500 g", weightGrams: 500, price: 499, mrp: 620, sku: "SAT-GND-500G", stock: 20, active: true },
@@ -301,7 +301,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.9,
     reviewCount: 38,
     images: [
-      "assets/amla_laddu.png"
+      "assets/amla-laddu-sugar.png"
     ],
     variants: [
       { id: "var_500g", label: "500 g", weightGrams: 500, price: 449, mrp: 560, sku: "SAT-BSN-500G", stock: 25, active: true },
@@ -324,7 +324,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.7,
     reviewCount: 20,
     images: [
-      "assets/amla_juice.png"
+      "assets/amla-juice.png"
     ],
     variants: [
       { id: "var_500ml", label: "500 ml", weightGrams: 500, price: 199, mrp: 250, sku: "SAT-JUC-500ML", stock: 35, active: true },
@@ -347,7 +347,7 @@ export const PRODUCTS_CATALOGUE = [
     rating: 4.9,
     reviewCount: 36,
     images: [
-      "assets/amla_murabba.jpg"
+      "assets/chyawanprash.png"
     ],
     variants: [
       { id: "var_500g", label: "500 g", weightGrams: 500, price: 599, mrp: 750, sku: "SAT-CHW-500G", stock: 25, active: true },

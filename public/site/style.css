@@ -173,10 +173,14 @@ header.site-header {
 .nav-link.active::after { width: 100%; background: var(--color-maroon); }
 
 .mobile-menu-toggle {
-    display: none; background: none; border: 2px solid var(--color-gold);
-    color: var(--color-maroon); font-size: 1.5rem; padding: 8px 14px; border-radius: 10px;
-    cursor: pointer; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    background: #FFFFFF; border: 2px solid var(--color-gold);
+    color: var(--color-maroon); font-size: 1.4rem; padding: 6px 14px; border-radius: 10px;
+    cursor: pointer; font-weight: 900; min-height: 42px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); transition: all var(--transition-fast);
 }
+.mobile-menu-toggle:hover { background: rgba(212, 175, 55, 0.15); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); }
+.mobile-menu-toggle:active { transform: translateY(0); }
 
 .btn-profile-trigger {
     background: #FFFFFF; color: var(--color-maroon); border: 2px solid var(--color-gold);
