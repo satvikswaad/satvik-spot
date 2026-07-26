@@ -994,7 +994,7 @@ function initProfilePage() {
         if (!user || !window.db || !window.firestoreDoc || !window.firestoreSetDoc) return;
         try {
             const userRef = window.firestoreDoc(window.db, 'users', user.uid);
-            await window.firestoreSetDoc(userRef, {
+            const userPayload = {
                 uid: user.uid,
                 email: user.email || data.email || '',
                 name: data.name || user.displayName || '',
@@ -1004,7 +1004,9 @@ function initProfilePage() {
                 city: data.city || '',
                 pincode: data.pincode || '',
                 updatedAt: window.firestoreServerTimestamp ? window.firestoreServerTimestamp() : new Date().toISOString()
-            }, { merge: true });
+            };
+            await window.firestoreSetDoc(userRef, userPayload, { merge: true });
+            console.log('✅ Firestore user doc synced for UID:', user.uid);
         } catch (err) {
             console.warn('Firestore User Sync Warning:', err);
         }
@@ -1075,6 +1077,8 @@ function initProfilePage() {
         btnSignOut.addEventListener('click', async () => {
             if (window.auth && window.signOut) {
                 await window.signOut(window.auth);
+                if (displayName) displayName.textContent = 'Welcome to Satvik Swaad';
+                if (displayPhone) displayPhone.textContent = 'Manage your delivery details & orders';
                 showToast('🚪 Signed out successfully');
             }
         });
@@ -1101,6 +1105,10 @@ function initProfilePage() {
                 if (btnSignOut) btnSignOut.style.setProperty('display', 'inline-flex', 'important');
                 if (authTitle) authTitle.innerHTML = `<span>✅ Logged in as:</span> <span>${user.email || user.displayName}</span>`;
                 if (authDesc) authDesc.textContent = 'Cloud Sync Active. Your delivery details, saved addresses, and order history are securely backed up in Firestore.';
+
+                const userHeadingName = user.displayName || (user.email ? user.email.split('@')[0] : 'Customer');
+                if (displayName) displayName.textContent = `Welcome, ${userHeadingName}`;
+                if (displayPhone) displayPhone.textContent = `✉️ ${user.email} | Verified Google Account`;
 
                 if (!savedProfile.name && user.displayName) savedProfile.name = user.displayName;
                 if (!savedProfile.email && user.email) savedProfile.email = user.email;
