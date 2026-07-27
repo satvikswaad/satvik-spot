@@ -182,45 +182,111 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
 
 export function generateWhatsAppPrefilledMessage(params: {
   publicOrderId: string;
-  items: Array<{ name: string; qty: number; unitPrice: number; lineTotal: number }>;
+  items: Array<{ name: string; qty: number; unitPrice: number; lineTotal: number; variantLabel?: string }>;
   subtotal: number;
   shippingFee: number;
   total: number;
   customerName: string;
   phone: string;
+  email?: string;
+  house?: string;
+  street?: string;
+  landmark?: string;
+  city?: string;
+  state?: string;
   pincode?: string;
+  address?: string;
+  note?: string;
+  paymentMethod?: string;
+  createdAt?: string;
 }): string {
-  const publicId = `#${params.publicOrderId.slice(-6).toUpperCase()}`;
-  const itemLines = params.items.map(i => `• ${i.name} (x${i.qty}) - ₹${i.lineTotal}`).join('\n');
-  const deliveryStr = params.shippingFee === 0 ? 'FREE (Promo)' : `₹${params.shippingFee}`;
+  const publicId = `${params.publicOrderId.slice(-6).toUpperCase()}`;
+
+  const now = params.createdAt ? new Date(params.createdAt) : new Date();
+  const dateStr = now.toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+
+  const formattedItems = params.items.map((item, index) => {
+    let baseName = item.name;
+    let variantSize = item.variantLabel || 'Standard';
+    const match = item.name.match(/^(.*?)\s*\((.*?)\)$/);
+    if (match) {
+      baseName = match[1];
+      variantSize = match[2];
+    }
+    return `${index + 1}. ${baseName}\n   • Variant: ${variantSize}\n   • Qty: x${item.qty}\n   • Price: ₹${item.unitPrice}\n   • Total: ₹${item.lineTotal}`;
+  }).join('\n\n');
+
+  const deliveryStr = params.shippingFee === 0 ? 'FREE 🎉' : `₹${params.shippingFee}`;
+  const discountStr = '₹0';
 
   const phoneDigits = params.phone.replace(/\D/g, '');
-  const maskedMobile = phoneDigits.length >= 10
-    ? `+91 ${phoneDigits.slice(-10, -4)}****${phoneDigits.slice(-4)}`
-    : params.phone;
+  const formattedPhone = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : params.phone;
 
-  const pincodeStr = params.pincode ? params.pincode : 'N/A';
+  const houseStr = params.house || params.address || 'N/A';
+  const streetStr = params.street || 'N/A';
+  const landmarkStr = params.landmark || 'N/A';
+  const cityStr = params.city || 'N/A';
+  const stateStr = params.state || 'N/A';
+  const pinStr = params.pincode || 'N/A';
+  const emailStr = params.email || 'N/A';
+  const noteStr = params.note || 'None';
+  const payMethodStr = params.paymentMethod || 'WhatsApp-Assisted Ordering';
 
-  return `Namaste Satvik Swaad,
+  return `🛒 *NEW ORDER REQUEST - SATVIK SWAAD*
 
-I want to continue with my order request.
+🙏 Namaste!
 
-Order ID: ${publicId}
+I would like to place the following order.
 
-Items:
-${itemLines}
+━━━━━━━━━━━━━━━━━━━━
+📦 *ORDER DETAILS*
+━━━━━━━━━━━━━━━━━━━━
+🆔 Order ID: #${publicId}
+📅 Order Date: ${dateStr}
 
+🛍️ *Items Ordered*
+${formattedItems}
+
+━━━━━━━━━━━━━━━━━━━━
+💰 *PAYMENT SUMMARY*
+━━━━━━━━━━━━━━━━━━━━
 Subtotal: ₹${params.subtotal}
-Delivery: ${deliveryStr}
-Final Amount: ₹${params.total}
+Delivery Charges: ${deliveryStr}
+Discount: ${discountStr}
+━━━━━━━━━━━━━━━━━━━━
+💳 *Grand Total: ₹${params.total}*
+━━━━━━━━━━━━━━━━━━━━
 
-Customer: ${params.customerName}
-Mobile: ${maskedMobile}
-PIN Code: ${pincodeStr}
+👤 *CUSTOMER DETAILS*
+Name: ${params.customerName}
+📞 Mobile: +91 ${formattedPhone}
+📧 Email: ${emailStr}
 
-Please verify this Order ID and send the official payment QR.
+📍 *DELIVERY ADDRESS*
+House/Flat: ${houseStr}
+Area/Street: ${streetStr}
+Landmark: ${landmarkStr}
+City: ${cityStr}
+State: ${stateStr}
+PIN Code: ${pinStr}
 
-Security: I will never share my UPI PIN, OTP, CVV or banking password.`;
+📝 *SPECIAL INSTRUCTIONS*
+${noteStr}
+
+💳 *PAYMENT METHOD*
+${payMethodStr}
+
+Kindly confirm:
+✅ Product availability
+✅ Final payable amount
+✅ Payment details (if applicable)
+✅ Expected dispatch/delivery time
+
+Thank you! 🙏`;
 }
 
 export interface WhatsAppOrderResult extends OrderCreationResult {
@@ -308,13 +374,20 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
       userId: userId || null,
       name: payload.name,
       phone: payload.phone,
+      email: payload.email || null,
+      house: payload.house || null,
+      street: payload.street || null,
+      landmark: payload.landmark || null,
+      city: payload.city || null,
+      state: payload.state || null,
       address: payload.address,
       pincode: payload.pincode || null,
+      note: payload.note || null,
       items: verifiedOrderItems,
       subtotal,
       shippingFee,
       total,
-      paymentMethod: 'WhatsApp-Assisted Ordering',
+      paymentMethod: payload.paymentMethod || 'WhatsApp-Assisted Ordering',
       paymentStatus: initialPaymentStatus,
       status: initialOrderStatus,
       guestSecretHash: guestSecretDetails ? guestSecretDetails.hashedSecret : null,
@@ -333,7 +406,16 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
       total,
       customerName: payload.name,
       phone: payload.phone,
-      pincode: payload.pincode
+      email: payload.email,
+      house: payload.house,
+      street: payload.street,
+      landmark: payload.landmark,
+      city: payload.city,
+      state: payload.state,
+      pincode: payload.pincode,
+      address: payload.address,
+      note: payload.note,
+      paymentMethod: payload.paymentMethod
     });
 
     const encodedMsg = encodeURIComponent(whatsappMessage);

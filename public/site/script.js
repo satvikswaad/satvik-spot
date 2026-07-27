@@ -936,15 +936,23 @@ async function populateCheckoutAddresses() {
 function applyAddressToForm(addr) {
     const nameInput = document.getElementById('co-name');
     const phoneInput = document.getElementById('co-phone');
-    const addressInput = document.getElementById('co-address');
+    const houseInput = document.getElementById('co-house');
+    const streetInput = document.getElementById('co-street');
+    const landmarkInput = document.getElementById('co-landmark');
     const cityInput = document.getElementById('co-city');
+    const stateInput = document.getElementById('co-state');
     const pincodeInput = document.getElementById('co-pincode');
+    const addressInput = document.getElementById('co-address');
 
     if (nameInput && addr.name) nameInput.value = addr.name;
     if (phoneInput && addr.phone) phoneInput.value = addr.phone.replace('+91', '');
-    if (addressInput) addressInput.value = `${addr.house}, ${addr.street}${addr.landmark ? ', ' + addr.landmark : ''}`;
+    if (houseInput && addr.house) houseInput.value = addr.house;
+    if (streetInput && addr.street) streetInput.value = addr.street;
+    if (landmarkInput && addr.landmark) landmarkInput.value = addr.landmark;
     if (cityInput && addr.city) cityInput.value = addr.city;
+    if (stateInput && addr.state) stateInput.value = addr.state;
     if (pincodeInput && addr.pincode) pincodeInput.value = addr.pincode;
+    if (addressInput) addressInput.value = `${addr.house || ''}, ${addr.street || ''}${addr.landmark ? ', ' + addr.landmark : ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}`;
 }
 
 export function openProfileModal() {
@@ -1729,23 +1737,53 @@ async function fetchProductReviews(productId, container) {
 export async function placeOrder() {
     const nameInput = document.getElementById('co-name');
     const phoneInput = document.getElementById('co-phone');
-    const addressInput = document.getElementById('co-address');
+    const emailInput = document.getElementById('co-email');
+    const houseInput = document.getElementById('co-house');
+    const streetInput = document.getElementById('co-street');
+    const landmarkInput = document.getElementById('co-landmark');
+    const cityInput = document.getElementById('co-city');
+    const stateInput = document.getElementById('co-state');
     const pincodeInput = document.getElementById('co-pincode');
+    const noteInput = document.getElementById('co-note');
     const errEl = document.getElementById('co-error-msg');
 
     if (errEl) { errEl.style.display = 'none'; }
 
     const name = nameInput ? nameInput.value.trim() : '';
     const phone = phoneInput ? phoneInput.value.trim() : '';
-    const address = addressInput ? addressInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const house = houseInput ? houseInput.value.trim() : '';
+    const street = streetInput ? streetInput.value.trim() : '';
+    const landmark = landmarkInput ? landmarkInput.value.trim() : '';
+    const city = cityInput ? cityInput.value.trim() : '';
+    const state = stateInput ? stateInput.value.trim() : '';
     const pincode = pincodeInput ? pincodeInput.value.trim() : '';
+    const note = noteInput ? noteInput.value.trim() : '';
 
-    if (!name || !phone || !address) {
+    const fullAddress = `${house}, ${street}${landmark ? ', ' + landmark : ''}, ${city}, ${state} - ${pincode}`;
+
+    if (!name || !phone || !house || !street || !city || !state || !pincode) {
         if (errEl) {
-            errEl.textContent = '⚠️ Please fill in all required shipping fields (Name, Phone, Address).';
+            errEl.textContent = '⚠️ Please fill in all required fields (Name, Phone, House No, Street/Area, City, State, Pincode).';
             errEl.style.display = 'block';
         } else {
-            alert('Please fill in all required shipping fields.');
+            alert('Please fill in all required delivery fields.');
+        }
+        return;
+    }
+
+    if (!/^[0-9]{10,15}$/.test(phone.replace(/\D/g, ''))) {
+        if (errEl) {
+            errEl.textContent = '⚠️ Please enter a valid 10-digit WhatsApp mobile number.';
+            errEl.style.display = 'block';
+        }
+        return;
+    }
+
+    if (!/^[0-9]{6}$/.test(pincode.trim())) {
+        if (errEl) {
+            errEl.textContent = '⚠️ Please enter a valid 6-digit Pincode.';
+            errEl.style.display = 'block';
         }
         return;
     }
@@ -1769,8 +1807,15 @@ export async function placeOrder() {
         const payload = {
             name,
             phone,
-            address,
-            ...(pincode ? { pincode } : {}),
+            email,
+            house,
+            street,
+            landmark,
+            city,
+            state,
+            pincode,
+            address: fullAddress,
+            note,
             paymentMethod: 'WhatsApp-Assisted Ordering',
             idempotencyKey,
             items: cartItems.map(i => ({ productId: String(i.productId || i.id), variantId: String(i.variantId || 'var_500g'), qty: i.qty }))

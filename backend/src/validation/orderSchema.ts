@@ -10,14 +10,36 @@ export interface CreateOrderPayload {
   name: string;
   phone: string;
   address: string;
+  email?: string;
+  house?: string;
+  street?: string;
+  landmark?: string;
+  city?: string;
+  state?: string;
   pincode?: string;
-  paymentMethod: 'WhatsApp-Assisted Ordering';
+  note?: string;
+  paymentMethod: string;
   items: OrderItemInput[];
   idempotencyKey: string;
 }
 
-const ALLOWED_PAYMENT_METHODS = ['WhatsApp-Assisted Ordering'];
-const ALLOWED_TOP_LEVEL_KEYS = new Set(['name', 'phone', 'address', 'pincode', 'paymentMethod', 'items', 'idempotencyKey']);
+const ALLOWED_PAYMENT_METHODS = ['WhatsApp-Assisted Ordering', 'Cash on Delivery', 'UPI', 'Online Payment'];
+const ALLOWED_TOP_LEVEL_KEYS = new Set([
+  'name',
+  'phone',
+  'address',
+  'email',
+  'house',
+  'street',
+  'landmark',
+  'city',
+  'state',
+  'pincode',
+  'note',
+  'paymentMethod',
+  'items',
+  'idempotencyKey'
+]);
 
 export function validateCreateOrderPayload(body: any): CreateOrderPayload {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
@@ -32,7 +54,7 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
     }
   }
 
-  const { name, phone, address, paymentMethod, items, idempotencyKey } = body;
+  const { name, phone, address, email, house, street, landmark, city, state, pincode, note, paymentMethod, items, idempotencyKey } = body;
 
   if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 100) {
     throw new ValidationError('Name must be between 2 and 100 characters');
@@ -43,12 +65,12 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
     throw new ValidationError('Phone number must contain between 10 and 15 digits');
   }
 
-  if (typeof address !== 'string' || address.trim().length < 5 || address.trim().length > 300) {
-    throw new ValidationError('Delivery address must be between 5 and 300 characters');
+  if (typeof address !== 'string' || address.trim().length < 2 || address.trim().length > 300) {
+    throw new ValidationError('Delivery address must be provided');
   }
 
-  if (!ALLOWED_PAYMENT_METHODS.includes(paymentMethod)) {
-    throw new ValidationError("Invalid payment method. Only 'WhatsApp-Assisted Ordering' is allowed");
+  if (paymentMethod && typeof paymentMethod !== 'string') {
+    throw new ValidationError('Invalid payment method string');
   }
 
   if (typeof idempotencyKey !== 'string' || idempotencyKey.trim().length < 8 || idempotencyKey.trim().length > 64) {
@@ -98,7 +120,15 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
     name: name.trim(),
     phone: phoneDigits,
     address: address.trim(),
-    paymentMethod,
+    ...(email ? { email: String(email).trim() } : {}),
+    ...(house ? { house: String(house).trim() } : {}),
+    ...(street ? { street: String(street).trim() } : {}),
+    ...(landmark ? { landmark: String(landmark).trim() } : {}),
+    ...(city ? { city: String(city).trim() } : {}),
+    ...(state ? { state: String(state).trim() } : {}),
+    ...(pincode ? { pincode: String(pincode).trim() } : {}),
+    ...(note ? { note: String(note).trim() } : {}),
+    paymentMethod: paymentMethod ? String(paymentMethod).trim() : 'WhatsApp-Assisted Ordering',
     idempotencyKey: idempotencyKey.trim(),
     items: validatedItems
   };

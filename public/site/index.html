@@ -371,41 +371,62 @@
                     <div>
                         <div class="checkout-section-title">📦 1. Delivery & Contact Details</div>
                         
-                        <div class="checkout-form-group">
-                            <label for="co-name">Full Name *</label>
-                            <input type="text" id="co-name" required placeholder="e.g. Ramesh Kumar" autocomplete="name" />
-                        </div>
-
                         <div class="form-row-2">
                             <div class="checkout-form-group">
-                                <label for="co-phone">Phone Number (10 Digits) *</label>
-                                <input type="tel" id="co-phone" required pattern="[0-9]{10,15}" placeholder="e.g. 9876543210" autocomplete="tel" />
+                                <label for="co-name">Full Name *</label>
+                                <input type="text" id="co-name" required placeholder="e.g. Ramesh Kumar" autocomplete="name" />
                             </div>
                             <div class="checkout-form-group">
-                                <label for="co-alt-phone">Alternate Phone (Optional)</label>
-                                <input type="tel" id="co-alt-phone" pattern="[0-9]{10,15}" placeholder="e.g. 9123456789" />
+                                <label for="co-phone">WhatsApp Mobile Number (10 Digits) *</label>
+                                <input type="tel" id="co-phone" required pattern="[0-9]{10,15}" placeholder="e.g. 9876543210" autocomplete="tel" />
                             </div>
                         </div>
 
                         <div class="checkout-form-group">
-                            <label for="co-email">Email Address (For Invoice & Tracking)</label>
+                            <label for="co-email">Email Address (Optional)</label>
                             <input type="email" id="co-email" placeholder="e.g. ramesh@example.com" autocomplete="email" />
                         </div>
 
-                        <div class="checkout-form-group">
-                            <label for="co-address">Complete Delivery Address *</label>
-                            <textarea id="co-address" required placeholder="House/Flat No., Street, Area, Landmark..." autocomplete="shipping street-address"></textarea>
+                        <div class="form-row-2">
+                            <div class="checkout-form-group">
+                                <label for="co-house">House / Flat / Building No. *</label>
+                                <input type="text" id="co-house" required placeholder="e.g. Flat 402, Royal Enclave" autocomplete="shipping address-line1" />
+                            </div>
+                            <div class="checkout-form-group">
+                                <label for="co-street">Area / Street / Colony *</label>
+                                <input type="text" id="co-street" required placeholder="e.g. Near Shiv Temple, Sigra" autocomplete="shipping address-line2" />
+                            </div>
                         </div>
 
                         <div class="form-row-2">
                             <div class="checkout-form-group">
+                                <label for="co-landmark">Landmark (Optional)</label>
+                                <input type="text" id="co-landmark" placeholder="e.g. Opposite City Hospital" />
+                            </div>
+                            <div class="checkout-form-group">
                                 <label for="co-city">City / Town *</label>
-                                <input type="text" id="co-city" placeholder="e.g. Varanasi" autocomplete="shipping address-level2" />
+                                <input type="text" id="co-city" required placeholder="e.g. Varanasi" autocomplete="shipping address-level2" />
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="checkout-form-group">
+                                <label for="co-state">State *</label>
+                                <input type="text" id="co-state" required placeholder="e.g. Uttar Pradesh" autocomplete="shipping address-level1" />
                             </div>
                             <div class="checkout-form-group">
                                 <label for="co-pincode">Pincode (6 Digits) *</label>
-                                <input type="text" id="co-pincode" pattern="[0-9]{6}" placeholder="e.g. 221001" autocomplete="shipping postal-code" />
+                                <input type="text" id="co-pincode" required pattern="[0-9]{6}" placeholder="e.g. 221001" autocomplete="shipping postal-code" />
                             </div>
+                        </div>
+
+                        <div class="checkout-form-group">
+                            <label for="co-note">Special Instructions / Notes (Optional)</label>
+                            <input type="text" id="co-note" placeholder="e.g. Handle with care, ring doorbell" />
+                        </div>
+
+                        <div class="checkout-form-group" style="display: none;">
+                            <textarea id="co-address" placeholder="Complete address fallback"></textarea>
                         </div>
                     </div>
 
