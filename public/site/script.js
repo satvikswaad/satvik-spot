@@ -1744,6 +1744,7 @@ export async function placeOrder() {
     const cityInput = document.getElementById('co-city');
     const stateInput = document.getElementById('co-state');
     const pincodeInput = document.getElementById('co-pincode');
+    const addressInput = document.getElementById('co-address');
     const noteInput = document.getElementById('co-note');
     const errEl = document.getElementById('co-error-msg');
 
@@ -1758,13 +1759,27 @@ export async function placeOrder() {
     const city = cityInput ? cityInput.value.trim() : '';
     const state = stateInput ? stateInput.value.trim() : '';
     const pincode = pincodeInput ? pincodeInput.value.trim() : '';
+    const addressRaw = addressInput ? addressInput.value.trim() : '';
     const note = noteInput ? noteInput.value.trim() : '';
 
-    const fullAddress = `${house}, ${street}${landmark ? ', ' + landmark : ''}, ${city}, ${state} - ${pincode}`;
+    // Robust Dual Address Field Resolution
+    let finalHouse = house;
+    let finalStreet = street;
+    let fullAddress = addressRaw;
 
-    if (!name || !phone || !house || !street || !city || !state || !pincode) {
+    if (addressRaw && (!finalHouse || !finalStreet)) {
+        const parts = addressRaw.split(',').map(s => s.trim()).filter(Boolean);
+        finalHouse = finalHouse || parts[0] || addressRaw;
+        finalStreet = finalStreet || parts.slice(1).join(', ') || parts[0] || addressRaw;
+    }
+
+    if (!fullAddress) {
+        fullAddress = [finalHouse, finalStreet, landmark, city, state, pincode].filter(Boolean).join(', ');
+    }
+
+    if (!name || !phone || !fullAddress || !city || !pincode) {
         if (errEl) {
-            errEl.textContent = '⚠️ Please fill in all required fields (Name, Phone, House No, Street/Area, City, State, Pincode).';
+            errEl.textContent = '⚠️ Please fill in all required delivery fields (Full Name, Phone, Delivery Address, City, Pincode).';
             errEl.style.display = 'block';
         } else {
             alert('Please fill in all required delivery fields.');
@@ -1808,11 +1823,11 @@ export async function placeOrder() {
             name,
             phone,
             email,
-            house,
-            street,
+            house: finalHouse || fullAddress,
+            street: finalStreet || city || fullAddress,
             landmark,
             city,
-            state,
+            state: state || 'Uttar Pradesh',
             pincode,
             address: fullAddress,
             note,
