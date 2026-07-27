@@ -1043,23 +1043,34 @@ function initProfilePage() {
 
             try {
                 const provider = new window.GoogleAuthProvider();
+                provider.addScope('email');
+                provider.addScope('profile');
+                provider.setCustomParameters({ prompt: 'select_account' });
+
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
                 if (isMobile && window.signInWithRedirect) {
                     await window.signInWithRedirect(window.auth, provider);
                 } else {
-                    const result = await window.signInWithPopup(window.auth, provider);
-                    if (result && result.user) {
-                        showToast(`✅ Welcome, ${result.user.displayName || result.user.email || 'Customer'}!`);
+                    try {
+                        const result = await window.signInWithPopup(window.auth, provider);
+                        if (result && result.user) {
+                            showToast(`✅ Welcome, ${result.user.displayName || result.user.email || 'Customer'}!`);
+                        }
+                    } catch (popupErr) {
+                        console.warn('Popup login failed or blocked, falling back to redirect auth:', popupErr);
+                        if (window.signInWithRedirect && popupErr.code !== 'auth/popup-closed-by-user') {
+                            await window.signInWithRedirect(window.auth, provider);
+                        } else if (popupErr.code === 'auth/popup-closed-by-user') {
+                            console.log('User closed Google popup window.');
+                        } else {
+                            throw popupErr;
+                        }
                     }
                 }
             } catch (err) {
                 console.warn('Google Sign-In Exception:', err);
-                if (err.code === 'auth/popup-blocked' && window.signInWithRedirect) {
-                    showToast('ℹ️ Redirecting to Google Sign-In...');
-                    const provider = new window.GoogleAuthProvider();
-                    await window.signInWithRedirect(window.auth, provider);
-                } else if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
+                if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
                     console.log('User closed popup or cancelled auth request');
                 } else {
                     showToast(`❌ Sign-in issue: ${err.message || 'Please try again'}`);
