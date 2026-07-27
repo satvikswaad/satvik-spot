@@ -1734,6 +1734,81 @@ async function fetchProductReviews(productId, container) {
     }
 }
 
+function generateFrontendWhatsAppMessage({ orderId, items, subtotal, shippingFee, total, name, phone, email, house, street, landmark, city, state, pincode, note }) {
+    const publicId = orderId ? orderId.slice(-6).toUpperCase() : Date.now().toString(36).slice(-6).toUpperCase();
+    const now = new Date();
+    const dateStr = now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
+
+    const formattedItems = items.map((item, index) => {
+        let baseName = item.name;
+        let variantSize = item.variantLabel || item.size || 'Standard';
+        const match = item.name.match(/^(.*?)\s*\((.*?)\)$/);
+        if (match) {
+            baseName = match[1];
+            variantSize = match[2];
+        }
+        const unitPrice = Number(item.price) || 0;
+        const lineTotal = unitPrice * (Number(item.qty) || 1);
+        return `${index + 1}. ${baseName}\n   • Variant: ${variantSize}\n   • Qty: x${item.qty}\n   • Price: ₹${unitPrice}\n   • Total: ₹${lineTotal}`;
+    }).join('\n\n');
+
+    const deliveryStr = shippingFee === 0 ? 'FREE 🎉' : `₹${shippingFee}`;
+    const phoneDigits = phone.replace(/\D/g, '');
+    const formattedPhone = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : phone;
+
+    return `🛒 *NEW ORDER REQUEST - SATVIK SWAAD*
+
+🙏 Namaste!
+
+I would like to place the following order.
+
+━━━━━━━━━━━━━━━━━━━━
+📦 *ORDER DETAILS*
+━━━━━━━━━━━━━━━━━━━━
+🆔 Order ID: #${publicId}
+📅 Order Date: ${dateStr}
+
+🛍️ *Items Ordered*
+${formattedItems}
+
+━━━━━━━━━━━━━━━━━━━━
+💰 *PAYMENT SUMMARY*
+━━━━━━━━━━━━━━━━━━━━
+Subtotal: ₹${subtotal}
+Delivery Charges: ${deliveryStr}
+Discount: ₹0
+━━━━━━━━━━━━━━━━━━━━
+💳 *Grand Total: ₹${total}*
+━━━━━━━━━━━━━━━━━━━━
+
+👤 *CUSTOMER DETAILS*
+Name: ${name}
+📞 Mobile: +91 ${formattedPhone}
+📧 Email: ${email || 'N/A'}
+
+📍 *DELIVERY ADDRESS*
+House/Flat: ${house || 'N/A'}
+Area/Street: ${street || 'N/A'}
+Landmark: ${landmark || 'N/A'}
+City: ${city || 'N/A'}
+State: ${state || 'Uttar Pradesh'}
+PIN Code: ${pincode || 'N/A'}
+
+📝 *SPECIAL INSTRUCTIONS*
+${note || 'None'}
+
+💳 *PAYMENT METHOD*
+WhatsApp-Assisted Ordering
+
+Kindly confirm:
+✅ Product availability
+✅ Final payable amount
+✅ Payment details (if applicable)
+✅ Expected dispatch/delivery time
+
+Thank you! 🙏`;
+}
+
 export async function placeOrder() {
     const nameInput = document.getElementById('co-name');
     const phoneInput = document.getElementById('co-phone');
@@ -1815,7 +1890,7 @@ export async function placeOrder() {
     }
 
     const btn = document.querySelector('#checkout-form button[type="submit"]');
-    if (btn) { btn.textContent = '⏳ Creating Order Request...'; btn.disabled = true; }
+    if (btn) { btn.textContent = '⏳ Opening WhatsApp...'; btn.disabled = true; }
 
     try {
         const idempotencyKey = 'idem_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
@@ -1836,82 +1911,101 @@ export async function placeOrder() {
             items: cartItems.map(i => ({ productId: String(i.productId || i.id), variantId: String(i.variantId || 'var_500g'), qty: i.qty }))
         };
 
-        const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
-        if (!apiBaseUrl) {
-            throw new Error('Checkout service URL is not configured.');
-        }
-        const checkoutUrl = `${apiBaseUrl}/api/v1/orders/create-whatsapp-request`;
+        // Instant Subtotal & Total calculation for guaranteed fast redirect
+        let subtotal = 0;
+        cartItems.forEach(i => { subtotal += (Number(i.price) || 0) * (Number(i.qty) || 1); });
+        const shippingFee = subtotal >= 500 ? 0 : 50;
+        let orderTotal = subtotal + shippingFee;
 
-        const headers = { 'Content-Type': 'application/json' };
-
-        // Attach Firebase App Check token
-        if (window.getAppCheckToken) {
-            try {
-                const appCheckToken = await window.getAppCheckToken();
-                if (appCheckToken) {
-                    headers['X-Firebase-AppCheck'] = appCheckToken;
-                }
-            } catch (acErr) {
-                console.warn('Could not attach App Check token:', acErr);
-            }
-        }
-
-        // Attach Auth Bearer token if signed in
-        if (window.auth?.currentUser) {
-            try {
-                const token = await window.auth.currentUser.getIdToken();
-                headers['Authorization'] = `Bearer ${token}`;
-            } catch (tErr) {
-                console.warn('Could not attach Auth token:', tErr);
-            }
-        }
-
-        const response = await fetch(checkoutUrl, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(payload)
+        // Build prefilled WhatsApp message & URL immediately
+        let targetMessage = generateFrontendWhatsAppMessage({
+            orderId: null,
+            items: cartItems,
+            subtotal,
+            shippingFee,
+            total: orderTotal,
+            name,
+            phone,
+            email,
+            house: finalHouse || fullAddress,
+            street: finalStreet || city || fullAddress,
+            landmark,
+            city,
+            state: state || 'Uttar Pradesh',
+            pincode,
+            note
         });
 
-        const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('application/json')) {
-            const responseText = await response.text();
-            console.error('Non-JSON checkout response', {
-                url: response.url,
-                status: response.status,
-                contentType
+        let targetWhatsAppUrl = `https://wa.me/919236587600?text=${encodeURIComponent(targetMessage)}`;
+        let orderResultObj = {
+            orderId: 'SATVIK-' + Date.now().toString(36).slice(-6).toUpperCase(),
+            total: orderTotal,
+            subtotal,
+            shippingFee,
+            whatsappUrl: targetWhatsAppUrl,
+            whatsappMessage: targetMessage
+        };
+
+        // Send backend POST in parallel with 4s timeout (so cold-start Render servers won't hang browser)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+        try {
+            const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
+            const checkoutUrl = `${apiBaseUrl}/api/v1/orders/create-whatsapp-request`;
+            const headers = { 'Content-Type': 'application/json' };
+
+            if (window.getAppCheckToken) {
+                try {
+                    const appCheckToken = await window.getAppCheckToken();
+                    if (appCheckToken) headers['X-Firebase-AppCheck'] = appCheckToken;
+                } catch (acErr) { console.warn('AppCheck token warning:', acErr); }
+            }
+
+            if (window.auth?.currentUser) {
+                try {
+                    const token = await window.auth.currentUser.getIdToken();
+                    headers['Authorization'] = `Bearer ${token}`;
+                } catch (tErr) { console.warn('Auth token warning:', tErr); }
+            }
+
+            const response = await fetch(checkoutUrl, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload),
+                signal: controller.signal
             });
-            throw new Error(
-                'The ordering service returned an invalid response. Please try again shortly.'
-            );
+
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.data) {
+                    orderResultObj = data.data;
+                    if (data.data.whatsappUrl) targetWhatsAppUrl = data.data.whatsappUrl;
+                }
+            }
+        } catch (netErr) {
+            clearTimeout(timeoutId);
+            console.warn('Backend order recording notice (proceeding directly to WhatsApp):', netErr);
         }
 
-        const data = await response.json();
-        if (!response.ok || !data.success) {
-            throw new Error(data.error?.message || 'Failed to place order');
-        }
-
-        const result = data.data;
+        // Close Checkout & Reset Cart
         closeCheckout();
         cart = {};
         saveCart();
         renderCart();
 
-        if (result.whatsappUrl) {
-            const waWin = window.open(result.whatsappUrl, '_blank', 'noopener,noreferrer');
-            showWhatsAppNoticeModal(result);
-            if (!waWin) {
-                showToast('📱 Order Created! Click "Open WhatsApp App" to send your order.');
-            }
-        } else {
-            showToast(`✅ Order Placed! Order ID: #${result.orderId.slice(-6).toUpperCase()}`);
-        }
+        // Direct Redirection (Never blocked by pop-up blockers)
+        window.location.href = targetWhatsAppUrl;
+
     } catch (e) {
         console.error("Order error:", e);
         if (errEl) {
             errEl.textContent = '⚠️ Order processing failed: ' + e.message;
             errEl.style.display = 'block';
         } else {
-            showToast('⚠️ Order processing failed: ' + e.message);
+            alert('⚠️ Order processing failed: ' + e.message);
         }
     } finally {
         if (btn) { btn.textContent = 'Continue on WhatsApp 💬'; btn.disabled = false; }
