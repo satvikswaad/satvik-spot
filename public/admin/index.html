@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <!-- Favicons (Circular Logo & Icons) -->
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
@@ -53,6 +53,7 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* ── AUTH VIEW ── */
@@ -62,7 +63,7 @@
             justify-content: center;
             min-height: 100vh;
             background: linear-gradient(135deg, var(--maroon-dark) 0%, var(--maroon) 60%, #3D0A0A 100%);
-            padding: 24px;
+            padding: 16px;
             position: relative;
         }
         #auth-container::before {
@@ -77,9 +78,9 @@
         .login-card {
             background: #FFFFFF;
             border-radius: var(--radius-xl);
-            padding: 44px 38px;
+            padding: 38px 30px;
             width: 100%;
-            max-width: 460px;
+            max-width: 440px;
             box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
             text-align: center;
             border: 1.5px solid var(--gold);
@@ -87,11 +88,11 @@
             z-index: 1;
         }
         .login-logo {
-            width: 76px;
-            height: 76px;
+            width: 68px;
+            height: 68px;
             border-radius: 50%;
             display: block;
-            margin: 0 auto 14px;
+            margin: 0 auto 12px;
             border: 2.5px solid var(--gold);
             box-shadow: 0 6px 16px rgba(0,0,0,0.12);
             object-fit: cover;
@@ -99,15 +100,15 @@
         }
         .login-card h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.85rem;
+            font-size: 1.7rem;
             color: var(--maroon);
             margin-bottom: 6px;
             font-weight: 700;
         }
         .login-card p.sub {
             color: var(--text-muted);
-            font-size: 0.92rem;
-            margin-bottom: 24px;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
         }
         .admin-badge {
             display: inline-flex;
@@ -115,35 +116,35 @@
             gap: 6px;
             background: var(--saffron-light);
             color: var(--saffron-dark);
-            font-size: 0.76rem;
+            font-size: 0.72rem;
             font-weight: 800;
-            padding: 6px 16px;
+            padding: 5px 14px;
             border-radius: 50px;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             border: 1px solid #F5D3C3;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             text-align: left;
         }
         .form-group label {
             display: block;
-            font-size: 0.76rem;
+            font-size: 0.74rem;
             font-weight: 800;
             color: var(--maroon);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.6px;
         }
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 12px 14px;
+            padding: 11px 13px;
             border: 1.5px solid var(--border-dark);
             border-radius: var(--radius-sm);
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             background: #FFFDF9;
             color: var(--dark);
             font-family: inherit;
@@ -160,9 +161,9 @@
             background: linear-gradient(135deg, var(--saffron) 0%, var(--saffron-dark) 100%);
             color: #FFFFFF;
             border: none;
-            padding: 13px 20px;
+            padding: 12px 18px;
             border-radius: var(--radius-sm);
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -180,9 +181,9 @@
             background: #F4EFE6;
             color: var(--dark);
             border: 1.5px solid var(--border-dark);
-            padding: 10px 18px;
+            padding: 9px 15px;
             border-radius: var(--radius-sm);
-            font-size: 0.92rem;
+            font-size: 0.88rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -199,10 +200,10 @@
             background: var(--red-light);
             color: var(--red);
             border-radius: var(--radius-sm);
-            padding: 12px 16px;
-            font-size: 0.88rem;
+            padding: 11px 14px;
+            font-size: 0.85rem;
             font-weight: 700;
-            margin-top: 16px;
+            margin-top: 14px;
             border: 1px solid #F8B4B4;
             text-align: left;
         }
@@ -211,15 +212,15 @@
             background: var(--green-light);
             color: var(--green);
             border-radius: var(--radius-sm);
-            padding: 12px 16px;
-            font-size: 0.88rem;
+            padding: 11px 14px;
+            font-size: 0.85rem;
             font-weight: 700;
-            margin-top: 16px;
+            margin-top: 14px;
             border: 1px solid #B8E1C2;
             text-align: left;
         }
 
-        /* ── PORTAL APP LAYOUT (HEADER + SIDEBAR + VIEWPORT) ── */
+        /* ── PORTAL APP LAYOUT ── */
         #portal-container {
             display: none;
             flex-direction: column;
@@ -230,11 +231,11 @@
         .suite-topbar {
             background: linear-gradient(90deg, var(--maroon-dark) 0%, var(--maroon) 70%, #4A0E0E 100%);
             color: #FFFFFF;
-            padding: 12px 24px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 3px solid var(--gold);
+            border-bottom: 2.5px solid var(--gold);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -243,28 +244,29 @@
         .topbar-brand {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
         .topbar-logo {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 2px solid var(--gold);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             object-fit: cover;
             background: #FFF;
+            flex-shrink: 0;
         }
         .topbar-title-group h2 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             color: var(--gold-light);
             line-height: 1.2;
             letter-spacing: 0.4px;
         }
         .topbar-title-group span.suite-subtitle {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 1.1px;
             color: #E2D9C8;
             font-weight: 700;
         }
@@ -272,23 +274,23 @@
         .topbar-center {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         .live-status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
             background: rgba(44, 94, 59, 0.35);
             border: 1px solid rgba(184, 225, 194, 0.4);
-            padding: 5px 12px;
+            padding: 4px 11px;
             border-radius: 50px;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: 700;
             color: #A3E635;
         }
         .live-pulse {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: #A3E635;
             box-shadow: 0 0 8px #A3E635;
@@ -302,43 +304,43 @@
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
         }
         .user-pill {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.15);
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 50px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #F8F5EE;
         }
         .role-badge {
             background: var(--gold);
             color: var(--maroon-dark);
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 900;
-            padding: 3px 8px;
+            padding: 2px 7px;
             border-radius: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
         }
 
         .btn-topbar {
             background: rgba(255,255,255,0.1);
             color: #FFFFFF;
             border: 1px solid rgba(255,255,255,0.22);
-            padding: 7px 14px;
+            padding: 6px 12px;
             border-radius: var(--radius-sm);
-            font-size: 0.84rem;
+            font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         .btn-topbar:hover {
             background: rgba(255,255,255,0.2);
@@ -353,65 +355,66 @@
             color: #FFFFFF;
         }
 
-        /* Mobile sidebar hamburger */
+        /* Mobile toggle */
         .btn-sidebar-toggle {
             display: none;
             background: transparent;
             border: none;
             color: var(--gold);
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 4px 6px;
+            line-height: 1;
         }
 
         /* Main Workspace Container */
         .suite-workspace {
             display: flex;
             flex: 1;
-            min-height: calc(100vh - 72px);
+            min-height: calc(100vh - 65px);
         }
 
         /* ── LEFT SIDEBAR ── */
         .suite-sidebar {
-            width: 270px;
+            width: 260px;
             background: #FFFFFF;
             border-right: 1.5px solid var(--border);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px 14px;
+            padding: 16px 12px;
             flex-shrink: 0;
             box-shadow: 2px 0 10px rgba(0,0,0,0.03);
             position: sticky;
-            top: 72px;
-            height: calc(100vh - 72px);
+            top: 65px;
+            height: calc(100vh - 65px);
             overflow-y: auto;
         }
         .sidebar-section-title {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.9px;
             color: var(--text-muted);
-            margin: 14px 10px 8px;
+            margin: 12px 8px 6px;
         }
         .sidebar-nav-list {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
         .nav-btn {
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 14px;
+            padding: 10px 12px;
             border-radius: var(--radius-md);
             border: 1.5px solid transparent;
             background: transparent;
             color: var(--dark);
-            font-size: 0.92rem;
+            font-size: 0.88rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -420,14 +423,14 @@
         .nav-btn-inner {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
         .nav-btn-icon {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
+            width: 24px;
         }
         .nav-btn:hover {
             background: var(--cream);
@@ -439,7 +442,7 @@
             color: #FFFFFF;
             border-color: var(--gold);
             border-left: 4px solid var(--gold);
-            box-shadow: 0 4px 14px rgba(122, 28, 28, 0.25);
+            box-shadow: 0 3px 10px rgba(122, 28, 28, 0.2);
         }
         .nav-btn.active .nav-badge {
             background: var(--gold);
@@ -448,12 +451,12 @@
         .nav-badge {
             background: var(--cream-bg);
             color: var(--maroon);
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 900;
-            padding: 2px 8px;
+            padding: 2px 7px;
             border-radius: 50px;
             border: 1px solid var(--border-dark);
-            min-width: 22px;
+            min-width: 20px;
             text-align: center;
         }
         .nav-badge.alert {
@@ -466,27 +469,83 @@
             background: var(--cream);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 14px;
-            margin-top: 20px;
+            padding: 12px;
+            margin-top: 16px;
         }
         .sidebar-footer-card .label {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.5px;
             font-weight: 800;
             color: var(--maroon);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         .sidebar-footer-card .val {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             color: var(--text-muted);
-            line-height: 1.4;
+            line-height: 1.35;
+        }
+
+        /* Mobile Drawer Backdrop & Header */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(42, 33, 29, 0.55);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            z-index: 2400;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .sidebar-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .sidebar-mobile-header {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            margin-bottom: 10px;
+            border-bottom: 1.5px solid var(--border);
+        }
+        .sidebar-mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-mobile-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid var(--gold);
+            object-fit: cover;
+        }
+        .sidebar-mobile-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--maroon);
+            font-size: 1.05rem;
+        }
+        .btn-sidebar-close {
+            background: transparent;
+            border: none;
+            font-size: 1.35rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            line-height: 1;
+        }
+        .btn-sidebar-close:hover {
+            color: var(--maroon);
         }
 
         /* ── RIGHT MAIN VIEWPORT ── */
         .suite-viewport {
             flex: 1;
-            padding: 28px 36px;
+            padding: 24px 28px;
             overflow-y: auto;
             max-width: 1440px;
             margin: 0 auto;
@@ -510,39 +569,39 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
         }
         .view-title-group h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.85rem;
+            font-size: 1.7rem;
             color: var(--maroon);
             margin-bottom: 4px;
             font-weight: 700;
         }
         .view-title-group p {
             color: var(--text-muted);
-            font-size: 0.94rem;
+            font-size: 0.9rem;
         }
         .view-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
         /* KPI Cards Grid */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 18px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
         }
         .kpi-card {
             background: #FFFFFF;
             border-radius: var(--radius-lg);
-            padding: 20px 22px;
+            padding: 18px 20px;
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
             transition: all 0.2s;
@@ -558,17 +617,18 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .kpi-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             background: var(--cream);
+            flex-shrink: 0;
         }
         .kpi-icon.revenue { background: #ECFDF5; color: #059669; }
         .kpi-icon.orders { background: #EFF6FF; color: #2563EB; }
@@ -577,40 +637,40 @@
         .kpi-icon.stock { background: #FEF2F2; color: #DC2626; }
         .kpi-icon.offline { background: #FDF4F0; color: var(--saffron-dark); }
         .kpi-title {
-            font-size: 0.78rem;
+            font-size: 0.74rem;
             font-weight: 800;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.7px;
+            letter-spacing: 0.6px;
         }
         .kpi-value {
             font-family: 'DM Serif Display', serif;
-            font-size: 1.95rem;
+            font-size: 1.85rem;
             color: var(--dark);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-weight: 600;
         }
         .kpi-note {
-            font-size: 0.76rem;
+            font-size: 0.74rem;
             color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: 4px;
         }
 
-        /* Generic Card Box */
+        /* Generic Content Card */
         .content-card {
             background: #FFFFFF;
             border-radius: var(--radius-lg);
-            padding: 26px;
+            padding: 22px;
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
-            margin-bottom: 26px;
+            margin-bottom: 22px;
         }
         .content-card h3 {
             font-family: 'Playfair Display', serif;
             color: var(--maroon);
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             margin-bottom: 6px;
             display: flex;
             align-items: center;
@@ -618,8 +678,8 @@
         }
         .content-card p.desc {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 18px;
+            font-size: 0.88rem;
+            margin-bottom: 16px;
         }
 
         /* Filter Tab Bar */
@@ -628,16 +688,16 @@
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding-bottom: 14px;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
             border-bottom: 1.5px solid var(--border);
         }
         .filter-tab {
-            padding: 8px 16px;
+            padding: 7px 15px;
             border-radius: 50px;
             background: #FFFFFF;
             border: 1.5px solid var(--border);
-            font-size: 0.85rem;
+            font-size: 0.84rem;
             font-weight: 700;
             color: var(--dark);
             cursor: pointer;
@@ -663,8 +723,8 @@
         .badge-cnt {
             background: var(--cream-bg);
             color: var(--dark);
-            font-size: 0.72rem;
-            padding: 1px 7px;
+            font-size: 0.7rem;
+            padding: 1px 6px;
             border-radius: 50px;
             font-weight: 800;
         }
@@ -674,23 +734,23 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            gap: 14px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .search-input-wrap {
             position: relative;
             flex: 1;
             max-width: 420px;
-            min-width: 260px;
+            min-width: 240px;
         }
         .search-input-wrap input {
             width: 100%;
-            padding: 10px 16px 10px 38px;
+            padding: 9px 15px 9px 36px;
             border-radius: 50px;
             border: 1.5px solid var(--border-dark);
             background: #FFFFFF;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             color: var(--dark);
         }
         .search-input-wrap input:focus {
@@ -700,10 +760,10 @@
         }
         .search-icon-svg {
             position: absolute;
-            left: 14px;
+            left: 13px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--text-muted);
             pointer-events: none;
         }
@@ -712,13 +772,13 @@
         .orders-grid {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
         .order-card {
             background: #FFFFFF;
             border: 1.5px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 22px 24px;
+            padding: 20px;
             box-shadow: var(--shadow-sm);
             transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -731,19 +791,20 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px dashed var(--border);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
         .order-id-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         .order-id-title {
             font-weight: 800;
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: var(--maroon);
             font-family: monospace;
             letter-spacing: 0.5px;
@@ -751,10 +812,10 @@
         .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            font-size: 0.75rem;
+            gap: 4px;
+            font-size: 0.72rem;
             font-weight: 800;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 50px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -770,58 +831,58 @@
         .order-body-grid {
             display: grid;
             grid-template-columns: 1.3fr 1.7fr 1fr;
-            gap: 20px;
+            gap: 18px;
             align-items: start;
         }
         .customer-meta h4 {
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             color: var(--dark);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
         .customer-meta p {
-            font-size: 0.84rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
             line-height: 1.45;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         .btn-wa-chat {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: #25D366;
             color: #FFFFFF;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             font-weight: 800;
-            padding: 5px 12px;
+            padding: 4px 11px;
             border-radius: 50px;
             text-decoration: none;
-            margin-top: 8px;
+            margin-top: 6px;
             transition: opacity 0.2s;
         }
         .btn-wa-chat:hover { opacity: 0.9; }
 
         .items-table {
             width: 100%;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             border-collapse: collapse;
         }
         .items-table tr {
             border-bottom: 1px solid var(--cream-bg);
         }
         .items-table td {
-            padding: 6px 4px;
+            padding: 5px 3px;
         }
 
         .order-actions-col {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 7px;
             align-items: stretch;
         }
         .btn-action {
-            padding: 8px 14px;
+            padding: 7px 12px;
             border-radius: var(--radius-sm);
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 800;
             border: none;
             cursor: pointer;
@@ -830,7 +891,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
         }
         .btn-action.confirm { background: #2563EB; color: #FFF; }
         .btn-action.confirm:hover { background: #1D4ED8; }
@@ -846,8 +907,8 @@
         /* Products Catalog Grid */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
         }
         .product-admin-card {
             background: #FFFFFF;
@@ -866,7 +927,7 @@
         }
         .product-thumb-wrap {
             position: relative;
-            height: 170px;
+            height: 160px;
             background: var(--cream);
             overflow: hidden;
             display: flex;
@@ -884,11 +945,11 @@
         }
         .stock-badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 10px;
+            top: 10px;
+            right: 10px;
+            padding: 3px 9px;
             border-radius: 50px;
-            font-size: 0.74rem;
+            font-size: 0.7rem;
             font-weight: 800;
             text-transform: uppercase;
         }
@@ -897,7 +958,7 @@
         .stock-badge.out-stock { background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
 
         .product-info-wrap {
-            padding: 18px;
+            padding: 16px;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -905,56 +966,56 @@
         }
         .product-name-h4 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.1rem;
+            font-size: 1.02rem;
             color: var(--maroon);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-weight: 700;
         }
         .product-hindi-sub {
-            font-size: 0.84rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 7px;
         }
         .product-price-row {
             display: flex;
             align-items: baseline;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
         .product-price-val {
             font-family: 'DM Serif Display', serif;
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--dark);
         }
         .product-mrp-val {
-            font-size: 0.9rem;
+            font-size: 0.86rem;
             color: #9CA3AF;
             text-decoration: line-through;
         }
         .stock-counter-row {
             background: var(--cream);
             border-radius: var(--radius-sm);
-            padding: 8px 12px;
+            padding: 6px 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
-            font-size: 0.85rem;
+            margin-bottom: 12px;
+            font-size: 0.82rem;
         }
 
         .quick-restock-btns {
             display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
+            gap: 5px;
+            margin-bottom: 10px;
         }
         .btn-restock-chip {
             flex: 1;
-            padding: 6px;
+            padding: 5px;
             background: #F4EFE6;
             border: 1px solid var(--border-dark);
             border-radius: var(--radius-sm);
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: 800;
             color: var(--maroon);
             cursor: pointer;
@@ -972,36 +1033,39 @@
             border-radius: var(--radius-md);
             border: 1.5px solid var(--border);
             background: #FFFFFF;
+            -webkit-overflow-scrolling: touch;
         }
         .ledger-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             text-align: left;
         }
         .ledger-table th {
             background: var(--cream);
             color: var(--maroon);
             font-weight: 800;
-            padding: 14px 18px;
+            padding: 12px 14px;
             text-transform: uppercase;
-            font-size: 0.76rem;
-            letter-spacing: 0.6px;
+            font-size: 0.74rem;
+            letter-spacing: 0.5px;
             border-bottom: 1.5px solid var(--border);
+            white-space: nowrap;
         }
         .ledger-table td {
-            padding: 14px 18px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border);
             color: var(--dark);
+            white-space: nowrap;
         }
         .ledger-table tr:hover td {
             background: #FAF7F2;
         }
         .tag-type {
             display: inline-block;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 800;
-            padding: 3px 8px;
+            padding: 2px 7px;
             border-radius: 50px;
             text-transform: uppercase;
         }
@@ -1019,12 +1083,12 @@
             z-index: 3000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
         .suite-modal-box {
             background: #FFFFFF;
             border-radius: var(--radius-xl);
-            padding: 34px 30px;
+            padding: 30px 26px;
             max-width: 540px;
             width: 100%;
             border: 1.5px solid var(--border-dark);
@@ -1034,52 +1098,45 @@
             overflow-y: auto;
             animation: modalFadeScale 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .suite-modal-box::-webkit-scrollbar {
-            width: 6px;
-        }
-        .suite-modal-box::-webkit-scrollbar-thumb {
-            background: var(--border-dark);
-            border-radius: 4px;
-        }
         @keyframes modalFadeScale {
             from { opacity: 0; transform: scale(0.95) translateY(8px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
+
         .suite-modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             border-bottom: 1.5px solid var(--border);
-            padding-bottom: 14px;
+            padding-bottom: 12px;
         }
         .suite-modal-header h3 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.45rem;
+            font-size: 1.35rem;
             color: var(--maroon);
         }
         .btn-modal-close {
             background: transparent;
             border: none;
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             color: var(--text-muted);
             cursor: pointer;
             padding: 4px 8px;
             line-height: 1;
             border-radius: var(--radius-sm);
-            transition: color 0.15s, background 0.15s;
+            transition: color 0.15s;
         }
         .btn-modal-close:hover {
             color: var(--maroon);
-            background: var(--cream);
         }
         .modal-btn-row {
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 10px;
+            margin-top: 20px;
             border-top: 1.5px solid var(--border);
-            padding-top: 16px;
+            padding-top: 14px;
         }
 
         /* Inactivity Modal Specific */
@@ -1093,13 +1150,13 @@
             z-index: 4000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
         .inactivity-box {
             background: #FFFFFF;
             border-radius: var(--radius-lg);
-            padding: 34px;
-            max-width: 440px;
+            padding: 30px;
+            max-width: 420px;
             width: 100%;
             text-align: center;
             border: 1.5px solid var(--gold);
@@ -1107,71 +1164,19 @@
             animation: modalFadeScale 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Mobile Drawer Backdrop & Header */
-        .sidebar-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(42, 33, 29, 0.55);
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
-            z-index: 2400;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-        .sidebar-backdrop.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .sidebar-mobile-header {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 14px;
-            margin-bottom: 12px;
-            border-bottom: 1.5px solid var(--border);
-        }
-        .sidebar-mobile-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .sidebar-mobile-logo {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 1.5px solid var(--gold);
-            object-fit: cover;
-        }
-        .sidebar-mobile-title {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            color: var(--maroon);
-            font-size: 1.1rem;
-        }
-        .btn-sidebar-close {
-            background: transparent;
-            border: none;
-            font-size: 1.35rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: var(--radius-sm);
-            line-height: 1;
-        }
-        .btn-sidebar-close:hover {
-            color: var(--maroon);
-        }
-
         .analytics-grid-two-col {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 22px;
+            gap: 20px;
         }
 
         .d-none { display: none !important; }
 
-        /* Responsive Breakpoints */
+        /* ═════════════════════════════════════════════════════════════════════
+           MOBILE RESPONSIVENESS & SCALING RULES (FULL COMPATIBILITY)
+           ═════════════════════════════════════════════════════════════════════ */
+
+        /* Tablet Breakpoint (769px to 1080px) */
         @media (max-width: 1080px) {
             .order-body-grid {
                 grid-template-columns: 1fr 1fr;
@@ -1187,13 +1192,14 @@
             }
         }
 
+        /* Mobile & Tablet Drawer Trigger (<= 820px) */
         @media (max-width: 820px) {
             .suite-sidebar {
                 position: fixed;
                 top: 0;
                 left: 0;
                 bottom: 0;
-                width: 280px;
+                width: 270px;
                 max-width: 82vw;
                 height: 100vh;
                 z-index: 2500;
@@ -1219,36 +1225,133 @@
                 align-items: center;
                 justify-content: center;
             }
-            .suite-viewport {
-                padding: 20px 16px;
-            }
             .topbar-center {
                 display: none;
             }
-            .order-body-grid {
-                grid-template-columns: 1fr;
-            }
-            .order-actions-col {
-                grid-column: span 1;
-            }
         }
 
-        @media (min-width: 601px) and (max-width: 960px) {
-            .kpi-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
+        /* ── MOBILE SCREENS (<= 768px): COMPACT & SCALED DOWN ── */
+        @media (max-width: 768px) {
+            body {
+                font-size: 13px;
             }
-        }
 
-        @media (max-width: 600px) {
-            .kpi-grid {
-                grid-template-columns: 1fr;
-                gap: 14px;
+            /* Compact Topbar */
+            .suite-topbar {
+                padding: 8px 12px;
+                min-height: 52px;
             }
+            .topbar-brand {
+                gap: 8px;
+            }
+            .topbar-logo {
+                width: 34px;
+                height: 34px;
+                border-width: 1.5px;
+            }
+            .topbar-title-group h2 {
+                font-size: 1.08rem;
+            }
+            .topbar-title-group span.suite-subtitle {
+                display: none;
+            }
+            .topbar-right {
+                gap: 8px;
+            }
+            .user-pill {
+                padding: 4px 8px;
+                font-size: 0.74rem;
+                max-width: 110px;
+            }
+            .user-pill #admin-user-display {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .role-badge {
+                display: none;
+            }
+            .btn-topbar {
+                padding: 5px 9px;
+                font-size: 0.76rem;
+            }
+
+            /* Viewport Margin */
+            .suite-viewport {
+                padding: 14px 10px;
+            }
+            .view-header {
+                margin-bottom: 14px;
+                gap: 8px;
+            }
+            .view-title-group h1 {
+                font-size: 1.35rem;
+            }
+            .view-title-group p {
+                font-size: 0.78rem;
+                line-height: 1.35;
+            }
+            .view-actions .btn-primary {
+                padding: 8px 14px;
+                font-size: 0.82rem;
+            }
+
+            /* 2-Column Compact KPI Grid on Mobile */
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                margin-bottom: 16px;
+            }
+            .kpi-card {
+                padding: 12px 10px;
+                border-radius: var(--radius-md);
+            }
+            .kpi-card-header {
+                margin-bottom: 6px;
+            }
+            .kpi-icon {
+                width: 30px;
+                height: 30px;
+                border-radius: 8px;
+                font-size: 1rem;
+            }
+            .kpi-title {
+                font-size: 0.65rem;
+                letter-spacing: 0.4px;
+            }
+            .kpi-value {
+                font-size: 1.35rem;
+                margin-bottom: 2px;
+            }
+            .kpi-note {
+                font-size: 0.66rem;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            /* Content Cards Compact */
+            .content-card {
+                padding: 14px 12px;
+                border-radius: var(--radius-md);
+                margin-bottom: 16px;
+            }
+            .content-card h3 {
+                font-size: 1.05rem;
+            }
+            .content-card p.desc {
+                font-size: 0.78rem;
+                margin-bottom: 12px;
+            }
+
+            /* Horizontal Touch Swipe Filter Tabs */
             .filter-tab-bar {
                 flex-wrap: nowrap;
                 overflow-x: auto;
-                padding-bottom: 10px;
+                padding-bottom: 8px;
+                margin-bottom: 14px;
+                gap: 6px;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
             }
@@ -1258,34 +1361,220 @@
             .filter-tab {
                 flex-shrink: 0;
                 white-space: nowrap;
+                padding: 6px 12px;
+                font-size: 0.76rem;
             }
-            .suite-modal-box {
-                padding: 24px 18px;
+            .badge-cnt {
+                font-size: 0.68rem;
+                padding: 1px 5px;
             }
-            .user-pill #admin-user-display {
-                max-width: 95px;
+
+            /* Compact Search Row */
+            .search-control-row {
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+            .search-input-wrap {
+                min-width: 100%;
+                max-width: 100%;
+            }
+            .search-input-wrap input {
+                padding: 8px 14px 8px 34px;
+                font-size: 0.82rem;
+            }
+            .search-icon-svg {
+                left: 12px;
+                font-size: 0.85rem;
+            }
+
+            /* Orders View on Mobile */
+            .order-card {
+                padding: 14px 12px;
+                border-radius: var(--radius-md);
+            }
+            .order-top-meta {
+                padding-bottom: 8px;
+                margin-bottom: 10px;
+                gap: 6px;
+            }
+            .order-id-title {
+                font-size: 0.9rem;
+            }
+            .status-pill {
+                font-size: 0.68rem;
+                padding: 3px 8px;
+            }
+            .order-body-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px;
+            }
+            .customer-meta h4 {
+                font-size: 0.88rem;
+            }
+            .customer-meta p {
+                font-size: 0.78rem;
+                margin-bottom: 3px;
+            }
+            .btn-wa-chat {
+                font-size: 0.72rem;
+                padding: 4px 10px;
+            }
+            .items-table {
+                font-size: 0.78rem;
+            }
+            .items-table td {
+                padding: 4px 2px;
+            }
+            .order-actions-col {
+                grid-column: span 1 !important;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .btn-action {
+                padding: 6px 8px;
+                font-size: 0.75rem;
+                min-width: 0;
+            }
+
+            /* Products View on Mobile: 2 Compact Columns */
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+            .product-admin-card {
+                border-radius: var(--radius-md);
+            }
+            .product-thumb-wrap {
+                height: 110px;
+            }
+            .stock-badge {
+                top: 6px;
+                right: 6px;
+                padding: 2px 6px;
+                font-size: 0.62rem;
+            }
+            .product-info-wrap {
+                padding: 10px 8px;
+            }
+            .product-name-h4 {
+                font-size: 0.88rem;
+                margin-bottom: 2px;
+                white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+            .product-hindi-sub {
+                font-size: 0.72rem;
+                margin-bottom: 4px;
                 white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
-            .topbar-title-group span.suite-subtitle {
-                display: none;
+            .product-price-row {
+                gap: 6px;
+                margin-bottom: 6px;
             }
-            .topbar-brand {
+            .product-price-val {
+                font-size: 1.05rem;
+            }
+            .product-mrp-val {
+                font-size: 0.75rem;
+            }
+            .stock-counter-row {
+                padding: 4px 6px;
+                font-size: 0.72rem;
+                margin-bottom: 8px;
+            }
+            .quick-restock-btns {
+                gap: 4px;
+                margin-bottom: 8px;
+            }
+            .btn-restock-chip {
+                padding: 4px 2px;
+                font-size: 0.68rem;
+            }
+            .product-info-wrap .btn-secondary {
+                padding: 6px 4px;
+                font-size: 0.72rem;
+            }
+
+            /* Analytics View on Mobile */
+            .analytics-grid-two-col {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            /* Offline View on Mobile */
+            .ledger-table th, .ledger-table td {
+                padding: 8px 10px;
+                font-size: 0.76rem;
+            }
+
+            /* Modals on Mobile */
+            .suite-modal-backdrop {
+                padding: 10px;
+                align-items: flex-end;
+            }
+            .suite-modal-box {
+                padding: 20px 16px;
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                max-height: 85vh;
+            }
+            .suite-modal-header {
+                margin-bottom: 14px;
+                padding-bottom: 10px;
+            }
+            .suite-modal-header h3 {
+                font-size: 1.2rem;
+            }
+            .form-group {
+                margin-bottom: 12px;
+            }
+            .form-group label {
+                font-size: 0.7rem;
+                margin-bottom: 4px;
+            }
+            .form-group input, .form-group select, .form-group textarea {
+                padding: 9px 10px;
+                font-size: 0.85rem;
+            }
+            .modal-btn-row {
+                margin-top: 16px;
+                padding-top: 12px;
                 gap: 8px;
             }
-            .topbar-logo {
-                width: 36px;
-                height: 36px;
-            }
-            .suite-topbar {
+            .modal-btn-row .btn-primary, .modal-btn-row .btn-secondary {
                 padding: 10px 14px;
+                font-size: 0.85rem;
             }
-            .view-header {
-                margin-bottom: 18px;
+            .inactivity-box {
+                padding: 22px 18px;
             }
-            .view-title-group h1 {
-                font-size: 1.55rem;
+            .inactivity-box h3 {
+                font-size: 1.15rem;
+            }
+            .inactivity-box p {
+                font-size: 0.84rem;
+                margin: 10px 0;
+            }
+        }
+
+        /* ── EXTRA SMALL MOBILE (<= 380px) ── */
+        @media (max-width: 380px) {
+            .kpi-value {
+                font-size: 1.15rem;
+            }
+            .kpi-icon {
+                width: 26px;
+                height: 26px;
+                font-size: 0.85rem;
+            }
+            .products-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .order-actions-col {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1362,20 +1651,24 @@
             </div>
         </header>
 
+        <!-- BACKDROP FOR MOBILE DRAWER -->
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
         <!-- WORKSPACE LAYOUT (SIDEBAR + CONTENT) -->
         <div class="suite-workspace">
-            <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
             <!-- LEFT SIDEBAR -->
             <aside class="suite-sidebar" id="admin-sidebar" role="navigation" aria-label="Admin Navigation">
                 <div>
+                    <!-- Mobile Drawer Header -->
                     <div class="sidebar-mobile-header">
                         <div class="sidebar-mobile-brand">
                             <img src="logo.png" alt="Satvik Swaad" class="sidebar-mobile-logo" />
-                            <span class="sidebar-mobile-title">Satvik Swaad</span>
+                            <span class="sidebar-mobile-title">Satvik Swaad Admin</span>
                         </div>
                         <button type="button" class="btn-sidebar-close" id="btn-sidebar-close" aria-label="Close navigation menu">✕</button>
                     </div>
+
                     <div class="sidebar-section-title">Core Operations</div>
                     <ul class="sidebar-nav-list">
                         <li>
@@ -1456,15 +1749,15 @@
                         </div>
                     </div>
 
-                    <!-- 6 High-Level KPI Cards -->
+                    <!-- 6 High-Level KPI Cards (2 columns on mobile, 4-6 on desktop) -->
                     <div class="kpi-grid">
                         <div class="kpi-card">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Online Gross Revenue</span>
+                                <span class="kpi-title">Online Gross</span>
                                 <div class="kpi-icon revenue">₹</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-revenue">₹0</div>
-                            <div class="kpi-note">All paid & confirmed online orders</div>
+                            <div class="kpi-note">Paid & confirmed orders</div>
                         </div>
 
                         <div class="kpi-card">
@@ -1473,43 +1766,43 @@
                                 <div class="kpi-icon orders">📦</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-orders-count">0</div>
-                            <div class="kpi-note">Lifetime incoming customer orders</div>
+                            <div class="kpi-note">Lifetime customer orders</div>
                         </div>
 
                         <div class="kpi-card">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">New / Pending Orders</span>
+                                <span class="kpi-title">Pending Orders</span>
                                 <div class="kpi-icon pending">⏳</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-pending-count" style="color: #D97706;">0</div>
-                            <div class="kpi-note">Awaiting admin confirmation</div>
+                            <div class="kpi-note">Awaiting admin review</div>
                         </div>
 
                         <div class="kpi-card">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Ready for Shipping</span>
+                                <span class="kpi-title">Ready to Ship</span>
                                 <div class="kpi-icon shipping">🚚</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-unshipped-count" style="color: #7C3AED;">0</div>
-                            <div class="kpi-note">Confirmed orders to dispatch</div>
+                            <div class="kpi-note">Confirmed to dispatch</div>
                         </div>
 
                         <div class="kpi-card">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Low Stock Alert</span>
+                                <span class="kpi-title">Low Stock</span>
                                 <div class="kpi-icon stock">⚠️</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-low-stock-count" style="color: #DC2626;">0</div>
-                            <div class="kpi-note">Items with 5 or fewer units left</div>
+                            <div class="kpi-note">Items ≤ 5 units left</div>
                         </div>
 
                         <div class="kpi-card">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Offline Net Balance</span>
+                                <span class="kpi-title">Offline Net</span>
                                 <div class="kpi-icon offline">💼</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-offline-balance">₹0</div>
-                            <div class="kpi-note">Offline Sales minus Raw Expenses</div>
+                            <div class="kpi-note">Sales minus Raw Expenses</div>
                         </div>
                     </div>
 
@@ -1533,10 +1826,10 @@
                         </div>
                     </div>
 
-                    <!-- Status Filter Tabs -->
+                    <!-- Status Filter Tabs (Horizontal swipeable on mobile) -->
                     <div class="filter-tab-bar" id="orders-status-tabs">
                         <button type="button" class="filter-tab active" data-status="all">All Orders <span class="badge-cnt" id="cnt-tab-all">0</span></button>
-                        <button type="button" class="filter-tab" data-status="pending">⏳ Pending / New <span class="badge-cnt" id="cnt-tab-pending">0</span></button>
+                        <button type="button" class="filter-tab" data-status="pending">⏳ Pending <span class="badge-cnt" id="cnt-tab-pending">0</span></button>
                         <button type="button" class="filter-tab" data-status="confirmed">📋 Confirmed <span class="badge-cnt" id="cnt-tab-confirmed">0</span></button>
                         <button type="button" class="filter-tab" data-status="unshipped">🚚 Ready to Ship <span class="badge-cnt" id="cnt-tab-unshipped">0</span></button>
                         <button type="button" class="filter-tab" data-status="shipped">✈️ Shipped <span class="badge-cnt" id="cnt-tab-shipped">0</span></button>
@@ -1548,14 +1841,14 @@
                     <div class="search-control-row">
                         <div class="search-input-wrap">
                             <span class="search-icon-svg">🔍</span>
-                            <input type="text" id="input-search-orders" placeholder="Search by Order ID, Name, or Phone..." />
+                            <input type="text" id="input-search-orders" placeholder="Search by Order ID, Name, Phone..." />
                         </div>
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <label style="font-size:0.85rem;font-weight:700;color:var(--text-muted);">Payment:</label>
-                            <select id="select-payment-filter" style="padding:8px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border-dark);font-size:0.85rem;">
-                                <option value="all">All Payments</option>
-                                <option value="paid">💳 Paid / Verified</option>
-                                <option value="unpaid">⏳ Unpaid / Pending</option>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);">Payment:</label>
+                            <select id="select-payment-filter" style="padding:7px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border-dark);font-size:0.8rem;">
+                                <option value="all">All</option>
+                                <option value="paid">💳 Paid</option>
+                                <option value="unpaid">⏳ Unpaid</option>
                             </select>
                         </div>
                     </div>
@@ -1574,11 +1867,11 @@
                             <p>Live inventory control, 1-click quick restocking (+10, +25, +50), pricing edits, and photo customization.</p>
                         </div>
                         <div class="view-actions">
-                            <button type="button" class="btn-primary" id="btn-open-new-product-modal">+ Add New Product</button>
+                            <button type="button" class="btn-primary" id="btn-open-new-product-modal">+ Add Product</button>
                         </div>
                     </div>
 
-                    <!-- Product Category Tabs -->
+                    <!-- Product Category Tabs (Horizontal swipeable on mobile) -->
                     <div class="filter-tab-bar" id="products-category-tabs">
                         <button type="button" class="filter-tab active" data-category="all">All Categories</button>
                         <button type="button" class="filter-tab" data-category="achar">Pickles (Achar)</button>
@@ -1595,7 +1888,7 @@
                         </div>
                     </div>
 
-                    <!-- Products Grid Container -->
+                    <!-- Products Grid Container (2 columns on mobile) -->
                     <div class="products-grid" id="products-grid-container">
                         <p style="color: #888;">Connecting to products catalog...</p>
                     </div>
@@ -1605,8 +1898,8 @@
                 <section class="view-section" id="view-analytics">
                     <div class="view-header">
                         <div class="view-title-group">
-                            <h1>Analytics & Performance Insights</h1>
-                            <p>Detailed sales breakdown, category distribution, best-selling products, and order fulfillment metrics.</p>
+                            <h1>Analytics & Insights</h1>
+                            <p>Sales breakdown, category distribution, best-selling products, and order fulfillment metrics.</p>
                         </div>
                     </div>
 
@@ -1618,7 +1911,7 @@
                                 <div class="kpi-icon revenue">📊</div>
                             </div>
                             <div class="kpi-value" id="kpi-analytics-aov">₹0</div>
-                            <div class="kpi-note">Calculated across verified orders</div>
+                            <div class="kpi-note">Across verified orders</div>
                         </div>
 
                         <div class="kpi-card">
@@ -1635,7 +1928,7 @@
                                 <span class="kpi-title">Top Category</span>
                                 <div class="kpi-icon orders">🏆</div>
                             </div>
-                            <div class="kpi-value" id="kpi-analytics-top-cat" style="font-size:1.5rem;">Pickles</div>
+                            <div class="kpi-value" id="kpi-analytics-top-cat" style="font-size:1.35rem;">Pickles</div>
                             <div class="kpi-note">Leading volume driver</div>
                         </div>
                     </div>
@@ -1669,7 +1962,7 @@
                             <p>Track non-website raw material expenses (cold-pressed mustard oil, spices, raw mangoes, glass jars, cartons) and offline sales.</p>
                         </div>
                         <div class="view-actions">
-                            <button type="button" class="btn-primary" id="btn-open-offline-modal">+ Record Offline Entry</button>
+                            <button type="button" class="btn-primary" id="btn-open-offline-modal">+ Record Entry</button>
                         </div>
                     </div>
 
@@ -1677,29 +1970,29 @@
                     <div class="kpi-grid">
                         <div class="kpi-card">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Raw Material Investments</span>
+                                <span class="kpi-title">Raw Investments</span>
                                 <div class="kpi-icon stock">🛢️</div>
                             </div>
                             <div class="kpi-value" id="kpi-offline-expenses" style="color:#DC2626;">₹0</div>
-                            <div class="kpi-note">Mustard oil, spices, mangoes, salt</div>
+                            <div class="kpi-note">Oil, spices, mangoes, salt, jars</div>
                         </div>
 
                         <div class="kpi-card">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Offline Sales Income</span>
+                                <span class="kpi-title">Offline Sales</span>
                                 <div class="kpi-icon revenue">💰</div>
                             </div>
                             <div class="kpi-value" id="kpi-offline-sales" style="color:#059669;">₹0</div>
-                            <div class="kpi-note">Exhibitions, mela stalls, direct kitchen pickups</div>
+                            <div class="kpi-note">Exhibitions, mela stalls, direct pickups</div>
                         </div>
 
                         <div class="kpi-card">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Net Offline Cash Flow</span>
+                                <span class="kpi-title">Net Cash Flow</span>
                                 <div class="kpi-icon offline">⚖️</div>
                             </div>
                             <div class="kpi-value" id="kpi-offline-net">₹0</div>
-                            <div class="kpi-note">Total Offline Income minus Offline Expenses</div>
+                            <div class="kpi-note">Income minus Expenses</div>
                         </div>
                     </div>
 
@@ -1721,7 +2014,7 @@
                                 </thead>
                                 <tbody id="offline-ledger-table-body">
                                     <tr>
-                                        <td colspan="6" style="text-align:center;color:#888;padding:24px;">No offline records found. Click "+ Record Offline Entry" to add one.</td>
+                                        <td colspan="6" style="text-align:center;color:#888;padding:20px;">No offline records found. Click "+ Record Entry" to add one.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1733,15 +2026,15 @@
                 <section class="view-section" id="view-security">
                     <div class="view-header">
                         <div class="view-title-group">
-                            <h1>Security Architecture & Cryptographic Tokens</h1>
+                            <h1>Security Architecture & Tokens</h1>
                             <p>Verify administrative custom claims, manage session timeouts, and inspect token payload security.</p>
                         </div>
                     </div>
 
                     <div class="content-card">
-                        <h3>📊 Administrative Identity & Verified Claims</h3>
+                        <h3>📊 Identity & Claims</h3>
                         <p class="desc">Access authorized exclusively via Verified Firebase Auth ID Token. Custom claim <code>admin: true</code> verified server-side.</p>
-                        <div style="margin-top: 16px; background: #FFFDF9; border: 1.5px solid var(--border); padding: 20px; border-radius: 12px; font-family: monospace; font-size: 0.92rem; line-height: 1.8;">
+                        <div style="margin-top: 14px; background: #FFFDF9; border: 1.5px solid var(--border); padding: 16px; border-radius: 10px; font-family: monospace; font-size: 0.88rem; line-height: 1.7;">
                             <div><strong>UID:</strong> <span id="dbg-uid">Loading...</span></div>
                             <div><strong>Email:</strong> <span id="dbg-email">Loading...</span></div>
                             <div><strong>Admin Claim:</strong> <span id="dbg-admin-claim">true</span></div>
@@ -1752,7 +2045,7 @@
                     <div class="content-card">
                         <h3>🛡️ Session Guard & Auto-Lock</h3>
                         <p class="desc">Administrative sessions automatically lock after 15 minutes of inactivity to protect sensitive financial and customer data.</p>
-                        <div style="display:flex;align-items:center;gap:14px;margin-top:14px;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
                             <button type="button" class="btn-secondary" id="btn-manual-lock">🔒 Lock Session Immediately</button>
                         </div>
                     </div>
@@ -1779,7 +2072,7 @@
                     <label for="prod-field-hindi">Name in Hindi (e.g. आम का अचार)</label>
                     <input type="text" id="prod-field-hindi" />
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                     <div class="form-group">
                         <label for="prod-field-category">Category</label>
                         <select id="prod-field-category">
@@ -1794,7 +2087,7 @@
                         <input type="text" id="prod-field-sku" />
                     </div>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                     <div class="form-group">
                         <label for="prod-field-price">Selling Price (₹)</label>
                         <input type="number" id="prod-field-price" min="1" required />
@@ -1804,32 +2097,32 @@
                         <input type="number" id="prod-field-mrp" min="1" required />
                     </div>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                     <div class="form-group">
                         <label for="prod-field-stock">Stock Quantity (Units)</label>
                         <input type="number" id="prod-field-stock" min="0" required />
                     </div>
                     <div class="form-group">
-                        <label for="prod-field-badge">Badge (e.g. Bestseller, Pure Desi)</label>
+                        <label for="prod-field-badge">Badge</label>
                         <input type="text" id="prod-field-badge" placeholder="Bestseller" />
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="prod-field-img">Image URL or Asset Path</label>
+                    <label for="prod-field-img">Image URL / Asset Path</label>
                     <input type="text" id="prod-field-img" placeholder="assets/aam-achar.png" />
                 </div>
                 <div class="form-group">
-                    <label for="prod-field-desc">Short Description</label>
-                    <textarea id="prod-field-desc" rows="3"></textarea>
+                    <label for="prod-field-desc">Description</label>
+                    <textarea id="prod-field-desc" rows="2"></textarea>
                 </div>
-                <div style="display:flex;align-items:center;gap:18px;margin-top:10px;">
-                    <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;">
+                <div style="display:flex;align-items:center;gap:14px;margin-top:8px;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.86rem;cursor:pointer;">
                         <input type="checkbox" id="prod-field-available" checked /> Available for Purchase
                     </label>
                 </div>
                 <div class="modal-btn-row">
                     <button type="button" class="btn-secondary" id="btn-cancel-product-modal">Cancel</button>
-                    <button type="submit" class="btn-primary" id="btn-save-product">Save Product Changes</button>
+                    <button type="submit" class="btn-primary" id="btn-save-product">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -1865,7 +2158,7 @@
                 </div>
                 <div class="modal-btn-row">
                     <button type="button" class="btn-secondary" id="btn-cancel-shipping-modal">Cancel</button>
-                    <button type="submit" class="btn-primary">Confirm Dispatch & Mark Shipped</button>
+                    <button type="submit" class="btn-primary">Confirm Dispatch</button>
                 </div>
             </form>
         </div>
@@ -1883,7 +2176,7 @@
                     <label for="off-type">Transaction Type</label>
                     <select id="off-type" required>
                         <option value="expense">Expense (Raw Material / Packing / Labour)</option>
-                        <option value="income">Income (Exhibition / Direct Kitchen Pickup Sale)</option>
+                        <option value="income">Income (Exhibition / Kitchen Cash Sale)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1901,7 +2194,7 @@
                         <option value="Other">Other Miscellaneous</option>
                     </select>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                     <div class="form-group">
                         <label for="off-amount">Amount (₹)</label>
                         <input type="number" id="off-amount" min="1" placeholder="e.g. 4500" required />
@@ -1912,7 +2205,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="off-desc">Description / Vendor / Notes</label>
+                    <label for="off-desc">Description / Notes / Vendor</label>
                     <textarea id="off-desc" rows="2" placeholder="e.g. 50L Pure Mustard Oil from village mill"></textarea>
                 </div>
                 <div class="modal-btn-row">
@@ -1926,8 +2219,8 @@
     <!-- ════ INACTIVITY WARNING MODAL ════ -->
     <div id="inactivity-modal">
         <div class="inactivity-box">
-            <h3 style="color: var(--maroon); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 8px;">⚠️ Session Timeout Warning</h3>
-            <p style="margin: 14px 0; font-size: 0.95rem; color: #555;">You have been inactive. You will be automatically logged out in <strong id="timer-sec" style="color: var(--saffron);">120</strong> seconds.</p>
+            <h3 style="color: var(--maroon); font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 8px;">⚠️ Session Timeout Warning</h3>
+            <p style="margin: 12px 0; font-size: 0.9rem; color: #555;">You have been inactive. You will be automatically logged out in <strong id="timer-sec" style="color: var(--saffron);">120</strong> seconds.</p>
             <button type="button" class="btn-primary" id="btn-stay">Stay Logged In</button>
         </div>
     </div>

@@ -71,28 +71,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const sidebar = document.getElementById('admin-sidebar');
-    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    // Mobile Sidebar Drawer Controls
     const btnSidebarToggle = document.getElementById('btn-sidebar-toggle');
     const btnSidebarClose = document.getElementById('btn-sidebar-close');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    const sidebar = document.getElementById('admin-sidebar');
 
-    function toggleMobileSidebar(forceState) {
-        if (!sidebar) return;
-        const isOpen = forceState !== undefined ? forceState : !sidebar.classList.contains('open');
-        if (isOpen) {
-            sidebar.classList.add('open');
-            if (sidebarBackdrop) sidebarBackdrop.classList.add('active');
-            if (window.innerWidth <= 820) document.body.style.overflow = 'hidden';
-        } else {
-            sidebar.classList.remove('open');
-            if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+    if (btnSidebarToggle) {
+        btnSidebarToggle.addEventListener('click', () => {
+            if (sidebar && sidebar.classList.contains('open')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        });
     }
-
-    if (btnSidebarToggle) btnSidebarToggle.addEventListener('click', () => toggleMobileSidebar());
-    if (btnSidebarClose) btnSidebarClose.addEventListener('click', () => toggleMobileSidebar(false));
-    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleMobileSidebar(false));
+    if (btnSidebarClose) btnSidebarClose.addEventListener('click', closeMobileSidebar);
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeMobileSidebar);
 
     const btnDashPendingOrders = document.getElementById('btn-dash-new-order-filter');
     if (btnDashPendingOrders) {
@@ -193,30 +188,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const formOfflineEntry = document.getElementById('form-offline-entry');
     if (formOfflineEntry) formOfflineEntry.addEventListener('submit', handleOfflineEntrySubmit);
 
-    // Modal backdrop click-to-dismiss
+    // Backdrop dismissal for all modals
     ['modal-product', 'modal-shipping', 'modal-offline'].forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    closeModal(modalId);
-                }
+        const modalEl = document.getElementById(modalId);
+        if (modalEl) {
+            modalEl.addEventListener('click', (e) => {
+                if (e.target === modalEl) closeModal(modalId);
             });
         }
     });
 
-    // Escape key modal dismissal
+    // Keyboard Escape to dismiss modals and drawer
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            ['modal-product', 'modal-shipping', 'modal-offline'].forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (modal && modal.style.display === 'flex') {
-                    closeModal(modalId);
-                }
-            });
+            closeModal('modal-product');
+            closeModal('modal-shipping');
+            closeModal('modal-offline');
+            closeMobileSidebar();
         }
     });
 });
+
+// Mobile Drawer Helper Functions
+function openMobileSidebar() {
+    const sidebar = document.getElementById('admin-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (sidebar) sidebar.classList.add('open');
+    if (backdrop) backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMobileSidebar() {
+    const sidebar = document.getElementById('admin-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (sidebar) sidebar.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+}
 
 // Auth State Observer
 (async function initAdminAuth() {
@@ -315,7 +323,7 @@ export async function handleAdminLogout() {
 // Inactivity Timer Logic
 function startInactivityTimer() {
     lastActivityTime = Date.now();
-    ['click', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
+    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
         window.addEventListener(evt, resetInactivityTimer, { passive: true });
     });
 
@@ -325,7 +333,7 @@ function startInactivityTimer() {
 
 function stopInactivityTimer() {
     if (inactivityInterval) clearInterval(inactivityInterval);
-    ['click', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
+    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
         window.removeEventListener(evt, resetInactivityTimer);
     });
     hideInactivityModal();
@@ -449,13 +457,11 @@ function switchAdminView(viewId) {
     });
 
     // Close mobile drawer if open
-    const sidebar = document.getElementById('admin-sidebar');
-    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-    if (sidebar && window.innerWidth <= 820) {
-        sidebar.classList.remove('open');
-        if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
-        document.body.style.overflow = '';
-    }
+    closeMobileSidebar();
+
+    // Scroll to top of viewport
+    const viewport = document.getElementById('admin-main-viewport');
+    if (viewport) viewport.scrollTop = 0;
 
     // Refresh view specific rendering
     if (viewId === 'view-orders') renderOrdersView();
@@ -609,33 +615,33 @@ function renderDashboardOrdersFeed(orders) {
     const container = document.createElement('div');
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
-    container.style.gap = '12px';
+    container.style.gap = '10px';
 
     orders.forEach(o => {
         const card = document.createElement('div');
         card.style.background = '#FFFFFF';
         card.style.border = '1px solid #E8DFD3';
-        card.style.padding = '14px 18px';
+        card.style.padding = '12px 14px';
         card.style.borderRadius = '10px';
         card.style.display = 'flex';
         card.style.alignItems = 'center';
         card.style.justifyContent = 'space-between';
         card.style.flexWrap = 'wrap';
-        card.style.gap = '10px';
+        card.style.gap = '8px';
 
         const leftCol = document.createElement('div');
         const titleStrong = document.createElement('strong');
         titleStrong.style.fontFamily = 'monospace';
         titleStrong.style.color = '#7A1C1C';
-        titleStrong.style.fontSize = '0.98rem';
+        titleStrong.style.fontSize = '0.92rem';
         titleStrong.textContent = 'Order #' + (o.id || '').slice(-6).toUpperCase();
 
         const summaryText = document.createTextNode(' — ₹' + (o.total || 0) + ' (' + (o.status || 'pending').toUpperCase() + ')');
 
         const detailsDiv = document.createElement('div');
-        detailsDiv.style.fontSize = '0.82rem';
+        detailsDiv.style.fontSize = '0.78rem';
         detailsDiv.style.color = '#6B625B';
-        detailsDiv.style.marginTop = '4px';
+        detailsDiv.style.marginTop = '2px';
         detailsDiv.textContent = 'Customer: ' + (o.name || o.customerName || 'N/A') + ' | Phone: ' + (o.phone || o.customerPhone || 'N/A');
 
         leftCol.appendChild(titleStrong);
@@ -645,8 +651,8 @@ function renderDashboardOrdersFeed(orders) {
         const btnView = document.createElement('button');
         btnView.type = 'button';
         btnView.className = 'btn-secondary';
-        btnView.style.padding = '6px 12px';
-        btnView.style.fontSize = '0.8rem';
+        btnView.style.padding = '5px 10px';
+        btnView.style.fontSize = '0.76rem';
         btnView.textContent = 'Manage Order →';
         btnView.addEventListener('click', () => {
             switchAdminView('view-orders');
@@ -707,12 +713,14 @@ function renderOrdersView() {
     if (filtered.length === 0) {
         const emptyDiv = document.createElement('div');
         emptyDiv.style.textAlign = 'center';
-        emptyDiv.style.padding = '40px 20px';
+        emptyDiv.style.padding = '36px 16px';
         emptyDiv.style.color = '#6B625B';
         const emptyH3 = document.createElement('h3');
+        emptyH3.style.fontSize = '1.1rem';
         emptyH3.textContent = 'No orders match this filter';
         const emptyP = document.createElement('p');
-        emptyP.style.marginTop = '6px';
+        emptyP.style.marginTop = '4px';
+        emptyP.style.fontSize = '0.82rem';
         emptyP.textContent = 'Try changing the status tab, payment filter, or clearing the search box.';
         emptyDiv.appendChild(emptyH3);
         emptyDiv.appendChild(emptyP);
@@ -752,12 +760,12 @@ function renderOrdersView() {
         idGroup.appendChild(payPill);
 
         const timeSpan = document.createElement('span');
-        timeSpan.style.fontSize = '0.82rem';
+        timeSpan.style.fontSize = '0.76rem';
         timeSpan.style.color = '#6B625B';
         let dateStr = 'N/A';
         if (o.createdAt) {
             const d = o.createdAt.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
-            dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
         }
         timeSpan.textContent = 'Placed: ' + dateStr;
 
@@ -805,9 +813,9 @@ function renderOrdersView() {
         // 2. Items List Column
         const itemsCol = document.createElement('div');
         const itemsTitle = document.createElement('h4');
-        itemsTitle.style.fontSize = '0.92rem';
-        itemsTitle.style.marginBottom = '8px';
-        itemsTitle.textContent = 'Ordered Items (' + (o.items ? o.items.length : 0) + ' items):';
+        itemsTitle.style.fontSize = '0.86rem';
+        itemsTitle.style.marginBottom = '6px';
+        itemsTitle.textContent = 'Items (' + (o.items ? o.items.length : 0) + '):';
         itemsCol.appendChild(itemsTitle);
 
         const itemsTable = document.createElement('table');
@@ -841,19 +849,16 @@ function renderOrdersView() {
         const totalLine = document.createElement('div');
         totalLine.style.display = 'flex';
         totalLine.style.justifyContent = 'space-between';
-        totalLine.style.marginTop = '10px';
-        totalLine.style.paddingTop = '8px';
+        totalLine.style.marginTop = '8px';
+        totalLine.style.paddingTop = '6px';
         totalLine.style.borderTop = '1.5px solid #E8DFD3';
         totalLine.style.fontWeight = '800';
-        totalLine.style.fontSize = '1.05rem';
+        totalLine.style.fontSize = '0.96rem';
         totalLine.style.color = '#7A1C1C';
 
         const totalLabel = document.createElement('span');
         totalLabel.textContent = 'Grand Total:';
         const totalVal = document.createElement('span');
-        totalVal.style.fontFamily = "'DM Serif Display', serif";
-        totalVal.style.fontSize = '1.35rem';
-        totalVal.style.fontWeight = '700';
         totalVal.textContent = '₹' + (o.total || o.finalAmount || 0);
 
         totalLine.appendChild(totalLabel);
@@ -869,7 +874,7 @@ function renderOrdersView() {
             const btnConfirm = document.createElement('button');
             btnConfirm.type = 'button';
             btnConfirm.className = 'btn-action confirm';
-            btnConfirm.textContent = '📋 Confirm Order';
+            btnConfirm.textContent = '📋 Confirm';
             btnConfirm.addEventListener('click', () => updateOrderStatus(o.id, 'confirmed'));
             actionsCol.appendChild(btnConfirm);
         }
@@ -879,7 +884,7 @@ function renderOrdersView() {
             const btnShip = document.createElement('button');
             btnShip.type = 'button';
             btnShip.className = 'btn-action ship';
-            btnShip.textContent = '🚚 Dispatch / Ship';
+            btnShip.textContent = '🚚 Dispatch';
             btnShip.addEventListener('click', () => openShippingModal(o.id));
             actionsCol.appendChild(btnShip);
         }
@@ -889,7 +894,7 @@ function renderOrdersView() {
             const btnDeliver = document.createElement('button');
             btnDeliver.type = 'button';
             btnDeliver.className = 'btn-action deliver';
-            btnDeliver.textContent = '✅ Mark Delivered';
+            btnDeliver.textContent = '✅ Deliver';
             btnDeliver.addEventListener('click', () => updateOrderStatus(o.id, 'delivered'));
             actionsCol.appendChild(btnDeliver);
         }
@@ -899,7 +904,7 @@ function renderOrdersView() {
             const btnVerifyPay = document.createElement('button');
             btnVerifyPay.type = 'button';
             btnVerifyPay.className = 'btn-action verify-pay';
-            btnVerifyPay.textContent = '💳 Mark Paid / Verify';
+            btnVerifyPay.textContent = '💳 Mark Paid';
             btnVerifyPay.addEventListener('click', () => verifyOrderPayment(o.id));
             actionsCol.appendChild(btnVerifyPay);
         }
@@ -909,7 +914,7 @@ function renderOrdersView() {
             const btnCancel = document.createElement('button');
             btnCancel.type = 'button';
             btnCancel.className = 'btn-action cancel';
-            btnCancel.textContent = '❌ Cancel Order';
+            btnCancel.textContent = '❌ Cancel';
             btnCancel.addEventListener('click', () => {
                 if (confirm('Are you sure you want to cancel Order #' + o.id + '?')) {
                     updateOrderStatus(o.id, 'cancelled');
@@ -1076,7 +1081,7 @@ function renderProductsView() {
     if (filtered.length === 0) {
         const emptyP = document.createElement('p');
         emptyP.style.color = '#888';
-        emptyP.style.padding = '24px';
+        emptyP.style.padding = '20px';
         emptyP.textContent = 'No products found matching category/search.';
         container.replaceChildren(emptyP);
         return;
@@ -1106,7 +1111,7 @@ function renderProductsView() {
             stockText = 'Out of Stock';
         } else if (stockQty <= 5) {
             stockClass = 'low-stock';
-            stockText = 'Low Stock (' + stockQty + ')';
+            stockText = 'Low (' + stockQty + ')';
         }
         stockBadge.className = 'stock-badge ' + stockClass;
         stockBadge.textContent = stockText;
@@ -1145,7 +1150,7 @@ function renderProductsView() {
         const counterRow = document.createElement('div');
         counterRow.className = 'stock-counter-row';
         const stockLabel = document.createElement('span');
-        stockLabel.textContent = 'Current Stock:';
+        stockLabel.textContent = 'Stock:';
         const stockStrong = document.createElement('strong');
         stockStrong.textContent = stockQty + ' Units';
         counterRow.appendChild(stockLabel);
@@ -1170,7 +1175,7 @@ function renderProductsView() {
         btnEdit.className = 'btn-secondary';
         btnEdit.style.width = '100%';
         btnEdit.style.justifyContent = 'center';
-        btnEdit.textContent = '✏️ Edit Product Details';
+        btnEdit.textContent = '✏️ Edit Product';
         btnEdit.addEventListener('click', () => openProductModal(p));
 
         infoWrap.appendChild(nameH4);
@@ -1220,7 +1225,7 @@ function openProductModal(prod = null) {
     const fieldAvail = document.getElementById('prod-field-available');
 
     if (prod) {
-        if (title) title.textContent = 'Edit Product: ' + (prod.name || prod.id);
+        if (title) title.textContent = 'Edit: ' + (prod.name || prod.id);
         if (fieldId) fieldId.value = prod.id;
         if (fieldName) fieldName.value = prod.name || '';
         if (fieldHindi) fieldHindi.value = prod.hindiName || prod.nameHindi || '';
@@ -1374,8 +1379,8 @@ function renderOfflineLedgerView() {
         td.colSpan = 6;
         td.style.textAlign = 'center';
         td.style.color = '#888';
-        td.style.padding = '24px';
-        td.textContent = 'No offline records found. Click "+ Record Offline Entry" to add one.';
+        td.style.padding = '20px';
+        td.textContent = 'No offline records found. Click "+ Record Entry" to add one.';
         tr.appendChild(td);
         tbody.replaceChildren(tr);
         return;
@@ -1418,8 +1423,8 @@ function renderOfflineLedgerView() {
         const btnDelete = document.createElement('button');
         btnDelete.type = 'button';
         btnDelete.className = 'btn-secondary';
-        btnDelete.style.padding = '4px 8px';
-        btnDelete.style.fontSize = '0.75rem';
+        btnDelete.style.padding = '3px 7px';
+        btnDelete.style.fontSize = '0.74rem';
         btnDelete.textContent = '🗑️ Delete';
         btnDelete.addEventListener('click', () => {
             if (confirm('Delete this entry: ' + entry.category + ' (₹' + entry.amount + ')?')) {
@@ -1542,24 +1547,26 @@ function renderAnalyticsView() {
             const wrap = document.createElement('div');
             wrap.style.display = 'flex';
             wrap.style.flexDirection = 'column';
-            wrap.style.gap = '10px';
+            wrap.style.gap = '8px';
 
             catEntries.sort((a, b) => b[1] - a[1]).forEach(([cat, rev]) => {
                 const row = document.createElement('div');
                 row.style.display = 'flex';
                 row.style.justifyContent = 'space-between';
-                row.style.padding = '8px 12px';
+                row.style.padding = '7px 10px';
                 row.style.background = '#FAF7F2';
                 row.style.borderRadius = '8px';
                 row.style.border = '1px solid #E8DFD3';
 
                 const spanCat = document.createElement('span');
                 spanCat.style.fontWeight = '700';
+                spanCat.style.fontSize = '0.84rem';
                 spanCat.style.textTransform = 'capitalize';
                 spanCat.textContent = cat;
 
                 const spanRev = document.createElement('span');
                 spanRev.style.fontWeight = '800';
+                spanRev.style.fontSize = '0.84rem';
                 spanRev.style.color = '#7A1C1C';
                 spanRev.textContent = '₹' + rev.toLocaleString('en-IN');
 
@@ -1584,14 +1591,14 @@ function renderAnalyticsView() {
             const wrap = document.createElement('div');
             wrap.style.display = 'flex';
             wrap.style.flexDirection = 'column';
-            wrap.style.gap = '10px';
+            wrap.style.gap = '8px';
 
             prodEntries.sort((a, b) => b[1] - a[1]).slice(0, 5).forEach(([name, units], idx) => {
                 const row = document.createElement('div');
                 row.style.display = 'flex';
                 row.style.alignItems = 'center';
                 row.style.justifyContent = 'space-between';
-                row.style.padding = '8px 12px';
+                row.style.padding = '7px 10px';
                 row.style.background = '#FAF7F2';
                 row.style.borderRadius = '8px';
                 row.style.border = '1px solid #E8DFD3';
@@ -1599,15 +1606,17 @@ function renderAnalyticsView() {
                 const left = document.createElement('div');
                 left.style.display = 'flex';
                 left.style.alignItems = 'center';
-                left.style.gap = '8px';
+                left.style.gap = '6px';
 
                 const rank = document.createElement('span');
                 rank.style.fontWeight = '900';
+                rank.style.fontSize = '0.8rem';
                 rank.style.color = '#D4A017';
                 rank.textContent = '#' + (idx + 1);
 
                 const title = document.createElement('span');
                 title.style.fontWeight = '700';
+                title.style.fontSize = '0.84rem';
                 title.textContent = name;
 
                 left.appendChild(rank);
@@ -1615,8 +1624,9 @@ function renderAnalyticsView() {
 
                 const count = document.createElement('span');
                 count.style.fontWeight = '800';
+                count.style.fontSize = '0.78rem';
                 count.style.color = '#2563EB';
-                count.textContent = units + ' Units Sold';
+                count.textContent = units + ' Sold';
 
                 row.appendChild(left);
                 row.appendChild(count);
