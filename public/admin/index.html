@@ -4,91 +4,1299 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Favicon (Circular Logo) -->
+    <!-- Favicons (Circular Logo & Icons) -->
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>Satvik Swaad – Secure Admin Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <title>Satvik Swaad – Secure Enterprise Admin Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Playfair+Display:wght@600;700;900&family=Lato:wght@400;600;700;900&display=swap" rel="stylesheet" />
     <style>
         :root {
             --maroon: #7A1C1C;
             --maroon-dark: #541212;
+            --maroon-light: #9B2C2C;
             --gold: #D4A017;
+            --gold-light: #F7E7B4;
+            --gold-dark: #B8860B;
             --saffron: #C8521A;
             --saffron-dark: #AA3E0C;
+            --saffron-light: #FCEEE8;
             --dark: #2A211D;
             --cream: #FAF7F2;
+            --cream-card: #FFFFFF;
+            --cream-bg: #F4EFE6;
             --green: #2C5E3B;
+            --green-light: #EAF5ED;
             --red: #C0392B;
-            --border: #E8E1D7;
-            --card-bg: #FFFFFF;
+            --red-light: #FDE8E8;
+            --blue: #2B6CB0;
+            --blue-light: #EBF8FF;
+            --border: #E8DFD3;
+            --border-dark: #D4C7B5;
+            --text-muted: #6B625B;
+            --shadow-sm: 0 2px 6px rgba(42, 33, 29, 0.05);
+            --shadow-md: 0 6px 18px rgba(42, 33, 29, 0.08);
+            --shadow-lg: 0 12px 36px rgba(42, 33, 29, 0.14);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 22px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Lato', system-ui, sans-serif; background: #F6F3ED; color: var(--dark); min-height: 100vh; }
+        body {
+            font-family: 'Lato', system-ui, -apple-system, sans-serif;
+            background: var(--cream-bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
 
-        /* AUTH VIEW */
+        /* ── AUTH VIEW ── */
         #auth-container {
-            display: flex; align-items: center; justify-content: center; min-height: 100vh;
-            background: linear-gradient(135deg, var(--maroon-dark) 0%, var(--maroon) 100%); padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--maroon-dark) 0%, var(--maroon) 60%, #3D0A0A 100%);
+            padding: 24px;
+            position: relative;
+        }
+        #auth-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(212, 160, 23, 0.12) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
         }
 
         .login-card {
-            background: #FFFFFF; border-radius: 20px; padding: 40px; width: 100%; max-width: 440px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); text-align: center; border: 1px solid var(--gold);
+            background: #FFFFFF;
+            border-radius: var(--radius-xl);
+            padding: 44px 38px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+            text-align: center;
+            border: 1.5px solid var(--gold);
+            position: relative;
+            z-index: 1;
         }
-
-        .login-card h1 { font-family: 'Playfair Display', serif; font-size: 1.75rem; color: var(--maroon); margin-bottom: 6px; }
-        .login-card p.sub { color: #665B55; font-size: 0.9rem; margin-bottom: 24px; }
+        .login-logo {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 14px;
+            border: 2.5px solid var(--gold);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            object-fit: cover;
+            background: #FFF;
+        }
+        .login-card h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.85rem;
+            color: var(--maroon);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .login-card p.sub {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 24px;
+        }
         .admin-badge {
-            display: inline-block; background: #FDF4F0; color: var(--saffron); font-size: 0.75rem;
-            font-weight: 800; padding: 6px 16px; border-radius: 50px; margin-bottom: 16px;
-            text-transform: uppercase; letter-spacing: 1px; border: 1px solid #F5D3C3;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--saffron-light);
+            color: var(--saffron-dark);
+            font-size: 0.76rem;
+            font-weight: 800;
+            padding: 6px 16px;
+            border-radius: 50px;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border: 1px solid #F5D3C3;
         }
 
-        .form-group { margin-bottom: 18px; text-align: left; }
-        .form-group label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--maroon); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-group input { width: 100%; padding: 12px 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: #FFFDF9; color: var(--dark); }
-        .form-group input:focus { outline: none; border-color: var(--saffron); }
+        .form-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.76rem;
+            font-weight: 800;
+            color: var(--maroon);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            background: #FFFDF9;
+            color: var(--dark);
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--saffron);
+            box-shadow: 0 0 0 3px rgba(200, 82, 26, 0.15);
+        }
 
         .btn-primary {
-            width: 100%; background: linear-gradient(135deg, var(--saffron) 0%, var(--saffron-dark) 100%);
-            color: #FFFFFF; border: none; padding: 14px; border-radius: 10px; font-size: 1rem;
-            font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(200, 82, 26, 0.3);
+            width: 100%;
+            background: linear-gradient(135deg, var(--saffron) 0%, var(--saffron-dark) 100%);
+            color: #FFFFFF;
+            border: none;
+            padding: 13px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(200, 82, 26, 0.35);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(200, 82, 26, 0.4); }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(200, 82, 26, 0.45);
+        }
+        .btn-secondary {
+            background: #F4EFE6;
+            color: var(--dark);
+            border: 1.5px solid var(--border-dark);
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-secondary:hover {
+            background: #EAE3D5;
+        }
 
-        .error-msg { display: none; background: #FDE8E8; color: var(--red); border-radius: 10px; padding: 12px; font-size: 0.85rem; font-weight: 700; margin-top: 16px; border: 1px solid #F8B4B4; }
-        .info-msg { display: none; background: #EAF5ED; color: var(--green); border-radius: 10px; padding: 12px; font-size: 0.85rem; font-weight: 700; margin-top: 16px; border: 1px solid #B8E1C2; }
+        .error-msg {
+            display: none;
+            background: var(--red-light);
+            color: var(--red);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-top: 16px;
+            border: 1px solid #F8B4B4;
+            text-align: left;
+        }
+        .info-msg {
+            display: none;
+            background: var(--green-light);
+            color: var(--green);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-top: 16px;
+            border: 1px solid #B8E1C2;
+            text-align: left;
+        }
 
-        /* PORTAL VIEW */
-        #portal-container { display: none; flex-direction: column; min-height: 100vh; }
-        .topbar { background: var(--maroon-dark); color: #FFFFFF; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--gold); }
-        .topbar h2 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--gold); }
-        .user-info { display: flex; align-items: center; gap: 16px; font-size: 0.9rem; }
+        /* ── PORTAL APP LAYOUT (HEADER + SIDEBAR + VIEWPORT) ── */
+        #portal-container {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-        .btn-logout { background: rgba(192, 57, 43, 0.2); color: #FFCCCC; border: 1px solid rgba(192, 57, 43, 0.5); padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-        .btn-logout:hover { background: rgba(192, 57, 43, 0.5); color: #FFFFFF; }
+        /* Top Brand Bar */
+        .suite-topbar {
+            background: linear-gradient(90deg, var(--maroon-dark) 0%, var(--maroon) 70%, #4A0E0E 100%);
+            color: #FFFFFF;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+        }
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .topbar-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            object-fit: cover;
+            background: #FFF;
+        }
+        .topbar-title-group h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            color: var(--gold-light);
+            line-height: 1.2;
+            letter-spacing: 0.4px;
+        }
+        .topbar-title-group span.suite-subtitle {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #E2D9C8;
+            font-weight: 700;
+        }
 
-        .content { padding: 32px; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .card { background: #FFFFFF; border-radius: 16px; padding: 28px; box-shadow: 0 8px 30px rgba(122, 28, 28, 0.06); margin-bottom: 28px; border: 1px solid var(--border); }
-        .card h3 { font-family: 'Playfair Display', serif; color: var(--maroon); font-size: 1.3rem; margin-bottom: 8px; }
+        .topbar-center {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .live-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(44, 94, 59, 0.35);
+            border: 1px solid rgba(184, 225, 194, 0.4);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #A3E635;
+        }
+        .live-pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #A3E635;
+            box-shadow: 0 0 8px #A3E635;
+            animation: pulseDot 1.8s infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
 
-        /* INACTIVITY MODAL */
-        #inactivity-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 3000; align-items: center; justify-content: center; }
-        .modal-box { background: #FFFFFF; border-radius: 16px; padding: 32px; max-width: 420px; text-align: center; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #F8F5EE;
+        }
+        .role-badge {
+            background: var(--gold);
+            color: var(--maroon-dark);
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-topbar {
+            background: rgba(255,255,255,0.1);
+            color: #FFFFFF;
+            border: 1px solid rgba(255,255,255,0.22);
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-topbar:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .btn-logout {
+            background: rgba(192, 57, 43, 0.3);
+            border-color: rgba(192, 57, 43, 0.6);
+            color: #FFD4D4;
+        }
+        .btn-logout:hover {
+            background: rgba(192, 57, 43, 0.6);
+            color: #FFFFFF;
+        }
+
+        /* Mobile sidebar hamburger */
+        .btn-sidebar-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* Main Workspace Container */
+        .suite-workspace {
+            display: flex;
+            flex: 1;
+            min-height: calc(100vh - 72px);
+        }
+
+        /* ── LEFT SIDEBAR ── */
+        .suite-sidebar {
+            width: 270px;
+            background: #FFFFFF;
+            border-right: 1.5px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 14px;
+            flex-shrink: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 72px;
+            height: calc(100vh - 72px);
+            overflow-y: auto;
+        }
+        .sidebar-section-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin: 14px 10px 8px;
+        }
+        .sidebar-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .nav-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid transparent;
+            background: transparent;
+            color: var(--dark);
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: left;
+        }
+        .nav-btn-inner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-btn-icon {
+            font-size: 1.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+        }
+        .nav-btn:hover {
+            background: var(--cream);
+            color: var(--maroon);
+            transform: translateX(2px);
+        }
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--maroon-dark) 0%, var(--maroon) 100%);
+            color: #FFFFFF;
+            border-color: var(--gold);
+            border-left: 4px solid var(--gold);
+            box-shadow: 0 4px 14px rgba(122, 28, 28, 0.25);
+        }
+        .nav-btn.active .nav-badge {
+            background: var(--gold);
+            color: var(--maroon-dark);
+        }
+        .nav-badge {
+            background: var(--cream-bg);
+            color: var(--maroon);
+            font-size: 0.72rem;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 50px;
+            border: 1px solid var(--border-dark);
+            min-width: 22px;
+            text-align: center;
+        }
+        .nav-badge.alert {
+            background: var(--red);
+            color: #FFF;
+            border-color: var(--red);
+        }
+
+        .sidebar-footer-card {
+            background: var(--cream);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-top: 20px;
+        }
+        .sidebar-footer-card .label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 800;
+            color: var(--maroon);
+            margin-bottom: 4px;
+        }
+        .sidebar-footer-card .val {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* ── RIGHT MAIN VIEWPORT ── */
+        .suite-viewport {
+            flex: 1;
+            padding: 28px 36px;
+            overflow-y: auto;
+            max-width: 1440px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeInView 0.25s ease-out;
+        }
+        .view-section.active {
+            display: block;
+        }
+        @keyframes fadeInView {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* View Headers */
+        .view-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .view-title-group h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.85rem;
+            color: var(--maroon);
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .view-title-group p {
+            color: var(--text-muted);
+            font-size: 0.94rem;
+        }
+        .view-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .kpi-card {
+            background: #FFFFFF;
+            border-radius: var(--radius-lg);
+            padding: 20px 22px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--gold);
+        }
+        .kpi-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            background: var(--cream);
+        }
+        .kpi-icon.revenue { background: #ECFDF5; color: #059669; }
+        .kpi-icon.orders { background: #EFF6FF; color: #2563EB; }
+        .kpi-icon.pending { background: #FFFBEB; color: #D97706; }
+        .kpi-icon.shipping { background: #F5F3FF; color: #7C3AED; }
+        .kpi-icon.stock { background: #FEF2F2; color: #DC2626; }
+        .kpi-icon.offline { background: #FDF4F0; color: var(--saffron-dark); }
+        .kpi-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+        .kpi-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.95rem;
+            color: var(--dark);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .kpi-note {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Generic Card Box */
+        .content-card {
+            background: #FFFFFF;
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 26px;
+        }
+        .content-card h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--maroon);
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .content-card p.desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 18px;
+        }
+
+        /* Filter Tab Bar */
+        .filter-tab-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1.5px solid var(--border);
+        }
+        .filter-tab {
+            padding: 8px 16px;
+            border-radius: 50px;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .filter-tab:hover {
+            border-color: var(--gold-dark);
+            background: var(--cream);
+        }
+        .filter-tab.active {
+            background: var(--maroon);
+            color: #FFFFFF;
+            border-color: var(--maroon);
+            box-shadow: 0 2px 8px rgba(122, 28, 28, 0.2);
+        }
+        .filter-tab.active .badge-cnt {
+            background: var(--gold);
+            color: var(--maroon-dark);
+        }
+        .badge-cnt {
+            background: var(--cream-bg);
+            color: var(--dark);
+            font-size: 0.72rem;
+            padding: 1px 7px;
+            border-radius: 50px;
+            font-weight: 800;
+        }
+
+        /* Search & Control Row */
+        .search-control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+            max-width: 420px;
+            min-width: 260px;
+        }
+        .search-input-wrap input {
+            width: 100%;
+            padding: 10px 16px 10px 38px;
+            border-radius: 50px;
+            border: 1.5px solid var(--border-dark);
+            background: #FFFFFF;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        .search-input-wrap input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.18);
+        }
+        .search-icon-svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* Orders Dynamic List */
+        .orders-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .order-card {
+            background: #FFFFFF;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .order-card:hover {
+            border-color: var(--gold);
+            box-shadow: var(--shadow-md);
+        }
+        .order-top-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .order-id-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .order-id-title {
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--maroon);
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-pill.status-pending { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+        .status-pill.status-confirmed { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+        .status-pill.status-shipped { background: #F5F3FF; color: #6D28D9; border: 1px solid #DDD6FE; }
+        .status-pill.status-delivered { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+        .status-pill.status-cancelled { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+        .payment-pill.paid { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+        .payment-pill.unpaid { background: #FFF1F2; color: #9F1239; border: 1px solid #FECDD3; }
+
+        .order-body-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1.7fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        .customer-meta h4 {
+            font-size: 0.95rem;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+        .customer-meta p {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 4px;
+        }
+        .btn-wa-chat {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #25D366;
+            color: #FFFFFF;
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 5px 12px;
+            border-radius: 50px;
+            text-decoration: none;
+            margin-top: 8px;
+            transition: opacity 0.2s;
+        }
+        .btn-wa-chat:hover { opacity: 0.9; }
+
+        .items-table {
+            width: 100%;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+        .items-table tr {
+            border-bottom: 1px solid var(--cream-bg);
+        }
+        .items-table td {
+            padding: 6px 4px;
+        }
+
+        .order-actions-col {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .btn-action {
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            transition: all 0.18s;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-action.confirm { background: #2563EB; color: #FFF; }
+        .btn-action.confirm:hover { background: #1D4ED8; }
+        .btn-action.ship { background: var(--maroon); color: #FFF; }
+        .btn-action.ship:hover { background: var(--maroon-dark); }
+        .btn-action.deliver { background: #059669; color: #FFF; }
+        .btn-action.deliver:hover { background: #047857; }
+        .btn-action.verify-pay { background: var(--gold-dark); color: #FFF; }
+        .btn-action.verify-pay:hover { background: #926C08; }
+        .btn-action.cancel { background: #EF4444; color: #FFF; }
+        .btn-action.cancel:hover { background: #DC2626; }
+
+        /* Products Catalog Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .product-admin-card {
+            background: #FFFFFF;
+            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-admin-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold);
+            box-shadow: var(--shadow-md);
+        }
+        .product-thumb-wrap {
+            position: relative;
+            height: 170px;
+            background: var(--cream);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-thumb-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+        .product-admin-card:hover .product-thumb-img {
+            transform: scale(1.05);
+        }
+        .stock-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .stock-badge.in-stock { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+        .stock-badge.low-stock { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+        .stock-badge.out-stock { background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
+
+        .product-info-wrap {
+            padding: 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-name-h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--maroon);
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .product-hindi-sub {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .product-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .product-price-val {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+        .product-mrp-val {
+            font-size: 0.9rem;
+            color: #9CA3AF;
+            text-decoration: line-through;
+        }
+        .stock-counter-row {
+            background: var(--cream);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            font-size: 0.85rem;
+        }
+
+        .quick-restock-btns {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .btn-restock-chip {
+            flex: 1;
+            padding: 6px;
+            background: #F4EFE6;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--maroon);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .btn-restock-chip:hover {
+            background: var(--gold-light);
+            border-color: var(--gold);
+        }
+
+        /* Ledger Table for Offline Finances */
+        .ledger-table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border);
+            background: #FFFFFF;
+        }
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        .ledger-table th {
+            background: var(--cream);
+            color: var(--maroon);
+            font-weight: 800;
+            padding: 14px 18px;
+            text-transform: uppercase;
+            font-size: 0.76rem;
+            letter-spacing: 0.6px;
+            border-bottom: 1.5px solid var(--border);
+        }
+        .ledger-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            color: var(--dark);
+        }
+        .ledger-table tr:hover td {
+            background: #FAF7F2;
+        }
+        .tag-type {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 50px;
+            text-transform: uppercase;
+        }
+        .tag-type.expense { background: #FEE2E2; color: #991B1B; }
+        .tag-type.income { background: #ECFDF5; color: #065F46; }
+
+        /* MODALS */
+        .suite-modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(42, 33, 29, 0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .suite-modal-box {
+            background: #FFFFFF;
+            border-radius: var(--radius-xl);
+            padding: 34px 30px;
+            max-width: 540px;
+            width: 100%;
+            border: 1.5px solid var(--border-dark);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalFadeScale 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .suite-modal-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        .suite-modal-box::-webkit-scrollbar-thumb {
+            background: var(--border-dark);
+            border-radius: 4px;
+        }
+        @keyframes modalFadeScale {
+            from { opacity: 0; transform: scale(0.95) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .suite-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1.5px solid var(--border);
+            padding-bottom: 14px;
+        }
+        .suite-modal-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            color: var(--maroon);
+        }
+        .btn-modal-close {
+            background: transparent;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+            border-radius: var(--radius-sm);
+            transition: color 0.15s, background 0.15s;
+        }
+        .btn-modal-close:hover {
+            color: var(--maroon);
+            background: var(--cream);
+        }
+        .modal-btn-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            border-top: 1.5px solid var(--border);
+            padding-top: 16px;
+        }
+
+        /* Inactivity Modal Specific */
+        #inactivity-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 4000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .inactivity-box {
+            background: #FFFFFF;
+            border-radius: var(--radius-lg);
+            padding: 34px;
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            border: 1.5px solid var(--gold);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: modalFadeScale 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Mobile Drawer Backdrop & Header */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(42, 33, 29, 0.55);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            z-index: 2400;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .sidebar-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .sidebar-mobile-header {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 14px;
+            margin-bottom: 12px;
+            border-bottom: 1.5px solid var(--border);
+        }
+        .sidebar-mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-mobile-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid var(--gold);
+            object-fit: cover;
+        }
+        .sidebar-mobile-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--maroon);
+            font-size: 1.1rem;
+        }
+        .btn-sidebar-close {
+            background: transparent;
+            border: none;
+            font-size: 1.35rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            line-height: 1;
+        }
+        .btn-sidebar-close:hover {
+            color: var(--maroon);
+        }
+
+        .analytics-grid-two-col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
         .d-none { display: none !important; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1080px) {
+            .order-body-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .order-actions-col {
+                grid-column: span 2;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .order-actions-col .btn-action {
+                flex: 1;
+                min-width: 130px;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .suite-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 280px;
+                max-width: 82vw;
+                height: 100vh;
+                z-index: 2500;
+                transform: translateX(-100%);
+                transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                box-shadow: none;
+                border-right: 1.5px solid var(--border);
+                border-bottom: none;
+                background: #FFFFFF;
+            }
+            .suite-sidebar.open {
+                transform: translateX(0);
+                box-shadow: 0 0 36px rgba(42, 33, 29, 0.35);
+            }
+            .sidebar-mobile-header {
+                display: flex;
+            }
+            .btn-sidebar-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .suite-viewport {
+                padding: 20px 16px;
+            }
+            .topbar-center {
+                display: none;
+            }
+            .order-body-grid {
+                grid-template-columns: 1fr;
+            }
+            .order-actions-col {
+                grid-column: span 1;
+            }
+        }
+
+        @media (min-width: 601px) and (max-width: 960px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .filter-tab-bar {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .filter-tab-bar::-webkit-scrollbar {
+                display: none;
+            }
+            .filter-tab {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+            .suite-modal-box {
+                padding: 24px 18px;
+            }
+            .user-pill #admin-user-display {
+                max-width: 95px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .topbar-title-group span.suite-subtitle {
+                display: none;
+            }
+            .topbar-brand {
+                gap: 8px;
+            }
+            .topbar-logo {
+                width: 36px;
+                height: 36px;
+            }
+            .suite-topbar {
+                padding: 10px 14px;
+            }
+            .view-header {
+                margin-bottom: 18px;
+            }
+            .view-title-group h1 {
+                font-size: 1.55rem;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- AUTH CONTAINER -->
+    <!-- AUTH CONTAINER (Military-Grade Login Flow) -->
     <div id="auth-container">
         <div class="login-card">
-            <img src="logo.png" alt="Satvik Swaad" style="width:68px;height:68px;border-radius:50%;display:block;margin:0 auto 12px;border:2px solid var(--gold);box-shadow:0 4px 12px rgba(0,0,0,0.1);" />
+            <img src="logo.png" alt="Satvik Swaad" class="login-logo" />
             <span class="admin-badge">🔐 Satvik Swaad Private Admin Portal</span>
             <h1>Administrator Login</h1>
             <p class="sub">Sign in with authorized Firebase credentials</p>
@@ -102,7 +1310,7 @@
                     <label for="a-pass">Password</label>
                     <input type="password" id="a-pass" placeholder="••••••••" autocomplete="current-password" />
                 </div>
-                <button class="btn-primary" id="btn-login">Sign In →</button>
+                <button type="button" class="btn-primary" id="btn-login">Sign In →</button>
                 <p style="margin-top: 14px; font-size: 0.85rem;">
                     <a href="#" id="link-forgot" style="color: var(--saffron); text-decoration: none; font-weight: 700;">Forgot password?</a>
                 </p>
@@ -113,7 +1321,7 @@
                     <label for="reset-email">Enter Registered Email</label>
                     <input type="email" id="reset-email" placeholder="admin@satvikswaad.com" />
                 </div>
-                <button class="btn-primary" id="btn-reset">Send Reset Link</button>
+                <button type="button" class="btn-primary" id="btn-reset">Send Reset Link</button>
                 <p style="margin-top: 14px; font-size: 0.85rem;">
                     <a href="#" id="link-back" style="color: var(--saffron); text-decoration: none; font-weight: 700;">← Back to login</a>
                 </p>
@@ -124,49 +1332,607 @@
         </div>
     </div>
 
-    <!-- PORTAL CONTAINER -->
+    <!-- PORTAL CONTAINER (High-Performance Admin Suite) -->
     <div id="portal-container">
-        <div class="topbar">
-            <div style="display:flex;align-items:center;gap:12px;"><img src="logo.png" alt="Satvik Swaad" style="width:40px;height:40px;border-radius:50%;border:1.5px solid var(--gold);" /><h2>Satvik Swaad Admin Panel</h2></div>
-            <div class="user-info">
-                <span id="admin-user-display">👤 Admin</span>
-                <span id="admin-claims-badge" class="admin-badge" style="margin:0;">admin: true</span>
-                <button class="btn-logout" id="btn-logout">🚪 Sign Out</button>
-            </div>
-        </div>
-
-        <div class="content">
-            <div class="card">
-                <h3>📊 Administrative Overview & Verified Claims</h3>
-                <p style="margin-top: 6px; color: #665B55; font-size: 0.95rem;">
-                    Access authorized via Verified Firebase Auth ID Token. Custom claim <code>admin: true</code> verified server-side.
-                </p>
-                <div style="margin-top: 16px; background: #FFFDF9; border: 1px solid var(--border); padding: 18px; border-radius: 10px; font-family: monospace; font-size: 0.9rem;">
-                    <div><strong>UID:</strong> <span id="dbg-uid">Loading...</span></div>
-                    <div><strong>Email:</strong> <span id="dbg-email">Loading...</span></div>
-                    <div><strong>Admin Claim:</strong> <span id="dbg-admin-claim">true</span></div>
-                    <div><strong>MFA Status:</strong> <span id="dbg-mfa">Gated / Enrolled</span></div>
+        
+        <!-- TOP BRAND BAR -->
+        <header class="suite-topbar">
+            <div class="topbar-brand">
+                <button type="button" class="btn-sidebar-toggle" id="btn-sidebar-toggle" aria-label="Toggle navigation menu">☰</button>
+                <img src="logo.png" alt="Satvik Swaad" class="topbar-logo" />
+                <div class="topbar-title-group">
+                    <h2>Satvik Swaad</h2>
+                    <span class="suite-subtitle">Enterprise Administration Suite</span>
                 </div>
             </div>
 
-            <div class="card">
-                <h3>📦 Realtime Orders Management</h3>
-                <p style="color: #665B55; font-size: 0.95rem; margin-top: 6px;">Orders loaded dynamically via Cloud Firestore Security Rules guarded by <code>request.auth.token.admin == true</code>.</p>
-                <div id="admin-orders-stream" style="margin-top: 18px;"><p style="color: #888;">Connecting to Firestore...</p></div>
+            <div class="topbar-center">
+                <div class="live-status-pill" id="live-status-indicator">
+                    <span class="live-pulse"></span>
+                    <span id="live-status-text">● Live Sync Active</span>
+                </div>
             </div>
+
+            <div class="topbar-right">
+                <div class="user-pill">
+                    <span id="admin-user-display">👤 Admin</span>
+                    <span id="admin-claims-badge" class="role-badge">admin_owner</span>
+                </div>
+                <button type="button" class="btn-topbar btn-logout" id="btn-logout">🚪 Sign Out</button>
+            </div>
+        </header>
+
+        <!-- WORKSPACE LAYOUT (SIDEBAR + CONTENT) -->
+        <div class="suite-workspace">
+            <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+            <!-- LEFT SIDEBAR -->
+            <aside class="suite-sidebar" id="admin-sidebar" role="navigation" aria-label="Admin Navigation">
+                <div>
+                    <div class="sidebar-mobile-header">
+                        <div class="sidebar-mobile-brand">
+                            <img src="logo.png" alt="Satvik Swaad" class="sidebar-mobile-logo" />
+                            <span class="sidebar-mobile-title">Satvik Swaad</span>
+                        </div>
+                        <button type="button" class="btn-sidebar-close" id="btn-sidebar-close" aria-label="Close navigation menu">✕</button>
+                    </div>
+                    <div class="sidebar-section-title">Core Operations</div>
+                    <ul class="sidebar-nav-list">
+                        <li>
+                            <button type="button" class="nav-btn active" id="btn-nav-dashboard" data-view="view-dashboard">
+                                <span class="nav-btn-inner">
+                                    <span class="nav-btn-icon">📊</span>
+                                    <span>Dashboard</span>
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="nav-btn" id="btn-nav-orders" data-view="view-orders">
+                                <span class="nav-btn-inner">
+                                    <span class="nav-btn-icon">📦</span>
+                                    <span>Orders</span>
+                                </span>
+                                <span class="nav-badge" id="badge-pending-orders">0</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="nav-btn" id="btn-nav-products" data-view="view-products">
+                                <span class="nav-btn-inner">
+                                    <span class="nav-btn-icon">🏷️</span>
+                                    <span>Products & Stock</span>
+                                </span>
+                                <span class="nav-badge alert d-none" id="badge-low-stock">0</span>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="sidebar-section-title">Business & Insights</div>
+                    <ul class="sidebar-nav-list">
+                        <li>
+                            <button type="button" class="nav-btn" id="btn-nav-analytics" data-view="view-analytics">
+                                <span class="nav-btn-inner">
+                                    <span class="nav-btn-icon">📈</span>
+                                    <span>Analytics</span>
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="nav-btn" id="btn-nav-offline" data-view="view-offline">
+                                <span class="nav-btn-inner">
+                                    <span class="nav-btn-icon">💼</span>
+                                    <span>Offline Ledger</span>
+                                </span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="nav-btn" id="btn-nav-security" data-view="view-security">
+                                <span class="nav-btn-inner">
+                                    <span class="nav-btn-icon">⚙️</span>
+                                    <span>Security & Tokens</span>
+                                </span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-footer-card">
+                    <div class="label">🔐 System Integrity</div>
+                    <div class="val">Session Guard Active.<br/>Firestore Rules Verified.</div>
+                </div>
+            </aside>
+
+            <!-- RIGHT DYNAMIC CONTENT VIEWPORT -->
+            <main class="suite-viewport" id="admin-main-viewport">
+
+                <!-- ════ VIEW 1: DASHBOARD ════ -->
+                <section class="view-section active" id="view-dashboard">
+                    <div class="view-header">
+                        <div class="view-title-group">
+                            <h1>Executive Dashboard</h1>
+                            <p>Real-time overview of online revenue, pending dispatches, stock health, and offline business.</p>
+                        </div>
+                        <div class="view-actions">
+                            <button type="button" class="btn-primary" id="btn-dash-new-order-filter">View Pending Orders →</button>
+                        </div>
+                    </div>
+
+                    <!-- 6 High-Level KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Online Gross Revenue</span>
+                                <div class="kpi-icon revenue">₹</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-dash-revenue">₹0</div>
+                            <div class="kpi-note">All paid & confirmed online orders</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Total Orders</span>
+                                <div class="kpi-icon orders">📦</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-dash-orders-count">0</div>
+                            <div class="kpi-note">Lifetime incoming customer orders</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">New / Pending Orders</span>
+                                <div class="kpi-icon pending">⏳</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-dash-pending-count" style="color: #D97706;">0</div>
+                            <div class="kpi-note">Awaiting admin confirmation</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Ready for Shipping</span>
+                                <div class="kpi-icon shipping">🚚</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-dash-unshipped-count" style="color: #7C3AED;">0</div>
+                            <div class="kpi-note">Confirmed orders to dispatch</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Low Stock Alert</span>
+                                <div class="kpi-icon stock">⚠️</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-dash-low-stock-count" style="color: #DC2626;">0</div>
+                            <div class="kpi-note">Items with 5 or fewer units left</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Offline Net Balance</span>
+                                <div class="kpi-icon offline">💼</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-dash-offline-balance">₹0</div>
+                            <div class="kpi-note">Offline Sales minus Raw Expenses</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders Real-time Ticker Card -->
+                    <div class="content-card">
+                        <h3>📦 Live Incoming Orders Feed</h3>
+                        <p class="desc">Streaming latest customer orders instantly via Cloud Firestore <code>onSnapshot</code>.</p>
+                        <!-- Protected Orders Stream Hook -->
+                        <div id="admin-orders-stream">
+                            <p style="color: #888;">Connecting to Firestore...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════ VIEW 2: ORDERS MANAGEMENT ════ -->
+                <section class="view-section" id="view-orders">
+                    <div class="view-header">
+                        <div class="view-title-group">
+                            <h1>Orders & Shipping Dispatch</h1>
+                            <p>Track multi-stage order lifecycles, filter by payment status, and dispatch shipments with tracking numbers.</p>
+                        </div>
+                    </div>
+
+                    <!-- Status Filter Tabs -->
+                    <div class="filter-tab-bar" id="orders-status-tabs">
+                        <button type="button" class="filter-tab active" data-status="all">All Orders <span class="badge-cnt" id="cnt-tab-all">0</span></button>
+                        <button type="button" class="filter-tab" data-status="pending">⏳ Pending / New <span class="badge-cnt" id="cnt-tab-pending">0</span></button>
+                        <button type="button" class="filter-tab" data-status="confirmed">📋 Confirmed <span class="badge-cnt" id="cnt-tab-confirmed">0</span></button>
+                        <button type="button" class="filter-tab" data-status="unshipped">🚚 Ready to Ship <span class="badge-cnt" id="cnt-tab-unshipped">0</span></button>
+                        <button type="button" class="filter-tab" data-status="shipped">✈️ Shipped <span class="badge-cnt" id="cnt-tab-shipped">0</span></button>
+                        <button type="button" class="filter-tab" data-status="delivered">✅ Delivered <span class="badge-cnt" id="cnt-tab-delivered">0</span></button>
+                        <button type="button" class="filter-tab" data-status="cancelled">❌ Cancelled <span class="badge-cnt" id="cnt-tab-cancelled">0</span></button>
+                    </div>
+
+                    <!-- Search & Secondary Filter Row -->
+                    <div class="search-control-row">
+                        <div class="search-input-wrap">
+                            <span class="search-icon-svg">🔍</span>
+                            <input type="text" id="input-search-orders" placeholder="Search by Order ID, Name, or Phone..." />
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <label style="font-size:0.85rem;font-weight:700;color:var(--text-muted);">Payment:</label>
+                            <select id="select-payment-filter" style="padding:8px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border-dark);font-size:0.85rem;">
+                                <option value="all">All Payments</option>
+                                <option value="paid">💳 Paid / Verified</option>
+                                <option value="unpaid">⏳ Unpaid / Pending</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Orders List -->
+                    <div class="orders-grid" id="orders-list-container">
+                        <p style="color: #888;">Loading orders...</p>
+                    </div>
+                </section>
+
+                <!-- ════ VIEW 3: PRODUCTS & INVENTORY ════ -->
+                <section class="view-section" id="view-products">
+                    <div class="view-header">
+                        <div class="view-title-group">
+                            <h1>Products & Inventory Customization</h1>
+                            <p>Live inventory control, 1-click quick restocking (+10, +25, +50), pricing edits, and photo customization.</p>
+                        </div>
+                        <div class="view-actions">
+                            <button type="button" class="btn-primary" id="btn-open-new-product-modal">+ Add New Product</button>
+                        </div>
+                    </div>
+
+                    <!-- Product Category Tabs -->
+                    <div class="filter-tab-bar" id="products-category-tabs">
+                        <button type="button" class="filter-tab active" data-category="all">All Categories</button>
+                        <button type="button" class="filter-tab" data-category="achar">Pickles (Achar)</button>
+                        <button type="button" class="filter-tab" data-category="murabba">Murabba</button>
+                        <button type="button" class="filter-tab" data-category="sweets">Sweets & Laddus</button>
+                        <button type="button" class="filter-tab" data-category="health">Health & Purity</button>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="search-control-row">
+                        <div class="search-input-wrap">
+                            <span class="search-icon-svg">🔍</span>
+                            <input type="text" id="input-search-products" placeholder="Search products by name or SKU..." />
+                        </div>
+                    </div>
+
+                    <!-- Products Grid Container -->
+                    <div class="products-grid" id="products-grid-container">
+                        <p style="color: #888;">Connecting to products catalog...</p>
+                    </div>
+                </section>
+
+                <!-- ════ VIEW 4: ANALYTICS & REPORTS ════ -->
+                <section class="view-section" id="view-analytics">
+                    <div class="view-header">
+                        <div class="view-title-group">
+                            <h1>Analytics & Performance Insights</h1>
+                            <p>Detailed sales breakdown, category distribution, best-selling products, and order fulfillment metrics.</p>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Metrics Overview -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Average Order Value (AOV)</span>
+                                <div class="kpi-icon revenue">📊</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-analytics-aov">₹0</div>
+                            <div class="kpi-note">Calculated across verified orders</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Fulfillment Rate</span>
+                                <div class="kpi-icon shipping">🎯</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-analytics-fulfillment">100%</div>
+                            <div class="kpi-note">Delivered vs Confirmed ratio</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Top Category</span>
+                                <div class="kpi-icon orders">🏆</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-analytics-top-cat" style="font-size:1.5rem;">Pickles</div>
+                            <div class="kpi-note">Leading volume driver</div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-grid-two-col">
+                        <!-- Category Distribution -->
+                        <div class="content-card">
+                            <h3>🏷️ Category Sales Distribution</h3>
+                            <p class="desc">Order count and revenue divided by product categories.</p>
+                            <div id="analytics-category-distribution-container">
+                                <p style="color:#888;">Aggregating category metrics...</p>
+                            </div>
+                        </div>
+
+                        <!-- Top 5 Bestselling Products -->
+                        <div class="content-card">
+                            <h3>🔥 Top 5 Best-Selling Products</h3>
+                            <p class="desc">Ranked by units ordered across all confirmed customer transactions.</p>
+                            <div id="analytics-top-products-container">
+                                <p style="color:#888;">Calculating product performance...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════ VIEW 5: OFFLINE BUSINESS & EXPENSE TRACKER ════ -->
+                <section class="view-section" id="view-offline">
+                    <div class="view-header">
+                        <div class="view-title-group">
+                            <h1>Offline Business & Physical Investments</h1>
+                            <p>Track non-website raw material expenses (cold-pressed mustard oil, spices, raw mangoes, glass jars, cartons) and offline sales.</p>
+                        </div>
+                        <div class="view-actions">
+                            <button type="button" class="btn-primary" id="btn-open-offline-modal">+ Record Offline Entry</button>
+                        </div>
+                    </div>
+
+                    <!-- Offline Financial Summary Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Raw Material Investments</span>
+                                <div class="kpi-icon stock">🛢️</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-offline-expenses" style="color:#DC2626;">₹0</div>
+                            <div class="kpi-note">Mustard oil, spices, mangoes, salt</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Offline Sales Income</span>
+                                <div class="kpi-icon revenue">💰</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-offline-sales" style="color:#059669;">₹0</div>
+                            <div class="kpi-note">Exhibitions, mela stalls, direct kitchen pickups</div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Net Offline Cash Flow</span>
+                                <div class="kpi-icon offline">⚖️</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-offline-net">₹0</div>
+                            <div class="kpi-note">Total Offline Income minus Offline Expenses</div>
+                        </div>
+                    </div>
+
+                    <!-- Ledger Table -->
+                    <div class="content-card">
+                        <h3>📒 Offline Ledger Entries</h3>
+                        <p class="desc">Historical log of all recorded physical purchases and offline receipts stored in Cloud Firestore.</p>
+                        <div class="ledger-table-wrap">
+                            <table class="ledger-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Category</th>
+                                        <th>Description / Vendor</th>
+                                        <th>Amount (₹)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="offline-ledger-table-body">
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;color:#888;padding:24px;">No offline records found. Click "+ Record Offline Entry" to add one.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ════ VIEW 6: SECURITY & SETTINGS ════ -->
+                <section class="view-section" id="view-security">
+                    <div class="view-header">
+                        <div class="view-title-group">
+                            <h1>Security Architecture & Cryptographic Tokens</h1>
+                            <p>Verify administrative custom claims, manage session timeouts, and inspect token payload security.</p>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <h3>📊 Administrative Identity & Verified Claims</h3>
+                        <p class="desc">Access authorized exclusively via Verified Firebase Auth ID Token. Custom claim <code>admin: true</code> verified server-side.</p>
+                        <div style="margin-top: 16px; background: #FFFDF9; border: 1.5px solid var(--border); padding: 20px; border-radius: 12px; font-family: monospace; font-size: 0.92rem; line-height: 1.8;">
+                            <div><strong>UID:</strong> <span id="dbg-uid">Loading...</span></div>
+                            <div><strong>Email:</strong> <span id="dbg-email">Loading...</span></div>
+                            <div><strong>Admin Claim:</strong> <span id="dbg-admin-claim">true</span></div>
+                            <div><strong>MFA Status:</strong> <span id="dbg-mfa">Gated / Enrolled</span></div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <h3>🛡️ Session Guard & Auto-Lock</h3>
+                        <p class="desc">Administrative sessions automatically lock after 15 minutes of inactivity to protect sensitive financial and customer data.</p>
+                        <div style="display:flex;align-items:center;gap:14px;margin-top:14px;">
+                            <button type="button" class="btn-secondary" id="btn-manual-lock">🔒 Lock Session Immediately</button>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
         </div>
     </div>
 
-    <!-- INACTIVITY WARNING MODAL -->
+    <!-- ════ MODAL 1: PRODUCT EDIT / CREATE MODAL ════ -->
+    <div class="suite-modal-backdrop" id="modal-product">
+        <div class="suite-modal-box">
+            <div class="suite-modal-header">
+                <h3 id="modal-product-title">Edit Product</h3>
+                <button type="button" class="btn-modal-close" id="btn-close-product-modal">✕</button>
+            </div>
+            <form id="form-product-edit">
+                <input type="hidden" id="prod-field-id" />
+                <div class="form-group">
+                    <label for="prod-field-name">Product Name (English)</label>
+                    <input type="text" id="prod-field-name" required />
+                </div>
+                <div class="form-group">
+                    <label for="prod-field-hindi">Name in Hindi (e.g. आम का अचार)</label>
+                    <input type="text" id="prod-field-hindi" />
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div class="form-group">
+                        <label for="prod-field-category">Category</label>
+                        <select id="prod-field-category">
+                            <option value="achar">Pickles (Achar)</option>
+                            <option value="murabba">Murabba</option>
+                            <option value="sweets">Sweets & Laddus</option>
+                            <option value="health">Health & Purity</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-field-sku">SKU Code</label>
+                        <input type="text" id="prod-field-sku" />
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div class="form-group">
+                        <label for="prod-field-price">Selling Price (₹)</label>
+                        <input type="number" id="prod-field-price" min="1" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-field-mrp">MRP (₹)</label>
+                        <input type="number" id="prod-field-mrp" min="1" required />
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div class="form-group">
+                        <label for="prod-field-stock">Stock Quantity (Units)</label>
+                        <input type="number" id="prod-field-stock" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-field-badge">Badge (e.g. Bestseller, Pure Desi)</label>
+                        <input type="text" id="prod-field-badge" placeholder="Bestseller" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="prod-field-img">Image URL or Asset Path</label>
+                    <input type="text" id="prod-field-img" placeholder="assets/aam-achar.png" />
+                </div>
+                <div class="form-group">
+                    <label for="prod-field-desc">Short Description</label>
+                    <textarea id="prod-field-desc" rows="3"></textarea>
+                </div>
+                <div style="display:flex;align-items:center;gap:18px;margin-top:10px;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.9rem;cursor:pointer;">
+                        <input type="checkbox" id="prod-field-available" checked /> Available for Purchase
+                    </label>
+                </div>
+                <div class="modal-btn-row">
+                    <button type="button" class="btn-secondary" id="btn-cancel-product-modal">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btn-save-product">Save Product Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ════ MODAL 2: SHIPPING DISPATCH MODAL ════ -->
+    <div class="suite-modal-backdrop" id="modal-shipping">
+        <div class="suite-modal-box">
+            <div class="suite-modal-header">
+                <h3>🚚 Dispatch & Ship Order</h3>
+                <button type="button" class="btn-modal-close" id="btn-close-shipping-modal">✕</button>
+            </div>
+            <form id="form-shipping-dispatch">
+                <input type="hidden" id="ship-order-id" />
+                <div class="form-group">
+                    <label>Order ID</label>
+                    <input type="text" id="ship-order-display" readonly style="background:#F4EFE6;font-family:monospace;" />
+                </div>
+                <div class="form-group">
+                    <label for="ship-courier">Courier Partner</label>
+                    <select id="ship-courier" required>
+                        <option value="Delhivery">Delhivery</option>
+                        <option value="BlueDart">BlueDart Express</option>
+                        <option value="India Post">India Post (Speed Post)</option>
+                        <option value="Shiprocket">Shiprocket</option>
+                        <option value="DTDC">DTDC Courier</option>
+                        <option value="Local Kitchen Rider">Direct Kitchen Delivery</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ship-tracking-number">Tracking / AWB Number</label>
+                    <input type="text" id="ship-tracking-number" placeholder="e.g. DEL123456789" required />
+                </div>
+                <div class="modal-btn-row">
+                    <button type="button" class="btn-secondary" id="btn-cancel-shipping-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Confirm Dispatch & Mark Shipped</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ════ MODAL 3: RECORD OFFLINE TRANSACTION MODAL ════ -->
+    <div class="suite-modal-backdrop" id="modal-offline">
+        <div class="suite-modal-box">
+            <div class="suite-modal-header">
+                <h3>💼 Record Offline Business Entry</h3>
+                <button type="button" class="btn-modal-close" id="btn-close-offline-modal">✕</button>
+            </div>
+            <form id="form-offline-entry">
+                <div class="form-group">
+                    <label for="off-type">Transaction Type</label>
+                    <select id="off-type" required>
+                        <option value="expense">Expense (Raw Material / Packing / Labour)</option>
+                        <option value="income">Income (Exhibition / Direct Kitchen Pickup Sale)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="off-category">Category</label>
+                    <select id="off-category" required>
+                        <option value="Cold-Pressed Mustard Oil">Cold-Pressed Mustard Oil</option>
+                        <option value="Traditional Spices">Traditional Spices (Hing, Methi, Kalonji)</option>
+                        <option value="Raw Mangoes / Fresh Produce">Raw Mangoes / Fresh Produce</option>
+                        <option value="Glass Jars & Packaging">Glass Jars & Packing Boxes</option>
+                        <option value="Kitchen Labour & Processing">Kitchen Labour & Handcrafting</option>
+                        <option value="Logistics & Transport">Logistics & Local Transport</option>
+                        <option value="Exhibition / Mela Stall Sale">Exhibition / Mela Stall Sale</option>
+                        <option value="Direct Kitchen Cash Sale">Direct Kitchen Cash Sale</option>
+                        <option value="Bulk Corporate Order">Bulk Corporate Order</option>
+                        <option value="Other">Other Miscellaneous</option>
+                    </select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div class="form-group">
+                        <label for="off-amount">Amount (₹)</label>
+                        <input type="number" id="off-amount" min="1" placeholder="e.g. 4500" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="off-date">Date</label>
+                        <input type="date" id="off-date" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="off-desc">Description / Vendor / Notes</label>
+                    <textarea id="off-desc" rows="2" placeholder="e.g. 50L Pure Mustard Oil from village mill"></textarea>
+                </div>
+                <div class="modal-btn-row">
+                    <button type="button" class="btn-secondary" id="btn-cancel-offline-modal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save to Ledger</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ════ INACTIVITY WARNING MODAL ════ -->
     <div id="inactivity-modal">
-        <div class="modal-box">
-            <h3 style="color: var(--maroon); font-family: 'Playfair Display', serif; font-size: 1.3rem;">⚠️ Session Timeout Warning</h3>
+        <div class="inactivity-box">
+            <h3 style="color: var(--maroon); font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 8px;">⚠️ Session Timeout Warning</h3>
             <p style="margin: 14px 0; font-size: 0.95rem; color: #555;">You have been inactive. You will be automatically logged out in <strong id="timer-sec" style="color: var(--saffron);">120</strong> seconds.</p>
-            <button class="btn-primary" id="btn-stay">Stay Logged In</button>
+            <button type="button" class="btn-primary" id="btn-stay">Stay Logged In</button>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK & Admin Controller Script -->
     <script type="module" src="./firebase-config.js"></script>
     <script type="module" src="./admin.js"></script>
 

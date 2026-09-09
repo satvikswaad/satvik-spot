@@ -178,6 +178,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Offline Finances & Expenses: Managed directly by verified Admin
+    match /offline_finances/{docId} {
+      allow read, write: if isAdmin();
+    }
+
     // Public Settings Collection
     match /settings/{document} {
       allow read: if resource.data.isPublic == true;
