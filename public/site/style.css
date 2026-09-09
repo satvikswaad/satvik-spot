@@ -67,12 +67,20 @@
 
 /* BASE RESET */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; font-size: 16px; }
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
+}
 body {
     font-family: 'Lato', system-ui, -apple-system, sans-serif;
     background: var(--color-cream); color: var(--color-dark);
     line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column;
     overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
 }
 body.menu-open { overflow: hidden !important; }
 
@@ -104,7 +112,10 @@ h2 { font-size: 2rem; line-height: 1.25; margin-bottom: 0.75rem; }
 /* TOP NOTIFICATION HEADER (CONTINUOUS MOTION TICKER LINE) */
 .announcement-ticker {
     width: 100%;
+    max-width: 100%;
     overflow: hidden;
+    overflow-x: hidden;
+    contain: paint layout;
     background: linear-gradient(90deg, #122818 0%, #1f4a2c 50%, #122818 100%);
     color: #FFF4D9;
     padding: 10px 0;
