@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Shopping Cart | Satvik Swaad</title>
+    <meta name="description" content="Review your handcrafted Satvik Swaad traditional pickles and pure treats before proceeding to checkout.">
+    <link rel="icon" type="image/png" href="assets/satvik_logo_round.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yatra+One&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="cart-page-body" style="background: #FAF5EB; min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- TOP ANNOUNCEMENT TICKER -->
+    <div class="announcement-ticker" role="region" aria-label="Announcements">
+        <div class="announcement-track">
+            <div class="announcement-group">
+                <span>✨ 100% HOMEMADE PICKLES & PRESERVES</span>
+                <span>☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL</span>
+                <span>👵 ANCESTRAL FAMILY RECIPES</span>
+                <span>🌿 ZERO ARTIFICIAL PRESERVATIVES</span>
+                <span>📦 FREE DELIVERY ON ORDERS ABOVE ₹499</span>
+            </div>
+            <div class="announcement-group" aria-hidden="true">
+                <span>✨ 100% HOMEMADE PICKLES & PRESERVES</span>
+                <span>☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL</span>
+                <span>👵 ANCESTRAL FAMILY RECIPES</span>
+                <span>🌿 ZERO ARTIFICIAL PRESERVATIVES</span>
+                <span>📦 FREE DELIVERY ON ORDERS ABOVE ₹499</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SITE HEADER -->
+    <header class="site-header" role="banner">
+        <div class="header-container ref-header">
+            <a href="index.html" class="logo-group" aria-label="Satvik Swaad home">
+                <svg class="logo-curve-svg" viewBox="0 0 140 38" fill="none" aria-hidden="true">
+                    <path d="M 0 0 C 18 0, 26 4, 32 12 C 42 26, 55 35, 70 35 C 85 35, 98 26, 108 12 C 114 4, 122 0, 140 0 Z" fill="#FAF5EB" />
+                </svg>
+                <span class="ref-logo-ring">
+                    <img src="assets/satvik_logo_round.png" alt="Satvik Swaad" class="ref-logo-img" />
+                </span>
+            </a>
+            
+            <nav class="main-nav ref-nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Shop</a>
+                <a href="our-story.html" class="nav-link">Our Story</a>
+                <a href="why-us.html" class="nav-link">Health & Purity</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-right-actions">
+                <a href="products.html" class="ref-icon-btn" aria-label="Continue Shopping" title="Continue Shopping" style="text-decoration: none; font-size: 1.1rem; color: #1D552C;">
+                    🛍️
+                </a>
+                <a href="profile.html" class="ref-icon-btn" aria-label="My Account" title="My Account" style="text-decoration: none; font-size: 1.1rem; color: #1D552C;">
+                    👤
+                </a>
+            </div>
+        </div>
+        
+        <div class="header-wave-wrap" aria-hidden="true">
+            <svg class="header-wave-svg" viewBox="0 0 1440 16" preserveAspectRatio="none">
+                <path d="M0,0 L1440,0 L1440,6 C1380,10 1320,4 1260,8 C1200,12 1140,5 1080,7 C1020,10 960,4 900,8 C840,11 780,5 720,7 C660,10 600,4 540,8 C480,12 420,5 360,7 C300,10 240,4 180,8 C120,12 60,5 0,7 Z" fill="#FAF5EB"/>
+            </svg>
+        </div>
+    </header>
+
+    <!-- MAIN CART CONTENT -->
+    <main id="main-content" style="flex: 1; max-width: 960px; width: 100%; margin: 0 auto; padding: 20px 16px 80px;">
+        
+        <!-- PAGE HEADER -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <a href="products.html" style="font-size: 0.85rem; color: #5C7A65; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 4px;">
+                    ← Back to Shop
+                </a>
+                <h1 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #164328; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>Shopping Cart</span>
+                    <span id="cart-item-count-badge" style="font-size: 0.82rem; font-family: 'Plus Jakarta Sans', sans-serif; background: #E6DEC8; color: #164328; padding: 2px 10px; border-radius: 999px; font-weight: 800;">0 items</span>
+                </h1>
+            </div>
+            <button type="button" id="btn-clear-cart-all" style="background: none; border: none; color: #9E3838; font-size: 0.82rem; font-weight: 700; cursor: pointer; text-decoration: underline; display: none;">
+                Clear Cart
+            </button>
+        </div>
+
+        <!-- PURITY NOTICE STRIP -->
+        <div style="background: #F4F8F3; border: 1.5px solid #C5DECC; border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.3rem;">🌿</span>
+            <span style="font-size: 0.82rem; color: #164328; font-weight: 700; line-height: 1.35;">
+                100% Satvik Purity Guarantee &bull; Sun-Cured in Kachi Ghani Mustard Oil &bull; Zero Onion, Garlic or Chemicals
+            </span>
+        </div>
+
+        <!-- DYNAMIC CONTAINER -->
+        <div id="cart-view-container">
+            <!-- Populated via JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- FIXED MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Navigation" style="z-index: 1000;">
+        <a href="index.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="products.html" class="nav-item">
+            <span class="nav-icon">🛍️</span>
+            <span class="nav-label">Products</span>
+        </a>
+        <a href="cart.html" class="nav-item active">
+            <span class="nav-icon" style="position: relative;">
+                🛒
+                <span class="cart-badge-count" id="mobile-cart-badge" style="display: none;">0</span>
+            </span>
+            <span class="nav-label">Cart</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Profile</span>
+        </a>
+    </nav>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <!-- SCRIPTS -->
+    <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./script.js"></script>
+
+    <!-- INLINE REACTIVE CART HYDRATION -->
+    <script>
+        (function() {
+            const CART_KEY = 'satwikCart_v2';
+            const LEGACY_KEY = 'satwikCart';
+
+            function getStoredCart() {
+                try {
+                    const raw = localStorage.getItem(CART_KEY) || localStorage.getItem(LEGACY_KEY);
+                    if (!raw) return {};
+                    return JSON.parse(raw) || {};
+                } catch(e) {
+                    return {};
+                }
+            }
+
+            function saveStoredCart(cart) {
+                localStorage.setItem(CART_KEY, JSON.stringify(cart));
+                localStorage.setItem(LEGACY_KEY, JSON.stringify(cart));
+                // Fire custom event so other components sync
+                window.dispatchEvent(new Event('cartUpdated'));
+            }
+
+            function escapeHtml(str) {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#x27;')
+                    .replace(/\//g, '&#x2F;');
+            }
+
+            function safeUrl(url) {
+                if (!url || typeof url !== 'string') return 'assets/aam-ka-achar.png';
+                const trimmed = url.trim();
+                const lower = trimmed.toLowerCase();
+                if (lower.startsWith('javascript:') || lower.startsWith('vbscript:') || lower.startsWith('data:')) {
+                    return 'assets/aam-ka-achar.png';
+                }
+                return escapeHtml(trimmed);
+            }
+
+            function renderCartPage() {
+                const cart = getStoredCart();
+                const items = Array.isArray(cart) ? cart : Object.values(cart);
+                const container = document.getElementById('cart-view-container');
+                const countBadge = document.getElementById('cart-item-count-badge');
+                const clearBtn = document.getElementById('btn-clear-cart-all');
+                const mobileBadge = document.getElementById('mobile-cart-badge');
+
+                const totalItemsCount = items.reduce((sum, item) => sum + (Number(item.qty || item.quantity) || 1), 0);
+                if (countBadge) countBadge.textContent = `${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'}`;
+                if (mobileBadge) {
+                    mobileBadge.textContent = totalItemsCount;
+                    mobileBadge.style.display = totalItemsCount > 0 ? 'inline-block' : 'none';
+                }
+
+                if (items.length === 0) {
+                    if (clearBtn) clearBtn.style.display = 'none';
+                    container.innerHTML = `
+                        <div style="background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 18px; padding: 42px 20px; text-align: center; box-shadow: 0 4px 16px rgba(60,50,20,0.06); margin-top: 10px;">
+                            <div style="font-size: 3.5rem; margin-bottom: 12px;">🏺</div>
+                            <h2 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.5rem; margin: 0 0 8px;">Your Cart is Empty</h2>
+                            <p style="color: #6B7280; font-size: 0.92rem; max-width: 380px; margin: 0 auto 24px; line-height: 1.5;">
+                                You haven't added any artisanal pickles or sweet treats to your cart yet. Explore our handcrafted batches!
+                            </p>
+                            <a href="products.html" style="display: inline-block; background: #164328; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(22,67,40,0.25);">
+                                Explore Products Catalogue →
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (clearBtn) clearBtn.style.display = 'inline-block';
+
+                const subtotal = items.reduce((sum, item) => sum + (Number(item.price || 0) * (Number(item.qty || item.quantity) || 1)), 0);
+
+                let itemsHtml = items.map((item, idx) => {
+                    const rawKey = item.lineKey || `${item.productId || item.id}::${item.variantId || 'default'}`;
+                    const key = escapeHtml(rawKey);
+                    const qty = Number(item.qty || item.quantity) || 1;
+                    const price = Number(item.price) || 0;
+                    const lineTotal = price * qty;
+                    const img = safeUrl(item.img || item.image || 'assets/aam-ka-achar.png');
+                    const name = escapeHtml(item.name || 'Satvik Swaad Product');
+                    const variant = escapeHtml(item.variantLabel || item.weight || '500 g');
+
+                    return `
+                        <div class="cart-item-row" data-line-key="${key}" style="display: flex; gap: 14px; background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 14px; padding: 12px; margin-bottom: 12px; align-items: center; box-shadow: 0 2px 8px rgba(60,50,20,0.04);">
+                            <img src="${img}" alt="${name}" style="width: 72px; height: 72px; object-fit: contain; background: #FAF8F5; border-radius: 10px; padding: 4px; flex-shrink: 0;" />
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 700; font-size: 0.95rem; color: #164328; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</div>
+                                <div style="font-size: 0.78rem; color: #6B7280; margin-bottom: 6px;">${variant} &bull; ₹${price} each</div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                                    <div style="display: inline-flex; align-items: center; border: 1.5px solid #DCD2BC; border-radius: 8px; overflow: hidden; background: #FAF8F5;">
+                                        <button type="button" class="btn-qty-minus" data-key="${key}" style="background: none; border: none; width: 30px; height: 30px; font-size: 1rem; cursor: pointer; color: #164328; font-weight: 800;">−</button>
+                                        <span style="width: 32px; text-align: center; font-size: 0.88rem; font-weight: 700; color: #164328;">${qty}</span>
+                                        <button type="button" class="btn-qty-plus" data-key="${key}" style="background: none; border: none; width: 30px; height: 30px; font-size: 1rem; cursor: pointer; color: #164328; font-weight: 800;">+</button>
+                                    </div>
+                                    <div style="font-weight: 800; font-size: 1.05rem; color: #164328;">₹${lineTotal}</div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-item-delete" data-key="${key}" aria-label="Remove item" style="background: none; border: none; color: #C53030; font-size: 1.2rem; cursor: pointer; padding: 6px; align-self: flex-start;">✕</button>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 18px;">
+                        <!-- ITEMS LIST -->
+                        <div>
+                            ${itemsHtml}
+                        </div>
+
+                        <!-- BILLING SUMMARY CARD -->
+                        <div style="background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 16px; padding: 18px; box-shadow: 0 4px 16px rgba(60,50,20,0.06);">
+                            <h3 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.2rem; margin: 0 0 14px; border-bottom: 1px dashed #E6DEC8; padding-bottom: 8px;">Order Summary</h3>
+                            
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #4B5563; margin-bottom: 8px;">
+                                <span>Items Subtotal:</span>
+                                <span style="font-weight: 700; color: #164328;">₹${subtotal}</span>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #4B5563; margin-bottom: 12px;">
+                                <span>Delivery Fee:</span>
+                                <span style="color: #1D552C; font-weight: 700;">FREE (Inaugural Offer)</span>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; color: #164328; border-top: 2px solid #E6DEC8; padding-top: 12px; margin-bottom: 18px;">
+                                <span>Total Payable:</span>
+                                <span>₹${subtotal}</span>
+                            </div>
+
+                            <button type="button" id="btn-proceed-to-checkout" style="width: 100%; background: #164328; color: #FFFFFF; border: none; padding: 14px 20px; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(22,67,40,0.3); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <span>Proceed to Checkout</span>
+                                <span>🔒</span>
+                            </button>
+
+                            <div style="text-align: center; margin-top: 12px;">
+                                <a href="https://wa.me/919236587600?text=Namaste%2C%20I%20would%20like%20to%20place%20an%20order%20for%20Satvik%20Swaad" target="_blank" rel="noopener noreferrer" style="font-size: 0.84rem; color: #1D552C; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                                    <span>💬 Quick Order via WhatsApp</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Bind handlers
+                container.querySelectorAll('.btn-qty-plus').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const k = btn.getAttribute('data-key');
+                        const c = getStoredCart();
+                        if (c[k]) {
+                            c[k].qty = (Number(c[k].qty) || 1) + 1;
+                            saveStoredCart(c);
+                            renderCartPage();
+                        }
+                    });
+                });
+
+                container.querySelectorAll('.btn-qty-minus').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const k = btn.getAttribute('data-key');
+                        const c = getStoredCart();
+                        if (c[k]) {
+                            const cur = Number(c[k].qty) || 1;
+                            if (cur > 1) {
+                                c[k].qty = cur - 1;
+                            } else {
+                                delete c[k];
+                            }
+                            saveStoredCart(c);
+                            renderCartPage();
+                        }
+                    });
+                });
+
+                container.querySelectorAll('.btn-item-delete').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const k = btn.getAttribute('data-key');
+                        const c = getStoredCart();
+                        delete c[k];
+                        saveStoredCart(c);
+                        renderCartPage();
+                    });
+                });
+
+                const checkoutBtn = document.getElementById('btn-proceed-to-checkout');
+                if (checkoutBtn) {
+                    checkoutBtn.addEventListener('click', () => {
+                        if (window.openCheckout) {
+                            window.openCheckout();
+                        } else {
+                            // Fallback if script.js export not yet attached
+                            import('./script.js').then(mod => {
+                                if (mod.openCheckout) mod.openCheckout();
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Clear All
+            const clearBtn = document.getElementById('btn-clear-cart-all');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to clear your cart?')) {
+                        saveStoredCart({});
+                        renderCartPage();
+                    }
+                });
+            }
+
+            window.addEventListener('DOMContentLoaded', renderCartPage);
+            window.addEventListener('cartUpdated', renderCartPage);
+        })();
+    </script>
+</body>
+</html>

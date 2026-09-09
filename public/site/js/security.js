@@ -16,16 +16,17 @@ export function sanitizeText(input) {
 export function validateUrl(url) {
   if (!url || typeof url !== 'string') return 'assets/aam-ka-achar.png';
   const trimmed = url.trim();
+  const cleaned = trimmed.replace(/[\x00-\x1f\x7f-\x9f]/g, '');
+  const lower = cleaned.toLowerCase();
 
   // Block dangerous schemes
-  const lower = trimmed.toLowerCase();
-  if (lower.startsWith('javascript:') || lower.startsWith('vbscript:')) {
+  if (lower.startsWith('javascript:') || lower.startsWith('vbscript:') || lower.startsWith('data:')) {
     console.warn('Blocked dangerous URL scheme:', url);
     return 'assets/aam-ka-achar.png';
   }
 
   // Allow safe relative paths
-  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('assets/')) {
+  if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('assets/') || trimmed.endsWith('.html') || trimmed.includes('.html?')) {
     return trimmed;
   }
 
@@ -40,6 +41,17 @@ export function validateUrl(url) {
   }
 
   return trimmed;
+}
+
+export function isSafeNavigationUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  const cleaned = trimmed.replace(/[\x00-\x1f\x7f-\x9f]/g, '');
+  const lower = cleaned.toLowerCase();
+  if (lower.startsWith('javascript:') || lower.startsWith('vbscript:') || lower.startsWith('data:')) {
+    return false;
+  }
+  return true;
 }
 
 export function createSafeElement(tag, options = {}) {

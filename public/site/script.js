@@ -1,4 +1,4 @@
-import { sanitizeText, validateUrl, createSafeElement } from './js/security.js';
+import { sanitizeText, validateUrl, createSafeElement, isSafeNavigationUrl } from './js/security.js';
 import { PRODUCTS_CATALOGUE } from './js/productsData.js';
 import { getCurrentLanguage, setLanguage, t, applyTranslations } from './js/translations.js';
 
@@ -80,6 +80,7 @@ function runInitializers() {
     ensureModalsInDOM();
     initLanguage();
     initUI();
+    initUniversalSearch();
     initHeroSlider();
     initScrollReveal();
     initScrollToTop();
@@ -229,36 +230,12 @@ function initUI() {
         });
     }
 
-    // Connect header search bars across all pages
-    const headerSearchInputs = document.querySelectorAll('.ref-search-input');
-    headerSearchInputs.forEach(hInput => {
-        hInput.addEventListener('input', (e) => {
-            const query = e.target.value;
-            if (searchInput) searchInput.value = query;
-            if (document.getElementById('product-grid-container')) {
-                searchProducts(query);
-            }
-        });
-        hInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const query = hInput.value.trim();
-                if (!document.getElementById('product-grid-container')) {
-                    window.location.href = `products.html?q=${encodeURIComponent(query)}`;
-                } else {
-                    if (searchInput) searchInput.value = query;
-                    searchProducts(query);
-                }
-            }
-        });
-    });
-
     // Check for query parameter on page load (e.g. products.html?q=pickle)
     try {
         const urlParams = new URLSearchParams(window.location.search);
         const initialQuery = urlParams.get('q') || urlParams.get('search');
         if (initialQuery) {
-            if (searchInput) searchInput.value = initialQuery;
+            const headerSearchInputs = document.querySelectorAll('.ref-search-input');
             headerSearchInputs.forEach(i => i.value = initialQuery);
             setTimeout(() => {
                 searchProducts(initialQuery);
@@ -278,7 +255,7 @@ function initUI() {
     });
 
     // Price and Availability filter checkbox listeners
-    const filterCheckboxes = document.querySelectorAll('.ref-filters input[type="checkbox"], #filter-instock, input[data-filter="in-stock"]');
+    const filterCheckboxes = document.querySelectorAll('.ref-filters input[type="checkbox"], .ref-filter-list input[type="checkbox"], #filter-instock, #filter-outofstock, input[data-filter="in-stock"], input[data-filter="out-of-stock"]');
     filterCheckboxes.forEach(cb => {
         cb.addEventListener('change', () => {
             if (typeof applyAllProductFilters === 'function') {
@@ -286,6 +263,8 @@ function initUI() {
             }
         });
     });
+
+    updateCategoryBadges();
 
     initProductCardsClickHandlers();
 
@@ -590,25 +569,30 @@ function initProductsSort() {
     if (!sortSelect) return;
 
     const container = document.getElementById('product-grid-container');
-    const originalOrder = container ? Array.from(container.children) : [];
+    if (!container) return;
 
-    sortSelect.addEventListener('change', (e) => {
-        const val = e.target.value;
-        if (!container) return;
+    const originalOrder = Array.from(container.querySelectorAll('.product-card:not(.fallback-recommendation-card)'));
+
+    const applySort = () => {
+        const val = sortSelect.value;
+        const emptyState = document.getElementById('products-empty-state');
+        const cards = Array.from(container.querySelectorAll('.product-card:not(.fallback-recommendation-card)'));
 
         if (val === 'newest' || val === 'default') {
-            originalOrder.forEach(card => container.appendChild(card));
+            originalOrder.forEach(card => {
+                if (emptyState) container.insertBefore(card, emptyState);
+                else container.appendChild(card);
+            });
             return;
         }
 
-        const cards = Array.from(container.children);
         cards.sort((a, b) => {
-            const pA = parseFloat(a.querySelector('.price-val')?.textContent.replace(/[^0-9.]/g, '') || '0');
-            const pB = parseFloat(b.querySelector('.price-val')?.textContent.replace(/[^0-9.]/g, '') || '0');
-            const nA = a.querySelector('.product-title')?.textContent || '';
-            const nB = b.querySelector('.product-title')?.textContent || '';
-            const rA = parseFloat(a.querySelector('.rating-score, .ref-rating-score')?.textContent || a.querySelector('.product-rating-row, .ref-rating-row')?.textContent.replace(/[^0-9.]/g, '') || '0');
-            const rB = parseFloat(b.querySelector('.rating-score, .ref-rating-score')?.textContent || b.querySelector('.product-rating-row, .ref-rating-row')?.textContent.replace(/[^0-9.]/g, '') || '0');
+            const pA = parseFloat(a.querySelector('.price-val, .ref-card-price')?.textContent.replace(/[^0-9.]/g, '') || '0');
+            const pB = parseFloat(b.querySelector('.price-val, .ref-card-price')?.textContent.replace(/[^0-9.]/g, '') || '0');
+            const nA = (a.querySelector('.ref-card-title, .product-title')?.textContent || '').trim();
+            const nB = (b.querySelector('.ref-card-title, .product-title')?.textContent || '').trim();
+            const rA = parseFloat(a.querySelector('.rating-score, .ref-rating-score')?.textContent.replace(/[^0-9.]/g, '') || '0');
+            const rB = parseFloat(b.querySelector('.rating-score, .ref-rating-score')?.textContent.replace(/[^0-9.]/g, '') || '0');
 
             if (val === 'price-asc' || val === 'price-low') return pA - pB;
             if (val === 'price-desc' || val === 'price-high') return pB - pA;
@@ -617,8 +601,13 @@ function initProductsSort() {
             return 0;
         });
 
-        cards.forEach(card => container.appendChild(card));
-    });
+        cards.forEach(card => {
+            if (emptyState) container.insertBefore(card, emptyState);
+            else container.appendChild(card);
+        });
+    };
+
+    sortSelect.addEventListener('change', applySort);
 }
 
 function initReviewsData() {
@@ -863,6 +852,10 @@ function animateCartBadge() {
 }
 
 function openCart() {
+    if (window.innerWidth <= 768 && !window.location.pathname.includes('cart.html')) {
+        window.location.href = 'cart.html';
+        return;
+    }
     const overlay = document.getElementById('cart-drawer-overlay');
     if (overlay) {
         overlay.classList.add('active');
@@ -2889,9 +2882,11 @@ function renderCatalogSeekFlow(category = 'all', query = '') {
     container.style.setProperty('animation-play-state', 'running', 'important');
 }
 
-function filterCategory(category) {
-    const isCatalogSeekFlow = false; // Never run seek flow conveyor on the shop catalog page
+/* ==========================================================================
+   ITEM 2: SHOP FILTERS, BADGES & SORTER
+   ========================================================================== */
 
+function filterCategory(category) {
     const tabs = document.querySelectorAll('.category-tab');
     tabs.forEach(t => {
         if (t.getAttribute('data-category') === category) {
@@ -2903,14 +2898,56 @@ function filterCategory(category) {
         }
     });
 
+    const secTitle = document.querySelector('.ref-section-title');
+    if (secTitle) {
+        if (category === 'all' || !category) secTitle.textContent = 'All Products';
+        else if (category === 'achar' || category === 'pickles') secTitle.textContent = 'Pickles';
+        else if (category === 'sweets' || category === 'murabba') secTitle.textContent = 'Sweets';
+        else if (category === 'health') secTitle.textContent = 'Health Products';
+        else secTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+    }
+
     currentCatalogCategory = category;
     applyAllProductFilters();
 }
 
 function searchProducts(query) {
-    const isCatalogSeekFlow = false;
     currentCatalogQuery = query;
     applyAllProductFilters();
+}
+
+function updateCategoryBadges() {
+    const allCards = document.querySelectorAll('#product-grid-container .product-card:not(.fallback-recommendation-card)');
+    if (!allCards || allCards.length === 0) return;
+
+    const allCount = allCards.length;
+    let picklesCount = 0;
+    let sweetsCount = 0;
+    let healthCount = 0;
+
+    allCards.forEach(card => {
+        const cat = (card.getAttribute('data-category') || '').toLowerCase();
+        if (cat.includes('achar') || cat.includes('pickles')) {
+            picklesCount++;
+        } else if (cat.includes('sweets') || cat.includes('murabba')) {
+            sweetsCount++;
+        } else if (cat.includes('health')) {
+            healthCount++;
+        }
+    });
+
+    // Sidebar buttons and tabs on products.html
+    const allBtnSpan = document.querySelector('.category-tab[data-category="all"] span, .ref-cat-btn-all span');
+    if (allBtnSpan) allBtnSpan.textContent = `All Products (${allCount})`;
+
+    const picklesBtnSpan = document.querySelector('.category-tab[data-category="achar"] span, .category-tab[data-category="pickles"] span');
+    if (picklesBtnSpan) picklesBtnSpan.textContent = `Pickles (${picklesCount})`;
+
+    const sweetsBtnSpan = document.querySelector('.category-tab[data-category="sweets"] span, .category-tab[data-category="murabba"] span');
+    if (sweetsBtnSpan) sweetsBtnSpan.textContent = `Sweets (${sweetsCount})`;
+
+    const healthBtnSpan = document.querySelector('.category-tab[data-category="health"] span');
+    if (healthBtnSpan) healthBtnSpan.textContent = `Health Products (${healthCount})`;
 }
 
 function applyAllProductFilters() {
@@ -2918,7 +2955,7 @@ function applyAllProductFilters() {
     const query = (currentCatalogQuery || '').toLowerCase().trim();
 
     // Check active price filters
-    const priceCheckboxes = document.querySelectorAll('.ref-filters input[type="checkbox"]:checked');
+    const priceCheckboxes = document.querySelectorAll('.ref-filters input[type="checkbox"]:checked, .ref-filter-list input[type="checkbox"][data-price]:checked');
     const activePriceTests = Array.from(priceCheckboxes).map(cb => {
         const val = cb.getAttribute('data-price') || cb.value;
         if (val === 'under-200' || cb.parentElement?.textContent.includes('Under ₹200')) return (p) => p < 200;
@@ -2928,41 +2965,44 @@ function applyAllProductFilters() {
         return null;
     }).filter(Boolean);
 
-    // Check in-stock filter
+    // Check active stock checkboxes (#filter-instock, #filter-outofstock)
     const inStockCb = document.getElementById('filter-instock') || document.querySelector('input[data-filter="in-stock"]');
-    const inStockOnly = inStockCb ? inStockCb.checked : false;
+    const outOfStockCb = document.getElementById('filter-outofstock') || document.querySelector('input[data-filter="out-of-stock"]');
+    const inStockChecked = inStockCb ? inStockCb.checked : false;
+    const outOfStockChecked = outOfStockCb ? outOfStockCb.checked : false;
 
     const cards = document.querySelectorAll('.product-card:not(.fallback-recommendation-card)');
     let visibleCount = 0;
 
     cards.forEach(card => {
         const cardCat = (card.getAttribute('data-category') || '').toLowerCase();
-        const title = card.querySelector('.product-title')?.textContent.toLowerCase() || '';
-        const hindiTitle = card.querySelector('.product-hindi-title')?.textContent.toLowerCase() || '';
-        const desc = card.querySelector('.product-desc')?.textContent.toLowerCase() || '';
-        const priceText = card.querySelector('.price-val')?.textContent.replace(/[^0-9.]/g, '') || '0';
-        const price = parseFloat(priceText);
+        const titleEl = card.querySelector('.ref-card-title, .product-title');
+        const title = titleEl ? titleEl.textContent.toLowerCase().trim() : '';
+        const hindiTitle = card.querySelector('.product-hindi-title')?.textContent.toLowerCase().trim() || '';
+        const desc = card.querySelector('.product-desc, .ref-card-cat')?.textContent.toLowerCase().trim() || '';
+        const priceEl = card.querySelector('.price-val, .ref-card-price');
+        const priceText = priceEl ? priceEl.textContent.replace(/[^0-9.]/g, '') : '0';
+        const price = parseFloat(priceText) || 0;
+        const pId = card.getAttribute('data-product-id') || '';
 
-        // Category match
+        // Category match: ('all', 'achar'/'pickles', 'sweets'/'murabba', 'health')
         let matchesCat = (category === 'all' || !category);
         if (!matchesCat) {
             if (category === 'achar' || category === 'pickles') {
                 matchesCat = cardCat.includes('achar') || cardCat.includes('pickles');
-            } else if (category === 'sweets') {
+            } else if (category === 'sweets' || category === 'murabba') {
                 matchesCat = cardCat.includes('sweets') || cardCat.includes('murabba');
-            } else if (category === 'murabba') {
-                matchesCat = cardCat.includes('murabba');
             } else if (category === 'health') {
                 matchesCat = cardCat.includes('health');
             } else {
-                matchesCat = (cardCat === category.toLowerCase());
+                matchesCat = cardCat.includes(category.toLowerCase());
             }
         }
 
-        // Query match
+        // Query match (smart fuzzy + synonyms + substring)
         let matchesQuery = true;
         if (query) {
-            matchesQuery = title.includes(query) || hindiTitle.includes(query) || desc.includes(query) || cardCat.includes(query);
+            matchesQuery = checkProductMatchesSearch(pId, title, hindiTitle, desc, cardCat, query);
         }
 
         // Price filter match
@@ -2973,20 +3013,552 @@ function applyAllProductFilters() {
 
         // Stock match
         let matchesStock = true;
-        if (inStockOnly) {
-            const isOutOfStock = card.classList.contains('out-of-stock');
+        const prod = PRODUCTS_CATALOGUE.find(p => p.id === pId);
+        const isCatalogueOutOfStock = prod && prod.variants && prod.variants.length > 0 && prod.variants.every(v => !v.stock || v.stock <= 0 || !v.active);
+        const isOutOfStock = card.classList.contains('out-of-stock') ||
+            card.classList.contains('sold-out') ||
+            card.getAttribute('data-in-stock') === 'false' ||
+            Boolean(card.querySelector('.badge-soldout, .out-of-stock-badge')) ||
+            Boolean(isCatalogueOutOfStock);
+
+        if (inStockChecked && !outOfStockChecked) {
             if (isOutOfStock) matchesStock = false;
+        } else if (!inStockChecked && outOfStockChecked) {
+            if (!isOutOfStock) matchesStock = false;
         }
 
         if (matchesCat && matchesQuery && matchesPrice && matchesStock) {
-            card.style.display = 'flex';
+            card.classList.remove('filter-hidden');
             visibleCount++;
         } else {
-            card.style.display = 'none';
+            card.classList.add('filter-hidden');
         }
     });
 
     updateProductGridEmptyState(visibleCount, query);
+    updateCategoryBadges();
+}
+
+/* ==========================================================================
+   ITEM 4: UNIVERSAL SMART FUZZY SEARCH & AUTO-SUGGEST ENGINE
+   ========================================================================== */
+
+/**
+ * Standard Levenshtein distance algorithm for typo tolerance
+ */
+function getLevenshteinDistance(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+
+    const row = [];
+    for (let i = 0; i <= b.length; i++) {
+        row[i] = i;
+    }
+
+    for (let i = 1; i <= a.length; i++) {
+        let prev = i;
+        for (let j = 1; j <= b.length; j++) {
+            let val;
+            if (a.charAt(i - 1) === b.charAt(j - 1)) {
+                val = row[j - 1];
+            } else {
+                val = Math.min(row[j - 1] + 1, prev + 1, row[j] + 1);
+            }
+            row[j - 1] = prev;
+            prev = val;
+        }
+        row[b.length] = prev;
+    }
+    return row[b.length];
+}
+
+/**
+ * Fuzzy word matcher with typo tolerance (Levenshtein distance <= 2 for words >= 4 chars)
+ */
+function fuzzyWordMatch(queryWord, targetWord) {
+    const qw = queryWord.toLowerCase().trim();
+    const tw = targetWord.toLowerCase().trim();
+    if (!qw || !tw) return false;
+
+    if (tw === qw || tw.includes(qw) || qw.includes(tw)) return true;
+
+    // Typo tolerance: Levenshtein distance <= 2 for words >= 4 chars
+    if (qw.length >= 4) {
+        if (Math.abs(qw.length - tw.length) <= 2) {
+            if (getLevenshteinDistance(qw, tw) <= 2) return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Synonym mapping groups
+ */
+const SYNONYM_GROUPS = [
+    {
+        // 'laddu', 'ladoo', 'laddoo', 'sweets', 'mithai', 'besan', 'gond' -> matches laddu products
+        synonyms: ['laddu', 'ladoo', 'laddoo', 'sweets', 'sweet', 'mithai', 'besan', 'gond', 'barfi'],
+        matchesProduct: (p, term) => {
+            const id = (p.id || '').toLowerCase();
+            const name = (p.name || '').toLowerCase();
+            const cat = (p.category || '').toLowerCase();
+            if (term === 'gond') return id.includes('gond') || name.includes('gond');
+            if (term === 'besan') return id.includes('besan') || name.includes('besan');
+            if (term === 'barfi') return id.includes('barfi') || name.includes('barfi');
+            if (term === 'laddu' || term === 'ladoo' || term === 'laddoo') {
+                return id.includes('laddu') || name.includes('laddu') || name.includes('ladoo');
+            }
+            // General sweets/mithai
+            return cat === 'sweets' || id.includes('laddu') || id.includes('barfi') || name.includes('laddu') || name.includes('barfi');
+        }
+    },
+    {
+        // 'achar', 'aachar', 'pickle', 'pickles', 'mirch', 'mirchi', 'aam', 'mango', 'nimbu', 'lemon', 'karela', 'lahsun', 'garlic' -> matches achar products
+        synonyms: ['achar', 'aachar', 'pickle', 'pickles', 'mirch', 'mirchi', 'aam', 'mango', 'nimbu', 'lemon', 'karela', 'lahsun', 'garlic'],
+        matchesProduct: (p, term) => {
+            const id = (p.id || '').toLowerCase();
+            const name = (p.name || '').toLowerCase();
+            const cat = (p.category || '').toLowerCase();
+            if (term === 'aam' || term === 'mango') return id.includes('aam') || name.includes('aam') || name.includes('mango');
+            if (term === 'mirch' || term === 'mirchi') return id.includes('mirch') || name.includes('mirch');
+            if (term === 'nimbu' || term === 'lemon') return id.includes('nimbu') || name.includes('nimbu') || name.includes('lemon');
+            if (term === 'karela') return id.includes('karel') || name.includes('karela') || name.includes('kareli');
+            if (term === 'lahsun' || term === 'garlic') return id.includes('lhsun') || id.includes('lahsun') || name.includes('lahsun') || name.includes('garlic');
+            // General achar / pickle
+            return cat === 'achar' || cat.includes('pickle') || id.includes('achar') || name.includes('achar') || name.includes('pickle');
+        }
+    },
+    {
+        // 'murabba', 'amla', 'chyawanprash', 'powder', 'juice' -> matches health/sweets preserves
+        synonyms: ['murabba', 'amla', 'chyawanprash', 'powder', 'juice'],
+        matchesProduct: (p, term) => {
+            const id = (p.id || '').toLowerCase();
+            const name = (p.name || '').toLowerCase();
+            const cat = (p.category || '').toLowerCase();
+            if (term === 'murabba') return id.includes('murabba') || name.includes('murabba');
+            if (term === 'amla') return id.includes('amla') || name.includes('amla');
+            if (term === 'chyawanprash') return id.includes('chyawanprash') || name.includes('chyawanprash');
+            if (term === 'powder') return id.includes('powder') || name.includes('powder');
+            if (term === 'juice') return id.includes('juice') || name.includes('juice');
+            return cat === 'health' || id.includes('murabba') || name.includes('murabba') || name.includes('chyawanprash');
+        }
+    }
+];
+
+/**
+ * Site pages and quick action redirects
+ */
+const SEARCH_NAV_ITEMS = [
+    {
+        id: 'contact',
+        title: '📞 Contact Us',
+        subtitle: 'Reach our team via phone, email or address',
+        url: 'contact.html',
+        type: 'page',
+        icon: '📞',
+        keywords: ['contact', 'call', 'support', 'phone', 'email', 'address', 'helpline', 'customer care']
+    },
+    {
+        id: 'our-story',
+        title: '📜 Our Story',
+        subtitle: 'Our heritage, virasat & traditional village roots',
+        url: 'our-story.html',
+        type: 'page',
+        icon: '📜',
+        keywords: ['story', 'about', 'history', 'virasat', 'heritage', 'tradition', 'roots', 'origin']
+    },
+    {
+        id: 'why-us',
+        title: '🌿 Health & Purity',
+        subtitle: '100% natural, sun-cured in wood-pressed mustard oil',
+        url: 'why-us.html',
+        type: 'page',
+        icon: '🌿',
+        keywords: ['why us', 'purity', 'health', 'mustard oil', 'sun-cured', 'cold-pressed', 'wood-pressed', 'natural', 'organic', 'preservative free']
+    },
+    {
+        id: 'reviews',
+        title: '⭐ Customer Reviews',
+        subtitle: 'Customer ratings, feedback & genuine testimonials',
+        url: 'reviews.html',
+        type: 'page',
+        icon: '⭐',
+        keywords: ['reviews', 'rating', 'ratings', 'feedback', 'testimonials', 'stars', 'satisfaction']
+    },
+    {
+        id: 'faq',
+        title: '❓ FAQ',
+        subtitle: 'Questions, answers, delivery & shipping information',
+        url: 'faq.html',
+        type: 'page',
+        icon: '❓',
+        keywords: ['faq', 'question', 'questions', 'help', 'delivery', 'shipping', 'transit', 'tracking']
+    },
+    {
+        id: 'profile',
+        title: '👤 My Account & Orders',
+        subtitle: 'Track your deliveries, past orders & addresses',
+        url: 'profile.html',
+        type: 'page',
+        icon: '👤',
+        keywords: ['profile', 'orders', 'account', 'login', 'track order', 'past orders', 'my orders', 'user']
+    },
+    {
+        id: 'cart',
+        title: '🛒 View Cart & Checkout',
+        subtitle: 'Open your shopping cart and complete checkout',
+        action: 'cart',
+        type: 'action',
+        icon: '🛒',
+        keywords: ['cart', 'basket', 'checkout', 'buy now', 'bag', 'view cart', 'items']
+    }
+];
+
+function checkProductMatchesSearch(pId, title, hindiTitle, desc, cardCat, query) {
+    const q = query.toLowerCase().trim();
+    if (!q) return true;
+
+    // Direct substring checks
+    if (title.includes(q) || hindiTitle.includes(q) || desc.includes(q) || cardCat.includes(q) || pId.includes(q)) {
+        return true;
+    }
+
+    const queryWords = q.split(/\s+/).filter(Boolean);
+
+    // Check synonym groups
+    for (const group of SYNONYM_GROUPS) {
+        for (const syn of group.synonyms) {
+            const matchesSyn = queryWords.some(qw => fuzzyWordMatch(qw, syn));
+            if (matchesSyn) {
+                const prodStub = { id: pId, name: title, category: cardCat };
+                if (group.matchesProduct(prodStub, syn)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    // Direct fuzzy match against individual words in product title, category, and id
+    const targetTokens = [
+        ...title.split(/\s+/),
+        ...hindiTitle.split(/\s+/),
+        ...cardCat.split(/\s+/),
+        pId.replace('prod_', '').replace(/_/g, ' ')
+    ].filter(Boolean);
+
+    return queryWords.every(qw => targetTokens.some(tw => fuzzyWordMatch(qw, tw)));
+}
+
+function getSearchSuggestions(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) return { pages: [], products: [] };
+
+    const queryWords = q.split(/\s+/).filter(Boolean);
+
+    // 1. Match Pages & Actions
+    const matchingPages = SEARCH_NAV_ITEMS.filter(item => {
+        if (item.title.toLowerCase().includes(q) || item.subtitle.toLowerCase().includes(q)) return true;
+        return item.keywords.some(kw => {
+            if (kw.includes(q) || q.includes(kw)) return true;
+            return queryWords.some(qw => fuzzyWordMatch(qw, kw));
+        });
+    });
+
+    // 2. Match Products from PRODUCTS_CATALOGUE
+    const matchingProducts = PRODUCTS_CATALOGUE.filter(p => {
+        const pId = (p.id || '').toLowerCase();
+        const title = (p.name || '').toLowerCase();
+        const hindiTitle = (p.hindiName || '').toLowerCase();
+        const desc = (p.shortDesc || '').toLowerCase();
+        const cat = (p.category || '').toLowerCase();
+        return checkProductMatchesSearch(pId, title, hindiTitle, desc, cat, q);
+    }).map(p => {
+        const image = (p.images && p.images[0]) ? p.images[0] : 'assets/logo.png';
+        const price = (p.variants && p.variants[0] && p.variants[0].price) ? p.variants[0].price : 199;
+        let catLabel = 'Pickles';
+        if (p.category === 'sweets') catLabel = 'Sweets';
+        else if (p.category === 'health') catLabel = 'Health Products';
+
+        return {
+            id: p.id,
+            name: p.name,
+            hindiName: p.hindiName || '',
+            image,
+            priceLabel: `₹${price}`,
+            categoryLabel: catLabel
+        };
+    });
+
+    return { pages: matchingPages, products: matchingProducts };
+}
+
+function renderSearchDropdown(dropdown, query, results) {
+    if (!dropdown) return;
+    dropdown.innerHTML = '';
+
+    if (!query) {
+        dropdown.classList.remove('active');
+        return;
+    }
+
+    const { pages = [], products = [] } = results || {};
+
+    if (pages.length === 0 && products.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'ref-search-empty';
+        emptyDiv.appendChild(document.createTextNode('🔍 No matching items found for "'));
+
+        const strongEl = document.createElement('strong');
+        strongEl.textContent = query;
+        emptyDiv.appendChild(strongEl);
+
+        emptyDiv.appendChild(document.createTextNode('". '));
+
+        const hintSpan = document.createElement('span');
+        hintSpan.className = 'ref-search-empty-hint';
+        hintSpan.textContent = 'Try searching for "Pickles", "Laddu", or "Contact Us".';
+        emptyDiv.appendChild(hintSpan);
+
+        dropdown.appendChild(emptyDiv);
+        dropdown.classList.add('active');
+        return;
+    }
+
+    if (pages.length > 0) {
+        const secLabel = document.createElement('div');
+        secLabel.className = 'ref-search-section-label';
+        secLabel.textContent = 'Pages & Actions';
+        dropdown.appendChild(secLabel);
+
+        pages.forEach(item => {
+            const pageItem = document.createElement('div');
+            pageItem.className = 'ref-search-item ref-search-item-page';
+            pageItem.setAttribute('data-type', sanitizeText(item.type || ''));
+            const targetVal = item.url ? validateUrl(item.url) : (item.action || '');
+            pageItem.setAttribute('data-target', targetVal);
+            pageItem.setAttribute('role', 'option');
+            pageItem.setAttribute('tabindex', '0');
+
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'ref-search-page-icon';
+            iconDiv.textContent = item.icon || '📄';
+            pageItem.appendChild(iconDiv);
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'ref-search-item-info';
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'ref-search-item-title';
+            titleSpan.textContent = item.title || '';
+            infoDiv.appendChild(titleSpan);
+
+            const subSpan = document.createElement('span');
+            subSpan.className = 'ref-search-item-sub';
+            subSpan.textContent = item.subtitle || '';
+            infoDiv.appendChild(subSpan);
+
+            pageItem.appendChild(infoDiv);
+
+            const badgeSpan = document.createElement('span');
+            badgeSpan.className = `ref-search-badge ${item.type === 'action' ? 'action' : ''}`;
+            badgeSpan.textContent = item.type === 'action' ? 'Action' : 'Page';
+            pageItem.appendChild(badgeSpan);
+
+            dropdown.appendChild(pageItem);
+        });
+    }
+
+    if (products.length > 0) {
+        const secLabel = document.createElement('div');
+        secLabel.className = 'ref-search-section-label';
+        secLabel.textContent = `Products (${products.length})`;
+        dropdown.appendChild(secLabel);
+
+        products.slice(0, 6).forEach(p => {
+            const prodItem = document.createElement('div');
+            prodItem.className = 'ref-search-item ref-search-item-product';
+            prodItem.setAttribute('data-product-id', sanitizeText(p.id || ''));
+            prodItem.setAttribute('role', 'option');
+            prodItem.setAttribute('tabindex', '0');
+
+            const img = document.createElement('img');
+            img.className = 'ref-search-item-thumb';
+            img.src = validateUrl(p.image || 'assets/logo.png');
+            img.alt = p.name || 'Product';
+            img.loading = 'lazy';
+            img.addEventListener('error', function () {
+                this.src = 'assets/logo.png';
+            });
+            prodItem.appendChild(img);
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'ref-search-item-info';
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'ref-search-item-title';
+            titleSpan.textContent = p.name || '';
+            infoDiv.appendChild(titleSpan);
+
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'ref-search-item-meta';
+
+            const catSpan = document.createElement('span');
+            catSpan.className = 'ref-search-item-cat';
+            catSpan.textContent = p.categoryLabel || '';
+            metaDiv.appendChild(catSpan);
+
+            const priceSpan = document.createElement('span');
+            priceSpan.className = 'ref-search-item-price';
+            priceSpan.textContent = p.priceLabel || '';
+            metaDiv.appendChild(priceSpan);
+
+            infoDiv.appendChild(metaDiv);
+            prodItem.appendChild(infoDiv);
+
+            dropdown.appendChild(prodItem);
+        });
+    }
+
+    dropdown.classList.add('active');
+}
+
+function initUniversalSearch() {
+    const searchBars = document.querySelectorAll('.ref-search-bar');
+    if (!searchBars.length) return;
+
+    searchBars.forEach(bar => {
+        let dropdown = bar.querySelector('.ref-search-suggestions');
+        if (!dropdown) {
+            dropdown = document.createElement('div');
+            dropdown.className = 'ref-search-suggestions';
+            dropdown.setAttribute('role', 'listbox');
+            dropdown.setAttribute('aria-label', 'Search Suggestions');
+            bar.appendChild(dropdown);
+        }
+
+        const input = bar.querySelector('.ref-search-input');
+        if (!input || input._searchInitialized) return;
+        input._searchInitialized = true;
+
+        let debounceTimer = null;
+
+        // Input event with 150ms debounce
+        input.addEventListener('input', (e) => {
+            const val = e.target.value;
+
+            // On products.html, typing also filters the product grid in real-time
+            if (document.getElementById('product-grid-container')) {
+                searchProducts(val);
+            }
+
+            clearTimeout(debounceTimer);
+            if (!val.trim()) {
+                dropdown.innerHTML = '';
+                dropdown.classList.remove('active');
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                const results = getSearchSuggestions(val);
+                renderSearchDropdown(dropdown, val.trim(), results);
+            }, 150);
+        });
+
+        // Focus event
+        input.addEventListener('focus', () => {
+            const val = input.value.trim();
+            if (val) {
+                const results = getSearchSuggestions(val);
+                renderSearchDropdown(dropdown, val, results);
+            }
+        });
+
+        // Keydown handling (Enter and Escape)
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                dropdown.classList.remove('active');
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = input.value.trim();
+                dropdown.classList.remove('active');
+
+                if (document.getElementById('product-grid-container')) {
+                    searchProducts(query);
+                } else if (query) {
+                    const results = getSearchSuggestions(query);
+                    if (results.pages.length > 0 && !results.products.length) {
+                        const topPage = results.pages[0];
+                        if (topPage.type === 'action' && topPage.action === 'cart') {
+                            openCart();
+                        } else if (topPage.url && isSafeNavigationUrl(topPage.url)) {
+                            const safeUrl = validateUrl(topPage.url);
+                            if (isSafeNavigationUrl(safeUrl)) {
+                                window.location.href = safeUrl;
+                            }
+                        }
+                    } else if (results.products.length === 1 && results.pages.length === 0) {
+                        window.location.href = `product-details.html?id=${encodeURIComponent(results.products[0].id)}`;
+                    } else {
+                        window.location.href = `products.html?q=${encodeURIComponent(query)}`;
+                    }
+                }
+            }
+        });
+
+        // Click on dropdown results
+        dropdown.addEventListener('click', (e) => {
+            const pageItem = e.target.closest('.ref-search-item-page');
+            if (pageItem) {
+                const type = pageItem.getAttribute('data-type');
+                const target = pageItem.getAttribute('data-target');
+                dropdown.classList.remove('active');
+                if (type === 'action' && target === 'cart') {
+                    openCart();
+                } else if (target && isSafeNavigationUrl(target)) {
+                    const safeUrl = validateUrl(target);
+                    if (isSafeNavigationUrl(safeUrl)) {
+                        window.location.href = safeUrl;
+                    }
+                }
+                return;
+            }
+
+            const prodItem = e.target.closest('.ref-search-item-product');
+            if (prodItem) {
+                const pId = prodItem.getAttribute('data-product-id');
+                dropdown.classList.remove('active');
+                if (pId) {
+                    window.location.href = `product-details.html?id=${encodeURIComponent(pId)}`;
+                }
+            }
+        });
+
+        // Keyboard activation on dropdown items
+        dropdown.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const item = e.target.closest('.ref-search-item');
+                if (item) {
+                    e.preventDefault();
+                    item.click();
+                }
+            }
+        });
+    });
+
+    // Close all suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.ref-search-bar')) {
+            document.querySelectorAll('.ref-search-suggestions').forEach(d => d.classList.remove('active'));
+        }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.ref-search-suggestions').forEach(d => d.classList.remove('active'));
+        }
+    });
 }
 
 /* ── DEDICATED PRODUCT DETAILS PAGE INITIALIZER ── */
@@ -4011,5 +4583,23 @@ if (typeof window !== 'undefined') {
     window.closeCart = closeCart;
     window.addToCart = addToCart;
     window.showToast = showToast;
+    window.filterCategory = filterCategory;
+    window.applyAllProductFilters = applyAllProductFilters;
+    window.searchProducts = searchProducts;
 }
+
+export {
+    getLevenshteinDistance,
+    fuzzyWordMatch,
+    getSearchSuggestions,
+    checkProductMatchesSearch,
+    SYNONYM_GROUPS,
+    SEARCH_NAV_ITEMS,
+    applyAllProductFilters,
+    filterCategory,
+    updateCategoryBadges,
+    initUniversalSearch,
+    initProductsSort
+};
+
 

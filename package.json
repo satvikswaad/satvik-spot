@@ -22,6 +22,8 @@
     "test:admin": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/phase6AdminDashboard.spec.ts\"",
     "test:visual": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/phase7VisualA11y.spec.ts\"",
     "test:e2e": "npx firebase emulators:exec --only firestore,auth \"npx jest --config functions/jest.config.js functions/tests/e2eBrowser.spec.ts\"",
+    "test:devices": "node tests/e2e/verify-all-devices.js",
+    "start:local": "node scripts/serve-local.js",
     "seed": "npx ts-node scripts/seed-products.ts",
     "backup": "npx ts-node scripts/backup-emulator.ts",
     "restore": "npx ts-node scripts/restore-emulator.ts",
