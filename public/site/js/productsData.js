@@ -353,5 +353,52 @@ export const PRODUCTS_CATALOGUE = [
       { id: "var_500g", label: "500 g", weightGrams: 500, price: 599, mrp: 750, sku: "SAT-CHW-500G", stock: 25, active: true },
       { id: "var_1kg", label: "1 kg", weightGrams: 1000, price: 1099, mrp: 1380, sku: "SAT-CHW-1KG", stock: 15, active: true }
     ]
+  },
+  {
+    id: "prod_besan_barfi",
+    name: "Besan Barfi",
+    hindiName: "शुद्ध देसी घी बेसन बर्फी",
+    category: "sweets",
+    badge: "Bestseller",
+    shortDesc: "Melt-in-mouth traditional gram flour fudge roasted in pure A2 cow ghee with pistachios and silver vark.",
+    fullDesc: "Prepared using ancestral slow-roasting technique with fragrant besan, pure A2 desi ghee, and green cardamom, garnished with chopped pistachios and almonds.",
+    ingredients: "Gram Flour (Besan), Pure Desi Ghee, Sugar, Pistachios, Almonds, Cardamom.",
+    storageInfo: "Store in an airtight container at room temperature.",
+    shelfLife: "30 Days from Preparation Date",
+    allergens: "Contains Milk Solids (Ghee), Tree Nuts.",
+    packaging: "Sealed Gift Box",
+    rating: 4.8,
+    reviewCount: 94,
+    images: [
+      "assets/product-besan-barfi.png"
+    ],
+    variants: [
+      { id: "var_500g", label: "500 g", weightGrams: 500, price: 279, mrp: 349, sku: "SAT-BRF-500G", stock: 30, active: true },
+      { id: "var_1kg", label: "1 kg", weightGrams: 1000, price: 529, mrp: 679, sku: "SAT-BRF-1KG", stock: 15, active: true }
+    ]
+  },
+  {
+    id: "prod_amla_powder",
+    name: "Amla Powder",
+    hindiName: "जैविक शुद्ध आंवला चूर्ण",
+    category: "health",
+    badge: "New",
+    shortDesc: "100% shade-dried wild forest amla ground to fine organic powder, loaded with natural Vitamin C.",
+    fullDesc: "Sun-cured and shade-dried organic forest amlas stone-ground to preserve heat-sensitive Vitamin C, antioxidants, and digestive bioactives.",
+    ingredients: "100% Organic Shade-Dried Wild Amla Fruit Powder.",
+    storageInfo: "Store in a cool, dry place. Keep airtight.",
+    shelfLife: "18 Months from Packaging Date",
+    allergens: "None declared.",
+    packaging: "Sealed Food-Grade Jar",
+    rating: 4.7,
+    reviewCount: 63,
+    images: [
+      "assets/product-amla-powder.png"
+    ],
+    variants: [
+      { id: "var_250g", label: "250 g", weightGrams: 250, price: 199, mrp: 259, sku: "SAT-AML-POW-250G", stock: 40, active: true },
+      { id: "var_500g", label: "500 g", weightGrams: 500, price: 349, mrp: 449, sku: "SAT-AML-POW-500G", stock: 25, active: true }
+    ]
   }
 ];
+

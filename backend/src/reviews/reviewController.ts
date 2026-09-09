@@ -1,36 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { db, admin } from '../config/firebase';
 import { AuthenticatedRequest } from '../auth/verifyAuth';
+import { validateCreateReviewPayload, CreateReviewPayload } from '../validation/reviewSchema';
 import { ValidationError } from '../errors/AppError';
 import { logger } from '../utils/logger';
 
-export interface CreateReviewPayload {
-  productId: string;
-  name: string;
-  rating: number;
-  text: string;
-}
+export type { CreateReviewPayload };
 
 export async function handleCreateReview(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
-    const { productId, name, rating, text } = req.body as CreateReviewPayload;
+    const { productId, name, rating, text } = validateCreateReviewPayload(req.body);
     const userId = req.user?.uid;
-
-    if (!productId || typeof productId !== 'string' || productId.trim().length === 0) {
-      throw new ValidationError('Product ID is required');
-    }
-
-    if (!name || typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 100) {
-      throw new ValidationError('Name must be between 2 and 100 characters');
-    }
-
-    if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
-      throw new ValidationError('Rating must be an integer between 1 and 5');
-    }
-
-    if (!text || typeof text !== 'string' || text.trim().length < 5 || text.trim().length > 500) {
-      throw new ValidationError('Review text must be between 5 and 500 characters');
-    }
 
     // Verify product exists
     const prodDoc = await db.collection('products').doc(productId).get();

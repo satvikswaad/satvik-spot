@@ -144,6 +144,24 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
+    // Inventory Logs: Append-only via Admin SDK backend
+    match /inventory_logs/{logId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Payment Transactions: Read by admin, direct client writes denied
+    match /payment_transactions/{txnId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Refunds: Read by admin, direct client writes denied
+    match /refunds/{refundId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
     // Idempotency Records: Backend Admin SDK only
     match /idempotency/{id} {
       allow read, write: if false;

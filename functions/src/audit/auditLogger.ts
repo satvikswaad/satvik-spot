@@ -8,6 +8,8 @@ export interface AuditEventParams {
   outcome: 'SUCCESS' | 'DENIED' | 'FAILED';
   ip?: string;
   details?: Record<string, any>;
+  beforeState?: Record<string, any> | null;
+  afterState?: Record<string, any> | null;
 }
 
 /**
@@ -23,6 +25,9 @@ export async function logAuditEvent(params: AuditEventParams): Promise<void> {
       targetRef: params.targetRef || null,
       outcome: params.outcome,
       ip: params.ip || 'unknown',
+      details: params.details || null,
+      beforeState: params.beforeState !== undefined ? params.beforeState : null,
+      afterState: params.afterState !== undefined ? params.afterState : null,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     };
 

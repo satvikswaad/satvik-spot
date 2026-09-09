@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../auth/verifyAuth';
-import { validateCreateOrderPayload } from '../validation/orderSchema';
+import { validateCreateOrderPayload, validateSubmitUtrPayload, validateGuestLookupPayload } from '../validation/orderSchema';
 import { processAuthoritativeOrder, processWhatsAppOrderRequest, submitUtrForOrder } from './orderService';
 import { hashGuestSecret } from '../guest/guestService';
 import { db } from '../config/firebase';
@@ -68,10 +68,7 @@ export const handleCreateWhatsAppOrder = createWhatsAppOrderHandler;
 
 export async function submitUtrHandler(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
-    const { orderId, utr, guestAccessSecret } = req.body;
-    if (!orderId || typeof orderId !== 'string') {
-      throw new ValidationError('orderId is required');
-    }
+    const { orderId, utr, guestAccessSecret } = validateSubmitUtrPayload(req.body);
 
     const result = await submitUtrForOrder(orderId, utr, guestAccessSecret);
     res.status(200).json({
@@ -86,11 +83,7 @@ export async function submitUtrHandler(req: AuthenticatedRequest, res: Response,
 
 export async function lookupGuestOrderHandler(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
-    const { orderId, guestAccessSecret } = req.body;
-
-    if (typeof orderId !== 'string' || !orderId.trim() || typeof guestAccessSecret !== 'string' || !guestAccessSecret.trim()) {
-      throw new ValidationError('Both orderId and guestAccessSecret are required for guest lookup');
-    }
+    const { orderId, guestAccessSecret } = validateGuestLookupPayload(req.body);
 
     const docRef = db.collection('orders').doc(orderId.trim());
     const snap = await docRef.get();

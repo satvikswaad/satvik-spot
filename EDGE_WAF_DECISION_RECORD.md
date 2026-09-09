@@ -18,7 +18,7 @@
 
 ## 2. Trade-Off Analysis & Recommendation
 
-- **Current Staging Verdict**: **NOT REQUIRED**. Firebase Hosting and Render provide enterprise-grade edge TLS termination and basic DDoS protection without additional cost or proxy hop complexity.
+- **Current Staging Verdict**: **NOT REQUIRED**. Firebase Hosting and Render provide edge TLS termination and basic DDoS protection without additional cost or proxy hop complexity.
 - **Production Recommendation**: **RECOMMENDED BEFORE PRODUCTION** if high-volume automated bot scraping or layer-7 HTTP flood attacks occur post-launch.
 - **Operational Trade-Offs**:
   1. Adding a proxy layer (e.g. Cloudflare) requires configuring `trust proxy = 2` on Express backend to accurately derive client IPs.

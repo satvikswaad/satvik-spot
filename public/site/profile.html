@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Favicon (Circular Logo) -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
     <title>My Profile & Saved Addresses | Satvik Swaad</title>
     <meta name="description" content="Manage your Satvik Swaad account profile, delivery addresses, and order history." />
     <link rel="stylesheet" href="./style.css" />
@@ -10,7 +14,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Outfit:wght@400;600;700;800;900&family=Rozha+One&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="profile-page-body">
+
+    <!-- ACCESSIBILITY: SKIP LINK -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <!-- TOP ANNOUNCEMENT MARQUEE BAR -->
     <div class="announcement-ticker" role="region" aria-label="Announcement">
@@ -32,38 +39,78 @@
 
     <!-- SITE HEADER -->
     <header class="site-header" role="banner">
-        <div class="header-container">
-            <div class="logo-group" onclick="window.location.href='index.html'">
-                <div>
-                    <span class="brand-title">Satvik Swaad</span>
-                    <span class="brand-sub">शुद्ध पारंपरिक स्वाद</span>
-                </div>
-            </div>
+  <div class="header-container ref-header">
+    <a href="index.html" class="logo-group" aria-label="Satvik Swaad home">
+      <svg class="logo-curve-svg" viewBox="0 0 140 38" fill="none" aria-hidden="true">
+        <path d="M 0 0 
+                 C 18 0, 26 4, 32 12 
+                 C 42 26, 55 35, 70 35 
+                 C 85 35, 98 26, 108 12 
+                 C 114 4, 122 0, 140 0 
+                 Z" 
+              fill="#FAF5EB" />
+      </svg>
+      <span class="ref-logo-ring">
+        <img src="assets/satvik_logo_round.png" alt="Satvik Swaad" class="ref-logo-img" />
+      </span>
+    </a>
+    <nav class="main-nav ref-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="products.html" class="nav-link">Shop</a>
+      <a href="our-story.html" class="nav-link">Our Story</a>
+      <a href="why-us.html" class="nav-link">Health & Purity</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </nav>
+    <div class="header-right-actions">
+      <!-- Hidden but preserved for JS -->
+      <button type="button" class="btn-lang-toggle" id="btn-lang-toggle" style="display:none;">हिन्दी</button>
+      <div class="ref-search-bar">
+        <input type="search" placeholder="Search for pickles, sweets..." class="ref-search-input" />
+        <svg class="ref-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <a href="profile.html" id="btn-open-profile" class="ref-icon-btn" aria-label="My profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <button type="button" id="btn-open-cart" class="ref-icon-btn" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="ref-cart-badge" id="cart-count-badge">0</span>
+      </button>
+      <button type="button" id="mobile-menu-btn" class="ref-mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
 
-            <nav class="main-nav" role="navigation" aria-label="Main Navigation">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="products.html" class="nav-link">Products</a>
-                <a href="why-us.html" class="nav-link">Why Us</a>
-                <a href="our-story.html" class="nav-link">Our Story</a>
-                <a href="reviews.html" class="nav-link">Reviews</a>
-                <a href="faq.html" class="nav-link">FAQ</a>
-                <a href="contact.html" class="nav-link">Contact</a>
-            </nav>
+  <div class="header-wave-wrap" aria-hidden="true">
+    <svg class="header-wave-svg" viewBox="0 0 1440 16" preserveAspectRatio="none">
+      <path d="M0,0 L1440,0 L1440,6 C1380,10 1320,4 1260,8 C1200,12 1140,5 1080,7 C1020,10 960,4 900,8 C840,11 780,5 720,7 C660,10 600,4 540,8 C480,12 420,5 360,7 C300,10 240,4 180,8 C120,12 60,5 0,7 Z" fill="#FAF5EB"/>
+          </svg>
+  </div>
 
-            <!-- EXPLICIT DIRECTIVE: Profile page header contains ZERO Profile/Cart buttons to prevent clashes -->
-            <div class="header-right-actions">
-                <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Navigation Menu" aria-expanded="false">☰</button>
-            </div>
-        </div>
-    </header>
+  <!-- HEADER DROPDOWN MENU (COMPACT, NON-BLURRING, PROFESSIONAL) -->
+  <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
+      <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
+          <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
+      </button>
+      <a href="index.html#hero" class="dropdown-nav-link" role="menuitem">🏠 Home</a>
+      <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Products (15)</a>
+      <a href="why-us.html" class="dropdown-nav-link" role="menuitem">✨ Why Us</a>
+      <a href="our-story.html#about" class="dropdown-nav-link" role="menuitem">📜 Our Story</a>
+      <a href="reviews.html" class="dropdown-nav-link" role="menuitem">⭐ Customer Reviews</a>
+      <a href="faq.html" class="dropdown-nav-link" role="menuitem">❓ FAQ</a>
+      <a href="contact.html" class="dropdown-nav-link" role="menuitem">📞 Contact Us</a>
+      <a href="profile.html" class="dropdown-nav-link profile-link" id="mobile-nav-profile" role="menuitem">👤 My Account & Orders</a>
+  </div>
+</header>
 
     <!-- MOBILE NAVIGATION DRAWER -->
     <div class="mobile-nav-overlay" id="mobile-nav-overlay">
         <div class="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-border); padding-bottom: 12px;">
                 <span class="brand-title" style="font-size: 1.3rem;">Satvik Swaad</span>
-                <button id="mobile-menu-close" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
+                <button id="mobile-menu-close" aria-label="Close Navigation Menu" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
             </div>
+            <button type="button" class="mobile-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;">
+                <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
+            </button>
             <a href="index.html" class="mobile-nav-link">Home</a>
             <a href="products.html" class="mobile-nav-link">Products (15)</a>
             <a href="why-us.html" class="mobile-nav-link">Why Us</a>
@@ -75,161 +122,696 @@
         </div>
     </div>
 
-    <!-- BREADCRUMBS -->
-    <nav class="breadcrumb-container" aria-label="Breadcrumb">
-        <div class="breadcrumb-inner">
-            <a href="index.html">Home</a>
-            <span>›</span>
-            <span class="current">My Account Profile</span>
-        </div>
-    </nav>
-
-    <!-- MAIN PROFILE CONTENT CONTAINER -->
-    <main style="max-width: 900px; margin: 0 auto; padding: 20px 16px 60px;">
-
-        <!-- GOOGLE AUTHENTICATION & DATA RESTORE CARD -->
-        <div style="background: #FFFFFF; border: 2px solid var(--color-gold); border-radius: 16px; padding: 18px 20px; margin-bottom: 24px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-            <div style="flex: 1; min-width: 260px;">
-                <h3 style="margin: 0; font-size: 1.15rem; color: var(--color-maroon); font-weight: 800; display: flex; align-items: center; gap: 6px;" id="auth-status-title">
-                    <span>🔐</span> <span>Cloud Account Backup & Restore</span>
-                </h3>
-                <p style="margin: 4px 0 0; font-size: 0.88rem; color: var(--color-sub);" id="auth-status-desc">
-                    Sign in with Google to securely store and restore your delivery details, saved addresses, and order history across devices or after clearing browser cache.
-                </p>
-            </div>
-            <div>
-                <button type="button" id="btn-google-signin" style="background: #FFFFFF; color: #3c4043; border: 2px solid #DADCE0; padding: 10px 18px; border-radius: 10px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.2s ease;">
-                    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-                    <span>Sign in with Google</span>
-                </button>
-                <button type="button" id="btn-google-signout" style="display: none; background: #FFF1F0; color: #D32F2F; border: 1.5px solid #FFA39E; padding: 10px 18px; border-radius: 10px; font-weight: 800; font-size: 0.9rem; cursor: pointer;">
-                    Sign Out 🚪
-                </button>
-            </div>
-        </div>
-
-        <!-- USER AVATAR CARD HEADER -->
-        <div style="background: linear-gradient(135deg, var(--color-maroon), #5c1800); border-radius: 16px; padding: 24px; color: #FFFFFF; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-medium); margin-bottom: 24px;">
-            <div style="width: 64px; height: 64px; border-radius: 50%; background: #FFD700; color: var(--color-maroon); font-size: 2rem; display: flex; align-items: center; justify-content: center; font-weight: 900; flex-shrink: 0; border: 3px solid #FFFFFF;">
-                👤
-            </div>
-            <div style="flex: 1;">
-                <h1 style="margin: 0; font-size: 1.5rem; font-family: 'Rozha One', serif; color: #FFD700;" id="profile-display-name">Welcome to Satvik Swaad</h1>
-                <p style="margin: 4px 0 0; font-size: 0.9rem; opacity: 0.9;" id="profile-display-phone">Manage your delivery details & orders</p>
-            </div>
-        </div>
-
-        <!-- PROFILE TABS / SECTIONS CONTAINER -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-
-            <!-- SECTION 1: PERSONAL INFORMATION FORM -->
-            <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-soft);">
-                <div style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px;">
-                    <span style="font-size: 1.3rem;">📋</span>
-                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--color-maroon);">Personal Information</h2>
+    
+    <!-- HERO BANNER (EXACT REFERENCE REPLICA) -->
+    <section class="ref-shop-hero-section relative isolate" aria-label="Profile Banner">
+      <div class="ref-hero-bg-container">
+        <img src="assets/profile-hero-banner.png" alt="Satvik Swaad - My Profile" class="ref-hero-banner-img" />
+      </div>
+      <div class="ref-hero-wave-wrap" aria-hidden="true">
+        <svg class="ref-hero-wave-svg" viewBox="0 0 1440 36" preserveAspectRatio="none">
+          <path d="M0,8 C120,24 240,24 360,12 C520,0 880,0 1440,12 L1440,36 L0,36 Z" fill="#FAF5EB"/>
+        </svg>
+      </div>
+    </section>
+    
+    <main id="main-content" role="main" class="profile-main-layout">
+        
+        <!-- LEFT SIDEBAR (EXACT REFERENCE REPLICA) -->
+        <aside class="profile-sidebar">
+            <div class="profile-sidebar-card">
+                <!-- User Avatar & Info Row -->
+                <div class="profile-user-card-inner">
+                    <div class="profile-avatar-circle" id="profile-avatar-circle">
+                        <span id="profile-display-initial">D</span>
+                    </div>
+                    <div class="profile-user-info">
+                        <h2 class="profile-user-name" id="profile-display-name">Ddu</h2>
+                        <p class="profile-user-subtitle" id="profile-display-phone">ddu@example.com</p>
+                        <button type="button" class="profile-google-badge" id="sidebar-google-btn" title="Click to manage Google Sign-In">
+                            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                            </svg>
+                            <span id="google-badge-text">Google Account</span>
+                        </button>
+                    </div>
                 </div>
-                <form id="form-profile-details">
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">Full Name *</label>
-                        <input type="text" id="prof-name" placeholder="Enter your full name" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                
+                <!-- Navigation Menu with working tabs -->
+                <nav class="profile-nav" aria-label="Profile navigation">
+                    <button type="button" class="profile-nav-btn active" data-tab="profile" id="nav-btn-profile">
+                        <span class="profile-nav-icon">👤</span>
+                        <span>My Profile</span>
+                    </button>
+                    <button type="button" class="profile-nav-btn" data-tab="orders" id="nav-btn-orders">
+                        <span class="profile-nav-icon">📦</span>
+                        <span>My Orders</span>
+                        <span class="profile-nav-count" id="sidebar-orders-count">1</span>
+                    </button>
+                    <button type="button" class="profile-nav-btn" data-tab="addresses" id="nav-btn-addresses">
+                        <span class="profile-nav-icon">📍</span>
+                        <span>My Addresses</span>
+                    </button>
+                    <button type="button" class="profile-nav-btn" data-tab="wishlist" id="nav-btn-wishlist">
+                        <span class="profile-nav-icon">🤍</span>
+                        <span>Wishlist</span>
+                        <span class="profile-nav-count" id="sidebar-wishlist-count">2</span>
+                    </button>
+                    <button type="button" class="profile-nav-btn" data-tab="settings" id="nav-btn-settings">
+                        <span class="profile-nav-icon">⚙️</span>
+                        <span>Settings</span>
+                    </button>
+                    
+                    <hr class="profile-nav-divider" />
+                    
+                    <button type="button" class="profile-nav-btn profile-nav-auth-btn" id="btn-google-signin">
+                        <span class="profile-nav-icon">🚪</span>
+                        <span>Sign In</span>
+                    </button>
+                    <button type="button" class="profile-nav-btn profile-nav-auth-btn profile-nav-signout" id="btn-google-signout" style="display: none;">
+                        <span class="profile-nav-icon">🚪</span>
+                        <span>Logout</span>
+                    </button>
+                </nav>
+                
+                <!-- Sidebar Doodle (Healthy Choices Happy You) inside card -->
+                <div class="profile-sidebar-doodle">
+                    <div class="profile-sidebar-doodle-text">
+                        <span>Healthy Choices</span><br>
+                        <span>Happy You ↴ ♡</span>
                     </div>
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">WhatsApp Mobile Number *</label>
-                        <input type="tel" id="prof-phone" placeholder="10-digit mobile number" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
-                    </div>
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">Email Address (Optional)</label>
-                        <input type="email" id="prof-email" placeholder="name@example.com" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
-                    </div>
-                    <button type="submit" style="width: 100%; padding: 12px; background: var(--color-maroon); color: #FFFFFF; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer;">Save Profile Info 💾</button>
-                </form>
-            </div>
-
-            <!-- SECTION 2: SAVED DELIVERY ADDRESS -->
-            <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-soft);">
-                <div style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px;">
-                    <span style="font-size: 1.3rem;">🏡</span>
-                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--color-maroon);">Saved Delivery Address</h2>
+                    <img src="assets/shop-left-leaf.png" alt="" class="profile-sidebar-doodle-img" aria-hidden="true" />
                 </div>
-                <form id="form-address-details">
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">House / Building / Flat No. *</label>
-                        <input type="text" id="prof-house" placeholder="e.g. Flat 402, Royal Enclave" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+            </div>
+        </aside>
+        
+        <!-- CENTER CONTENT (TAB PANELS) -->
+        <div class="profile-content-area">
+            
+            <!-- TAB 1: MY PROFILE (DEFAULT) -->
+            <section id="tab-panel-profile" class="profile-tab-panel active" role="tabpanel" aria-labelledby="nav-btn-profile">
+                
+                <!-- Card 1: Personal Information -->
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <h2 class="profile-card-title">🌿 Personal Information</h2>
+                        <button type="button" class="btn-profile-action" id="btn-toggle-edit-profile">
+                            <span id="btn-edit-text">✏ Edit Profile</span>
+                        </button>
                     </div>
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">Street / Area / Landmark *</label>
-                        <input type="text" id="prof-street" placeholder="e.g. Near Shiv Temple, Sector 12" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
-                        <div>
-                            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">City / Town *</label>
-                            <input type="text" id="prof-city" placeholder="City" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                    
+                    <!-- View Mode -->
+                    <div class="profile-info-grid" id="profile-info-view">
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Name</span>
+                            <span class="profile-info-value" id="view-prof-name">Ddu</span>
                         </div>
-                        <div>
-                            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--color-sub); margin-bottom: 4px;">Pincode *</label>
-                            <input type="text" id="prof-pincode" placeholder="6-digit Pincode" maxlength="6" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" required />
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Email Address</span>
+                            <span class="profile-info-value" id="view-prof-email">ddu@example.com</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Phone Number</span>
+                            <span class="profile-info-value" id="view-prof-phone">+91 98765 43210</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Joined On</span>
+                            <span class="profile-info-value" id="view-prof-joined">Aug 7, 2025</span>
                         </div>
                     </div>
-                    <button type="submit" style="width: 100%; padding: 12px; background: var(--color-saffron); color: #FFFFFF; border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer;">Save Delivery Address 📍</button>
-                </form>
-            </div>
-
-        </div>
-
-        <!-- SECTION 3: MY ORDERS & QUICK RE-ORDER -->
-        <div style="background: #FFFFFF; border: 2px solid var(--color-border); border-radius: 16px; padding: 20px; margin-top: 24px; box-shadow: var(--shadow-soft);">
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--color-border); padding-bottom: 12px; margin-bottom: 16px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.3rem;">📦</span>
-                    <h2 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--color-maroon);">Recent Orders History</h2>
+                    
+                    <!-- Edit Mode Form -->
+                    <form id="form-profile-details" class="profile-edit-form">
+                        <div class="profile-form-grid">
+                            <div class="profile-input-group">
+                                <label for="prof-name" class="profile-input-label">Full Name</label>
+                                <input type="text" id="prof-name" class="profile-input-field" placeholder="Enter your full name" required />
+                            </div>
+                            <div class="profile-input-group">
+                                <label for="prof-email" class="profile-input-label">Email Address</label>
+                                <input type="email" id="prof-email" class="profile-input-field" placeholder="name@example.com" />
+                            </div>
+                            <div class="profile-input-group">
+                                <label for="prof-phone" class="profile-input-label">Phone Number</label>
+                                <input type="tel" id="prof-phone" class="profile-input-field" placeholder="10-digit mobile number" required />
+                            </div>
+                            <div class="profile-input-group">
+                                <label for="prof-joined" class="profile-input-label">Joined Date</label>
+                                <input type="text" id="prof-joined" class="profile-input-field" value="Aug 7, 2025" readonly style="color: #9ca3af;" />
+                            </div>
+                        </div>
+                        <div class="profile-form-actions">
+                            <button type="button" class="btn-profile-action" id="btn-cancel-edit-profile">Cancel</button>
+                            <button type="submit" class="btn-profile-primary">💾 Save Changes</button>
+                        </div>
+                    </form>
+                    
+                    <!-- Doodle inside card (Good Food Good Mood) -->
+                    <div class="profile-info-doodle-wrap">
+                        <span class="profile-info-doodle-text">Good Food<br>Good Mood ♡</span>
+                    </div>
                 </div>
-                <a href="products.html" style="font-size: 0.85rem; font-weight: 800; color: var(--color-maroon); text-decoration: underline;">Explore Catalogue →</a>
-            </div>
-            <div id="profile-orders-list">
-                <p style="text-align: center; color: var(--color-sub); padding: 20px 0;">No past orders recorded on this device yet. Browse our homemade catalogue and place your first order!</p>
-            </div>
+                
+                <!-- Card 2: Saved Addresses (Summary) -->
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <h2 class="profile-card-title">📍 Saved Addresses</h2>
+                        <button type="button" class="btn-profile-primary" id="btn-add-address-profile">
+                            + Add New Address
+                        </button>
+                    </div>
+                    
+                    <div class="profile-addresses-container" id="profile-summary-addresses">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <!-- Card 3: Order History (Summary) -->
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <h2 class="profile-card-title">📦 Order History</h2>
+                        <button type="button" class="btn-profile-action" id="link-view-all-orders">
+                            View All Orders →
+                        </button>
+                    </div>
+                    
+                    <div class="profile-orders-container" id="profile-summary-orders">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- TAB 2: MY ORDERS (FULL) -->
+            <section id="tab-panel-orders" class="profile-tab-panel" role="tabpanel" aria-labelledby="nav-btn-orders">
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <div>
+                            <h2 class="profile-card-title">📦 My Orders &amp; Delivery History</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.88rem; color: #6b7280;">Track active shipments and reorder your kitchen staples</p>
+                        </div>
+                        <span class="profile-info-label" id="orders-tab-count-badge">Total: 1</span>
+                    </div>
+                    
+                    <!-- Filter Pills Bar -->
+                    <div class="orders-filter-bar">
+                        <button type="button" class="filter-pill-btn active" data-order-filter="all">All Orders</button>
+                        <button type="button" class="filter-pill-btn" data-order-filter="delivered">Delivered</button>
+                        <button type="button" class="filter-pill-btn" data-order-filter="transit">In Transit</button>
+                        <button type="button" class="filter-pill-btn" data-order-filter="processing">Processing</button>
+                    </div>
+                    
+                    <div class="profile-orders-container" id="orders-full-container">
+                        <!-- Populated dynamically with full order cards & items -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- TAB 3: MY ADDRESSES (FULL) -->
+            <section id="tab-panel-addresses" class="profile-tab-panel" role="tabpanel" aria-labelledby="nav-btn-addresses">
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <div>
+                            <h2 class="profile-card-title">📍 My Delivery Addresses</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.88rem; color: #6b7280;">Manage and add delivery locations for 1-click checkout</p>
+                        </div>
+                        <button type="button" class="btn-profile-primary" id="btn-add-address-full">
+                            + Add New Address
+                        </button>
+                    </div>
+                    
+                    <div class="profile-addresses-container" id="addresses-full-container">
+                        <!-- Populated dynamically with address cards -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- TAB 4: WISHLIST (FULL) -->
+            <section id="tab-panel-wishlist" class="profile-tab-panel" role="tabpanel" aria-labelledby="nav-btn-wishlist">
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <div>
+                            <h2 class="profile-card-title">♥ My Wishlist</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.88rem; color: #6b7280;">Homemade treasures you've saved for your kitchen</p>
+                        </div>
+                        <button type="button" class="btn-profile-primary" id="btn-move-all-cart">
+                            🛒 Add All to Cart
+                        </button>
+                    </div>
+                    
+                    <div class="wishlist-products-grid" id="wishlist-full-grid">
+                        <!-- Populated dynamically with wishlist cards -->
+                    </div>
+                    
+                    <div id="wishlist-empty-state" class="profile-empty-state" style="display: none;">
+                        <span class="profile-empty-icon">🤍</span>
+                        <h3 class="profile-empty-title">Your Wishlist is Empty</h3>
+                        <p class="profile-empty-desc">Explore our authentic sun-cured pickles and pure sweets made with traditional love!</p>
+                        <a href="products.html" class="btn-profile-primary">🛍 Browse Catalogue</a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- TAB 5: SETTINGS (FULL) -->
+            <section id="tab-panel-settings" class="profile-tab-panel" role="tabpanel" aria-labelledby="nav-btn-settings">
+                <div class="profile-card settings-section-card">
+                    <div class="profile-card-header">
+                        <div>
+                            <h2 class="profile-card-title">⚙ Account &amp; Preferences</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.88rem; color: #6b7280;">Control your notification channels, language, and delivery preferences</p>
+                        </div>
+                    </div>
+                    
+                    <form id="form-user-settings">
+                        <!-- Section 1: Notifications -->
+                        <h3 style="font-size: 1.05rem; color: #1f4a2c; margin: 0 0 12px; font-weight: 700;">🔔 Notifications</h3>
+                        
+                        <div class="settings-toggle-row">
+                            <div class="settings-toggle-info">
+                                <div class="settings-toggle-title">WhatsApp Order &amp; Delivery Updates</div>
+                                <div class="settings-toggle-desc">Receive real-time tracking links, invoice, and delivery OTP on WhatsApp.</div>
+                            </div>
+                            <label class="switch" aria-label="Toggle WhatsApp Notifications">
+                                <input type="checkbox" id="setting-notify-whatsapp" checked />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="settings-toggle-row">
+                            <div class="settings-toggle-info">
+                                <div class="settings-toggle-title">SMS Dispatch Alerts</div>
+                                <div class="settings-toggle-desc">Receive instant text message when courier is out for delivery.</div>
+                            </div>
+                            <label class="switch" aria-label="Toggle SMS Alerts">
+                                <input type="checkbox" id="setting-notify-sms" checked />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="settings-toggle-row">
+                            <div class="settings-toggle-info">
+                                <div class="settings-toggle-title">Seasonal Pickles &amp; Festive Offers Email</div>
+                                <div class="settings-toggle-desc">Be the first to taste limited seasonal harvest batches (Amla, Kathal, Aam).</div>
+                            </div>
+                            <label class="switch" aria-label="Toggle Email Newsletter">
+                                <input type="checkbox" id="setting-notify-email" />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        
+                        <!-- Section 2: Language & Region -->
+                        <h3 style="font-size: 1.05rem; color: #1f4a2c; margin: 24px 0 12px; font-weight: 700;">🌐 Language &amp; Regional</h3>
+                        <div class="profile-form-grid" style="margin-bottom: 20px;">
+                            <div class="profile-input-group">
+                                <label for="setting-language" class="profile-input-label">Interface Language</label>
+                                <select id="setting-language" class="profile-input-field">
+                                    <option value="en" selected>English (Default)</option>
+                                    <option value="hi">हिन्दी (Hindi)</option>
+                                </select>
+                            </div>
+                            <div class="profile-input-group">
+                                <label for="setting-currency" class="profile-input-label">Currency Display</label>
+                                <input type="text" id="setting-currency" class="profile-input-field" value="₹ INR (Indian Rupee)" readonly style="color: #6b7280;" />
+                            </div>
+                        </div>
+                        
+                        <!-- Section 3: Delivery Note -->
+                        <h3 style="font-size: 1.05rem; color: #1f4a2c; margin: 24px 0 12px; font-weight: 700;">🚚 Default Delivery Note</h3>
+                        <div class="profile-input-group" style="margin-bottom: 24px;">
+                            <label for="setting-delivery-note" class="profile-input-label">Special Delivery Instructions</label>
+                            <input type="text" id="setting-delivery-note" class="profile-input-field" placeholder="e.g. Ring doorbell, leave at front porch or with security guard" />
+                        </div>
+                        
+                        <!-- Section 4: Data & Cache -->
+                        <h3 style="font-size: 1.05rem; color: #1f4a2c; margin: 24px 0 12px; font-weight: 700;">🔒 Data &amp; Cloud Backup</h3>
+                        <div class="settings-toggle-row">
+                            <div class="settings-toggle-info">
+                                <div class="settings-toggle-title">Local Browser Cache</div>
+                                <div class="settings-toggle-desc">Reset local cart, addresses, and form storage if encountering cached data issues.</div>
+                            </div>
+                            <button type="button" class="btn-profile-action" id="btn-clear-cache" style="color: #dc2626; border-color: #fca5a5;">
+                                🧹 Clear Cache
+                            </button>
+                        </div>
+                        
+                        <div class="profile-form-actions" style="margin-top: 24px;">
+                            <button type="submit" class="btn-profile-primary" style="padding: 10px 24px; font-size: 0.95rem;">
+                                💾 Save Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
         </div>
-
+        
+        <!-- RIGHT COLUMN (REFERENCE REPLICA) -->
+        <aside class="profile-right-col">
+            <!-- Pinned Polaroid Photo with Tape -->
+            <figure class="profile-polaroid-frame">
+                <span class="profile-polaroid-tape" aria-hidden="true"></span>
+                <div class="profile-polaroid-img-wrap">
+                    <img src="assets/mother-child.png" alt="Maa ke swaad ki virasat - Authentic Indian Traditional Homemade Pickles" class="profile-polaroid-img" />
+                </div>
+                <figcaption class="profile-polaroid-caption">
+                    <span>Maa ke swaad ki virasat</span>
+                    <span style="color: #c98a1a;">♡</span>
+                </figcaption>
+            </figure>
+            
+            <!-- Mud Hut & Generations Artwork (Exact Reference Graphic) -->
+            <div class="profile-right-art-wrap" aria-hidden="true">
+                <img src="assets/profile-right-art.png" alt="Same Love Since Generations" class="profile-right-art-img" />
+            </div>
+        </aside>
+        
     </main>
 
-    <!-- FOOTER -->
-    <footer class="site-footer" role="contentinfo">
-        <div class="footer-container">
-            <div>
-                <h3 class="footer-brand">Satvik Swaad</h3>
-                <p class="footer-desc">Authentic homemade pickles, murabbas, and traditional sweets crafted with zero artificial preservatives in pure mustard oil and A2 cow ghee.</p>
+    <!-- MODAL: ORDER DETAILS -->
+    <div class="profile-modal-overlay" id="modal-order-details" role="dialog" aria-modal="true" aria-label="Order Details">
+        <div class="profile-modal-card">
+            <div class="profile-modal-header">
+                <h3 class="profile-modal-title" id="modal-order-title">Order #SS1247 Details</h3>
+                <button type="button" class="profile-modal-close" id="btn-close-order-modal" aria-label="Close modal">✕</button>
             </div>
-            <div>
-                <h4 class="footer-heading">Quick Links</h4>
-                <ul class="footer-list">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="products.html">All 15 Products</a></li>
-                    <li><a href="why-us.html">Why Choose Us</a></li>
-                    <li><a href="our-story.html">Our Heritage Story</a></li>
-                </ul>
+            <div class="profile-modal-body">
+                <!-- Stepper -->
+                <div class="order-stepper">
+                    <div class="stepper-step completed">
+                        <div class="stepper-dot">✓</div>
+                        <span class="stepper-label">Placed</span>
+                    </div>
+                    <div class="stepper-step completed">
+                        <div class="stepper-dot">✓</div>
+                        <span class="stepper-label">Confirmed</span>
+                    </div>
+                    <div class="stepper-step completed">
+                        <div class="stepper-dot">✓</div>
+                        <span class="stepper-label">Packed</span>
+                    </div>
+                    <div class="stepper-step completed">
+                        <div class="stepper-dot">✓</div>
+                        <span class="stepper-label">Shipped</span>
+                    </div>
+                    <div class="stepper-step completed">
+                        <div class="stepper-dot">✓</div>
+                        <span class="stepper-label">Delivered</span>
+                    </div>
+                </div>
+                
+                <div id="modal-order-content">
+                    <!-- Injected by JS -->
+                </div>
             </div>
-            <div>
-                <h4 class="footer-heading">Help & Legal</h4>
-                <ul class="footer-list">
-                    <li><a href="faq.html">FAQ & Help</a></li>
-                    <li><a href="contact.html">Contact Us</a></li>
-                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="terms-and-conditions.html">Terms & Conditions</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-heading">Quality & Trust</h4>
-                <ul class="footer-list">
-                    <li>FSSAI Licence: <strong>PENDING</strong></li>
-                    <li>GSTIN: <strong>PENDING</strong></li>
-                    <li>Pure Cold-Pressed Mustard Oil</li>
-                    <li>100% Chemical Free</li>
-                </ul>
+            <div class="profile-modal-footer">
+                <button type="button" class="btn-profile-action" id="btn-modal-order-close">Close</button>
+                <button type="button" class="btn-profile-primary" id="btn-modal-order-reorder">🔄 Reorder Items</button>
             </div>
         </div>
-        <div class="footer-bottom">
-            <span>© 2026 Satvik Swaad. All rights reserved.</span>
-            <span>Crafted with ❤️ in India | Pure Taste of Tradition</span>
+    </div>
+
+    <!-- MODAL: ADD / EDIT ADDRESS -->
+    <div class="profile-modal-overlay" id="modal-address-edit" role="dialog" aria-modal="true" aria-label="Delivery Address Form">
+        <div class="profile-modal-card">
+            <div class="profile-modal-header">
+                <h3 class="profile-modal-title" id="modal-address-title">Add Delivery Address</h3>
+                <button type="button" class="profile-modal-close" id="btn-close-address-modal" aria-label="Close modal">✕</button>
+            </div>
+            <div class="profile-modal-body">
+                <form id="form-modal-address" class="profile-form-grid" style="display: grid; gap: 14px;">
+                    <input type="hidden" id="modal-addr-id" value="" />
+                    
+                    <div class="profile-input-group" style="grid-column: 1 / -1;">
+                        <label class="profile-input-label">Address Type</label>
+                        <div style="display: flex; gap: 12px;">
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem;">
+                                <input type="radio" name="modal-addr-type" value="Home" checked /> 🏠 Home
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem;">
+                                <input type="radio" name="modal-addr-type" value="Work" /> 🏢 Work
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem;">
+                                <input type="radio" name="modal-addr-type" value="Other" /> 📍 Other
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-input-group">
+                        <label for="modal-addr-name" class="profile-input-label">Recipient Name</label>
+                        <input type="text" id="modal-addr-name" class="profile-input-field" placeholder="Full Name" required />
+                    </div>
+                    
+                    <div class="profile-input-group">
+                        <label for="modal-addr-phone" class="profile-input-label">Mobile Number</label>
+                        <input type="tel" id="modal-addr-phone" class="profile-input-field" placeholder="10-digit number" required />
+                    </div>
+                    
+                    <div class="profile-input-group" style="grid-column: 1 / -1;">
+                        <label for="modal-addr-house" class="profile-input-label">Flat / House No. / Building</label>
+                        <input type="text" id="modal-addr-house" class="profile-input-field" placeholder="e.g. 123 Green Valley, B-Block" required />
+                    </div>
+                    
+                    <div class="profile-input-group" style="grid-column: 1 / -1;">
+                        <label for="modal-addr-street" class="profile-input-label">Street / Area / Locality</label>
+                        <input type="text" id="modal-addr-street" class="profile-input-field" placeholder="e.g. Near Shiv Mandir, Vijay Nagar" required />
+                    </div>
+                    
+                    <div class="profile-input-group">
+                        <label for="modal-addr-city" class="profile-input-label">City</label>
+                        <input type="text" id="modal-addr-city" class="profile-input-field" placeholder="e.g. Indore" required />
+                    </div>
+                    
+                    <div class="profile-input-group">
+                        <label for="modal-addr-state" class="profile-input-label">State</label>
+                        <input type="text" id="modal-addr-state" class="profile-input-field" placeholder="e.g. Madhya Pradesh" required />
+                    </div>
+                    
+                    <div class="profile-input-group">
+                        <label for="modal-addr-pincode" class="profile-input-label">Pincode</label>
+                        <input type="text" id="modal-addr-pincode" class="profile-input-field" placeholder="6-digit Pincode" pattern="[0-9]{6}" required />
+                    </div>
+                    
+                    <div class="profile-input-group" style="display: flex; align-items: center; justify-content: center;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 600; color: #1f4a2c; cursor: pointer;">
+                            <input type="checkbox" id="modal-addr-default" /> Set as Default Address
+                        </label>
+                    </div>
+                    
+                    <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+                        <button type="button" class="btn-profile-action" id="btn-cancel-address-modal">Cancel</button>
+                        <button type="submit" class="btn-profile-primary">Save Address</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHOPPING CART DRAWER (PRESERVED & FULLY ACCESSIBLE) -->
+    <div class="cart-drawer-overlay" id="cart-drawer-overlay">
+        <div class="cart-drawer" role="dialog" aria-modal="true" aria-label="Shopping Cart">
+            <div class="cart-header">
+                <h3>Shopping Cart 🛒</h3>
+                <button class="btn-close-drawer" id="btn-close-cart" aria-label="Close Shopping Cart">✕</button>
+            </div>
+            <div class="cart-body" id="cart-items-container">
+                <p style="text-align: center; color: var(--color-sub); margin-top: 40px;">Your cart is currently empty.</p>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total-row">
+                    <span>Total Amount:</span>
+                    <span id="cart-total-display">₹0</span>
+                </div>
+                <button class="btn-add-cart" id="btn-checkout">Proceed to Checkout →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SITE FOOTER -->
+    <!-- SATVIK SWAAD SIGNATURE WAVY FOOTER (EXACT REFERENCE UI WITH ANIMATION) -->
+    <footer class="site-footer" role="contentinfo">
+        <!-- TOP ORGANIC WAVE DIVIDER (SEAMLESS 2PX OVERLAP, ZERO LINES) -->
+        <div class="footer-wave-wrap" aria-hidden="true">
+            <svg class="footer-wave-svg" viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path d="M0,35 C240,68 480,78 720,48 C960,18 1200,62 1440,30 L1440,80 L0,80 Z" fill="#0E381E"/>
+            </svg>
+        </div>
+
+        <!-- UNIFIED SEAMLESS FOOTER WRAP (NO HORIZONTAL SEAMS OR LINES) -->
+        <div class="footer-inner-wrap">
+            <!-- ANIMATED BACKGROUND BOTANICALS & FIREFLIES -->
+            <div class="footer-animated-bg" aria-hidden="true">
+                <!-- Left Botanicals -->
+                <div class="footer-branch branch-left-top">
+                    <svg viewBox="0 0 100 120" fill="none">
+                        <path d="M0 10 C30 25 50 60 45 110" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(18 20) rotate(15)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(30 40) rotate(-10)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(42 62) rotate(20)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(46 86) rotate(-15)"><path d="M0 0 C-14 -5 -26 -2 -32 8 C-22 11 -10 9 0 0 Z" fill="#1f522a" opacity="0.8"/></g>
+                        <g transform="translate(45 108) rotate(5)"><path d="M0 0 C10 -4 20 -2 25 6 C17 8 8 7 0 0 Z" fill="#2d6e3c" opacity="0.85"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-left-mid">
+                    <svg viewBox="0 0 90 90" fill="none">
+                        <path d="M0 45 C35 42 60 35 85 20" stroke="#1d552c" stroke-width="2" stroke-linecap="round"/>
+                        <g transform="translate(30 42) rotate(-15)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                        <g transform="translate(55 36) rotate(18)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#2f753f" opacity="0.9"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-left-bot">
+                    <svg viewBox="0 0 100 120" fill="none">
+                        <path d="M0 110 C25 90 45 60 50 10" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(16 95) rotate(-20)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(30 75) rotate(15)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(42 50) rotate(-18)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                    </svg>
+                </div>
+
+                <!-- Right Botanicals -->
+                <div class="footer-branch branch-right-top">
+                    <svg viewBox="0 0 100 120" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 10 C30 25 50 60 45 110" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(18 20) rotate(15)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(30 40) rotate(-10)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(42 62) rotate(20)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(46 86) rotate(-15)"><path d="M0 0 C-14 -5 -26 -2 -32 8 C-22 11 -10 9 0 0 Z" fill="#1f522a" opacity="0.8"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-right-mid">
+                    <svg viewBox="0 0 90 90" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 45 C35 42 60 35 85 20" stroke="#1d552c" stroke-width="2" stroke-linecap="round"/>
+                        <g transform="translate(30 42) rotate(-15)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                        <g transform="translate(55 36) rotate(18)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#2f753f" opacity="0.9"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-right-bot">
+                    <svg viewBox="0 0 100 120" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 110 C25 90 45 60 50 10" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(16 95) rotate(-20)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(30 75) rotate(15)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(42 50) rotate(-18)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                    </svg>
+                </div>
+
+                <!-- Floating Fireflies / Golden Glow Particles -->
+                <span class="footer-firefly firefly-1"></span>
+                <span class="footer-firefly firefly-2"></span>
+                <span class="footer-firefly firefly-3"></span>
+                <span class="footer-firefly firefly-4"></span>
+                <span class="footer-firefly firefly-5"></span>
+                <span class="footer-firefly firefly-6"></span>
+            </div>
+
+            <!-- TRUST ROW (DIRECTLY FLOWING WITH ZERO HORIZONTAL LINES) -->
+            <div class="footer-trust-row">
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🌿</span>
+                    <span class="footer-trust-text">100% Homemade</span>
+                </div>
+
+                <span class="footer-trust-sep" aria-hidden="true"></span>
+
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🪷</span>
+                    <span class="footer-trust-text">Indian Tradition</span>
+                </div>
+
+                <span class="footer-trust-sep" aria-hidden="true"></span>
+
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🤍</span>
+                    <span class="footer-trust-text">For a Healthier You</span>
+                </div>
+            </div>
+
+            <!-- 4-COLUMN CONTENT GRID -->
+            <div class="footer-container">
+                <!-- COL 1: BRAND -->
+                <div class="footer-col footer-col-brand">
+                    <div class="footer-brand-header">
+                        <img src="assets/logo.png" alt="Satvik Swaad" class="footer-brand-logo" />
+                        <div class="footer-brand-title-wrap">
+                            <span class="footer-brand-title">Satvik Swaad</span>
+                            <span class="footer-brand-tagline">— Maa ke swaad ki virasat —</span>
+                        </div>
+                    </div>
+                    <p class="footer-desc">Authentic homemade pickles, murabbas, and traditional sweets crafted with zero artificial preservatives in pure mustard oil and A2 cow ghee.</p>
+                    <div class="footer-flourish" aria-hidden="true">
+                        <svg width="130" height="18" viewBox="0 0 130 18" fill="none">
+                            <path d="M8 9 Q35 2 65 9 T122 9" stroke="#E5A93C" stroke-width="1.3" stroke-linecap="round"/>
+                            <circle cx="65" cy="9" r="2.5" fill="#E5A93C"/>
+                            <circle cx="45" cy="8" r="1.5" fill="#E5A93C"/>
+                            <circle cx="85" cy="8" r="1.5" fill="#E5A93C"/>
+                            <path d="M22 6 C28 4 32 7 28 11 C24 10 21 8 22 6 Z" fill="#E5A93C"/>
+                            <path d="M108 6 C102 4 98 7 102 11 C106 10 109 8 108 6 Z" fill="#E5A93C"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- COL 2: QUICK LINKS -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Quick Links</span>
+                    </h4>
+                    <ul class="footer-list">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Shop</a></li>
+                        <li><a href="our-story.html">Our Story</a></li>
+                        <li><a href="why-us.html">Health &amp; Purity</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- COL 3: HELP & LEGAL -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Help &amp; Legal</span>
+                    </h4>
+                    <ul class="footer-list">
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-and-conditions.html">Terms &amp; Conditions</a></li>
+                        <li><a href="shipping-delivery-policy.html">Shipping &amp; Delivery Policy</a></li>
+                        <li><a href="cancellation-refund-policy.html">Cancellation &amp; Refund Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- COL 4: QUALITY & TRUST -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Quality &amp; Trust</span>
+                    </h4>
+                    <ul class="footer-list footer-trust-list">
+                        <li>FSSAI Licence: <strong class="badge-pending">PENDING</strong></li>
+                        <li>GSTIN: <strong class="badge-pending">PENDING</strong></li>
+                        <li>Pure Cold-Pressed Mustard Oil</li>
+                        <li>100% Chemical Free</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- BOTTOM COPYRIGHT BAR -->
+            <div class="footer-bottom-wrap">
+                <div class="footer-bottom">
+                    <span class="footer-copy-left">© 2026 Satvik Swaad. All rights reserved.</span>
+                    <span class="footer-copy-right">Crafted with ❤️ in India | Pure Taste of Tradition</span>
+                </div>
+            </div>
         </div>
     </footer>
 

@@ -20,15 +20,23 @@ export interface FeatureGateConfig {
   checkoutEnabled: boolean;
   paymentsEnabled: boolean;
   whatsappAssistedOrderingEnabled: boolean;
+  whatsappCheckoutEnabled: boolean;
   marketplaceAmazonEnabled: boolean;
   marketplaceFlipkartEnabled: boolean;
   publicIndexingEnabled: boolean;
+}
+
+export interface RazorpayConfig {
+  razorpayKeyId: string;
+  razorpayKeySecret: string;
+  razorpayWebhookSecret: string;
 }
 
 export interface ServerConfig {
   port: number;
   nodeEnv: string;
   corsAllowedOrigins: string[];
+  adminAllowedIps?: string[];
 }
 
 export function validateFssaiFormat(fssai: string): boolean {
@@ -41,10 +49,11 @@ export function validateGstinFormat(gstin: string): boolean {
   return /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/.test(gstin.trim());
 }
 
-export const envConfig: FeatureGateConfig & RegulatoryConfig & ServerConfig = {
+export const envConfig: FeatureGateConfig & RegulatoryConfig & ServerConfig & RazorpayConfig = {
   port: parseInt(process.env.PORT || '5000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
   corsAllowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || 'https://satvik-spot-staging.web.app,https://satvik-spot-staging-admin.web.app,http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000,http://localhost:8080').split(',').map(s => s.trim()),
+  adminAllowedIps: process.env.ADMIN_ALLOWED_IPS ? process.env.ADMIN_ALLOWED_IPS.split(',').map(s => s.trim()).filter(Boolean) : undefined,
   fssaiStatus: (process.env.FSSAI_STATUS as any) || 'pending',
   fssaiNumber: validateFssaiFormat(process.env.FSSAI_NUMBER || '') ? (process.env.FSSAI_NUMBER || '').trim() : '',
   gstStatus: (process.env.GST_STATUS as any) || 'pending',
@@ -53,9 +62,13 @@ export const envConfig: FeatureGateConfig & RegulatoryConfig & ServerConfig = {
   checkoutEnabled: process.env.CHECKOUT_ENABLED === 'true',
   paymentsEnabled: process.env.PAYMENTS_ENABLED === 'true',
   whatsappAssistedOrderingEnabled: process.env.WHATSAPP_ASSISTED_ORDERING_ENABLED === 'true',
+  whatsappCheckoutEnabled: process.env.WHATSAPP_CHECKOUT_ENABLED === 'true',
   marketplaceAmazonEnabled: process.env.MARKETPLACE_AMAZON_ENABLED === 'true',
   marketplaceFlipkartEnabled: process.env.MARKETPLACE_FLIPKART_ENABLED === 'true',
-  publicIndexingEnabled: process.env.PUBLIC_INDEXING_ENABLED === 'true'
+  publicIndexingEnabled: process.env.PUBLIC_INDEXING_ENABLED === 'true',
+  razorpayKeyId: process.env.RAZORPAY_KEY_ID || '',
+  razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET || '',
+  razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || ''
 };
 
 export const ALLOWED_ENV_NAMES = ['development', 'test', 'local', 'staging', 'production'];
@@ -133,6 +146,16 @@ export function validateStartupConfig(overrideEnv?: Partial<ServerConfig & Featu
 
   if (envConfig.marketplaceFlipkartEnabled && !process.env.FLIPKART_CLIENT_SECRET) {
     errors.push('FLIPKART_CONNECTOR_ENABLED is true but FLIPKART_CLIENT_SECRET is missing');
+  }
+
+  // Razorpay credential validation: required only when payments feature flag is enabled
+  if (envConfig.paymentsEnabled) {
+    if (!envConfig.razorpayKeyId) {
+      errors.push('PAYMENTS_ENABLED is true but RAZORPAY_KEY_ID is missing');
+    }
+    if (!envConfig.razorpayKeySecret) {
+      errors.push('PAYMENTS_ENABLED is true but RAZORPAY_KEY_SECRET is missing');
+    }
   }
 
   return {

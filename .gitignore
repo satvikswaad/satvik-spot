@@ -7,10 +7,20 @@ functions/node_modules/
 dist/
 lib/
 build/
+public/site/dist/
 backend/dist/
 functions/lib/
 .firebase/
 coverage/
+*.zip
+/*.png
+/*.py
+.ref_source/
+REFRENCE_PICS/
+*.pdf
+preview_ui_options.html
+
+
 
 # Environment files and credentials
 .env

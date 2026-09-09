@@ -11,18 +11,16 @@ const mimeTypes = {
     '.jpeg': 'image/jpeg',
     '.svg': 'image/svg+xml',
     '.json': 'application/json; charset=UTF-8',
-    '.ico': 'image/x-icon'
+    '.ico': 'image/x-icon',
+    '.webp': 'image/webp',
+    '.xml': 'application/xml; charset=UTF-8',
+    '.txt': 'text/plain; charset=UTF-8'
 };
 
 function createStaticServer(publicDir, port, name) {
     const server = http.createServer((req, res) => {
         let reqPath = req.url.split('?')[0];
         if (reqPath === '/') reqPath = '/index.html';
-        if (reqPath === '/favicon.ico') {
-            res.writeHead(204);
-            res.end();
-            return;
-        }
 
         let filePath = path.join(publicDir, reqPath);
         
@@ -74,4 +72,5 @@ const siteDir = path.resolve(__dirname, '../public/site');
 const adminDir = path.resolve(__dirname, '../public/admin');
 
 createStaticServer(siteDir, 5000, 'Satvik Swaad Customer Storefront');
+createStaticServer(siteDir, 8000, 'Satvik Swaad Customer Storefront (Port 8000)');
 createStaticServer(adminDir, 5001, 'Satvik Swaad Admin Portal');

@@ -133,3 +133,85 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
     items: validatedItems
   };
 }
+
+const ALLOWED_SUBMIT_UTR_KEYS = new Set(['orderId', 'utr', 'guestAccessSecret']);
+
+export interface SubmitUtrPayload {
+  orderId: string;
+  utr: string;
+  guestAccessSecret?: string;
+}
+
+/**
+ * Validates payload for submitting a payment UTR reference.
+ * Strictly disallows unexpected/unknown keys.
+ */
+export function validateSubmitUtrPayload(body: any): SubmitUtrPayload {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new ValidationError('Invalid request payload format');
+  }
+
+  const keys = Object.keys(body);
+  for (const k of keys) {
+    if (!ALLOWED_SUBMIT_UTR_KEYS.has(k)) {
+      throw new ValidationError(`Forbidden or unexpected field in request: '${k}'`);
+    }
+  }
+
+  const { orderId, utr, guestAccessSecret } = body;
+
+  if (typeof orderId !== 'string' || !orderId.trim()) {
+    throw new ValidationError('orderId is required');
+  }
+
+  if (typeof utr !== 'string' || !utr.trim()) {
+    throw new ValidationError('utr is required');
+  }
+
+  if (guestAccessSecret !== undefined && guestAccessSecret !== null) {
+    if (typeof guestAccessSecret !== 'string' || !guestAccessSecret.trim()) {
+      throw new ValidationError('guestAccessSecret must be a valid non-empty string');
+    }
+  }
+
+  return {
+    orderId: orderId.trim(),
+    utr: utr.trim(),
+    ...(guestAccessSecret ? { guestAccessSecret: guestAccessSecret.trim() } : {})
+  };
+}
+
+const ALLOWED_GUEST_LOOKUP_KEYS = new Set(['orderId', 'guestAccessSecret']);
+
+export interface GuestLookupPayload {
+  orderId: string;
+  guestAccessSecret: string;
+}
+
+/**
+ * Validates payload for guest order status lookup.
+ * Strictly disallows unexpected/unknown keys.
+ */
+export function validateGuestLookupPayload(body: any): GuestLookupPayload {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new ValidationError('Invalid request payload format');
+  }
+
+  const keys = Object.keys(body);
+  for (const k of keys) {
+    if (!ALLOWED_GUEST_LOOKUP_KEYS.has(k)) {
+      throw new ValidationError(`Forbidden or unexpected field in request: '${k}'`);
+    }
+  }
+
+  const { orderId, guestAccessSecret } = body;
+
+  if (typeof orderId !== 'string' || !orderId.trim() || typeof guestAccessSecret !== 'string' || !guestAccessSecret.trim()) {
+    throw new ValidationError('Both orderId and guestAccessSecret are required for guest lookup');
+  }
+
+  return {
+    orderId: orderId.trim(),
+    guestAccessSecret: guestAccessSecret.trim()
+  };
+}

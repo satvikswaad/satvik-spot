@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Favicon (Circular Logo) -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Why Choose Satvik Swaad – Quality, Heritage & Trust</title>
     <meta name="description" content="Discover why Satvik Swaad pickles and amla preserves are loved: sun-cured naturally, made with cold-pressed mustard oil, zero artificial preservatives, and authentic family recipes." />
@@ -20,7 +24,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Playfair+Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="./style.css" />
 </head>
@@ -53,43 +57,78 @@
 
     <!-- SITE HEADER -->
     <header class="site-header" role="banner">
-        <div class="header-container">
-            <div class="logo-group" onclick="window.location.href='index.html'">
-                <div>
-                    <span class="brand-title">Satvik Swaad</span>
-                    <span class="brand-sub">शुद्ध पारंपरिक स्वाद</span>
-                </div>
-            </div>
+  <div class="header-container ref-header">
+    <a href="index.html" class="logo-group" aria-label="Satvik Swaad home">
+      <svg class="logo-curve-svg" viewBox="0 0 140 38" fill="none" aria-hidden="true">
+        <path d="M 0 0 
+                 C 18 0, 26 4, 32 12 
+                 C 42 26, 55 35, 70 35 
+                 C 85 35, 98 26, 108 12 
+                 C 114 4, 122 0, 140 0 
+                 Z" 
+              fill="#FAF5EB" />
+      </svg>
+      <span class="ref-logo-ring">
+        <img src="assets/satvik_logo_round.png" alt="Satvik Swaad" class="ref-logo-img" />
+      </span>
+    </a>
+    <nav class="main-nav ref-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="products.html" class="nav-link">Shop</a>
+      <a href="our-story.html" class="nav-link">Our Story</a>
+      <a href="why-us.html" class="nav-link active">Health & Purity</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </nav>
+    <div class="header-right-actions">
+      <!-- Hidden but preserved for JS -->
+      <button type="button" class="btn-lang-toggle" id="btn-lang-toggle" style="display:none;">हिन्दी</button>
+      <div class="ref-search-bar">
+        <input type="search" placeholder="Search for pickles, sweets..." class="ref-search-input" />
+        <svg class="ref-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <a href="profile.html" id="btn-open-profile" class="ref-icon-btn" aria-label="My profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <button type="button" id="btn-open-cart" class="ref-icon-btn" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="ref-cart-badge" id="cart-count-badge">0</span>
+      </button>
+      <button type="button" id="mobile-menu-btn" class="ref-mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
 
-            <nav class="main-nav" role="navigation" aria-label="Main Navigation">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="products.html" class="nav-link">Products</a>
-                <a href="why-us.html" class="nav-link active">Why Us</a>
-                <a href="our-story.html" class="nav-link">Our Story</a>
-                <a href="reviews.html" class="nav-link">Reviews</a>
-                <a href="faq.html" class="nav-link">FAQ</a>
-            </nav>
+  <div class="header-wave-wrap" aria-hidden="true">
+    <svg class="header-wave-svg" viewBox="0 0 1440 16" preserveAspectRatio="none">
+      <path d="M0,0 L1440,0 L1440,6 C1380,10 1320,4 1260,8 C1200,12 1140,5 1080,7 C1020,10 960,4 900,8 C840,11 780,5 720,7 C660,10 600,4 540,8 C480,12 420,5 360,7 C300,10 240,4 180,8 C120,12 60,5 0,7 Z" fill="#FAF5EB"/>
+          </svg>
+  </div>
 
-            <div class="header-right-actions">
-                <a href="profile.html" class="btn-profile-trigger" id="btn-open-profile" aria-label="Account Profile">
-                    <span>👤 Profile</span>
-                </a>
-                <button type="button" class="btn-cart-trigger" id="btn-open-cart" aria-label="Open Shopping Cart">
-                    <span>🛒 Cart</span>
-                    <span class="cart-badge" id="cart-count-badge">0</span>
-                </button>
-                <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Navigation Menu" aria-expanded="false">☰</button>
-            </div>
-        </div>
-    </header>
+  <!-- HEADER DROPDOWN MENU (COMPACT, NON-BLURRING, PROFESSIONAL) -->
+  <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
+      <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
+          <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
+      </button>
+      <a href="index.html#hero" class="dropdown-nav-link" role="menuitem">🏠 Home</a>
+      <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Products (15)</a>
+      <a href="why-us.html" class="dropdown-nav-link active" role="menuitem">✨ Why Us</a>
+      <a href="our-story.html#about" class="dropdown-nav-link" role="menuitem">📜 Our Story</a>
+      <a href="reviews.html" class="dropdown-nav-link" role="menuitem">⭐ Customer Reviews</a>
+      <a href="faq.html" class="dropdown-nav-link" role="menuitem">❓ FAQ</a>
+      <a href="contact.html" class="dropdown-nav-link" role="menuitem">📞 Contact Us</a>
+      <a href="profile.html" class="dropdown-nav-link profile-link" id="mobile-nav-profile" role="menuitem">👤 My Account & Orders</a>
+  </div>
+</header>
 
     <!-- MOBILE NAVIGATION DRAWER -->
     <div class="mobile-nav-overlay" id="mobile-nav-overlay">
         <div class="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-border); padding-bottom: 12px;">
                 <span class="brand-title" style="font-size: 1.3rem;">Satvik Swaad</span>
-                <button id="mobile-menu-close" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
+                <button id="mobile-menu-close" aria-label="Close Navigation Menu" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
             </div>
+            <button type="button" class="mobile-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;">
+                <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
+            </button>
             <a href="index.html" class="mobile-nav-link">Home</a>
             <a href="products.html" class="mobile-nav-link">Products (15)</a>
             <a href="why-us.html" class="mobile-nav-link active">Why Us</a>
@@ -99,69 +138,282 @@
             <a href="#" id="mobile-nav-profile" class="mobile-nav-link" style="border-top: 1px solid var(--color-border); margin-top: 8px; padding-top: 12px; color: var(--color-maroon); font-weight: 800;">👤 My Profile & Saved Addresses</a>
         </div>
     </div>
+    <!-- HERO BANNER (EXACT REFERENCE REPLICA) -->
+    <section class="ref-shop-hero-section relative isolate">
+      <div class="ref-hero-bg-container">
+        <img src="assets/ref-health-hero-banner.png" alt="Satvik Swaad - Health & Purity" class="ref-hero-banner-img" />
+      </div>
+      <div class="ref-hero-wave-wrap" aria-hidden="true">
+        <svg class="ref-hero-wave-svg" viewBox="0 0 1440 36" preserveAspectRatio="none">
+          <path d="M0,8 C120,24 240,24 360,12 C520,0 880,0 1440,12 L1440,36 L0,36 Z" fill="#FAF5EB"/>
+        </svg>
+      </div>
+    </section>
 
-    <!-- BREADCRUMBS -->
-    <div class="breadcrumbs" aria-label="Breadcrumbs">
-        <a href="index.html">Home</a> <span>/</span> <strong>Why Us</strong>
-    </div>
+    <main id="main-content" class="hp-page" role="main">
 
-    <main id="main-content" class="page-container" role="main">
-
-        <section aria-label="Why Satvik Swaad">
-            <div class="section-title-wrapper">
-                <span class="section-subtitle">Authentic Quality Pillars</span>
-                <h1 class="section-title">Why Choose Satvik Swaad</h1>
+        <!-- COMPARISON SECTION -->
+        <section id="comparison" class="hp-comparison-section" aria-labelledby="comparison-heading">
+            <div class="hp-section-header">
+                <span class="hp-section-subtitle">Artisanal Purity vs. Mass-Market Industrial Methods</span>
+                <h2 id="comparison-heading" class="hp-section-title">Satvik Swaad vs. Typical Market Products</h2>
+                <div class="hp-flourish-wrap" aria-hidden="true">
+                    <span class="hp-flourish-line"></span>
+                    <svg class="hp-flourish-leaf" viewBox="0 0 24 24" fill="none">
+                        <path d="M6 18C8 13 13 8 20 5C18 12 13 16 8 18L6 18Z" fill="#2E7D32"/>
+                        <path d="M18 18C16 13 11 8 4 5C6 12 11 16 16 18L18 18Z" fill="#3D7B50" opacity="0.75"/>
+                    </svg>
+                    <span class="hp-flourish-line"></span>
+                </div>
             </div>
 
-            <p style="text-align: center; max-width: 760px; margin: 0 auto 48px; font-size: 1.15rem; color: var(--color-sub); line-height: 1.7;">
-                We take immense pride in crafting authentic Indian pickles, murabbas, and traditional sweets without compromising on purity, ancestral recipes, or natural aging techniques.
+            <!-- COMPARISON TABLE CARD -->
+            <div class="hp-comp-card">
+                <div class="hp-table-scroll" tabindex="0" role="region" aria-label="Comparison Table: Scroll horizontally on mobile devices">
+                    <table class="hp-comp-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="hp-th-dim">Evaluation Dimension</th>
+                                <th scope="col" class="hp-th-satvik">
+                                    <div class="hp-th-brand-title">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M5 21C7 15 13 9 21 6C19 14 13 19 7 21L5 21Z" fill="#A5D6A7"/>
+                                        </svg>
+                                        Satvik Swaad
+                                    </div>
+                                    <div class="hp-th-brand-sub">Artisanal Home-Style Methods</div>
+                                </th>
+                                <th scope="col" class="hp-th-market">
+                                    <div class="hp-th-market-title">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M2 20h20"/>
+                                            <path d="M6 20V10l6 4V8l6 4V4h2v16"/>
+                                        </svg>
+                                        Typical Mass-Market Products
+                                    </div>
+                                    <div class="hp-th-market-sub">Standard Commercial Alternatives</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- ROW 1: Oil Base -->
+                            <tr class="hp-comp-row">
+                                <th scope="row" class="hp-td-dim">
+                                    <div class="hp-dim-wrap">
+                                        <span class="hp-dim-icon-circle">💧</span>
+                                        <span class="hp-dim-title">Oil Base</span>
+                                    </div>
+                                </th>
+                                <td class="hp-td-satvik">
+                                    <span class="hp-tag-satvik">100% Cold-Pressed</span>
+                                    <div class="hp-content-text">
+                                        <strong>100% Cold-Pressed Kachi Ghani Mustard Oil.</strong> Retains natural antioxidants, authentic pungency, and vital fatty acids without chemical refinement.
+                                    </div>
+                                </td>
+                                <td class="hp-td-market">
+                                    <span class="hp-tag-market">Refined Blends</span>
+                                    <div class="hp-market-text">
+                                        <strong>Refined Palm / Cottonseed Oil blends &amp; chemical antioxidants (TBHQ).</strong> Extracted using high-heat industrial solvent processes.
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ROW 2: Preservation Method -->
+                            <tr class="hp-comp-row">
+                                <th scope="row" class="hp-td-dim">
+                                    <div class="hp-dim-wrap">
+                                        <span class="hp-dim-icon-circle">🧂</span>
+                                        <span class="hp-dim-title">Preservation Method</span>
+                                    </div>
+                                </th>
+                                <td class="hp-td-satvik">
+                                    <span class="hp-tag-satvik">Sun-Cured &amp; Rock Salt</span>
+                                    <div class="hp-content-text">
+                                        <strong>Traditional rock salt (Sendha Namak), turmeric, cold-pressed oil seal &amp; multi-day sun-curing.</strong> Relies on natural osmotic pressure and bio-active preservation.
+                                    </div>
+                                </td>
+                                <td class="hp-td-market">
+                                    <span class="hp-tag-market">Synthetic Preservatives</span>
+                                    <div class="hp-market-text">
+                                        <strong>Synthetic chemical preservatives (Sodium Benzoate INS 211, Potassium Metabisulphite INS 224).</strong> Added to extend warehouse shelf stability.
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ROW 3: Acidity & Souring -->
+                            <tr class="hp-comp-row">
+                                <th scope="row" class="hp-td-dim">
+                                    <div class="hp-dim-wrap">
+                                        <span class="hp-dim-icon-circle">🍋</span>
+                                        <span class="hp-dim-title">Acidity &amp; Souring</span>
+                                    </div>
+                                </th>
+                                <td class="hp-td-satvik">
+                                    <span class="hp-tag-satvik">Natural Raw Fruit Acids</span>
+                                    <div class="hp-content-text">
+                                        <strong>Natural sun-dried raw mango (Amchur), whole fresh lime juice &amp; natural fermentation.</strong> Organic fruit acids mature gradually under ambient sunlight.
+                                    </div>
+                                </td>
+                                <td class="hp-td-market">
+                                    <span class="hp-tag-market">Synthetic Acidulants</span>
+                                    <div class="hp-market-text">
+                                        <strong>Industrial Glacial Acetic Acid (Synthetic Vinegar INS 260).</strong> Concentrated chemical acidulants added for instant artificial tartness.
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ROW 4: Processing & Batching -->
+                            <tr class="hp-comp-row">
+                                <th scope="row" class="hp-td-dim">
+                                    <div class="hp-dim-wrap">
+                                        <span class="hp-dim-icon-circle">⚙️</span>
+                                        <span class="hp-dim-title">Processing &amp; Batching</span>
+                                    </div>
+                                </th>
+                                <td class="hp-td-satvik">
+                                    <span class="hp-tag-satvik">Glass-Jar Micro-Batches</span>
+                                    <div class="hp-content-text">
+                                        <strong>Micro-batches (&lt; 50kg) sun-cured naturally in glass jars.</strong> Allows individual monitoring, gentle stirring, and unhurried natural curing.
+                                    </div>
+                                </td>
+                                <td class="hp-td-market">
+                                    <span class="hp-tag-market">Mechanized High-Heat</span>
+                                    <div class="hp-market-text">
+                                        <strong>Continuous high-heat industrial kettle cooking &amp; rapid mechanized packing.</strong> High-speed automated manufacturing lines to maximize unit throughput.
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ROW 5: Sweetener Base -->
+                            <tr class="hp-comp-row">
+                                <th scope="row" class="hp-td-dim">
+                                    <div class="hp-dim-wrap">
+                                        <span class="hp-dim-icon-circle">🍯</span>
+                                        <span class="hp-dim-title">Sweetener Base<br/><small style="font-weight: 500; font-size: 11.5px; color: #64748B;">(Murabbas &amp; Sweets)</small></span>
+                                    </div>
+                                </th>
+                                <td class="hp-td-satvik">
+                                    <span class="hp-tag-satvik">Desi Khand &amp; A2 Ghee</span>
+                                    <div class="hp-content-text">
+                                        <strong>Traditional Desi Khand / Organic Jaggery / Pure A2 Cow Ghee.</strong> Rich in natural minerals, prepared without chemical bleaching or industrial hydrogenation.
+                                    </div>
+                                </td>
+                                <td class="hp-td-market">
+                                    <span class="hp-tag-market">Refined Sugars &amp; Fats</span>
+                                    <div class="hp-market-text">
+                                        <strong>Commercial refined white sugar, high-fructose corn syrup &amp; hydrogenated vegetable fats (Vanaspati).</strong> Chemically bleached sucrose and trans-fat shortenings.
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ROW 6: Spices & Aromatics -->
+                            <tr class="hp-comp-row">
+                                <th scope="row" class="hp-td-dim">
+                                    <div class="hp-dim-wrap">
+                                        <span class="hp-dim-icon-circle">🌿</span>
+                                        <span class="hp-dim-title">Spices &amp; Aromatics</span>
+                                    </div>
+                                </th>
+                                <td class="hp-td-satvik">
+                                    <span class="hp-tag-satvik">Stone-Ground Whole Spices</span>
+                                    <div class="hp-content-text">
+                                        <strong>Hand-cleaned, stone-ground whole roasted spices (Saunf, Kalonji, Rai, Methi, Hing).</strong> Retains natural volatile essential oils and fresh pungent aromas.
+                                    </div>
+                                </td>
+                                <td class="hp-td-market">
+                                    <span class="hp-tag-market">Extracts &amp; Oleoresins</span>
+                                    <div class="hp-market-text">
+                                        <strong>Solvent-extracted spice powders, oleoresins &amp; artificial essence blends.</strong> De-oiled spent powders supplemented with synthetic flavoring agents.
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ROW 7: Regulatory & Lab Verification -->
+                            <tr class="hp-comp-row">
+                                <th scope="row" class="hp-td-dim">
+                                    <div class="hp-dim-wrap">
+                                        <span class="hp-dim-icon-circle">🔬</span>
+                                        <span class="hp-dim-title">Regulatory &amp; Lab<br/><small style="font-weight: 500; font-size: 11.5px; color: #64748B;">Verification</small></span>
+                                    </div>
+                                </th>
+                                <td class="hp-td-satvik">
+                                    <span class="hp-tag-satvik">Third-Party Panel Testing</span>
+                                    <div class="hp-content-text">
+                                        <strong>NABL-accredited laboratory panel testing (heavy metals, microbial limits, pesticide residue) &amp; FSSAI standards.</strong> Validated safety and quality parameters.
+                                    </div>
+                                </td>
+                                <td class="hp-td-market">
+                                    <span class="hp-tag-market">Baseline Statutory</span>
+                                    <div class="hp-market-text">
+                                        <strong>Standard commercial compliance.</strong> Baseline statutory minimum compliance without specialized small-batch purity audits.
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PRE-LAUNCH LAB AUDIT NOTICE CARD -->
+            <div class="hp-notice-card" role="note" aria-label="Pre-Launch Lab Audit Notice">
+                <div class="hp-notice-icon" aria-hidden="true">🧪</div>
+                <div>
+                    <h3 class="hp-notice-title">Pre-Launch Lab Audit Notice</h3>
+                    <p class="hp-notice-desc">All batch-specific microbiological parameters, shelf-life evaluations, and nutritional claims will be validated by NABL-accredited third-party laboratories/test certificates and archived under our FSSAI compliance record prior to commercial retail dispatch.</p>
+                </div>
+            </div>
+
+            <!-- DISCLAIMER -->
+            <p class="hp-disclaimer">
+                <em>Disclaimer: Comparison is based on customary manufacturing practices of mass-market commercial condiments versus artisanal home-style preparation methods. It does not target, disparage, or reference any specific manufacturer or trademarked brand.</em>
             </p>
 
-            <!-- 4 QUALITY PILLARS -->
-            <div class="trust-badges-grid" style="margin-bottom: 64px;">
-                <div class="trust-card" style="flex-direction: column; align-items: flex-start; padding: 32px;">
-                    <div class="trust-icon" style="font-size: 3rem; margin-bottom: 12px;">☀️</div>
-                    <div class="trust-title" style="font-size: 1.3rem; margin-bottom: 8px;">Sun-Cured Maturity</div>
-                    <div class="trust-desc" style="font-size: 0.96rem; line-height: 1.6;">Our pickles are matured under natural sunlight for days to allow spices and pure mustard oil to penetrate deep into raw mango, chillies, and amla.</div>
-                </div>
-
-                <div class="trust-card" style="flex-direction: column; align-items: flex-start; padding: 32px;">
-                    <div class="trust-icon" style="font-size: 3rem; margin-bottom: 12px;">🪔</div>
-                    <div class="trust-title" style="font-size: 1.3rem; margin-bottom: 8px;">Pure Cold-Pressed Mustard Oil</div>
-                    <div class="trust-desc" style="font-size: 0.96rem; line-height: 1.6;">We use unrefined, cold-pressed mustard oil known for its natural preservative properties, pungent aroma, and authentic North Indian taste.</div>
-                </div>
-
-                <div class="trust-card" style="flex-direction: column; align-items: flex-start; padding: 32px;">
-                    <div class="trust-icon" style="font-size: 3rem; margin-bottom: 12px;">🌿</div>
-                    <div class="trust-title" style="font-size: 1.3rem; margin-bottom: 8px;">Zero Synthetic Preservatives</div>
-                    <div class="trust-desc" style="font-size: 0.96rem; line-height: 1.6;">No vinegar, no chemical preservatives, and no artificial coloring agents. Only natural salt, oil, turmeric, and sun-drying.</div>
-                </div>
-
-                <div class="trust-card" style="flex-direction: column; align-items: flex-start; padding: 32px;">
-                    <div class="trust-icon" style="font-size: 3rem; margin-bottom: 12px;">👵</div>
-                    <div class="trust-title" style="font-size: 1.3rem; margin-bottom: 8px;">Ancestral Family Recipes</div>
-                    <div class="trust-desc" style="font-size: 0.96rem; line-height: 1.6;">Crafted using whole hand-ground spices including saunf, kalonji, rai, hing, and roasted cumin following traditional household recipes.</div>
+            <!-- TRANSPARENT COMPLIANCE & LICENSING STATUS CARD -->
+            <div class="hp-compliance-card" role="region" aria-label="Transparent Compliance and Licensing Status">
+                <div class="hp-compliance-icon" aria-hidden="true">🛡️</div>
+                <div>
+                    <h3 class="hp-compliance-title">Transparent Compliance &amp; Licensing Status</h3>
+                    <p class="hp-compliance-sub">At Satvik Swaad, transparency with our customers is paramount:</p>
+                    <ul class="hp-compliance-list">
+                        <li class="hp-compliance-item">• <strong>FSSAI Registration / License:</strong> Currently <span class="hp-status-pending">PENDING Approval</span>.</li>
+                        <li class="hp-compliance-item">• <strong>GSTIN Registration:</strong> Currently <span class="hp-status-pending">PENDING Issuance</span>.</li>
+                        <li class="hp-compliance-item">• <strong>Packaging Standards:</strong> Food-grade glass &amp; BPA-free airtight jars.</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- REGULATORY TRANSPARENCY NOTICE -->
-            <div style="background: #FFFFFF; border: 2px solid var(--color-gold); border-radius: var(--radius-card); padding: 40px; max-width: 900px; margin: 0 auto 64px; box-shadow: var(--shadow-soft);">
-                <h3 style="color: var(--color-maroon); font-size: 1.4rem; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
-                    <span>📜</span> Transparent Compliance & Licensing Status
-                </h3>
-                <p style="font-size: 1rem; color: var(--color-sub); line-height: 1.7; margin-bottom: 16px;">
-                    At Satvik Swaad, transparency with our customers is paramount:
-                </p>
-                <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-weight: 800; color: var(--color-dark);">
-                    <li>• <strong>FSSAI Registration / Licence:</strong> Currently <em>PENDING Approval</em>.</li>
-                    <li>• <strong>GSTIN Registration:</strong> Currently <em>PENDING Issuance</em>.</li>
-                    <li>• <strong>Packaging Standards:</strong> Food-grade glass & BPA-free airtight jars.</li>
-                </ul>
+            <!-- ACTION BUTTONS -->
+            <div class="hp-actions-wrap">
+                <a href="products.html" class="hp-btn-explore">Explore 15 Products →</a>
+                <a href="our-story.html" class="hp-btn-story">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 21C7 15 13 9 21 6C19 14 13 19 7 21L5 21Z" fill="#2E7D32"/>
+                    </svg>
+                    Read Our Brand Story →
+                </a>
             </div>
 
-            <div style="text-align: center;">
-                <a href="products.html" class="btn-hero" style="margin-right: 16px;">Explore 15 Products →</a>
-                <a href="our-story.html" class="nav-link" style="font-size: 1.1rem; font-weight: 900;">Read Our Brand Story →</a>
+            <!-- CORNER BOTANICAL LEAF SPRAYS -->
+            <div class="hp-corner-leaves-wrap" aria-hidden="true">
+                <svg class="hp-corner-leaf-left" viewBox="0 0 100 100" fill="none">
+                    <path d="M15 85C30 55 45 40 85 20" stroke="#234B34" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+                    <g transform="translate(35 60) rotate(-35)">
+                        <path d="M0 0C8 -3 18 -2 22 5C14 8 5 7 0 0Z" fill="#234B34" opacity="0.5"/>
+                    </g>
+                    <g transform="translate(55 45) rotate(-15)">
+                        <path d="M0 0C8 -3 18 -2 22 5C14 8 5 7 0 0Z" fill="#234B34" opacity="0.4"/>
+                    </g>
+                </svg>
+
+                <svg class="hp-corner-leaf-right" viewBox="0 0 100 100" fill="none">
+                    <path d="M15 85C30 55 45 40 85 20" stroke="#234B34" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+                    <g transform="translate(35 60) rotate(-35)">
+                        <path d="M0 0C8 -3 18 -2 22 5C14 8 5 7 0 0Z" fill="#234B34" opacity="0.5"/>
+                    </g>
+                    <g transform="translate(55 45) rotate(-15)">
+                        <path d="M0 0C8 -3 18 -2 22 5C14 8 5 7 0 0Z" fill="#234B34" opacity="0.4"/>
+                    </g>
+                </svg>
             </div>
         </section>
 
@@ -193,9 +445,9 @@
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-gold-light); padding-bottom: 14px;">
                 <div>
                     <h2 id="checkout-title" style="color: var(--color-maroon); font-size: 1.6rem; margin: 0;">Checkout & Shipping</h2>
-                    <span style="font-size: 0.85rem; color: var(--color-sub); font-weight: 700;">🔒 256-Bit SSL Encrypted & Idempotent Secure Checkout</span>
+                    <span style="font-size: 0.85rem; color: var(--color-sub); font-weight: 700;">🔒 TLS Encrypted Secure Checkout</span>
                 </div>
-                <button type="button" id="btn-close-checkout-icon" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--color-sub);">✕</button>
+                <button type="button" id="btn-close-checkout-icon" aria-label="Close Checkout Dialog" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--color-sub);">✕</button>
             </div>
             <div id="checkout-notice" style="background: #FFF3CD; color: #856404; border: 1px solid #FFEEBA; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-top: 16px; font-weight: 800;">
                 ℹ️ Online ordering will open after required registrations and launch preparations are completed.
@@ -227,16 +479,17 @@
                             <div class="checkout-form-group" style="margin-top: 18px;">
                                 <div style="background: rgba(212,175,55,0.08); border: 1.5px solid var(--color-gold); border-radius: 12px; padding: 14px 16px; margin-top: 6px;">
                                     <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--color-maroon); font-size: 0.95rem;">
-                                        <span>💬</span> <span>Order through WhatsApp</span>
+                                        <span>💳</span> <span>Secure Online Payment</span>
                                     </div>
                                     <p style="margin: 6px 0 0 0; font-size: 0.83rem; color: #555555; line-height: 1.4;">
-                                        After your order request is created, WhatsApp will open. Send the prepared message to receive the official payment QR and further confirmation.
+                                        Pay securely via UPI (Google Pay, PhonePe, Paytm), Debit/Credit Cards, or Netbanking via verified payment gateway.
                                     </p>
                                 </div>
                             </div>
                         </div>
                         <div style="margin-top: 24px;">
-                            <button type="submit" id="btn-submit-order" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Continue on WhatsApp 💬</button>
+                            <button type="submit" id="btn-submit-order" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Proceed to Pay 💳</button>
+                            <a href="https://wa.me/919236587600?text=Namaste!%20I%20have%20a%20question%20regarding%20an%20order%20on%20Satvik%20Swaad." target="_blank" rel="noopener noreferrer" id="btn-wa-support" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; padding: 12px; border: 1.5px solid #25D366; color: #128C7E; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.92rem; background: #F0FFF4;">Need Help? Chat on WhatsApp 💬</a>
                             <button type="button" id="btn-close-checkout" style="width: 100%; margin-top: 10px; background: none; border: none; color: var(--color-sub); cursor: pointer;">Cancel</button>
                         </div>
                     </div>
@@ -246,47 +499,189 @@
     </div>
 
     <!-- FOOTER -->
+        <!-- SATVIK SWAAD SIGNATURE WAVY FOOTER (EXACT REFERENCE UI WITH ANIMATION) -->
     <footer class="site-footer" role="contentinfo">
-        <div class="footer-container">
-            <div>
-                <div class="footer-brand">Satvik Swaad</div>
-                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and traditional preserves prepared with pure mustard oil and ancestral recipes.</p>
-            </div>
-            <div>
-                <h4 class="footer-heading">Quick Navigation</h4>
-                <ul class="footer-list">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="products.html">15 Products Catalogue</a></li>
-                    <li><a href="why-us.html">Why Satvik Swaad</a></li>
-                    <li><a href="our-story.html">Our Story & Values</a></li>
-                    <li><a href="reviews.html">Verified Reviews</a></li>
-                    <li><a href="faq.html">FAQ</a></li>
-                    <li><a href="contact.html">Contact Us</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-heading">Legal & Privacy</h4>
-                <ul class="footer-list">
-                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="terms-and-conditions.html">Terms and Conditions</a></li>
-                    <li><a href="shipping-delivery-policy.html">Shipping & Delivery Policy</a></li>
-                    <li><a href="cancellation-refund-policy.html">Cancellation & Refund Policy</a></li>
-                    <li><a href="contact.html">Data Subject Request</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-heading">Quality & Trust</h4>
-                <ul class="footer-list">
-                    <li>FSSAI Licence: <strong>PENDING</strong></li>
-                    <li>GSTIN: <strong>PENDING</strong></li>
-                    <li>Pure Cold-Pressed Mustard Oil</li>
-                    <li>100% Chemical Free</li>
-                </ul>
-            </div>
+        <!-- TOP ORGANIC WAVE DIVIDER (SEAMLESS 2PX OVERLAP, ZERO LINES) -->
+        <div class="footer-wave-wrap" aria-hidden="true">
+            <svg class="footer-wave-svg" viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path d="M0,35 C240,68 480,78 720,48 C960,18 1200,62 1440,30 L1440,80 L0,80 Z" fill="#0E381E"/>
+            </svg>
         </div>
-        <div class="footer-bottom">
-            <span>© 2026 Satvik Swaad. All rights reserved.</span>
-            <span>Crafted with ❤️ in India | Pure Taste of Tradition</span>
+
+        <!-- UNIFIED SEAMLESS FOOTER WRAP (NO HORIZONTAL SEAMS OR LINES) -->
+        <div class="footer-inner-wrap">
+            <!-- ANIMATED BACKGROUND BOTANICALS & FIREFLIES -->
+            <div class="footer-animated-bg" aria-hidden="true">
+                <!-- Left Botanicals -->
+                <div class="footer-branch branch-left-top">
+                    <svg viewBox="0 0 100 120" fill="none">
+                        <path d="M0 10 C30 25 50 60 45 110" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(18 20) rotate(15)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(30 40) rotate(-10)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(42 62) rotate(20)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(46 86) rotate(-15)"><path d="M0 0 C-14 -5 -26 -2 -32 8 C-22 11 -10 9 0 0 Z" fill="#1f522a" opacity="0.8"/></g>
+                        <g transform="translate(45 108) rotate(5)"><path d="M0 0 C10 -4 20 -2 25 6 C17 8 8 7 0 0 Z" fill="#2d6e3c" opacity="0.85"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-left-mid">
+                    <svg viewBox="0 0 90 90" fill="none">
+                        <path d="M0 45 C35 42 60 35 85 20" stroke="#1d552c" stroke-width="2" stroke-linecap="round"/>
+                        <g transform="translate(30 42) rotate(-15)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                        <g transform="translate(55 36) rotate(18)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#2f753f" opacity="0.9"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-left-bot">
+                    <svg viewBox="0 0 100 120" fill="none">
+                        <path d="M0 110 C25 90 45 60 50 10" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(16 95) rotate(-20)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(30 75) rotate(15)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(42 50) rotate(-18)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                    </svg>
+                </div>
+
+                <!-- Right Botanicals -->
+                <div class="footer-branch branch-right-top">
+                    <svg viewBox="0 0 100 120" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 10 C30 25 50 60 45 110" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(18 20) rotate(15)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(30 40) rotate(-10)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(42 62) rotate(20)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(46 86) rotate(-15)"><path d="M0 0 C-14 -5 -26 -2 -32 8 C-22 11 -10 9 0 0 Z" fill="#1f522a" opacity="0.8"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-right-mid">
+                    <svg viewBox="0 0 90 90" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 45 C35 42 60 35 85 20" stroke="#1d552c" stroke-width="2" stroke-linecap="round"/>
+                        <g transform="translate(30 42) rotate(-15)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                        <g transform="translate(55 36) rotate(18)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#2f753f" opacity="0.9"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-right-bot">
+                    <svg viewBox="0 0 100 120" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 110 C25 90 45 60 50 10" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(16 95) rotate(-20)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(30 75) rotate(15)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(42 50) rotate(-18)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                    </svg>
+                </div>
+
+                <!-- Floating Fireflies / Golden Glow Particles -->
+                <span class="footer-firefly firefly-1"></span>
+                <span class="footer-firefly firefly-2"></span>
+                <span class="footer-firefly firefly-3"></span>
+                <span class="footer-firefly firefly-4"></span>
+                <span class="footer-firefly firefly-5"></span>
+                <span class="footer-firefly firefly-6"></span>
+            </div>
+
+                        <!-- TRUST ROW (DIRECTLY FLOWING WITH ZERO HORIZONTAL LINES) -->
+            <div class="footer-trust-row">
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🌿</span>
+                    <span class="footer-trust-text">100% Homemade</span>
+                </div>
+
+                <span class="footer-trust-sep" aria-hidden="true"></span>
+
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🪷</span>
+                    <span class="footer-trust-text">Indian Tradition</span>
+                </div>
+
+                <span class="footer-trust-sep" aria-hidden="true"></span>
+
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🤍</span>
+                    <span class="footer-trust-text">For a Healthier You</span>
+                </div>
+            </div>
+
+            <!-- 4-COLUMN CONTENT GRID -->
+            <div class="footer-container">
+                <!-- COL 1: BRAND -->
+                <div class="footer-col footer-col-brand">
+                    <div class="footer-brand-header">
+                        <img src="assets/logo.png" alt="Satvik Swaad" class="footer-brand-logo" />
+                        <div class="footer-brand-title-wrap">
+                            <span class="footer-brand-title">Satvik Swaad</span>
+                            <span class="footer-brand-tagline">— Maa ke swaad ki virasat —</span>
+                        </div>
+                    </div>
+                    <p class="footer-desc">Authentic homemade pickles, murabbas, and traditional sweets crafted with zero artificial preservatives in pure mustard oil and A2 cow ghee.</p>
+                    <div class="footer-flourish" aria-hidden="true">
+                        <svg width="130" height="18" viewBox="0 0 130 18" fill="none">
+                            <path d="M8 9 Q35 2 65 9 T122 9" stroke="#E5A93C" stroke-width="1.3" stroke-linecap="round"/>
+                            <circle cx="65" cy="9" r="2.5" fill="#E5A93C"/>
+                            <circle cx="45" cy="8" r="1.5" fill="#E5A93C"/>
+                            <circle cx="85" cy="8" r="1.5" fill="#E5A93C"/>
+                            <path d="M22 6 C28 4 32 7 28 11 C24 10 21 8 22 6 Z" fill="#E5A93C"/>
+                            <path d="M108 6 C102 4 98 7 102 11 C106 10 109 8 108 6 Z" fill="#E5A93C"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- COL 2: QUICK LINKS -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Quick Links</span>
+                    </h4>
+                    <ul class="footer-list">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Shop</a></li>
+                        <li><a href="our-story.html">Our Story</a></li>
+                        <li><a href="why-us.html">Health &amp; Purity</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- COL 3: HELP & LEGAL -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Help &amp; Legal</span>
+                    </h4>
+                    <ul class="footer-list">
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-and-conditions.html">Terms &amp; Conditions</a></li>
+                        <li><a href="shipping-delivery-policy.html">Shipping &amp; Delivery Policy</a></li>
+                        <li><a href="cancellation-refund-policy.html">Cancellation &amp; Refund Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- COL 4: QUALITY & TRUST -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Quality &amp; Trust</span>
+                    </h4>
+                    <ul class="footer-list footer-trust-list">
+                        <li>FSSAI Licence: <strong class="badge-pending">PENDING</strong></li>
+                        <li>GSTIN: <strong class="badge-pending">PENDING</strong></li>
+                        <li>Pure Cold-Pressed Mustard Oil</li>
+                        <li>100% Chemical Free</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- BOTTOM COPYRIGHT BAR -->
+            <div class="footer-bottom-wrap">
+                <div class="footer-bottom">
+                    <span class="footer-copy-left">© 2026 Satvik Swaad. All rights reserved.</span>
+                    <span class="footer-copy-right">Crafted with ❤️ in India | Pure Taste of Tradition</span>
+                </div>
+            </div>
         </div>
     </footer>
 

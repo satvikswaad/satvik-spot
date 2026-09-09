@@ -4,6 +4,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Favicon (Circular Logo) -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Contact Us – Satvik Swaad</title>
     <meta name="description" content="Get in touch with Satvik Swaad for inquiries about our traditional Indian homemade pickles, murabbas, laddus, and traditional preserves." />
@@ -20,7 +24,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=DM+Serif+Display&family=Playfair+Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="./style.css" />
 </head>
@@ -53,44 +57,78 @@
 
     <!-- SITE HEADER -->
     <header class="site-header" role="banner">
-        <div class="header-container">
-            <div class="logo-group" onclick="window.location.href='index.html'">
-                <div>
-                    <span class="brand-title">Satvik Swaad</span>
-                    <span class="brand-sub">शुद्ध पारंपरिक स्वाद</span>
-                </div>
-            </div>
+  <div class="header-container ref-header">
+    <a href="index.html" class="logo-group" aria-label="Satvik Swaad home">
+      <svg class="logo-curve-svg" viewBox="0 0 140 38" fill="none" aria-hidden="true">
+        <path d="M 0 0 
+                 C 18 0, 26 4, 32 12 
+                 C 42 26, 55 35, 70 35 
+                 C 85 35, 98 26, 108 12 
+                 C 114 4, 122 0, 140 0 
+                 Z" 
+              fill="#FAF5EB" />
+      </svg>
+      <span class="ref-logo-ring">
+        <img src="assets/satvik_logo_round.png" alt="Satvik Swaad" class="ref-logo-img" />
+      </span>
+    </a>
+    <nav class="main-nav ref-nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="products.html" class="nav-link">Shop</a>
+      <a href="our-story.html" class="nav-link">Our Story</a>
+      <a href="why-us.html" class="nav-link">Health & Purity</a>
+      <a href="contact.html" class="nav-link active">Contact</a>
+    </nav>
+    <div class="header-right-actions">
+      <!-- Hidden but preserved for JS -->
+      <button type="button" class="btn-lang-toggle" id="btn-lang-toggle" style="display:none;">हिन्दी</button>
+      <div class="ref-search-bar">
+        <input type="search" placeholder="Search for pickles, sweets..." class="ref-search-input" />
+        <svg class="ref-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <a href="profile.html" id="btn-open-profile" class="ref-icon-btn" aria-label="My profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </a>
+      <button type="button" id="btn-open-cart" class="ref-icon-btn" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="ref-cart-badge" id="cart-count-badge">0</span>
+      </button>
+      <button type="button" id="mobile-menu-btn" class="ref-mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
 
-            <nav class="main-nav" role="navigation" aria-label="Main Navigation">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="products.html" class="nav-link">Products</a>
-                <a href="why-us.html" class="nav-link">Why Us</a>
-                <a href="our-story.html" class="nav-link">Our Story</a>
-                <a href="reviews.html" class="nav-link">Reviews</a>
-                <a href="faq.html" class="nav-link">FAQ</a>
-                <a href="contact.html" class="nav-link active">Contact</a>
-            </nav>
+  <div class="header-wave-wrap" aria-hidden="true">
+    <svg class="header-wave-svg" viewBox="0 0 1440 16" preserveAspectRatio="none">
+      <path d="M0,0 L1440,0 L1440,6 C1380,10 1320,4 1260,8 C1200,12 1140,5 1080,7 C1020,10 960,4 900,8 C840,11 780,5 720,7 C660,10 600,4 540,8 C480,12 420,5 360,7 C300,10 240,4 180,8 C120,12 60,5 0,7 Z" fill="#FAF5EB"/>
+          </svg>
+  </div>
 
-            <div class="header-right-actions">
-                <a href="profile.html" class="btn-profile-trigger" id="btn-open-profile" aria-label="Account Profile">
-                    <span>👤 Profile</span>
-                </a>
-                <button type="button" class="btn-cart-trigger" id="btn-open-cart" aria-label="Open Shopping Cart">
-                    <span>🛒 Cart</span>
-                    <span class="cart-badge" id="cart-count-badge">0</span>
-                </button>
-                <button class="mobile-menu-toggle" id="mobile-menu-btn" aria-label="Open Navigation Menu" aria-expanded="false">☰</button>
-            </div>
-        </div>
-    </header>
+  <!-- HEADER DROPDOWN MENU (COMPACT, NON-BLURRING, PROFESSIONAL) -->
+  <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
+      <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
+          <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
+      </button>
+      <a href="index.html#hero" class="dropdown-nav-link" role="menuitem">🏠 Home</a>
+      <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Products (15)</a>
+      <a href="why-us.html" class="dropdown-nav-link" role="menuitem">✨ Why Us</a>
+      <a href="our-story.html#about" class="dropdown-nav-link" role="menuitem">📜 Our Story</a>
+      <a href="reviews.html" class="dropdown-nav-link" role="menuitem">⭐ Customer Reviews</a>
+      <a href="faq.html" class="dropdown-nav-link" role="menuitem">❓ FAQ</a>
+      <a href="contact.html" class="dropdown-nav-link active" role="menuitem">📞 Contact Us</a>
+      <a href="profile.html" class="dropdown-nav-link profile-link" id="mobile-nav-profile" role="menuitem">👤 My Account & Orders</a>
+  </div>
+</header>
 
     <!-- MOBILE NAVIGATION DRAWER -->
     <div class="mobile-nav-overlay" id="mobile-nav-overlay">
         <div class="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-border); padding-bottom: 12px;">
                 <span class="brand-title" style="font-size: 1.3rem;">Satvik Swaad</span>
-                <button id="mobile-menu-close" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
+                <button id="mobile-menu-close" aria-label="Close Navigation Menu" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
             </div>
+            <button type="button" class="mobile-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;">
+                <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
+            </button>
             <a href="index.html" class="mobile-nav-link">Home</a>
             <a href="products.html" class="mobile-nav-link">Products (15)</a>
             <a href="why-us.html" class="mobile-nav-link">Why Us</a>
@@ -103,7 +141,7 @@
     </div>
 
     <!-- BREADCRUMBS -->
-    <nav class="breadcrumb-container" aria-label="Breadcrumb">
+    <nav class="breadcrumb-container" aria-label="Breadcrumb" style="display:none;">
         <div class="breadcrumb-inner">
             <a href="index.html">Home</a>
             <span class="separator">›</span>
@@ -112,55 +150,195 @@
     </nav>
 
     <!-- MAIN CONTENT -->
-    <main id="main-content" class="page-content" role="main">
-        <section class="page-header-section">
-            <h1 class="page-title">Contact Satvik Swaad</h1>
-            <p class="page-subtitle">We are always happy to answer questions about our authentic homemade pickles, traditional recipes, or batch preparation.</p>
+        <main id="main-content" class="page-container paper-texture" role="main">
+        <!-- A) HERO BANNER -->
+        <section class="hero-banner-section isolate">
+            <div class="hero-bg-container">
+                <img src="assets/village-hero.png" alt="" class="hero-bg-image" />
+                <div class="hero-overlay"></div>
+
+                <div class="hero-corner-fold">
+                    <div class="corner-triangle"></div>
+                    <svg class="leaf-spray corner-leaf" viewBox="0 0 120 120" style="transform: scaleX(-1);">
+                        <path d="M20 108C34 78 46 60 74 40C86 31 98 24 108 18" stroke="var(--color-green)" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                        <g transform="translate(34 82) rotate(-35)"><path d="M0 0C10 -4 22 -3 30 6C20 10 8 9 0 0Z" fill="var(--color-green)" opacity="0.9"/><path d="M0 0C-10 -4 -22 -3 -30 6C-20 10 -8 9 0 0Z" fill="var(--color-green)" opacity="0.72"/></g>
+                        <g transform="translate(46 66) rotate(-20)"><path d="M0 0C10 -4 22 -3 30 6C20 10 8 9 0 0Z" fill="var(--color-green)" opacity="0.9"/><path d="M0 0C-10 -4 -22 -3 -30 6C-20 10 -8 9 0 0Z" fill="var(--color-green)" opacity="0.72"/></g>
+                        <g transform="translate(60 52) rotate(-5)"><path d="M0 0C10 -4 22 -3 30 6C20 10 8 9 0 0Z" fill="var(--color-green)" opacity="0.9"/><path d="M0 0C-10 -4 -22 -3 -30 6C-20 10 -8 9 0 0Z" fill="var(--color-green)" opacity="0.72"/></g>
+                        <g transform="translate(74 40) rotate(10)"><path d="M0 0C10 -4 22 -3 30 6C20 10 8 9 0 0Z" fill="var(--color-green)" opacity="0.9"/><path d="M0 0C-10 -4 -22 -3 -30 6C-20 10 -8 9 0 0Z" fill="var(--color-green)" opacity="0.72"/></g>
+                        <g transform="translate(88 30) rotate(22)"><path d="M0 0C10 -4 22 -3 30 6C20 10 8 9 0 0Z" fill="var(--color-green)" opacity="0.9"/><path d="M0 0C-10 -4 -22 -3 -30 6C-20 10 -8 9 0 0Z" fill="var(--color-green)" opacity="0.72"/></g>
+                    </svg>
+                </div>
+
+                <div class="hero-content">
+                    <div class="animate-fade-up">
+                        <h1 class="hero-title">
+                            <span class="title-top text-white">Get in</span>
+                            <span class="title-script-wrapper">
+                                <span class="brush-underline text-gold">Touch</span>
+                                <svg viewBox="0 0 32 30" class="heart-doodle text-gold" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 27C16 27 3 19 3 10.5C3 6 6.5 3 10.5 3C13 3 15 4.5 16 6.5C17 4.5 19 3 21.5 3C25.5 3 29 6 29 10.5C29 19 16 27 16 27Z" /></svg>
+                            </span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            <span class="brush-underline">We'd Love to Hear from You</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="hero-paper-note hidden-mobile" style="transform: rotate(-6deg);">
+                    <span class="note-tape"></span>
+                    <p>Your Feedback Matters</p>
+                </div>
+
+                <div class="hero-right-doodle hidden-mobile">
+                    <span class="doodle-text block">Pure</span>
+                    <span class="doodle-text block">Desi</span>
+                    <span class="doodle-text block">Goodness</span>
+                    <svg viewBox="0 0 32 30" class="heart-doodle text-white ml-auto" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; margin-top: 4px;"><path d="M16 27C16 27 3 19 3 10.5C3 6 6.5 3 10.5 3C13 3 15 4.5 16 6.5C17 4.5 19 3 21.5 3C25.5 3 29 6 29 10.5C29 19 16 27 16 27Z" /></svg>
+                </div>
+            </div>
+
+            <svg viewBox="0 0 1440 60" preserveAspectRatio="none" class="wavy-divider hero-wavy" aria-hidden="true">
+                <path d="M0 30C120 8 260 6 420 22C620 42 760 54 920 40C1080 26 1240 6 1440 24V60H0V30Z" fill="var(--color-bg)" />
+            </svg>
         </section>
 
-        <section class="content-grid-section">
-            <div class="contact-card-wrapper" style="max-width: 800px; margin: 0 auto; background: #ffffff; border: 2px solid var(--color-border); border-radius: 12px; padding: 32px;">
-                <h2 style="font-family: 'Playfair Display', serif; color: var(--color-maroon); margin-bottom: 16px; font-size: 1.6rem;">Send Us a Message</h2>
-                <p style="color: var(--color-sub); margin-bottom: 24px; font-size: 0.95rem; line-height: 1.6;">
-                    Fill out the form below to get in touch with our team. Whether you have questions about product availability, ingredients, or data privacy, we will respond promptly.
-                </p>
+        <!-- B) CONTACT CONTENT -->
+        <section class="contact-content-section" style="max-width: 1400px; margin: 0 auto; padding: 40px 16px;">
+            <div class="contact-layout">
+                <!-- Info card -->
+                <aside class="contact-info-card">
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>
+                            <div>
+                                <p class="info-title">Our Address</p>
+                                <p class="info-line">Satvik Swaad Pvt. Ltd.</p>
+                                <p class="info-line">Village & Post – Kothapalli,</p>
+                                <p class="info-line">Dist. – Nizamabad, Telangana – 503001</p>
+                            </div>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+                            <div>
+                                <p class="info-title">Phone</p>
+                                <p class="info-line">+91 98765 43210</p>
+                                <p class="info-line">(Mon – Sat, 9 AM – 6 PM)</p>
+                            </div>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+                            <div>
+                                <p class="info-title">Email</p>
+                                <p class="info-line">support@satvikswaad.com</p>
+                            </div>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                            <div>
+                                <p class="info-title">Business Hours</p>
+                                <p class="info-line">Mon – Sat: 9 AM – 6 PM</p>
+                                <p class="info-line">(Sunday Closed)</p>
+                            </div>
+                        </li>
+                    </ul>
+                </aside>
 
-                <form id="contact-form" action="#" method="POST" style="display: flex; flex-direction: column; gap: 18px;">
-                    <div>
-                        <label for="contact-name" style="display: block; font-weight: 700; color: var(--color-text); margin-bottom: 6px;">Your Name *</label>
-                        <input type="text" id="contact-name" name="name" required minlength="2" maxlength="100" placeholder="Enter your full name" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem;" />
+                <!-- Form -->
+                <div class="contact-form-area">
+                    <div class="script-title-wrapper" style="justify-content: flex-start; gap: 12px; margin-bottom: 4px;">
+                        <svg viewBox="0 0 40 40" class="sparkle-mark" fill="none" stroke="var(--color-saffron)" stroke-width="3" stroke-linecap="round"><path d="M8 20h14" /><path d="M10 10l9 6" /><path d="M10 30l9 -6" /></svg>
+                        <h2 class="script-title text-green">Send Us a Message</h2>
+                        <svg viewBox="0 0 40 40" class="sparkle-mark" fill="none" stroke="var(--color-saffron)" stroke-width="3" stroke-linecap="round" style="transform: scaleX(-1);"><path d="M8 20h14" /><path d="M10 10l9 6" /><path d="M10 30l9 -6" /></svg>
                     </div>
+                    <p class="contact-subtitle" style="margin-bottom: 24px;">We are here to help! Fill out the form below and we'll get back to you soon.</p>
 
-                    <div>
-                        <label for="contact-email" style="display: block; font-weight: 700; color: var(--color-text); margin-bottom: 6px;">Email Address (Optional)</label>
-                        <input type="email" id="contact-email" name="email" placeholder="name@example.com" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem;" />
+                    <form id="contact-form" class="contact-form-block">
+                        <div class="form-grid">
+                            <label class="form-field">
+                                <span class="field-label">Name <span class="required">*</span></span>
+                                <input type="text" id="contact-name" name="name" class="ss-input" required placeholder="Your name" />
+                            </label>
+                            <label class="form-field">
+                                <span class="field-label">Email <span class="required">*</span></span>
+                                <input type="email" id="contact-email" name="email" class="ss-input" required placeholder="your@email.com" />
+                            </label>
+                        </div>
+                        <label class="form-field" style="margin-top: 20px;">
+                            <span class="field-label">Phone <span class="required">*</span></span>
+                            <input type="tel" id="contact-phone" name="phone" class="ss-input" required placeholder="Your phone number" />
+                        </label>
+
+                        
+                        <label class="form-field" style="margin-top: 20px;">
+                            <span class="field-label">Subject <span class="required">*</span></span>
+                            <div class="select-wrapper">
+                                <select id="contact-subject" name="subject" class="ss-input" required>
+                                    <option value="" disabled selected>Select a subject</option>
+                                    <option>General Enquiry</option>
+                                    <option>Order Support</option>
+                                    <option>Bulk / Gifting Order</option>
+                                    <option>Feedback</option>
+                                    <option>Partnership</option>
+                                </select>
+                                <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                        </label>
+
+                        <label class="form-field" style="margin-top: 20px;">
+                            <span class="field-label">Message <span class="required">*</span></span>
+                            <textarea id="contact-message" name="message" class="ss-input resize-none" rows="5" required placeholder="Type your message here..."></textarea>
+                        </label>
+
+                        <button type="submit" id="btn-submit-contact" class="btn-send-message group mt-6" style="margin-top: 24px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                            Send Message
+                        </button>
+                        <div id="contact-success-msg" style="display: none; margin-top: 16px; color: var(--color-green); font-weight: bold;">
+                            ✅ Thank you! Your message has been sent.
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Polaroid -->
+                <div class="polaroid-column hidden-mobile">
+                    <figure class="polaroid-card" style="transform: rotate(-3deg);">
+                        <span class="tape"></span>
+                        <div class="polaroid-img-wrapper">
+                            <img src="assets/mother-child.png" alt="" />
+                        </div>
+                        <figcaption class="polaroid-caption">
+                            <span class="brush-underline">Maa ke swaad ki virasat</span>
+                            <svg viewBox="0 0 32 30" class="heart-doodle text-gold" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 27C16 27 3 19 3 10.5C3 6 6.5 3 10.5 3C13 3 15 4.5 16 6.5C17 4.5 19 3 21.5 3C25.5 3 29 6 29 10.5C29 19 16 27 16 27Z" /></svg>
+                        </figcaption>
+                    </figure>
+                    <div class="doodle-group" style="display: flex; gap: 8px;">
+                        <div class="doodle-text-lines text-right" style="margin-top: 10px;">
+                            <span class="doodle-text block">Same</span>
+                            <span class="doodle-text block">Love</span>
+                            <span class="doodle-text block">Since</span>
+                            <span class="doodle-text block">Generations</span>
+                            <svg viewBox="0 0 32 30" class="heart-doodle doodle-right text-gold" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; margin-top: 4px;"><path d="M16 27C16 27 3 19 3 10.5C3 6 6.5 3 10.5 3C13 3 15 4.5 16 6.5C17 4.5 19 3 21.5 3C25.5 3 29 6 29 10.5C29 19 16 27 16 27Z" /></svg>
+                        </div>
+                        <svg viewBox="0 0 60 60" class="arrow-doodle scale-x-flip" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8C22 14 34 26 40 46" /><path d="M28 44l12 4 3 -12" /></svg>
                     </div>
-
-                    <div>
-                        <label for="contact-phone" style="display: block; font-weight: 700; color: var(--color-text); margin-bottom: 6px;">Phone Number (Optional)</label>
-                        <input type="tel" id="contact-phone" name="phone" placeholder="10-digit mobile number" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem;" />
-                    </div>
-
-                    <div>
-                        <label for="contact-subject" style="display: block; font-weight: 700; color: var(--color-text); margin-bottom: 6px;">Subject</label>
-                        <input type="text" id="contact-subject" name="subject" placeholder="General Inquiry / Data Request" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem;" />
-                    </div>
-
-                    <div>
-                        <label for="contact-message" style="display: block; font-weight: 700; color: var(--color-text); margin-bottom: 6px;">Your Message *</label>
-                        <textarea id="contact-message" name="message" required minlength="5" maxlength="500" rows="5" placeholder="Write your message here (5 - 500 characters)" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: 8px; font-size: 0.95rem; resize: vertical;"></textarea>
-                    </div>
-
-                    <button type="submit" id="btn-submit-contact" class="btn-add-cart" style="padding: 14px 28px; font-size: 1rem; align-self: flex-start; margin-top: 8px;">
-                        Send Message ✉️
-                    </button>
-                </form>
-
-                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--color-border); font-size: 0.88rem; color: var(--color-sub);">
-                    <span>🔒 Your information is processed safely in accordance with our <a href="privacy-policy.html" style="color: var(--color-maroon); font-weight: 700; text-decoration: underline;">Privacy Policy</a>.</span>
                 </div>
             </div>
         </section>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const form = document.getElementById('contact-form');
+                if(form) {
+                    form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const msg = document.getElementById('contact-success-msg');
+                        if(msg) msg.style.display = 'block';
+                        form.reset();
+                        setTimeout(() => { if(msg) msg.style.display = 'none'; }, 4000);
+                    });
+                }
+            });
+        </script>
     </main>
 
     <!-- SHOPPING CART DRAWER -->
@@ -184,47 +362,189 @@
     </div>
 
     <!-- SITE FOOTER -->
+    <!-- SATVIK SWAAD SIGNATURE WAVY FOOTER (EXACT REFERENCE UI WITH ANIMATION) -->
     <footer class="site-footer" role="contentinfo">
-        <div class="footer-container">
-            <div>
-                <div class="footer-brand">Satvik Swaad</div>
-                <p class="footer-desc">Bringing you authentic, artisanal Indian homemade pickles, murabbas, laddus, and traditional preserves prepared with pure mustard oil and ancestral recipes.</p>
-            </div>
-            <div>
-                <h4 class="footer-heading">Quick Navigation</h4>
-                <ul class="footer-list">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="products.html">15 Products Catalogue</a></li>
-                    <li><a href="why-us.html">Why Satvik Swaad</a></li>
-                    <li><a href="our-story.html">Our Story & Values</a></li>
-                    <li><a href="reviews.html">Verified Reviews</a></li>
-                    <li><a href="faq.html">FAQ</a></li>
-                    <li><a href="contact.html">Contact Us</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-heading">Legal & Privacy</h4>
-                <ul class="footer-list">
-                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="terms-and-conditions.html">Terms and Conditions</a></li>
-                    <li><a href="shipping-delivery-policy.html">Shipping & Delivery Policy</a></li>
-                    <li><a href="cancellation-refund-policy.html">Cancellation & Refund Policy</a></li>
-                    <li><a href="contact.html">Data Subject Request</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-heading">Quality & Trust</h4>
-                <ul class="footer-list">
-                    <li>FSSAI Licence: <strong>PENDING</strong></li>
-                    <li>GSTIN: <strong>PENDING</strong></li>
-                    <li>Pure Cold-Pressed Mustard Oil</li>
-                    <li>100% Chemical Free</li>
-                </ul>
-            </div>
+        <!-- TOP ORGANIC WAVE DIVIDER (SEAMLESS 2PX OVERLAP, ZERO LINES) -->
+        <div class="footer-wave-wrap" aria-hidden="true">
+            <svg class="footer-wave-svg" viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path d="M0,35 C240,68 480,78 720,48 C960,18 1200,62 1440,30 L1440,80 L0,80 Z" fill="#0E381E"/>
+            </svg>
         </div>
-        <div class="footer-bottom">
-            <span>© 2026 Satvik Swaad. All rights reserved.</span>
-            <span>Crafted with ❤️ in India | Pure Taste of Tradition</span>
+
+        <!-- UNIFIED SEAMLESS FOOTER WRAP (NO HORIZONTAL SEAMS OR LINES) -->
+        <div class="footer-inner-wrap">
+            <!-- ANIMATED BACKGROUND BOTANICALS & FIREFLIES -->
+            <div class="footer-animated-bg" aria-hidden="true">
+                <!-- Left Botanicals -->
+                <div class="footer-branch branch-left-top">
+                    <svg viewBox="0 0 100 120" fill="none">
+                        <path d="M0 10 C30 25 50 60 45 110" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(18 20) rotate(15)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(30 40) rotate(-10)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(42 62) rotate(20)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(46 86) rotate(-15)"><path d="M0 0 C-14 -5 -26 -2 -32 8 C-22 11 -10 9 0 0 Z" fill="#1f522a" opacity="0.8"/></g>
+                        <g transform="translate(45 108) rotate(5)"><path d="M0 0 C10 -4 20 -2 25 6 C17 8 8 7 0 0 Z" fill="#2d6e3c" opacity="0.85"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-left-mid">
+                    <svg viewBox="0 0 90 90" fill="none">
+                        <path d="M0 45 C35 42 60 35 85 20" stroke="#1d552c" stroke-width="2" stroke-linecap="round"/>
+                        <g transform="translate(30 42) rotate(-15)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                        <g transform="translate(55 36) rotate(18)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#2f753f" opacity="0.9"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-left-bot">
+                    <svg viewBox="0 0 100 120" fill="none">
+                        <path d="M0 110 C25 90 45 60 50 10" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(16 95) rotate(-20)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(30 75) rotate(15)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(42 50) rotate(-18)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                    </svg>
+                </div>
+
+                <!-- Right Botanicals -->
+                <div class="footer-branch branch-right-top">
+                    <svg viewBox="0 0 100 120" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 10 C30 25 50 60 45 110" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(18 20) rotate(15)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(30 40) rotate(-10)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(42 62) rotate(20)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(46 86) rotate(-15)"><path d="M0 0 C-14 -5 -26 -2 -32 8 C-22 11 -10 9 0 0 Z" fill="#1f522a" opacity="0.8"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-right-mid">
+                    <svg viewBox="0 0 90 90" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 45 C35 42 60 35 85 20" stroke="#1d552c" stroke-width="2" stroke-linecap="round"/>
+                        <g transform="translate(30 42) rotate(-15)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                        <g transform="translate(55 36) rotate(18)"><path d="M0 0 C10 -5 22 -3 28 6 C18 9 7 7 0 0 Z" fill="#2f753f" opacity="0.9"/></g>
+                    </svg>
+                </div>
+                <div class="footer-branch branch-right-bot">
+                    <svg viewBox="0 0 100 120" fill="none" style="transform: scaleX(-1);">
+                        <path d="M0 110 C25 90 45 60 50 10" stroke="#1d552c" stroke-width="2.5" stroke-linecap="round"/>
+                        <g transform="translate(16 95) rotate(-20)"><path d="M0 0 C12 -6 24 -4 30 6 C20 10 8 8 0 0 Z" fill="#245d32" opacity="0.85"/></g>
+                        <g transform="translate(30 75) rotate(15)"><path d="M0 0 C-12 -6 -24 -4 -30 6 C-20 10 -8 8 0 0 Z" fill="#2d6e3c" opacity="0.9"/></g>
+                        <g transform="translate(42 50) rotate(-18)"><path d="M0 0 C14 -5 26 -2 32 8 C22 11 10 9 0 0 Z" fill="#286637" opacity="0.85"/></g>
+                    </svg>
+                </div>
+
+                <!-- Floating Fireflies / Golden Glow Particles -->
+                <span class="footer-firefly firefly-1"></span>
+                <span class="footer-firefly firefly-2"></span>
+                <span class="footer-firefly firefly-3"></span>
+                <span class="footer-firefly firefly-4"></span>
+                <span class="footer-firefly firefly-5"></span>
+                <span class="footer-firefly firefly-6"></span>
+            </div>
+
+                        <!-- TRUST ROW (DIRECTLY FLOWING WITH ZERO HORIZONTAL LINES) -->
+            <div class="footer-trust-row">
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🌿</span>
+                    <span class="footer-trust-text">100% Homemade</span>
+                </div>
+
+                <span class="footer-trust-sep" aria-hidden="true"></span>
+
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🪷</span>
+                    <span class="footer-trust-text">Indian Tradition</span>
+                </div>
+
+                <span class="footer-trust-sep" aria-hidden="true"></span>
+
+                <div class="footer-trust-item">
+                    <span class="footer-trust-icon">🤍</span>
+                    <span class="footer-trust-text">For a Healthier You</span>
+                </div>
+            </div>
+
+            <!-- 4-COLUMN CONTENT GRID -->
+            <div class="footer-container">
+                <!-- COL 1: BRAND -->
+                <div class="footer-col footer-col-brand">
+                    <div class="footer-brand-header">
+                        <img src="assets/logo.png" alt="Satvik Swaad" class="footer-brand-logo" />
+                        <div class="footer-brand-title-wrap">
+                            <span class="footer-brand-title">Satvik Swaad</span>
+                            <span class="footer-brand-tagline">— Maa ke swaad ki virasat —</span>
+                        </div>
+                    </div>
+                    <p class="footer-desc">Authentic homemade pickles, murabbas, and traditional sweets crafted with zero artificial preservatives in pure mustard oil and A2 cow ghee.</p>
+                    <div class="footer-flourish" aria-hidden="true">
+                        <svg width="130" height="18" viewBox="0 0 130 18" fill="none">
+                            <path d="M8 9 Q35 2 65 9 T122 9" stroke="#E5A93C" stroke-width="1.3" stroke-linecap="round"/>
+                            <circle cx="65" cy="9" r="2.5" fill="#E5A93C"/>
+                            <circle cx="45" cy="8" r="1.5" fill="#E5A93C"/>
+                            <circle cx="85" cy="8" r="1.5" fill="#E5A93C"/>
+                            <path d="M22 6 C28 4 32 7 28 11 C24 10 21 8 22 6 Z" fill="#E5A93C"/>
+                            <path d="M108 6 C102 4 98 7 102 11 C106 10 109 8 108 6 Z" fill="#E5A93C"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- COL 2: QUICK LINKS -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Quick Links</span>
+                    </h4>
+                    <ul class="footer-list">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Shop</a></li>
+                        <li><a href="our-story.html">Our Story</a></li>
+                        <li><a href="why-us.html">Health &amp; Purity</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- COL 3: HELP & LEGAL -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Help &amp; Legal</span>
+                    </h4>
+                    <ul class="footer-list">
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-and-conditions.html">Terms &amp; Conditions</a></li>
+                        <li><a href="shipping-delivery-policy.html">Shipping &amp; Delivery Policy</a></li>
+                        <li><a href="cancellation-refund-policy.html">Cancellation &amp; Refund Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- COL 4: QUALITY & TRUST -->
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Quality &amp; Trust</span>
+                    </h4>
+                    <ul class="footer-list footer-trust-list">
+                        <li>FSSAI Licence: <strong class="badge-pending">PENDING</strong></li>
+                        <li>GSTIN: <strong class="badge-pending">PENDING</strong></li>
+                        <li>Pure Cold-Pressed Mustard Oil</li>
+                        <li>100% Chemical Free</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- BOTTOM COPYRIGHT BAR -->
+            <div class="footer-bottom-wrap">
+                <div class="footer-bottom">
+                    <span class="footer-copy-left">© 2026 Satvik Swaad. All rights reserved.</span>
+                    <span class="footer-copy-right">Crafted with ❤️ in India | Pure Taste of Tradition</span>
+                </div>
+            </div>
         </div>
     </footer>
 

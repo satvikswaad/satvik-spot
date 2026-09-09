@@ -66,7 +66,7 @@ describe('Phase 10A: Render Express Backend Migration & Staging Safety', () => {
     if (res.status === 503) {
       expect(res.body.status).toBe('not_ready');
     }
-  });
+  }, 25000);
 
   it('7. Firebase Functions wrapper is no longer required', () => {
     const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8'));

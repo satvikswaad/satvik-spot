@@ -5,6 +5,7 @@ import { getAuthoritativeProductInTransaction } from '../products/productService
 import { generateGuestAccessSecret, hashGuestSecret } from '../guest/guestService';
 import { OutOfStockError, AppError, ValidationError, AuthorizationError } from '../errors/AppError';
 import { logger } from '../utils/logger';
+import { logInventoryChangeInTransaction } from '../inventory/inventoryService';
 
 export interface ProcessOrderParams {
   payload: CreateOrderPayload;
@@ -31,7 +32,9 @@ function computePayloadHash(payload: CreateOrderPayload): string {
     phone: payload.phone,
     address: payload.address,
     paymentMethod: payload.paymentMethod,
-    items: payload.items.map(i => ({ productId: i.productId, variantId: i.variantId || '', qty: i.qty })).sort((a, b) => (a.productId + a.variantId).localeCompare(b.productId + b.variantId))
+    items: payload.items
+      .map(orderItem => ({ productId: orderItem.productId, variantId: orderItem.variantId || '', qty: orderItem.qty }))
+      .sort((itemA, itemB) => (itemA.productId + itemA.variantId).localeCompare(itemB.productId + itemB.variantId))
   });
   return crypto.createHash('sha256').update(canonicalString).digest('hex');
 }
@@ -75,7 +78,14 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       lineTotal: number;
     }> = [];
 
-    const productUpdates: Array<{ docRef: admin.firestore.DocumentReference; newStock: number }> = [];
+    const productUpdates: Array<{
+      docRef: admin.firestore.DocumentReference;
+      productId: string;
+      variantId?: string;
+      previousStock: number;
+      newStock: number;
+      qty: number;
+    }> = [];
 
     for (const itemInput of payload.items) {
       const product = await getAuthoritativeProductInTransaction(transaction, itemInput.productId, itemInput.variantId);
@@ -105,7 +115,11 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       const productRef = db.collection('products').doc(product.id);
       productUpdates.push({
         docRef: productRef,
-        newStock: product.stock - itemInput.qty
+        productId: product.id,
+        variantId: itemInput.variantId,
+        previousStock: product.stock,
+        newStock: product.stock - itemInput.qty,
+        qty: itemInput.qty
       });
     }
 
@@ -126,11 +140,18 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
     const initialPaymentStatus = 'Unpaid';
     const initialOrderStatus = 'Pending';
 
+    const itemNames = verifiedOrderItems.map(item => item.name);
+    const itemSummary = verifiedOrderItems.map(item => `${item.name} × ${item.qty}`).join(', ');
+
     const orderDocData: Record<string, any> = {
       orderId,
       userId: userId || null,
       name: payload.name,
       phone: payload.phone,
+      customerName: payload.name,   // Point-in-time immutable snapshot
+      customerPhone: payload.phone, // Point-in-time immutable snapshot
+      itemNames,
+      itemSummary,
       address: payload.address,
       items: verifiedOrderItems,
       subtotal,
@@ -148,6 +169,16 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
 
     for (const update of productUpdates) {
       transaction.update(update.docRef, { stock: update.newStock });
+      logInventoryChangeInTransaction(transaction, {
+        productId: update.productId,
+        variantId: update.variantId,
+        previousStock: update.previousStock,
+        newStock: update.newStock,
+        delta: -update.qty,
+        reason: 'ORDER_DEDUCTION',
+        orderId,
+        actorUid: userId || 'GUEST'
+      });
     }
 
     // 7. Store Idempotency Record Bound to ownerId, action, and requestHash
@@ -175,6 +206,144 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       userId: userId || 'GUEST',
       total
     });
+
+    return resultPayload;
+  });
+}
+
+/**
+ * Creates an order for Razorpay online checkout flow.
+ * Status starts as PAYMENT_INITIATED. Stock is validated but NOT deducted
+ * until payment is confirmed via webhook/verification callback.
+ */
+export async function processCheckoutOrder(params: ProcessOrderParams): Promise<OrderCreationResult> {
+  const { payload, userId } = params;
+  const action = 'api/v1/payments/create-order';
+  const ownerId = userId || `GUEST_${payload.phone}`;
+  const requestHash = computePayloadHash(payload);
+
+  return db.runTransaction(async (transaction) => {
+    // 1. Idempotency Binding Check
+    const idempotencyRef = db.collection('idempotency').doc(payload.idempotencyKey);
+    const idempotencySnap = await transaction.get(idempotencyRef);
+
+    if (idempotencySnap.exists) {
+      const cached = idempotencySnap.data()!;
+
+      if (cached.ownerId !== ownerId || cached.action !== action || cached.requestHash !== requestHash) {
+        logger.warn('Idempotency key collision in checkout order', {
+          idempotencyKey: payload.idempotencyKey,
+          expectedHash: cached.requestHash,
+          actualHash: requestHash
+        });
+        throw new AppError('Idempotency key reused with a different order payload or identity', 409, 'IDEMPOTENCY_CONFLICT');
+      }
+
+      logger.info('Idempotency key match in checkout: returning cached result', { idempotencyKey: payload.idempotencyKey });
+      return cached.result as OrderCreationResult;
+    }
+
+    // 2. Fetch Authoritative Products & Validate Stock (no deduction yet)
+    let subtotal = 0;
+    const verifiedOrderItems: Array<{
+      productId: string;
+      variantId?: string;
+      name: string;
+      qty: number;
+      unitPrice: number;
+      lineTotal: number;
+    }> = [];
+
+    for (const itemInput of payload.items) {
+      const product = await getAuthoritativeProductInTransaction(transaction, itemInput.productId, itemInput.variantId);
+
+      if (product.stock < itemInput.qty) {
+        throw new OutOfStockError(
+          `Insufficient stock for '${product.name}'. Requested: ${itemInput.qty}, Available: ${product.stock}`
+        );
+      }
+
+      const lineTotal = product.price * itemInput.qty;
+      subtotal += lineTotal;
+
+      const itemName = product.selectedVariant
+        ? `${product.name} (${product.selectedVariant.label})`
+        : product.name;
+
+      verifiedOrderItems.push({
+        productId: product.id,
+        ...(itemInput.variantId ? { variantId: itemInput.variantId } : {}),
+        name: itemName,
+        qty: itemInput.qty,
+        unitPrice: product.price,
+        lineTotal
+      });
+    }
+
+    // 3. Server-Side Pricing
+    const shippingFee = subtotal >= 500 ? 0 : 50;
+    const total = subtotal + shippingFee;
+
+    // 4. Guest Secret
+    let guestSecretDetails;
+    if (!userId) {
+      guestSecretDetails = generateGuestAccessSecret();
+    }
+
+    // 5. Create Order with PAYMENT_INITIATED status
+    const newOrderRef = db.collection('orders').doc();
+    const orderId = newOrderRef.id;
+
+    const initialPaymentStatus = 'PAYMENT_INITIATED';
+    const initialOrderStatus = 'AwaitingPayment';
+
+    const itemNames = verifiedOrderItems.map(item => item.name);
+    const itemSummary = verifiedOrderItems.map(item => `${item.name} × ${item.qty}`).join(', ');
+
+    const orderDocData: Record<string, any> = {
+      orderId,
+      userId: userId || null,
+      name: payload.name,
+      phone: payload.phone,
+      customerName: payload.name,   // Point-in-time immutable snapshot
+      customerPhone: payload.phone, // Point-in-time immutable snapshot
+      itemNames,
+      itemSummary,
+      address: payload.address,
+      items: verifiedOrderItems,
+      subtotal,
+      shippingFee,
+      total,
+      paymentMethod: 'Online Payment',
+      paymentStatus: initialPaymentStatus,
+      status: initialOrderStatus,
+      guestSecretHash: guestSecretDetails ? guestSecretDetails.hashedSecret : null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    transaction.set(newOrderRef, orderDocData);
+
+    // 6. Store Idempotency Record
+    const resultPayload: OrderCreationResult = {
+      orderId,
+      total,
+      subtotal,
+      shippingFee,
+      status: initialOrderStatus,
+      paymentStatus: initialPaymentStatus,
+      ...(guestSecretDetails ? { guestAccessSecret: guestSecretDetails.plainSecret } : {}),
+      createdAt: new Date().toISOString()
+    };
+
+    transaction.set(idempotencyRef, {
+      ownerId,
+      action,
+      requestHash,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      result: resultPayload
+    });
+
+    logger.info('Checkout order created, awaiting payment', { orderId, userId: userId || 'GUEST', total });
 
     return resultPayload;
   });
@@ -209,15 +378,15 @@ export function generateWhatsAppPrefilledMessage(params: {
     timeStyle: 'short'
   });
 
-  const formattedItems = params.items.map((item, index) => {
-    let baseName = item.name;
-    let variantSize = item.variantLabel || 'Standard';
-    const match = item.name.match(/^(.*?)\s*\((.*?)\)$/);
+  const formattedItems = params.items.map((orderItem, itemIndex) => {
+    let baseName = orderItem.name;
+    let variantSize = orderItem.variantLabel || 'Standard';
+    const match = orderItem.name.match(/^(.*?)\s*\((.*?)\)$/);
     if (match) {
       baseName = match[1];
       variantSize = match[2];
     }
-    return `${index + 1}. ${baseName}\n   • Variant: ${variantSize}\n   • Qty: x${item.qty}\n   • Price: ₹${item.unitPrice}\n   • Total: ₹${item.lineTotal}`;
+    return `${itemIndex + 1}. ${baseName}\n   • Variant: ${variantSize}\n   • Qty: x${orderItem.qty}\n   • Price: ₹${orderItem.unitPrice}\n   • Total: ₹${orderItem.lineTotal}`;
   }).join('\n\n');
 
   const deliveryStr = params.shippingFee === 0 ? 'FREE 🎉' : `₹${params.shippingFee}`;
@@ -369,11 +538,18 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
     const initialPaymentStatus = 'PAYMENT_PENDING';
     const initialOrderStatus = 'AWAITING_PAYMENT';
 
+    const itemNames = verifiedOrderItems.map(item => item.name);
+    const itemSummary = verifiedOrderItems.map(item => `${item.name} × ${item.qty}`).join(', ');
+
     const orderDocData: Record<string, any> = {
       orderId,
       userId: userId || null,
       name: payload.name,
       phone: payload.phone,
+      customerName: payload.name,   // Point-in-time immutable snapshot
+      customerPhone: payload.phone, // Point-in-time immutable snapshot
+      itemNames,
+      itemSummary,
       email: payload.email || null,
       house: payload.house || null,
       street: payload.street || null,

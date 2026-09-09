@@ -9,12 +9,13 @@ import {
   deleteSavedAddress,
   getCustomerOrders
 } from './customerService';
-import { AuthorizationError } from '../errors/AppError';
+import { validateUpdateProfilePayload, validateAddressPayload } from '../validation/customerSchema';
+import { AuthenticationError, AuthorizationError } from '../errors/AppError';
 
 export async function handleGetCustomerProfile(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     if (!req.user || !req.user.uid) {
-      throw new AuthorizationError('Authentication required');
+      throw new AuthenticationError('Authentication required');
     }
     const profile = await getCustomerProfile(req.user.uid);
     return res.status(200).json({ success: true, data: profile });
@@ -26,9 +27,10 @@ export async function handleGetCustomerProfile(req: AuthenticatedRequest, res: R
 export async function handleUpdateCustomerProfile(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     if (!req.user || !req.user.uid) {
-      throw new AuthorizationError('Authentication required');
+      throw new AuthenticationError('Authentication required');
     }
-    const profile = await updateCustomerProfile(req.user.uid, req.body);
+    const validated = validateUpdateProfilePayload(req.body);
+    const profile = await updateCustomerProfile(req.user.uid, validated);
     return res.status(200).json({ success: true, data: profile });
   } catch (err) {
     return next(err);
@@ -38,7 +40,7 @@ export async function handleUpdateCustomerProfile(req: AuthenticatedRequest, res
 export async function handleGetSavedAddresses(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     if (!req.user || !req.user.uid) {
-      throw new AuthorizationError('Authentication required');
+      throw new AuthenticationError('Authentication required');
     }
     const addresses = await getSavedAddresses(req.user.uid);
     return res.status(200).json({ success: true, data: addresses });
@@ -50,9 +52,10 @@ export async function handleGetSavedAddresses(req: AuthenticatedRequest, res: Re
 export async function handleAddSavedAddress(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     if (!req.user || !req.user.uid) {
-      throw new AuthorizationError('Authentication required');
+      throw new AuthenticationError('Authentication required');
     }
-    const address = await addSavedAddress(req.user.uid, req.body);
+    const validated = validateAddressPayload(req.body, false);
+    const address = await addSavedAddress(req.user.uid, validated as any);
     return res.status(201).json({ success: true, data: address });
   } catch (err) {
     return next(err);
@@ -62,10 +65,11 @@ export async function handleAddSavedAddress(req: AuthenticatedRequest, res: Resp
 export async function handleUpdateSavedAddress(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     if (!req.user || !req.user.uid) {
-      throw new AuthorizationError('Authentication required');
+      throw new AuthenticationError('Authentication required');
     }
     const { addressId } = req.params;
-    const address = await updateSavedAddress(req.user.uid, addressId, req.body);
+    const validated = validateAddressPayload(req.body, true);
+    const address = await updateSavedAddress(req.user.uid, addressId, validated as any);
     return res.status(200).json({ success: true, data: address });
   } catch (err) {
     return next(err);
@@ -75,7 +79,7 @@ export async function handleUpdateSavedAddress(req: AuthenticatedRequest, res: R
 export async function handleDeleteSavedAddress(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     if (!req.user || !req.user.uid) {
-      throw new AuthorizationError('Authentication required');
+      throw new AuthenticationError('Authentication required');
     }
     const { addressId } = req.params;
     await deleteSavedAddress(req.user.uid, addressId);
@@ -88,7 +92,7 @@ export async function handleDeleteSavedAddress(req: AuthenticatedRequest, res: R
 export async function handleGetCustomerOrders(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     if (!req.user || !req.user.uid) {
-      throw new AuthorizationError('Authentication required');
+      throw new AuthenticationError('Authentication required');
     }
     const orders = await getCustomerOrders(req.user.uid);
     return res.status(200).json({ success: true, data: orders });

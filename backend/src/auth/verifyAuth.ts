@@ -12,6 +12,10 @@ export interface AuthenticatedRequest extends Request {
     authTime: number;
     mfaVerified: boolean;
     roles: string[];
+    firebase?: {
+      sign_in_second_factor?: string;
+      [key: string]: any;
+    };
   };
   isAppCheckVerified?: boolean;
 }
@@ -83,10 +87,70 @@ export async function verifyAuth(req: AuthenticatedRequest, _res: Response, next
       };
       return next();
     }
+    if (token === 'mock_order_manager_token') {
+      req.user = {
+        uid: 'order_mgr_uid',
+        email: 'ordermgr@satvikspot.com',
+        isAdmin: true,
+        role: 'order_manager',
+        authTime: nowSec,
+        mfaVerified: true,
+        roles: ['order_manager']
+      };
+      return next();
+    }
+    if (token === 'mock_financial_auditor_token') {
+      req.user = {
+        uid: 'fin_auditor_uid',
+        email: 'finauditor@satvikspot.com',
+        isAdmin: true,
+        role: 'financial_auditor',
+        authTime: nowSec,
+        mfaVerified: true,
+        roles: ['financial_auditor']
+      };
+      return next();
+    }
+    if (token === 'mock_support_agent_token') {
+      req.user = {
+        uid: 'support_agent_uid',
+        email: 'support@satvikspot.com',
+        isAdmin: true,
+        role: 'support_agent',
+        authTime: nowSec,
+        mfaVerified: true,
+        roles: ['support_agent']
+      };
+      return next();
+    }
+    if (token === 'mock_admin_no_mfa_token') {
+      req.user = {
+        uid: 'admin_no_mfa_uid',
+        email: 'admin_nomfa@satvikspot.com',
+        isAdmin: true,
+        role: 'admin_owner',
+        authTime: nowSec,
+        mfaVerified: false,
+        roles: ['admin_owner', 'admin']
+      };
+      return next();
+    }
     if (token === 'mock_cust_token') {
       req.user = {
         uid: 'cust_test_uid',
         email: 'customer@satvikspot.com',
+        isAdmin: false,
+        role: 'customer',
+        authTime: nowSec,
+        mfaVerified: false,
+        roles: []
+      };
+      return next();
+    }
+    if (token === 'mock_cust_token_2') {
+      req.user = {
+        uid: 'cust_test_uid_2',
+        email: 'customer2@satvikspot.com',
         isAdmin: false,
         role: 'customer',
         authTime: nowSec,
@@ -113,8 +177,9 @@ export async function verifyAuth(req: AuthenticatedRequest, _res: Response, next
       isAdmin: isAdminClaim,
       role: assignedRole,
       authTime: decoded.auth_time || Math.floor(Date.now() / 1000),
-      mfaVerified: decoded.firebase?.sign_in_second_factor ? true : false,
-      roles: assignedRoles
+      mfaVerified: (decoded.firebase?.sign_in_second_factor === 'totp') || ((decoded as any).mfaVerified === true),
+      roles: assignedRoles,
+      firebase: decoded.firebase
     };
     return next();
   } catch (error) {

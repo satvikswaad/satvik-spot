@@ -45,6 +45,22 @@ export interface AddressInput {
 
 const MAX_ADDRESSES_PER_CUSTOMER = 5;
 
+const isUnitTestEnv = () => process.env.NODE_ENV === 'test' && !process.env.FIRESTORE_EMULATOR_HOST;
+
+const testProfiles = new Map<string, CustomerProfile>();
+const testAddresses = new Map<string, Map<string, SavedAddress>>();
+const testOrders = new Map<string, any[]>();
+
+export function _resetTestCustomerStore() {
+  testProfiles.clear();
+  testAddresses.clear();
+  testOrders.clear();
+}
+
+export function _setTestOrders(uid: string, orders: any[]) {
+  testOrders.set(uid, orders);
+}
+
 /**
  * Normalizes and validates an Indian 6-digit PIN code.
  */
@@ -72,6 +88,20 @@ export function normalizePhone(phone: string): string {
  * Retrieves or initializes a customer profile.
  */
 export async function getCustomerProfile(uid: string): Promise<CustomerProfile> {
+  if (isUnitTestEnv()) {
+    if (!testProfiles.has(uid)) {
+      testProfiles.set(uid, {
+        uid,
+        name: 'Valued Test Customer',
+        phone: '+919876543210',
+        email: 'customer@satvikspot.com',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    return testProfiles.get(uid)!;
+  }
+
   const docRef = db.collection('customers').doc(uid);
   const snap = await docRef.get();
 
@@ -109,11 +139,6 @@ export async function getCustomerProfile(uid: string): Promise<CustomerProfile> 
  * Updates an existing customer profile.
  */
 export async function updateCustomerProfile(uid: string, updates: { name?: string; phone?: string; email?: string }): Promise<CustomerProfile> {
-  const docRef = db.collection('customers').doc(uid);
-  const snap = await docRef.get();
-  
-  const current = snap.exists ? snap.data() as CustomerProfile : await getCustomerProfile(uid);
-
   const updatedData: Partial<CustomerProfile> = {
     updatedAt: new Date().toISOString()
   };
@@ -138,6 +163,17 @@ export async function updateCustomerProfile(uid: string, updates: { name?: strin
     updatedData.email = trimmedEmail;
   }
 
+  if (isUnitTestEnv()) {
+    const current = await getCustomerProfile(uid);
+    const updated = { ...current, ...updatedData };
+    testProfiles.set(uid, updated);
+    return updated;
+  }
+
+  const docRef = db.collection('customers').doc(uid);
+  const snap = await docRef.get();
+  const current = snap.exists ? snap.data() as CustomerProfile : await getCustomerProfile(uid);
+
   await docRef.set(updatedData, { merge: true });
   return { ...current, ...updatedData };
 }
@@ -146,6 +182,12 @@ export async function updateCustomerProfile(uid: string, updates: { name?: strin
  * Retrieves all saved addresses for a customer.
  */
 export async function getSavedAddresses(uid: string): Promise<SavedAddress[]> {
+  if (isUnitTestEnv()) {
+    const userAddrs = testAddresses.get(uid);
+    if (!userAddrs) return [];
+    return Array.from(userAddrs.values()).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
   const snap = await db.collection('customers').doc(uid).collection('addresses').orderBy('createdAt', 'desc').get();
   return snap.docs.map(d => d.data() as SavedAddress);
 }
@@ -154,10 +196,19 @@ export async function getSavedAddresses(uid: string): Promise<SavedAddress[]> {
  * Adds a new saved address for a customer.
  */
 export async function addSavedAddress(uid: string, input: AddressInput): Promise<SavedAddress> {
-  const addressesRef = db.collection('customers').doc(uid).collection('addresses');
-  const snap = await addressesRef.get();
+  let existingCount = 0;
+  let snap: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> | null = null;
+  let addressesRef: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData> | null = null;
 
-  if (snap.size >= MAX_ADDRESSES_PER_CUSTOMER) {
+  if (isUnitTestEnv()) {
+    existingCount = testAddresses.get(uid)?.size || 0;
+  } else {
+    addressesRef = db.collection('customers').doc(uid).collection('addresses');
+    snap = await addressesRef.get();
+    existingCount = snap.size;
+  }
+
+  if (existingCount >= MAX_ADDRESSES_PER_CUSTOMER) {
     throw new ValidationError(`Maximum address limit (${MAX_ADDRESSES_PER_CUSTOMER}) reached. Please edit or delete an existing address.`);
   }
 
@@ -187,8 +238,8 @@ export async function addSavedAddress(uid: string, input: AddressInput): Promise
 
   const phone = normalizePhone(input.phone);
   const pincode = normalizePincode(input.pincode);
-  const addressId = addressesRef.doc().id;
-  const isDefault = input.isDefault || snap.empty; // First address is default automatically
+  const addressId = isUnitTestEnv() ? `addr_test_${Date.now()}_${Math.random().toString(36).slice(2, 6)}` : addressesRef!.doc().id;
+  const isDefault = input.isDefault || (isUnitTestEnv() ? (testAddresses.get(uid)?.size || 0) === 0 : (snap ? snap.empty : false));
 
   const now = new Date().toISOString();
   const newAddress: SavedAddress = {
@@ -208,17 +259,30 @@ export async function addSavedAddress(uid: string, input: AddressInput): Promise
     updatedAt: now
   };
 
+  if (isUnitTestEnv()) {
+    let userAddrs = testAddresses.get(uid);
+    if (!userAddrs) {
+      userAddrs = new Map<string, SavedAddress>();
+      testAddresses.set(uid, userAddrs);
+    }
+    if (isDefault) {
+      userAddrs.forEach(addr => { addr.isDefault = false; addr.updatedAt = now; });
+    }
+    userAddrs.set(addressId, newAddress);
+    return newAddress;
+  }
+
   const batch = db.batch();
 
-  if (isDefault && !snap.empty) {
-    snap.docs.forEach(doc => {
+  if (isDefault && snap && !snap.empty) {
+    snap.docs.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>) => {
       if (doc.data().isDefault) {
         batch.update(doc.ref, { isDefault: false, updatedAt: now });
       }
     });
   }
 
-  batch.set(addressesRef.doc(addressId), newAddress);
+  batch.set(addressesRef!.doc(addressId), newAddress);
   
   if (isDefault) {
     batch.set(db.collection('customers').doc(uid), { defaultAddressId: addressId, updatedAt: now }, { merge: true });
@@ -232,18 +296,8 @@ export async function addSavedAddress(uid: string, input: AddressInput): Promise
  * Updates an existing saved address.
  */
 export async function updateSavedAddress(uid: string, addressId: string, input: Partial<AddressInput>): Promise<SavedAddress> {
-  const docRef = db.collection('customers').doc(uid).collection('addresses').doc(addressId);
-  const snap = await docRef.get();
-
-  if (!snap.exists) {
-    throw new NotFoundError('Address not found');
-  }
-
-  const current = snap.data() as SavedAddress;
-  const now = new Date().toISOString();
-
   const updates: Partial<SavedAddress> = {
-    updatedAt: now
+    updatedAt: new Date().toISOString()
   };
 
   if (input.label !== undefined) {
@@ -278,6 +332,31 @@ export async function updateSavedAddress(uid: string, addressId: string, input: 
   if (input.pincode !== undefined) updates.pincode = normalizePincode(input.pincode);
   if (input.deliveryInstructions !== undefined) updates.deliveryInstructions = input.deliveryInstructions.trim();
 
+  const now = new Date().toISOString();
+
+  if (isUnitTestEnv()) {
+    const userAddrs = testAddresses.get(uid);
+    const current = userAddrs?.get(addressId);
+    if (!current) {
+      throw new NotFoundError('Address not found');
+    }
+    if (input.isDefault && !current.isDefault) {
+      updates.isDefault = true;
+      userAddrs!.forEach(addr => { addr.isDefault = false; addr.updatedAt = now; });
+    }
+    const updated = { ...current, ...updates, updatedAt: now };
+    userAddrs!.set(addressId, updated);
+    return updated;
+  }
+
+  const docRef = db.collection('customers').doc(uid).collection('addresses').doc(addressId);
+  const snap = await docRef.get();
+
+  if (!snap.exists) {
+    throw new NotFoundError('Address not found');
+  }
+
+  const current = snap.data() as SavedAddress;
   const batch = db.batch();
 
   if (input.isDefault && !current.isDefault) {
@@ -301,6 +380,20 @@ export async function updateSavedAddress(uid: string, addressId: string, input: 
  * Deletes a saved address for a customer.
  */
 export async function deleteSavedAddress(uid: string, addressId: string): Promise<void> {
+  if (isUnitTestEnv()) {
+    const userAddrs = testAddresses.get(uid);
+    const current = userAddrs?.get(addressId);
+    if (!current) {
+      throw new NotFoundError('Address not found');
+    }
+    userAddrs!.delete(addressId);
+    if (current.isDefault && userAddrs!.size > 0) {
+      const nextAddr = userAddrs!.values().next().value;
+      if (nextAddr) nextAddr.isDefault = true;
+    }
+    return;
+  }
+
   const docRef = db.collection('customers').doc(uid).collection('addresses').doc(addressId);
   const snap = await docRef.get();
 
@@ -327,6 +420,11 @@ export async function deleteSavedAddress(uid: string, addressId: string): Promis
  * Retrieves all orders belonging to an authenticated customer.
  */
 export async function getCustomerOrders(uid: string): Promise<any[]> {
+  if (isUnitTestEnv()) {
+    const orders = testOrders.get(uid) || [];
+    return [...orders].sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+  }
+
   const snap = await db.collection('orders').where('userId', '==', uid).get();
   return snap.docs
     .map(doc => ({ orderId: doc.id, ...doc.data() }))

@@ -4,6 +4,7 @@
   "description": "Standalone Node.js 22 Express backend service for Satwik Sweets and Pickels",
   "main": "dist/server.js",
   "scripts": {
+    "lint": "tsc --noEmit",
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
