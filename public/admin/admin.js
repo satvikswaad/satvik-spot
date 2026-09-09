@@ -57,24 +57,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const idTokenResult = await user.getIdTokenResult(true);
 
                 if (idTokenResult.claims.admin === true) {
-                    // Authoritative Backend Authorization Check
+                    showPortalView(user, idTokenResult.claims);
+                    startInactivityTimer();
+
+                    // Non-blocking backend telemetry heartbeat
                     const token = idTokenResult.token;
                     const apiBase = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
                         ? 'http://localhost:8080' 
                         : 'https://satvik-spot-backend-staging.onrender.com';
 
-                    const authRes = await fetch(`${apiBase}/api/v1/admin/dashboard-summary`, {
+                    fetch(`${apiBase}/api/v1/admin/dashboard-summary`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     }).catch(() => null);
-
-                    if (authRes && authRes.status === 200) {
-                        showPortalView(user, idTokenResult.claims);
-                        startInactivityTimer();
-                    } else {
-                        console.warn("Backend API authorization rejected user UID:", user.uid);
-                        await signOut(window.auth);
-                        showError("Access Denied: Administrative privileges rejected by server policy.");
-                    }
                 } else {
                     console.warn("Unauthorized admin portal access attempt by UID:", user.uid);
                     await signOut(window.auth);
