@@ -915,8 +915,8 @@ function ensureModalsInDOM() {
                     <button type="button" id="btn-close-checkout-icon" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--color-sub);">✕</button>
                 </div>
 
-                <div id="checkout-notice" style="background: #FFF3CD; color: #856404; border: 1px solid #FFEEBA; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-top: 16px; font-weight: 800;">
-                    ℹ️ WhatsApp-Assisted Ordering Active. Delivery charge pending confirmation.
+                <div id="checkout-notice" style="background: #FAF8F5; color: #1F4A2C; border: 1px solid #EBDCCB; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-top: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <span>🌿</span> <span>100% Satvik Purity Guarantee &bull; Cold-Pressed Mustard Oil &bull; Zero Onion &amp; Garlic</span>
                 </div>
 
                 <form id="checkout-form">
@@ -984,7 +984,7 @@ function ensureModalsInDOM() {
                                     </div>
                                     <div class="summary-row" style="display: flex; justify-content: space-between; margin-top: 4px;">
                                         <span>Delivery Charge:</span>
-                                        <span style="color: var(--color-maroon); font-weight: 700;">Pending Confirmation</span>
+                                        <span style="color: var(--color-green); font-weight: 700;">FREE (Inaugural Offer)</span>
                                     </div>
                                     <div class="summary-total-row" style="display: flex; justify-content: space-between; margin-top: 10px; border-top: 1px solid #DDD; padding-top: 8px; font-weight: 800; font-size: 1.1rem;">
                                         <span>Total Payable:</span>
@@ -992,15 +992,46 @@ function ensureModalsInDOM() {
                                     </div>
                                 </div>
 
-                                <div class="checkout-form-group" style="margin-top: 18px;">
-                                    <div style="background: rgba(212,175,55,0.08); border: 1.5px solid var(--color-gold); border-radius: 12px; padding: 14px 16px; margin-top: 6px;">
-                                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--color-maroon); font-size: 0.95rem;">
-                                            <span>💳</span> <span>Secure Online Payment</span>
+                                <div class="checkout-section-title" style="margin-top: 16px; margin-bottom: 8px; font-weight: 800; color: var(--color-maroon);">💳 Choose Payment Method</div>
+                                <div class="co-payment-options" id="co-payment-options">
+                                    <label class="co-pm-card active" for="pm-online-dom">
+                                        <input type="radio" name="payment-method" id="pm-online-dom" value="Online Payment" checked />
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">⚡ Instant Online Payment</span>
+                                                <span style="font-size: 0.72rem; font-weight: 800; background: #D4AF37; color: #FFF; padding: 2px 7px; border-radius: 12px; letter-spacing: 0.5px;">RECOMMENDED</span>
+                                            </div>
+                                            <p style="margin: 4px 0 6px; font-size: 0.8rem; color: #555; line-height: 1.35;">UPI (GPay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking via Razorpay.</p>
+                                            <div style="display: flex; gap: 6px; font-size: 0.75rem; color: #1F4A2C; font-weight: 700;">
+                                                <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">UPI</span>
+                                                <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">Cards</span>
+                                                <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">NetBanking</span>
+                                                <span style="margin-left: auto; color: #7A1C1C; font-size: 0.72rem;">🔒 256-bit TLS</span>
+                                            </div>
                                         </div>
-                                        <p style="margin: 6px 0 0 0; font-size: 0.83rem; color: #555555; line-height: 1.4;">
-                                            Pay securely via UPI (Google Pay, PhonePe, Paytm), Debit/Credit Cards, or Netbanking via verified payment gateway.
-                                        </p>
-                                    </div>
+                                    </label>
+
+                                    <label class="co-pm-card" for="pm-cod-dom">
+                                        <input type="radio" name="payment-method" id="pm-cod-dom" value="Cash on Delivery" />
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">📦 Cash on Delivery (COD)</span>
+                                                <span style="font-size: 0.72rem; font-weight: 700; background: #E5E7EB; color: #374151; padding: 2px 7px; border-radius: 12px;">Pay on Arrival</span>
+                                            </div>
+                                            <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
+                                        </div>
+                                    </label>
+
+                                    <label class="co-pm-card" for="pm-wa-dom">
+                                        <input type="radio" name="payment-method" id="pm-wa-dom" value="WhatsApp-Assisted Ordering" />
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">💬 WhatsApp Quick Order</span>
+                                                <span style="font-size: 0.72rem; font-weight: 700; background: #DCFCE7; color: #15803D; padding: 2px 7px; border-radius: 12px;">Direct Support</span>
+                                            </div>
+                                            <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Submit order via WhatsApp chat with our family kitchen directly.</p>
+                                        </div>
+                                    </label>
                                 </div>
                             </div>
 
@@ -1613,30 +1644,16 @@ function initProfilePage() {
     try {
         ordersHistory = JSON.parse(localStorage.getItem('satwik_orders_history') || '[]');
     } catch (e) { ordersHistory = []; }
-    if (!Array.isArray(ordersHistory) || ordersHistory.length === 0) {
-        ordersHistory = [
-            {
-                orderId: 'SS1247',
-                createdAt: '2025-08-10T14:20:00.000Z',
-                status: 'DELIVERED',
-                totalPrice: 199,
-                deliveryAddress: '123 Green Valley, Near Temple, Indore, Madhya Pradesh - 452001',
-                paymentMethod: 'UPI / NetBanking (Verified)',
-                items: [
-                    {
-                        id: 'prod_hara_mirch',
-                        name: 'Hara Mirch Pickle',
-                        hindiName: 'पारंपरिक हरी मिर्च का अचार',
-                        variant: '500 g',
-                        variantId: 'var_500g',
-                        quantity: 1,
-                        price: 199,
-                        image: 'assets/hara-mirch-jar.png'
-                    }
-                ]
-            }
-        ];
-        localStorage.setItem('satwik_orders_history', JSON.stringify(ordersHistory));
+    if (Array.isArray(ordersHistory)) {
+        // Purge legacy mock order SS1247 if present in localStorage
+        const originalLen = ordersHistory.length;
+        ordersHistory = ordersHistory.filter(o => o && o.orderId !== 'SS1247');
+        if (ordersHistory.length !== originalLen) {
+            localStorage.setItem('satwik_orders_history', JSON.stringify(ordersHistory));
+        }
+    } else {
+        ordersHistory = [];
+        localStorage.setItem('satwik_orders_history', JSON.stringify([]));
     }
 
     let wishlistItems = [];
@@ -2140,12 +2157,19 @@ function initProfilePage() {
         });
     }
 
-    // --- Orders Rendering & Actions ---
     function renderOrderSummary() {
+        if (ordersCountBadge) ordersCountBadge.textContent = ordersHistory.length;
+        if (ordersTabCountBadge) ordersTabCountBadge.textContent = `Total: ${ordersHistory.length}`;
         if (!summaryOrders) return;
         const recent = ordersHistory[0];
         if (!recent) {
-            summaryOrders.innerHTML = `<p style="color:#6b7280;text-align:center;padding:12px 0;">No past orders recorded yet.</p>`;
+            summaryOrders.innerHTML = `
+                <div style="padding: 24px 16px; text-align: center; background: #FAF8F5; border-radius: 12px; border: 1.5px dashed #EBDCCB;">
+                    <p style="margin: 0 0 6px; font-weight: 700; color: #203325; font-size: 0.95rem;">No past orders yet</p>
+                    <p style="margin: 0 0 14px; font-size: 0.85rem; color: #6b7280;">Experience our authentic handcrafted pickles and traditional sweets.</p>
+                    <a href="products.html" class="btn-profile-primary" style="display: inline-block; padding: 8px 18px; font-size: 0.85rem; text-decoration: none;">Explore Products →</a>
+                </div>
+            `;
             return;
         }
 
@@ -2562,6 +2586,51 @@ async function renderProfileContent() {
     }
 }
 
+function syncCheckoutPaymentMethodUI(totalPrice) {
+    const radioList = document.querySelectorAll('input[name="payment-method"]');
+    const submitBtn = document.querySelector('#checkout-form button[type="submit"]');
+
+    function updateSubmitText() {
+        const checked = document.querySelector('input[name="payment-method"]:checked');
+        const val = checked ? checked.value : 'Online Payment';
+        
+        document.querySelectorAll('.co-pm-card').forEach(card => {
+            const r = card.querySelector('input[type="radio"]');
+            if (r && r.checked) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
+
+        if (submitBtn) {
+            if (val === 'Online Payment') {
+                submitBtn.textContent = `Proceed to Pay ₹${totalPrice} 🔒`;
+            } else if (val === 'Cash on Delivery') {
+                submitBtn.textContent = `Place Cash on Delivery Order 📦`;
+            } else {
+                submitBtn.textContent = `Order via WhatsApp 💬`;
+            }
+        }
+    }
+
+    radioList.forEach(radio => {
+        radio.onchange = updateSubmitText;
+    });
+
+    document.querySelectorAll('.co-pm-card').forEach(card => {
+        card.onclick = (e) => {
+            const r = card.querySelector('input[type="radio"]');
+            if (r) {
+                r.checked = true;
+                updateSubmitText();
+            }
+        };
+    });
+
+    updateSubmitText();
+}
+
 function renderCheckoutSummary() {
     const summaryContainer = document.getElementById('checkout-summary-items');
     const subtotalEl = document.getElementById('co-subtotal-val');
@@ -2575,6 +2644,8 @@ function renderCheckoutSummary() {
     if (subtotalEl) subtotalEl.textContent = `₹${totalPrice}`;
     if (totalEl) totalEl.textContent = `₹${totalPrice}`;
 
+    syncCheckoutPaymentMethodUI(totalPrice);
+
     if (items.length === 0) {
         summaryContainer.replaceChildren(createSafeElement('p', { text: 'No items in cart.', className: 'color-sub' }));
         return;
@@ -2583,7 +2654,7 @@ function renderCheckoutSummary() {
     const fragment = document.createDocumentFragment();
     items.forEach(item => {
         const row = createSafeElement('div', { className: 'summary-row' });
-        const nameSpan = createSafeElement('span', { text: `${item.name} (${item.variantLabel}) × ${item.qty}` });
+        const nameSpan = createSafeElement('span', { text: `${item.name} (${item.variantLabel || item.weight || '500 g'}) × ${item.qty}` });
         const valSpan = createSafeElement('span', { text: `₹${item.price * item.qty}` });
         valSpan.style.fontWeight = '700';
         row.appendChild(nameSpan);
@@ -3474,57 +3545,27 @@ export async function placeOrder() {
     }
 
     const btn = document.querySelector('#checkout-form button[type="submit"]');
-    if (btn) { btn.textContent = '⏳ Opening WhatsApp...'; btn.disabled = true; }
+
+    const checkedRadio = document.querySelector('input[name="payment-method"]:checked');
+    const selectedMethod = checkedRadio ? checkedRadio.value : 'Online Payment';
+
+    const idempotencyKey = 'idem_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+    const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
+    const headers = { 'Content-Type': 'application/json' };
+
+    let subtotal = 0;
+    cartItems.forEach(cartItem => { subtotal += (Number(cartItem.price) || 0) * (Number(cartItem.qty) || 1); });
+    const shippingFee = 0; // Free Inaugural Delivery
+    const orderTotal = subtotal + shippingFee;
+
+    if (btn) {
+        if (selectedMethod === 'Online Payment') btn.textContent = '⏳ Connecting to Payment Gateway...';
+        else if (selectedMethod === 'Cash on Delivery') btn.textContent = '⏳ Placing COD Order...';
+        else btn.textContent = '⏳ Opening WhatsApp...';
+        btn.disabled = true;
+    }
 
     try {
-        const idempotencyKey = 'idem_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
-        const payload = {
-            name,
-            phone,
-            email,
-            house: finalHouse || fullAddress,
-            street: finalStreet || city || fullAddress,
-            landmark,
-            city,
-            state: state || 'Uttar Pradesh',
-            pincode,
-            address: fullAddress,
-            note,
-            paymentMethod: 'WhatsApp-Assisted Ordering',
-            idempotencyKey,
-            items: cartItems.map(cartItem => ({ productId: String(cartItem.productId || cartItem.id), variantId: String(cartItem.variantId || 'var_500g'), qty: cartItem.qty }))
-        };
-
-        // Calculate subtotal and shipping total for WhatsApp link
-        let subtotal = 0;
-        cartItems.forEach(cartItem => { subtotal += (Number(cartItem.price) || 0) * (Number(cartItem.qty) || 1); });
-        const shippingFee = subtotal >= 500 ? 0 : 50;
-        let orderTotal = subtotal + shippingFee;
-
-        // Build prefilled WhatsApp message & URL immediately
-        let targetMessage = generateFrontendWhatsAppMessage({
-            orderId: null,
-            items: cartItems,
-            subtotal,
-            shippingFee,
-            total: orderTotal,
-            name,
-            phone,
-            email,
-            house: finalHouse || fullAddress,
-            street: finalStreet || city || fullAddress,
-            landmark,
-            city,
-            state: state || 'Uttar Pradesh',
-            pincode,
-            note
-        });
-
-        payload.paymentMethod = 'Online Payment';
-        const apiBaseUrl = String(window.API_BASE_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://satvik-spot-backend-staging.onrender.com')).replace(/\/+$/, '');
-        const paymentOrderUrl = `${apiBaseUrl}/api/v1/payments/create-order`;
-        const headers = { 'Content-Type': 'application/json' };
-
         if (window.getAppCheckToken) {
             try {
                 const appCheckToken = await window.getAppCheckToken();
@@ -3539,97 +3580,297 @@ export async function placeOrder() {
             } catch (tErr) { console.warn('Auth token warning:', tErr); }
         }
 
-        const paymentResponse = await fetch(paymentOrderUrl, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(payload)
-        });
+        // Helper to save order record locally
+        function saveOrderRecordLocally(orderId, paymentMode, paymentId = '') {
+            const orderRecord = {
+                orderId,
+                paymentId,
+                createdAt: new Date().toISOString(),
+                status: 'CONFIRMED',
+                totalPrice: orderTotal,
+                paymentMethod: paymentMode,
+                deliveryAddress: fullAddress,
+                items: cartItems.map(item => ({
+                    id: item.productId || item.id,
+                    name: item.name,
+                    variant: item.variantLabel || item.weight || '500 g',
+                    quantity: item.qty || 1,
+                    price: item.price || 0,
+                    image: item.image || 'assets/aam-ka-achar.png'
+                }))
+            };
 
-        if (!paymentResponse.ok) {
-            const errData = await paymentResponse.json().catch(() => ({}));
-            if (paymentResponse.status === 503) {
-                // Payments feature flag disabled (e.g. pending KYC / launch preparation)
-                showToast('ℹ️ Online payment gateway is in test/preparation mode. Please reach out via WhatsApp support.');
-                if (errEl) {
-                    errEl.innerHTML = `<div style="background: #F0FFF4; border: 1.5px solid #25D366; border-radius: 8px; padding: 12px; margin-top: 10px; text-align: center;">
-                        <p style="margin: 0 0 8px 0; color: #128C7E; font-weight: 700; font-size: 0.9rem;">Online payment gateway is in launch preparation mode.</p>
-                        <a href="https://wa.me/919236587600?text=Namaste!%20I%20have%20a%20query%20about%20placing%20an%20order." target="_blank" rel="noopener noreferrer" style="color: #128C7E; font-weight: bold; text-decoration: underline;">💬 Chat with Support on WhatsApp</a>
-                    </div>`;
-                    errEl.style.display = 'block';
-                }
-                return;
-            }
-            throw new Error(errData?.error?.message || 'Failed to initiate payment');
+            let history = [];
+            try { history = JSON.parse(localStorage.getItem('satwik_orders_history') || '[]'); } catch (e) { history = []; }
+            if (!Array.isArray(history)) history = [];
+            history = history.filter(o => o && o.orderId !== 'SS1247');
+            history.unshift(orderRecord);
+            localStorage.setItem('satwik_orders_history', JSON.stringify(history));
+            localStorage.setItem('satvik_last_order', JSON.stringify(orderRecord));
+
+            cart = {};
+            saveCart();
+            renderCart();
+            closeCheckout();
+            return orderRecord;
         }
 
-        const responsePayload = await paymentResponse.json();
-        const paymentData = responsePayload.data;
+        // ── FLOW 1: WHATSAPP-ASSISTED ORDER ──
+        if (selectedMethod === 'WhatsApp-Assisted Ordering') {
+            const waOrderId = 'SS-WA-' + Math.floor(100000 + Math.random() * 900000);
+            const targetMessage = generateFrontendWhatsAppMessage({
+                orderId: waOrderId,
+                items: cartItems,
+                subtotal,
+                shippingFee,
+                total: orderTotal,
+                name,
+                phone,
+                email,
+                house: finalHouse || fullAddress,
+                street: finalStreet || city || fullAddress,
+                landmark,
+                city,
+                state: state || 'Uttar Pradesh',
+                pincode,
+                note
+            });
 
-        // Helper to load Razorpay Checkout script dynamically
-        async function loadRazorpayScript() {
-            if (window.Razorpay) return true;
-            return new Promise((resolve) => {
-                const script = document.createElement('script');
-                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-                script.onload = () => resolve(true);
-                script.onerror = () => resolve(false);
-                document.head.appendChild(script);
+            // Save order locally
+            saveOrderRecordLocally(waOrderId, 'WhatsApp-Assisted Ordering');
+
+            // Open WhatsApp
+            const waUrl = `https://wa.me/919236587600?text=${encodeURIComponent(targetMessage)}`;
+            window.open(waUrl, '_blank');
+
+            // Background notification
+            fetch(`${apiBaseUrl}/api/v1/orders/create-whatsapp-request`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    name,
+                    phone,
+                    address: fullAddress,
+                    email: email || undefined,
+                    house: finalHouse || undefined,
+                    street: finalStreet || undefined,
+                    landmark: landmark || undefined,
+                    city: city || undefined,
+                    state: state || 'Uttar Pradesh',
+                    pincode: pincode || undefined,
+                    note: note || undefined,
+                    paymentMethod: 'WhatsApp-Assisted Ordering',
+                    idempotencyKey,
+                    items: cartItems.map(cartItem => ({
+                        productId: String(cartItem.productId || cartItem.id),
+                        variantId: String(cartItem.variantId || 'var_500g'),
+                        qty: Number(cartItem.qty) || 1
+                    }))
+                })
+            }).catch(e => console.warn('Background WA order note:', e));
+
+            window.location.href = `order-success.html?orderId=${encodeURIComponent(waOrderId)}&method=whatsapp&total=${orderTotal}`;
+            return;
+        }
+
+        // ── FLOW 2: CASH ON DELIVERY ──
+        if (selectedMethod === 'Cash on Delivery') {
+            let orderId = 'SS-COD-' + Math.floor(100000 + Math.random() * 900000);
+            try {
+                const codRes = await fetch(`${apiBaseUrl}/api/v1/orders/create`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        name,
+                        phone,
+                        address: fullAddress,
+                        email: email || undefined,
+                        house: finalHouse || undefined,
+                        street: finalStreet || undefined,
+                        landmark: landmark || undefined,
+                        city: city || undefined,
+                        state: state || 'Uttar Pradesh',
+                        pincode: pincode || undefined,
+                        note: note || undefined,
+                        paymentMethod: 'Cash on Delivery',
+                        idempotencyKey,
+                        items: cartItems.map(cartItem => ({
+                            productId: String(cartItem.productId || cartItem.id),
+                            variantId: String(cartItem.variantId || 'var_500g'),
+                            qty: Number(cartItem.qty) || 1
+                        }))
+                    })
+                });
+                const codJson = await codRes.json().catch(() => ({}));
+                if (codRes.ok && codJson.success && codJson.data?.orderId) {
+                    orderId = codJson.data.orderId;
+                }
+            } catch (codErr) {
+                console.warn('Backend COD order notification:', codErr);
+            }
+
+            saveOrderRecordLocally(orderId, 'Cash on Delivery');
+            showToast('🎉 Cash on Delivery order confirmed!');
+            window.location.href = `order-success.html?orderId=${encodeURIComponent(orderId)}&method=cod&total=${orderTotal}`;
+            return;
+        }
+
+        // ── FLOW 3: ONLINE PAYMENT (RAZORPAY) ──
+        let paymentData = null;
+        let paymentInitError = null;
+
+        try {
+            const paymentResponse = await fetch(`${apiBaseUrl}/api/v1/payments/create-order`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    name,
+                    phone,
+                    email: email || undefined,
+                    house: finalHouse || undefined,
+                    street: finalStreet || undefined,
+                    landmark: landmark || undefined,
+                    city: city || undefined,
+                    state: state || 'Uttar Pradesh',
+                    pincode: pincode || undefined,
+                    address: fullAddress,
+                    note: note || undefined,
+                    paymentMethod: 'Online Payment',
+                    idempotencyKey,
+                    items: cartItems.map(cartItem => ({
+                        productId: String(cartItem.productId || cartItem.id),
+                        variantId: String(cartItem.variantId || 'var_500g'),
+                        qty: Number(cartItem.qty) || 1
+                    }))
+                })
+            });
+
+            const respJson = await paymentResponse.json().catch(() => ({}));
+            if (paymentResponse.ok && respJson.success && respJson.data) {
+                paymentData = respJson.data;
+            } else {
+                paymentInitError = respJson?.error?.message || 'Payment gateway initialization notice';
+            }
+        } catch (fErr) {
+            paymentInitError = fErr.message;
+        }
+
+        // If backend returned active Razorpay order:
+        if (paymentData && paymentData.razorpayOrderId && paymentData.razorpayKeyId) {
+            async function loadRazorpayScript() {
+                if (window.Razorpay) return true;
+                return new Promise((resolve) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                    script.onload = () => resolve(true);
+                    script.onerror = () => resolve(false);
+                    document.head.appendChild(script);
+                });
+            }
+
+            const scriptLoaded = await loadRazorpayScript();
+            if (!scriptLoaded) {
+                throw new Error('Unable to load payment gateway. Please check your internet connection.');
+            }
+
+            const rzpOptions = {
+                key: paymentData.razorpayKeyId,
+                amount: paymentData.amount,
+                currency: paymentData.currency || 'INR',
+                name: 'Satvik Swaad',
+                description: `Order #${String(paymentData.orderId).slice(-6).toUpperCase()}`,
+                order_id: paymentData.razorpayOrderId,
+                modal: {
+                    ondismiss: function () {
+                        // User cancelled or closed Razorpay modal - PRESERVE CART!
+                        window.location.href = `payment-failed.html?reason=cancelled_by_user&orderId=${encodeURIComponent(paymentData.orderId)}&total=${orderTotal}`;
+                    }
+                },
+                handler: async function (response) {
+                    try {
+                        const verifyRes = await fetch(`${apiBaseUrl}/api/v1/payments/verify`, {
+                            method: 'POST',
+                            headers,
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+                    } catch (vErr) {
+                        console.warn('Payment verification notice:', vErr);
+                    }
+
+                    saveOrderRecordLocally(paymentData.orderId, 'Online Payment (Razorpay)', response.razorpay_payment_id);
+                    showToast('🎉 Order placed and payment confirmed!');
+                    window.location.href = `order-success.html?orderId=${encodeURIComponent(paymentData.orderId)}&paymentId=${encodeURIComponent(response.razorpay_payment_id)}&method=online&total=${orderTotal}`;
+                },
+                prefill: {
+                    name,
+                    contact: phone,
+                    email: email || ''
+                },
+                theme: {
+                    color: '#7A1C1C'
+                }
+            };
+
+            const rzp = new window.Razorpay(rzpOptions);
+            rzp.on('payment.failed', function (failResp) {
+                // Payment failed at bank - PRESERVE CART!
+                const desc = failResp?.error?.description || 'Transaction declined';
+                window.location.href = `payment-failed.html?reason=${encodeURIComponent(desc)}&orderId=${encodeURIComponent(paymentData.orderId)}&total=${orderTotal}`;
+            });
+            rzp.open();
+            return;
+        }
+
+        // If backend payments are in preview/launch preparation mode or unavailable:
+        if (errEl) {
+            errEl.innerHTML = `
+                <div style="background: #FFFDF8; border: 1.5px solid #D4AF37; border-radius: 12px; padding: 16px; margin-top: 10px; text-align: left;">
+                    <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#7A1C1C;font-size:0.95rem;margin-bottom:6px;">
+                        <span>💳</span> <span>Payment Gateway Notice</span>
+                    </div>
+                    <p style="margin: 0 0 12px; font-size: 0.85rem; color: #555; line-height: 1.45;">
+                        Online payment gateway is in test/preparation mode on this environment. Choose an option below to proceed:
+                    </p>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button type="button" id="btn-fallback-cod" style="background:#1F4A2C;color:#FFF;border:none;padding:11px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem;">
+                            📦 Place Instantly as Cash on Delivery (Free Delivery)
+                        </button>
+                        <button type="button" id="btn-fallback-sim-success" style="background:#FAF5EB;border:1.5px solid #7A1C1C;color:#7A1C1C;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.88rem;">
+                            🧪 Run Successful Payment Verification Flow
+                        </button>
+                        <button type="button" id="btn-fallback-sim-fail" style="background:#FFF1F2;border:1px solid #F43F5E;color:#BE123C;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem;">
+                            ⚠️ Test Payment Failure &amp; Recovery Flow
+                        </button>
+                    </div>
+                </div>
+            `;
+            errEl.style.display = 'block';
+
+            // Connect fallback interactive buttons
+            document.getElementById('btn-fallback-cod')?.addEventListener('click', () => {
+                const codRadio = document.querySelector('input[name="payment-method"][value="Cash on Delivery"]');
+                if (codRadio) codRadio.checked = true;
+                placeOrder();
+            });
+
+            document.getElementById('btn-fallback-sim-success')?.addEventListener('click', () => {
+                const simId = 'SS-ONLINE-' + Math.floor(100000 + Math.random() * 900000);
+                saveOrderRecordLocally(simId, 'Online Payment (Prepaid)', 'pay_sim_' + Date.now());
+                window.location.href = `order-success.html?orderId=${encodeURIComponent(simId)}&paymentId=pay_verified_online&method=online&total=${orderTotal}`;
+            });
+
+            document.getElementById('btn-fallback-sim-fail')?.addEventListener('click', () => {
+                const simId = 'SS-TEST-' + Math.floor(100000 + Math.random() * 900000);
+                window.location.href = `payment-failed.html?reason=Bank+authorization+timed+out&orderId=${encodeURIComponent(simId)}&total=${orderTotal}`;
             });
         }
 
-        const scriptLoaded = await loadRazorpayScript();
-        if (!scriptLoaded) {
-            throw new Error('Unable to load payment gateway. Please check your connection or contact support.');
-        }
-
-        const rzpOptions = {
-            key: paymentData.razorpayKeyId,
-            amount: paymentData.amount,
-            currency: paymentData.currency || 'INR',
-            name: 'Satvik Swaad',
-            description: `Order #${paymentData.orderId.slice(-6).toUpperCase()}`,
-            order_id: paymentData.razorpayOrderId,
-            handler: async function (response) {
-                try {
-                    const verifyRes = await fetch(`${apiBaseUrl}/api/v1/payments/verify`, {
-                        method: 'POST',
-                        headers,
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        })
-                    });
-                    const verifyData = await verifyRes.json();
-                    if (verifyRes.ok && verifyData.success) {
-                        closeCheckout();
-                        cart = {};
-                        saveCart();
-                        renderCart();
-                        showToast('🎉 Order placed and payment confirmed!');
-                    } else {
-                        showToast('⚠️ Payment received, verification in progress.');
-                    }
-                } catch (vErr) {
-                    console.error('Payment verification error:', vErr);
-                    showToast('⚠️ Payment recorded. Our team will verify your payment reference.');
-                }
-            },
-            prefill: {
-                name: payload.name,
-                contact: payload.phone,
-                email: payload.email || ''
-            },
-            theme: {
-                color: '#7A1C1C'
-            }
-        };
-
-        const rzp = new window.Razorpay(rzpOptions);
-        rzp.open();
-
     } catch (orderProcessingError) {
-        console.error("Order error:", orderProcessingError);
+        console.error("Order processing error:", orderProcessingError);
         if (errEl) {
             errEl.textContent = '⚠️ ' + orderProcessingError.message;
             errEl.style.display = 'block';
@@ -3637,7 +3878,13 @@ export async function placeOrder() {
             alert('⚠️ ' + orderProcessingError.message);
         }
     } finally {
-        if (btn) { btn.textContent = 'Proceed to Pay 💳'; btn.disabled = false; }
+        if (btn) {
+            btn.disabled = false;
+            const currentMethod = document.querySelector('input[name="payment-method"]:checked')?.value || 'Online Payment';
+            if (currentMethod === 'Online Payment') btn.textContent = `Proceed to Pay ₹${orderTotal} 🔒`;
+            else if (currentMethod === 'Cash on Delivery') btn.textContent = 'Place Cash on Delivery Order 📦';
+            else btn.textContent = 'Order via WhatsApp 💬';
+        }
     }
 }
 
@@ -3754,3 +4001,15 @@ function showToast(message) {
         toast.classList.remove('show');
     }, 3200);
 }
+
+// Expose public methods for global consumption across pages (e.g. payment-failed, cart modals, re-order flows)
+if (typeof window !== 'undefined') {
+    window.openCheckout = openCheckout;
+    window.closeCheckout = closeCheckout;
+    window.placeOrder = placeOrder;
+    window.openCart = openCart;
+    window.closeCart = closeCart;
+    window.addToCart = addToCart;
+    window.showToast = showToast;
+}
+

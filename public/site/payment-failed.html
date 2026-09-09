@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Payment Incomplete – Satvik Swaad</title>
+    <meta name="description" content="Payment could not be completed. Your items are safe in your cart. Retry or choose Cash on Delivery." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=DM+Serif+Display&family=Playfair+Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+
+    <!-- TOP ANNOUNCEMENT TICKER -->
+    <div class="announcement-ticker" aria-label="Satvik Swaad announcements">
+        <div class="announcement-track">
+            <div class="announcement-group">
+                <span>✨ 100% HOMEMADE PICKLES & PRESERVES</span>
+                <span>☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL</span>
+                <span>👵 ANCESTRAL FAMILY RECIPES</span>
+                <span>🌿 ZERO ARTIFICIAL PRESERVATIVES</span>
+                <span>🪔 PURE TRADITIONAL DESI TASTE</span>
+                <span>📦 FREE SHIPPING ON ORDERS ABOVE ₹500</span>
+            </div>
+            <div class="announcement-group" aria-hidden="true">
+                <span>✨ 100% HOMEMADE PICKLES & PRESERVES</span>
+                <span>☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL</span>
+                <span>👵 ANCESTRAL FAMILY RECIPES</span>
+                <span>🌿 ZERO ARTIFICIAL PRESERVATIVES</span>
+                <span>🪔 PURE TRADITIONAL DESI TASTE</span>
+                <span>📦 FREE SHIPPING ON ORDERS ABOVE ₹500</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SITE HEADER -->
+    <header class="site-header" role="banner">
+        <div class="header-container ref-header">
+            <a href="index.html" class="logo-group" aria-label="Satvik Swaad home">
+                <svg class="logo-curve-svg" viewBox="0 0 140 38" fill="none" aria-hidden="true">
+                    <path d="M 0 0 C 18 0, 26 4, 32 12 C 42 26, 55 35, 70 35 C 85 35, 98 26, 108 12 C 114 4, 122 0, 140 0 Z" fill="#FAF5EB" />
+                </svg>
+                <span class="ref-logo-ring">
+                    <img src="assets/satvik_logo_round.png" alt="Satvik Swaad" class="ref-logo-img" />
+                </span>
+            </a>
+            <nav class="main-nav ref-nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Shop</a>
+                <a href="our-story.html" class="nav-link">Our Story</a>
+                <a href="why-us.html" class="nav-link">Health & Purity</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+            <div class="header-right-actions">
+                <button type="button" class="btn-lang-toggle" id="btn-lang-toggle" style="display:none;">हिन्दी</button>
+                <div class="ref-search-bar">
+                    <input type="search" placeholder="Search for pickles, sweets..." class="ref-search-input" />
+                    <svg class="ref-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+                <a href="profile.html" id="btn-open-profile" class="ref-icon-btn" aria-label="My profile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </a>
+                <button type="button" id="btn-open-cart" class="ref-icon-btn" aria-label="Open cart">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="ref-cart-badge" id="cart-count-badge">0</span>
+                </button>
+                <button type="button" id="mobile-menu-btn" class="ref-mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
+            </div>
+        </div>
+
+        <div class="header-wave-wrap" aria-hidden="true">
+            <svg class="header-wave-svg" viewBox="0 0 1440 16" preserveAspectRatio="none">
+                <path d="M0,0 L1440,0 L1440,6 C1380,10 1320,4 1260,8 C1200,12 1140,5 1080,7 C1020,10 960,4 900,8 C840,11 780,5 720,7 C660,10 600,4 540,8 C480,12 420,5 360,7 C300,10 240,4 180,8 C120,12 60,5 0,7 Z" fill="#FAF5EB"/>
+            </svg>
+        </div>
+    </header>
+
+    <!-- PAYMENT FAILED MAIN CONTENT -->
+    <main id="main-content" class="failed-page-container">
+        <div class="failed-card">
+            
+            <!-- Warning Badge -->
+            <div class="failed-icon-badge">
+                <div class="failed-icon-circle">⚠️</div>
+            </div>
+
+            <div class="failed-status-pill">भुगतान अधूरा रहा &bull; Payment Incomplete</div>
+            <h1 class="failed-title">Payment Could Not Be Completed</h1>
+            
+            <!-- Reassurance Notice -->
+            <div class="failed-safe-banner">
+                <div class="safe-icon">🛡️</div>
+                <div class="safe-content">
+                    <strong>Your money is completely safe!</strong>
+                    <p>If any money was debited from your account, your bank will automatically reverse it within 3-5 business days. Your cart has been safely preserved so you don't have to choose your items again.</p>
+                </div>
+            </div>
+
+            <!-- Failure Details Box -->
+            <div class="failed-details-box">
+                <div class="meta-item">
+                    <span class="meta-label">Reference Order ID</span>
+                    <span class="meta-value" id="fail-order-id">Loading...</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Order Amount</span>
+                    <span class="meta-value" id="fail-order-amount">₹0</span>
+                </div>
+                <div class="meta-item" style="grid-column: 1 / -1;">
+                    <span class="meta-label">Reported Reason</span>
+                    <span class="meta-value reason-text" id="fail-reason-text">Transaction was cancelled or declined by your payment provider.</span>
+                </div>
+            </div>
+
+            <!-- Primary Recovery Buttons -->
+            <div class="failed-actions-group">
+                <button type="button" id="btn-retry-payment" class="btn-retry-primary">
+                    <span>🔄 Retry Online Payment</span>
+                </button>
+
+                <button type="button" id="btn-convert-cod" class="btn-cod-alternative">
+                    <span>📦 Switch to Cash on Delivery (Pay at Doorstep)</span>
+                </button>
+
+                <a href="#" id="btn-fail-wa-help" class="btn-wa-help" target="_blank" rel="noopener noreferrer">
+                    <span>💬 Need Help? Chat with Support on WhatsApp</span>
+                </a>
+
+                <a href="products.html" class="btn-back-shop">
+                    <span>🛍️ Return to Shop & Cart</span>
+                </a>
+            </div>
+
+            <!-- FAQ & Help Accordion -->
+            <div class="failed-faq-box">
+                <h3 class="failed-faq-title">❓ Common Questions</h3>
+                <div class="failed-faq-item">
+                    <strong>Why did my transaction fail?</strong>
+                    <p>Transactions can fail due to bank server timeouts, incorrect OTP, temporary card limits, or cancelled authorization requests.</p>
+                </div>
+                <div class="failed-faq-item">
+                    <strong>Can I pay using Cash on Delivery instead?</strong>
+                    <p>Yes! Simply click the "Switch to Cash on Delivery" button above. We will confirm your address and dispatch your order without requiring any prepayment.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">
+                        <span class="footer-brand-title">Satvik Swaad</span>
+                        <span class="footer-brand-hindi">सात्विक स्वाद - शुद्धता ही पहचान</span>
+                    </div>
+                    <p class="footer-desc">
+                        Handcrafted with pure cold-pressed mustard oil, sun-dried spices, and zero chemicals. Bringing the divine authentic taste of grandmother's kitchen to your dining table.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Quick Links</span>
+                    </h4>
+                    <ul class="footer-list">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">All 15 Products</a></li>
+                        <li><a href="our-story.html">Our Story</a></li>
+                        <li><a href="why-us.html">Health & Purity</a></li>
+                        <li><a href="reviews.html">Customer Reviews</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Help & Legal</span>
+                    </h4>
+                    <ul class="footer-list">
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="terms-and-conditions.html">Terms & Conditions</a></li>
+                        <li><a href="shipping-delivery-policy.html">Shipping & Delivery</a></li>
+                        <li><a href="cancellation-refund-policy.html">Cancellation & Refund</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">
+                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
+                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
+                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
+                        </svg>
+                        <span>Quality & Trust</span>
+                    </h4>
+                    <ul class="footer-list footer-trust-list">
+                        <li>FSSAI Licence: <strong class="badge-pending">PENDING</strong></li>
+                        <li>GSTIN: <strong class="badge-pending">PENDING</strong></li>
+                        <li>Pure Cold-Pressed Mustard Oil</li>
+                        <li>100% Chemical & Onion-Garlic Free</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom-wrap">
+                <div class="footer-bottom">
+                    <span class="footer-copy-left">© 2026 Satvik Swaad. All rights reserved.</span>
+                    <span class="footer-copy-right">Crafted with ❤️ in India | Pure Taste of Tradition</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- DYNAMIC FAILURE HYDRATION & RECOVERY SCRIPT -->
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get('orderId') || 'SS-' + Math.floor(100000 + Math.random() * 900000);
+            const rawReason = params.get('reason') || '';
+            const total = params.get('total') || params.get('amount') || '';
+
+            let friendlyReason = 'Payment was declined or cancelled before confirmation.';
+            if (rawReason.toLowerCase().includes('cancel')) {
+                friendlyReason = 'Payment window was closed or cancelled by user.';
+            } else if (rawReason.toLowerCase().includes('timeout')) {
+                friendlyReason = 'Transaction timed out while connecting to your bank.';
+            } else if (rawReason) {
+                friendlyReason = decodeURIComponent(rawReason);
+            }
+
+            document.getElementById('fail-order-id').textContent = '#' + orderId;
+            document.getElementById('fail-reason-text').textContent = friendlyReason;
+            if (total) {
+                document.getElementById('fail-order-amount').textContent = '₹' + total;
+            } else {
+                let savedCart = {};
+                try { savedCart = JSON.parse(localStorage.getItem('satvik_cart') || '{}'); } catch(e){}
+                const sum = Object.values(savedCart).reduce((a, b) => a + ((b.price || 0) * (b.qty || 1)), 0);
+                document.getElementById('fail-order-amount').textContent = sum > 0 ? ('₹' + sum) : 'Saved in Cart';
+            }
+
+            // WhatsApp Support Link
+            const waBtn = document.getElementById('btn-fail-wa-help');
+            if (waBtn) {
+                const waText = encodeURIComponent(
+                    `Namaste Satvik Swaad team! 🙏\n\n` +
+                    `My payment for Order #${orderId} could not be completed.\n` +
+                    `Reason: ${friendlyReason}\n\n` +
+                    `Could you please assist me in completing this order or sharing a direct payment QR?`
+                );
+                waBtn.href = `https://wa.me/919236587600?text=${waText}`;
+            }
+
+            // Retry Online Payment -> Open Checkout Modal
+            const retryBtn = document.getElementById('btn-retry-payment');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', () => {
+                    if (window.openCheckout) {
+                        window.openCheckout();
+                    } else {
+                        window.location.href = 'products.html';
+                    }
+                });
+            }
+
+            // Switch to Cash on Delivery -> 1-click order creation!
+            const codBtn = document.getElementById('btn-convert-cod');
+            if (codBtn) {
+                codBtn.addEventListener('click', () => {
+                    codBtn.textContent = '⏳ Switching to Cash on Delivery...';
+                    codBtn.disabled = true;
+
+                    // Read saved cart
+                    let cart = {};
+                    try {
+                        const rawCart = localStorage.getItem('satwikCart_v2') || localStorage.getItem('satwikCart') || localStorage.getItem('satvik_cart') || '{}';
+                        cart = JSON.parse(rawCart);
+                    } catch(e) { cart = {}; }
+                    const cartItems = Array.isArray(cart) ? cart : Object.values(cart);
+                    const codTotal = cartItems.reduce((a, b) => a + ((b.price || 0) * (b.qty || b.quantity || 1)), 0) || 249;
+
+                    let savedProfile = {};
+                    try { savedProfile = JSON.parse(localStorage.getItem('satvik_user_profile') || '{}'); } catch(e){}
+                    let savedAddresses = [];
+                    try { savedAddresses = JSON.parse(localStorage.getItem('satvik_saved_addresses') || '[]'); } catch(e){}
+                    const defaultAddr = savedAddresses[0] || {};
+
+                    const codOrderId = 'SS-COD-' + Math.floor(100000 + Math.random() * 900000);
+                    const fullAddr = defaultAddr.house 
+                        ? `${defaultAddr.house}, ${defaultAddr.street}, ${defaultAddr.city} - ${defaultAddr.pincode}` 
+                        : 'Customer Delivery Address';
+
+                    const newOrder = {
+                        orderId: codOrderId,
+                        createdAt: new Date().toISOString(),
+                        status: 'CONFIRMED',
+                        totalPrice: codTotal,
+                        paymentMethod: 'Cash on Delivery',
+                        deliveryAddress: fullAddr,
+                        items: cartItems.length > 0 ? cartItems.map(i => ({
+                            id: i.productId || i.id,
+                            name: i.name,
+                            variant: i.variantLabel || i.weight || '500 g',
+                            quantity: i.qty || i.quantity || 1,
+                            price: i.price || codTotal,
+                            image: i.img || i.image || 'assets/aam-ka-achar.png'
+                        })) : [{ name: 'Handcrafted Traditional Pickle', variant: '500 g', quantity: 1, price: codTotal, image: 'assets/aam-ka-achar.png' }]
+                    };
+
+                    let orders = [];
+                    try { orders = JSON.parse(localStorage.getItem('satwik_orders_history') || '[]'); } catch(e){}
+                    if (!Array.isArray(orders)) orders = [];
+                    orders = orders.filter(o => o && o.orderId !== 'SS1247');
+                    orders.unshift(newOrder);
+                    localStorage.setItem('satwik_orders_history', JSON.stringify(orders));
+                    localStorage.setItem('satvik_last_order', JSON.stringify(newOrder));
+
+                    // Clear all cart variations now that COD order is confirmed
+                    localStorage.removeItem('satwikCart_v2');
+                    localStorage.removeItem('satwikCart');
+                    localStorage.removeItem('satvik_cart');
+
+                    window.location.href = `order-success.html?orderId=${encodeURIComponent(codOrderId)}&method=cod&total=${codTotal}`;
+                });
+            }
+        })();
+    </script>
+
+    <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./script.js"></script>
+</body>
+</html>

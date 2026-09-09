@@ -79,20 +79,14 @@
         /* INACTIVITY MODAL */
         #inactivity-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 3000; align-items: center; justify-content: center; }
         .modal-box { background: #FFFFFF; border-radius: 16px; padding: 32px; max-width: 420px; text-align: center; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .skip-link { position: absolute; top: -100px; left: 16px; background: var(--gold); color: var(--dark); padding: 12px 20px; border-radius: 8px; font-weight: 900; z-index: 9999; transition: top 0.2s; text-decoration: none; }
-        .skip-link:focus { top: 16px; }
         .d-none { display: none !important; }
     </style>
 </head>
 
 <body>
 
-    <!-- ACCESSIBILITY: SKIP LINK -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-
-    <main id="main-content" role="main">
-        <!-- AUTH CONTAINER -->
-        <div id="auth-container">
+    <!-- AUTH CONTAINER -->
+    <div id="auth-container">
         <div class="login-card">
             <img src="logo.png" alt="Satvik Swaad" style="width:68px;height:68px;border-radius:50%;display:block;margin:0 auto 12px;border:2px solid var(--gold);box-shadow:0 4px 12px rgba(0,0,0,0.1);" />
             <span class="admin-badge">🔐 Satvik Swaad Private Admin Portal</span>
@@ -156,16 +150,12 @@
             </div>
 
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                    <h3 style="margin-bottom: 0;">📦 Realtime Orders Management</h3>
-                    <span id="realtime-sync-badge" style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; background: #EAF5ED; color: #2C5E3B; border: 1px solid #B8E1C2;">● Initializing...</span>
-                </div>
+                <h3>📦 Realtime Orders Management</h3>
                 <p style="color: #665B55; font-size: 0.95rem; margin-top: 6px;">Orders loaded dynamically via Cloud Firestore Security Rules guarded by <code>request.auth.token.admin == true</code>.</p>
                 <div id="admin-orders-stream" style="margin-top: 18px;"><p style="color: #888;">Connecting to Firestore...</p></div>
             </div>
         </div>
     </div>
-    </main>
 
     <!-- INACTIVITY WARNING MODAL -->
     <div id="inactivity-modal">

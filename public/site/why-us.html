@@ -449,8 +449,8 @@
                 </div>
                 <button type="button" id="btn-close-checkout-icon" aria-label="Close Checkout Dialog" style="background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--color-sub);">✕</button>
             </div>
-            <div id="checkout-notice" style="background: #FFF3CD; color: #856404; border: 1px solid #FFEEBA; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-top: 16px; font-weight: 800;">
-                ℹ️ Online ordering will open after required registrations and launch preparations are completed.
+            <div id="checkout-notice" style="background: #FAF8F5; color: #1F4A2C; border: 1px solid #EBDCCB; padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-top: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <span>🌿</span> <span>100% Satvik Purity Guarantee &bull; Cold-Pressed Mustard Oil &bull; Zero Onion &amp; Garlic</span>
             </div>
             <form id="checkout-form">
                 <div class="checkout-grid">
@@ -476,15 +476,46 @@
                                 <div class="summary-row"><span>Items Subtotal:</span><span id="co-subtotal-val">₹0</span></div>
                                 <div class="summary-total-row"><span>Total Payable:</span><span id="co-total-val" style="color: var(--color-maroon);">₹0</span></div>
                             </div>
-                            <div class="checkout-form-group" style="margin-top: 18px;">
-                                <div style="background: rgba(212,175,55,0.08); border: 1.5px solid var(--color-gold); border-radius: 12px; padding: 14px 16px; margin-top: 6px;">
-                                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--color-maroon); font-size: 0.95rem;">
-                                        <span>💳</span> <span>Secure Online Payment</span>
+                            <div class="checkout-section-title" style="margin-top: 16px; margin-bottom: 8px;">💳 Choose Payment Method</div>
+                            <div class="co-payment-options" id="co-payment-options">
+                                <label class="co-pm-card active" for="pm-online-why">
+                                    <input type="radio" name="payment-method" id="pm-online-why" value="Online Payment" checked />
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">⚡ Instant Online Payment</span>
+                                            <span style="font-size: 0.72rem; font-weight: 800; background: #D4AF37; color: #FFF; padding: 2px 7px; border-radius: 12px; letter-spacing: 0.5px;">RECOMMENDED</span>
+                                        </div>
+                                        <p style="margin: 4px 0 6px; font-size: 0.8rem; color: #555; line-height: 1.35;">UPI (GPay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking via Razorpay.</p>
+                                        <div style="display: flex; gap: 6px; font-size: 0.75rem; color: #1F4A2C; font-weight: 700;">
+                                            <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">UPI</span>
+                                            <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">Cards</span>
+                                            <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">NetBanking</span>
+                                            <span style="margin-left: auto; color: #7A1C1C; font-size: 0.72rem;">🔒 256-bit TLS</span>
+                                        </div>
                                     </div>
-                                    <p style="margin: 6px 0 0 0; font-size: 0.83rem; color: #555555; line-height: 1.4;">
-                                        Pay securely via UPI (Google Pay, PhonePe, Paytm), Debit/Credit Cards, or Netbanking via verified payment gateway.
-                                    </p>
-                                </div>
+                                </label>
+
+                                <label class="co-pm-card" for="pm-cod-why">
+                                    <input type="radio" name="payment-method" id="pm-cod-why" value="Cash on Delivery" />
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">📦 Cash on Delivery (COD)</span>
+                                            <span style="font-size: 0.72rem; font-weight: 700; background: #E5E7EB; color: #374151; padding: 2px 7px; border-radius: 12px;">Pay on Arrival</span>
+                                        </div>
+                                        <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
+                                    </div>
+                                </label>
+
+                                <label class="co-pm-card" for="pm-wa-why">
+                                    <input type="radio" name="payment-method" id="pm-wa-why" value="WhatsApp-Assisted Ordering" />
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">💬 WhatsApp Quick Order</span>
+                                            <span style="font-size: 0.72rem; font-weight: 700; background: #DCFCE7; color: #15803D; padding: 2px 7px; border-radius: 12px;">Direct Support</span>
+                                        </div>
+                                        <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Submit order via WhatsApp chat with our family kitchen directly.</p>
+                                    </div>
+                                </label>
                             </div>
                         </div>
                         <div style="margin-top: 24px;">
