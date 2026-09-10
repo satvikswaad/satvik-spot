@@ -5692,20 +5692,11 @@ footer.site-footer .footer-grid {
     color: #8FA899 !important;
 }
 
-.footer-bottom-recaptcha {
-    font-size: 0.65rem !important;
-    color: #728F7C !important;
+.footer-bottom-tagline {
+    font-size: 0.72rem !important;
+    color: #C8DBD0 !important;
     letter-spacing: 0.2px;
-}
-
-.footer-bottom-recaptcha a {
-    color: #A9D5B6 !important;
-    text-decoration: none !important;
-}
-
-.footer-bottom-recaptcha a:hover {
-    color: #E5A93C !important;
-    text-decoration: underline !important;
+    font-weight: 500;
 }
 
 @media (max-width: 767px) {
@@ -5760,8 +5751,8 @@ footer.site-footer .footer-grid {
     .footer-bottom-copy {
         font-size: 0.68rem !important;
     }
-    .footer-bottom-recaptcha {
-        font-size: 0.62rem !important;
+    .footer-bottom-tagline {
+        font-size: 0.66rem !important;
     }
 }
 /* === CATALOG AUTO-FLOW CONVEYOR (ANIMATES AUTOMATICALLY RIGHT TO LEFT SLOWLY) === */
