@@ -49,10 +49,19 @@
         }
       ],
       "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
+        { "source": "/shop", "destination": "/products.html" },
+        { "source": "/products", "destination": "/products.html" },
+        { "source": "/cookies-policy", "destination": "/cookies-policy.html" },
+        { "source": "/cancellation-policy", "destination": "/cancellation-refund-policy.html" },
+        { "source": "/terms", "destination": "/terms-and-conditions.html" },
+        { "source": "/privacy", "destination": "/privacy-policy.html" },
+        { "source": "/our-story", "destination": "/our-story.html" },
+        { "source": "/why-us", "destination": "/why-us.html" },
+        { "source": "/contact", "destination": "/contact.html" },
+        { "source": "/faq", "destination": "/faq.html" },
+        { "source": "/reviews", "destination": "/reviews.html" },
+        { "source": "/profile", "destination": "/profile.html" },
+        { "source": "**", "destination": "/index.html" }
       ]
     },
     {

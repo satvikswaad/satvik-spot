@@ -155,7 +155,13 @@
   </url>
   <url>
     <loc>https://satwikspot.web.app/cancellation-refund-policy.html</loc>
-    <lastmod>2026-07-22</lastmod>
+    <lastmod>2026-09-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://satwikspot.web.app/cookies-policy.html</loc>
+    <lastmod>2026-09-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

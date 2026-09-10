@@ -3802,6 +3802,12 @@ function initProductDetailsPage() {
                 }
             }
         }
+
+        const btnWhatsAppOrder = document.getElementById('pd-btn-whatsapp');
+        if (btnWhatsAppOrder && selectedVariant) {
+            const msg = encodeURIComponent(`Namaste Satvik Swaad! I would like to order:\n• Product: ${prod.name} (${prod.hindiName || ''})\n• Pack Size: ${selectedVariant.label}\n• Price: ₹${selectedVariant.price}\n• Quantity: ${selectedQty}\n\nPlease confirm availability and share payment details.`);
+            btnWhatsAppOrder.href = `https://wa.me/919236587600?text=${msg}`;
+        }
     }
 
     if (variantsBox && Array.isArray(prod.variants)) {
@@ -3935,6 +3941,31 @@ function initProductDetailsPage() {
                 addToCart(prod.id, selectedVariant.id, selectedQty);
             }
         });
+    }
+
+    const btnBuyNow = document.getElementById('pd-btn-buy-now');
+    if (btnBuyNow) {
+        btnBuyNow.addEventListener('click', () => {
+            if (selectedVariant) {
+                addToCart(prod.id, selectedVariant.id, selectedQty);
+                openCheckout();
+            }
+        });
+    }
+
+    const btnWhatsAppOrder = document.getElementById('pd-btn-whatsapp');
+    function updateWhatsAppOrderLink() {
+        if (!btnWhatsAppOrder || !selectedVariant) return;
+        const msg = encodeURIComponent(`Namaste Satvik Swaad! I would like to order:\n• Product: ${prod.name} (${prod.hindiName || ''})\n• Pack Size: ${selectedVariant.label}\n• Price: ₹${selectedVariant.price}\n• Quantity: ${selectedQty}\n\nPlease confirm availability and share payment details.`);
+        btnWhatsAppOrder.href = `https://wa.me/919236587600?text=${msg}`;
+    }
+    updateWhatsAppOrderLink();
+
+    if (qtyMinus) {
+        qtyMinus.addEventListener('click', updateWhatsAppOrderLink);
+    }
+    if (qtyPlus) {
+        qtyPlus.addEventListener('click', updateWhatsAppOrderLink);
     }
 
     // Render Product-Specific Reviews

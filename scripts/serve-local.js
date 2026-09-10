@@ -22,7 +22,31 @@ function createStaticServer(publicDir, port, name) {
         let reqPath = req.url.split('?')[0];
         if (reqPath === '/') reqPath = '/index.html';
 
+        const routeRewrites = {
+            '/shop': '/products.html',
+            '/products': '/products.html',
+            '/cookies-policy': '/cookies-policy.html',
+            '/cancellation-policy': '/cancellation-refund-policy.html',
+            '/terms': '/terms-and-conditions.html',
+            '/privacy': '/privacy-policy.html',
+            '/our-story': '/our-story.html',
+            '/why-us': '/why-us.html',
+            '/contact': '/contact.html',
+            '/faq': '/faq.html',
+            '/reviews': '/reviews.html',
+            '/profile': '/profile.html'
+        };
+
+        if (routeRewrites[reqPath]) {
+            reqPath = routeRewrites[reqPath];
+        }
+
         let filePath = path.join(publicDir, reqPath);
+
+        // Extensionless .html fallback
+        if (!path.extname(filePath) && fs.existsSync(filePath + '.html')) {
+            filePath = filePath + '.html';
+        }
         
         // Prevent directory traversal
         if (!filePath.startsWith(publicDir)) {
