@@ -218,72 +218,104 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="site-footer">
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <div class="footer-brand">
-                        <span class="footer-brand-title">Satvik Swaad</span>
-                        <span class="footer-brand-hindi">सात्विक स्वाद - शुद्धता ही पहचान</span>
+        <footer class="site-footer" role="contentinfo">
+        <!-- TOP ORGANIC WAVE DIVIDER -->
+        <div class="footer-wave-wrap" aria-hidden="true">
+            <svg class="footer-wave-svg" viewBox="0 0 1440 60" preserveAspectRatio="none">
+                <path d="M0,25 C320,50 640,10 960,35 C1200,50 1360,20 1440,30 L1440,60 L0,60 Z" fill="#0E381E"/>
+            </svg>
+        </div>
+
+        <div class="footer-inner-wrap">
+            <div class="footer-container">
+                <!-- COL 1: BRAND ESSENCE & DIRECT CONTACT -->
+                <div class="footer-col footer-col-brand">
+                    <a href="index.html" class="footer-brand-header" aria-label="Satvik Swaad Home">
+                        <img src="assets/logo.png" alt="Satvik Swaad" class="footer-brand-logo" width="54" height="54" />
+                        <div class="footer-brand-title-wrap">
+                            <span class="footer-brand-title">Satvik Swaad</span>
+                            <span class="footer-brand-tagline">Maa ke swaad ki virasat</span>
+                        </div>
+                    </a>
+                    <p class="footer-desc">Authentic homemade pickles, murabbas &amp; heritage delicacies prepared with sun-cured methods, cold-pressed mustard oil, and zero artificial preservatives.</p>
+                    
+                    <div class="footer-contact-chips">
+                        <a href="https://wa.me/919236587600?text=Namaste%2C%20I%20have%20an%20inquiry%20about%20Satvik%20Swaad" target="_blank" rel="noopener noreferrer" class="footer-contact-chip" aria-label="Chat on WhatsApp">
+                            <span class="chip-icon">💬</span>
+                            <span>+91 92365 87600</span>
+                        </a>
+                        <a href="mailto:satvikswaad.care@gmail.com" class="footer-contact-chip" aria-label="Send Email">
+                            <span class="chip-icon">✉️</span>
+                            <span>satvikswaad.care@gmail.com</span>
+                        </a>
                     </div>
-                    <p class="footer-desc">
-                        Handcrafted with pure cold-pressed mustard oil, sun-dried spices, and zero chemicals. Bringing the divine authentic taste of grandmother's kitchen to your dining table.
-                    </p>
                 </div>
+
+                <!-- COL 2: SHOP & EXPLORE (ACCORDION ON MOBILE) -->
                 <div class="footer-col">
-                    <h4 class="footer-heading">
-                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
-                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
-                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
-                        </svg>
-                        <span>Quick Links</span>
-                    </h4>
-                    <ul class="footer-list">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="products.html">All 15 Products</a></li>
-                        <li><a href="our-story.html">Our Story</a></li>
-                        <li><a href="why-us.html">Health & Purity</a></li>
-                        <li><a href="reviews.html">Customer Reviews</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
+                    <details class="footer-accordion" open>
+                        <summary class="footer-accordion-summary">
+                            <span class="footer-heading-text">Shop &amp; Explore</span>
+                            <span class="footer-chevron" aria-hidden="true"></span>
+                        </summary>
+                        <ul class="footer-list">
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="products.html">All Products (15)</a></li>
+                            <li><a href="products.html?category=achar">Pickles &amp; Achar</a></li>
+                            <li><a href="products.html?category=sweets">Sweets &amp; Murabba</a></li>
+                            <li><a href="our-story.html">Our Heritage Story</a></li>
+                        </ul>
+                    </details>
                 </div>
+
+                <!-- COL 3: CUSTOMER CARE (ACCORDION ON MOBILE) -->
                 <div class="footer-col">
-                    <h4 class="footer-heading">
-                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
-                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
-                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
-                        </svg>
-                        <span>Help & Legal</span>
-                    </h4>
-                    <ul class="footer-list">
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                        <li><a href="terms-and-conditions.html">Terms & Conditions</a></li>
-                        <li><a href="shipping-delivery-policy.html">Shipping & Delivery</a></li>
-                        <li><a href="cancellation-refund-policy.html">Cancellation & Refund</a></li>
-                    </ul>
+                    <details class="footer-accordion" open>
+                        <summary class="footer-accordion-summary">
+                            <span class="footer-heading-text">Customer Care</span>
+                            <span class="footer-chevron" aria-hidden="true"></span>
+                        </summary>
+                        <ul class="footer-list">
+                            <li><a href="profile.html#orders">Track My Order</a></li>
+                            <li><a href="contact.html">Contact Us</a></li>
+                            <li><a href="faq.html">Help &amp; FAQs</a></li>
+                            <li><a href="why-us.html">Purity &amp; Quality Promise</a></li>
+                            <li><a href="reviews.html">Verified Customer Reviews</a></li>
+                        </ul>
+                    </details>
                 </div>
+
+                <!-- COL 4: LEGAL & POLICIES (ACCORDION ON MOBILE - PAYMENT GATEWAY / GOOGLE ADS COMPLIANCE) -->
                 <div class="footer-col">
-                    <h4 class="footer-heading">
-                        <svg class="footer-heading-icon" viewBox="0 0 24 24" fill="#E5A93C">
-                            <path d="M17 8C8 10 5 16 3 21C6 20 12 18 16 13C18 10 18 8 17 8Z"/>
-                            <path d="M17 8C19 5 21 3 22 2C21 4 20 7 17 8Z"/>
-                        </svg>
-                        <span>Quality & Trust</span>
-                    </h4>
-                    <ul class="footer-list footer-trust-list">
-                        <li>FSSAI Licence: <strong class="badge-pending">PENDING</strong></li>
-                        <li>GSTIN: <strong class="badge-pending">PENDING</strong></li>
-                        <li>Pure Cold-Pressed Mustard Oil</li>
-                        <li>100% Chemical & Onion-Garlic Free</li>
-                    </ul>
+                    <details class="footer-accordion" open>
+                        <summary class="footer-accordion-summary">
+                            <span class="footer-heading-text">Policies &amp; Legal</span>
+                            <span class="footer-chevron" aria-hidden="true"></span>
+                        </summary>
+                        <ul class="footer-list">
+                            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                            <li><a href="terms-and-conditions.html">Terms &amp; Conditions</a></li>
+                            <li><a href="shipping-delivery-policy.html">Shipping &amp; Delivery Policy</a></li>
+                            <li><a href="cancellation-refund-policy.html">Cancellation &amp; Refund Policy</a></li>
+                            <li><span class="footer-fssai-pill">🌿 100% Traditional Homemade</span></li>
+                        </ul>
+                    </details>
                 </div>
             </div>
+
+            <!-- PAYMENT BADGES & BOTTOM COPYRIGHT BAR -->
             <div class="footer-bottom-wrap">
                 <div class="footer-bottom">
-                    <span class="footer-copy-left">© 2026 Satvik Swaad. All rights reserved.</span>
-                    <span class="footer-copy-right">Crafted with ❤️ in India | Pure Taste of Tradition</span>
+                    <div class="footer-trust-badges">
+                        <span class="footer-badge-item">🔒 100% Secure Checkout</span>
+                        <span class="footer-badge-dot">•</span>
+                        <span class="footer-badge-item">UPI / Cards / NetBanking</span>
+                        <span class="footer-badge-dot">•</span>
+                        <span class="footer-badge-item">Pan-India Delivery</span>
+                    </div>
+                    <div class="footer-copyright-row">
+                        <span class="footer-copy-left">© 2026 Satvik Swaad. Handcrafted with purity in Nizamabad, India.</span>
+                    </div>
                 </div>
             </div>
         </div>

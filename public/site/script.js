@@ -93,7 +93,36 @@ function runInitializers() {
     initProfilePage();
     initReorderSection();
     initFloatingAgent();
+    initFooterAccordion();
     renderCart();
+}
+
+function initFooterAccordion() {
+    const accordions = document.querySelectorAll('.footer-accordion');
+    if (!accordions.length) return;
+
+    function applyAccordionState() {
+        const isMobile = window.innerWidth < 768;
+        accordions.forEach((acc) => {
+            if (isMobile) {
+                acc.removeAttribute('open');
+            } else {
+                acc.setAttribute('open', '');
+            }
+        });
+    }
+
+    applyAccordionState();
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+                accordions.forEach(acc => acc.setAttribute('open', ''));
+            }
+        }, 150);
+    });
 }
 
 function initLanguage() {
