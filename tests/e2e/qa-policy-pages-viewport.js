@@ -6,6 +6,7 @@ const pages = [
   'cookies-policy.html',
   'terms-and-conditions.html',
   'privacy-policy.html',
+  'shipping-delivery-policy.html',
   'cancellation-refund-policy.html'
 ];
 

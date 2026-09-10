@@ -53,6 +53,8 @@
         { "source": "/products", "destination": "/products.html" },
         { "source": "/cookies-policy", "destination": "/cookies-policy.html" },
         { "source": "/cancellation-policy", "destination": "/cancellation-refund-policy.html" },
+        { "source": "/shipping", "destination": "/shipping-delivery-policy.html" },
+        { "source": "/shipping-delivery-policy", "destination": "/shipping-delivery-policy.html" },
         { "source": "/terms", "destination": "/terms-and-conditions.html" },
         { "source": "/privacy", "destination": "/privacy-policy.html" },
         { "source": "/our-story", "destination": "/our-story.html" },

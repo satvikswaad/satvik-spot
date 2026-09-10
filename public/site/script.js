@@ -3685,6 +3685,15 @@ function initProductDetailsPage() {
         if (btnBuyNow) btnBuyNow.textContent = t('productDetails.btnBuyNow');
     }
 
+    const ingredientsEl = document.getElementById('pd-ingredients') || document.getElementById('pd-spec-ingredients');
+    const storageEl = document.getElementById('pd-storage-info') || document.getElementById('pd-spec-storage');
+    const shelfLifeEl = document.getElementById('pd-shelf-life') || document.getElementById('pd-spec-shelflife');
+    const allergensEl = document.getElementById('pd-allergens') || document.getElementById('pd-spec-allergens');
+    const packagingEl = document.getElementById('pd-packaging') || document.getElementById('pd-spec-packaging');
+    const ratingValEl = document.getElementById('pd-rating-val');
+    const reviewCountEl = document.getElementById('pd-review-count-text') || document.getElementById('pd-review-count');
+    const badgeEl = document.getElementById('pd-badge');
+
     renderProductDetailsLocalized();
     window.addEventListener('languageChanged', renderProductDetailsLocalized);
     if (ingredientsEl) ingredientsEl.textContent = prod.ingredients || 'Verified traditional ingredients.';

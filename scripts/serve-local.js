@@ -27,6 +27,8 @@ function createStaticServer(publicDir, port, name) {
             '/products': '/products.html',
             '/cookies-policy': '/cookies-policy.html',
             '/cancellation-policy': '/cancellation-refund-policy.html',
+            '/shipping': '/shipping-delivery-policy.html',
+            '/shipping-delivery-policy': '/shipping-delivery-policy.html',
             '/terms': '/terms-and-conditions.html',
             '/privacy': '/privacy-policy.html',
             '/our-story': '/our-story.html',
