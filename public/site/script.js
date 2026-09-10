@@ -118,12 +118,19 @@ function initFooterAccordion() {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            if (window.innerWidth >= 768) {
-                accordions.forEach(acc => acc.setAttribute('open', ''));
-            }
+            applyAccordionState();
         }, 150);
     });
 }
+
+window.handleFooterSubscribe = function(form) {
+    if (!form) return;
+    const input = form.querySelector('.footer-newsletter-input');
+    const email = input ? input.value.trim() : '';
+    if (!email) return;
+    showToast('Dhanyawad! You have been subscribed to Satvik updates. 🙏');
+    form.reset();
+};
 
 function initLanguage() {
     const activeLang = getCurrentLanguage();
