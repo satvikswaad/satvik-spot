@@ -80,6 +80,7 @@ function runInitializers() {
     ensureModalsInDOM();
     initLanguage();
     initUI();
+    initStickyHeader();
     initUniversalSearch();
     initHeroSlider();
     initScrollReveal();
@@ -376,6 +377,9 @@ function initMobileNav() {
         }
 
         function openDropdown() {
+            if (typeof updateHeaderOffsets === 'function') {
+                updateHeaderOffsets();
+            }
             headerDropdown.classList.add('active');
             mobileBtn.setAttribute('aria-expanded', 'true');
         }
@@ -411,6 +415,9 @@ function initMobileNav() {
 
     if (navOverlay) {
         function openMobileMenu() {
+            if (typeof updateHeaderOffsets === 'function') {
+                updateHeaderOffsets();
+            }
             navOverlay.classList.add('active');
             mobileBtn.setAttribute('aria-expanded', 'true');
             document.body.classList.add('menu-open');
@@ -582,6 +589,120 @@ function initScrollToTop() {
     });
 }
 
+/* ── STICKY HEADER & SCROLL INTERACTIONS ── */
+let updateHeaderOffsets = null;
+
+function initStickyHeader() {
+    const header = document.querySelector('.site-header');
+    const ticker = document.querySelector('.announcement-ticker');
+
+    if (!header) return;
+
+    let isTicking = false;
+
+    // Helper: calculate live height of ticker (usually ~36-40px)
+    function getTickerHeight() {
+        if (!ticker) return 0;
+        return ticker.offsetHeight || (ticker.getBoundingClientRect && Math.round(ticker.getBoundingClientRect().height)) || 0;
+    }
+
+    let tickerHeight = getTickerHeight();
+
+    // Helper: update dropdown and drawer top offsets / max heights while scrolling
+    function updateMenuOffsets(headerHeight, headerBottom) {
+        // Expose dynamic header metrics via CSS variables for smooth responsive layouts
+        document.documentElement.style.setProperty('--site-header-height', `${headerHeight}px`);
+        document.documentElement.style.setProperty('--site-header-bottom', `${headerBottom}px`);
+
+        // Update Header Dropdown Menu offset and max-height
+        const headerDropdown = document.getElementById('header-dropdown-menu');
+        if (headerDropdown) {
+            const isInsideHeader = header.contains(headerDropdown);
+            if (isInsideHeader) {
+                headerDropdown.style.top = `${headerHeight + 6}px`;
+            } else {
+                headerDropdown.style.top = `${headerBottom + 6}px`;
+            }
+            const availableHeight = Math.max(160, window.innerHeight - headerBottom - 16);
+            headerDropdown.style.maxHeight = `${availableHeight}px`;
+            headerDropdown.style.overflowY = 'auto';
+        }
+
+        // Update Mobile Nav Drawer or offset containers if present
+        const mobileDrawers = document.querySelectorAll('.mobile-nav-drawer');
+        mobileDrawers.forEach(drawer => {
+            if (drawer.classList.contains('offset-header') || drawer.dataset.offsetHeader === 'true') {
+                drawer.style.top = `${headerBottom}px`;
+                drawer.style.height = `calc(100vh - ${headerBottom}px)`;
+            }
+        });
+
+        // Ensure any drawer or modal overlay respecting header offset updates accordingly
+        const offsetElements = document.querySelectorAll('[data-calc-header-offset="true"]');
+        offsetElements.forEach(el => {
+            el.style.top = `${headerBottom}px`;
+        });
+    }
+
+    // Core scroll update function with RAF throttling
+    function onScrollUpdate() {
+        const scrollY = window.pageYOffset || window.scrollY || document.documentElement.scrollTop || 0;
+        const scrollThreshold = tickerHeight > 0 ? tickerHeight : 30;
+
+        // Toggle 'is-scrolled' when scrolled past threshold or > 30px, remove when back at very top
+        const shouldBeScrolled = scrollY > 30 || (scrollThreshold > 0 && scrollY >= scrollThreshold);
+        if (shouldBeScrolled) {
+            if (!header.classList.contains('is-scrolled')) {
+                header.classList.add('is-scrolled');
+            }
+        } else {
+            if (header.classList.contains('is-scrolled')) {
+                header.classList.remove('is-scrolled');
+            }
+        }
+
+        // Calculate live header dimensions for dropdowns / drawers
+        const headerRect = header.getBoundingClientRect();
+        const headerHeight = Math.round(headerRect.height || header.offsetHeight || 0);
+        const headerBottom = Math.max(0, Math.round(headerRect.bottom));
+
+        updateMenuOffsets(headerHeight, headerBottom);
+
+        isTicking = false;
+    }
+
+    // Expose offset updater for external callers (e.g. mobile menu opening)
+    updateHeaderOffsets = function() {
+        tickerHeight = getTickerHeight();
+        const headerRect = header.getBoundingClientRect();
+        const headerHeight = Math.round(headerRect.height || header.offsetHeight || 0);
+        const headerBottom = Math.max(0, Math.round(headerRect.bottom));
+        updateMenuOffsets(headerHeight, headerBottom);
+    };
+
+    // Scroll listener using requestAnimationFrame for optimal 60fps/120fps performance
+    function onWindowScroll() {
+        if (!isTicking) {
+            window.requestAnimationFrame(onScrollUpdate);
+            isTicking = true;
+        }
+    }
+
+    // Resize listener to recalculate ticker and header heights
+    function onWindowResize() {
+        tickerHeight = getTickerHeight();
+        onScrollUpdate();
+    }
+
+    // Attach passive listeners
+    window.addEventListener('scroll', onWindowScroll, { passive: true });
+    window.addEventListener('resize', onWindowResize, { passive: true });
+    window.addEventListener('orientationchange', onWindowResize, { passive: true });
+
+    // Initial calculation on page load / DOM ready
+    onScrollUpdate();
+}
+
 function initFaqSearch() {
     const searchInput = document.getElementById('faq-search');
     if (!searchInput) return;
@@ -689,7 +810,7 @@ function renderPublicReviews(reviews, container) {
 
         card.appendChild(topRow);
         card.appendChild(textP);
-        if (r.verifiedPurchase) {
+        if (reviewItem.verifiedPurchase) {
             const badge = createSafeElement('span', { text: '✓ Verified Purchase', style: 'font-size: 0.78rem; color: #389e0d; font-weight: 700; display: inline-block; margin-top: 8px;' });
             card.appendChild(badge);
         }
@@ -4662,6 +4783,7 @@ if (typeof window !== 'undefined') {
     window.filterCategory = filterCategory;
     window.applyAllProductFilters = applyAllProductFilters;
     window.searchProducts = searchProducts;
+    window.initStickyHeader = initStickyHeader;
 }
 
 export {
@@ -4675,7 +4797,8 @@ export {
     filterCategory,
     updateCategoryBadges,
     initUniversalSearch,
-    initProductsSort
+    initProductsSort,
+    initStickyHeader
 };
 
 

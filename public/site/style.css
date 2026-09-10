@@ -70,7 +70,7 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100%;
     width: 100%;
 }
@@ -78,7 +78,7 @@ body {
     font-family: 'Lato', system-ui, -apple-system, sans-serif;
     background: var(--color-cream); color: var(--color-dark);
     line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column;
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100%;
     width: 100%;
 }
@@ -177,10 +177,16 @@ h2 { font-size: 2rem; line-height: 1.25; margin-bottom: 0.75rem; }
 header.site-header {
     background: #FAF5EB;
     border-bottom: none;
-    position: sticky; top: 0; z-index: 1000;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
     box-shadow: none;
-    transition: all var(--transition-normal);
+    transition: box-shadow 0.25s ease, background-color 0.25s ease;
     overflow: visible;
+}
+
+.site-header.is-scrolled {
+    box-shadow: 0 4px 18px rgba(74, 28, 18, 0.12), 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 .header-container {
     max-width: 1440px; width: 100%; margin: 0 auto; padding: 14px 32px;
@@ -1626,7 +1632,7 @@ footer.site-footer {
 
 /* RESPONSIVE LAYOUT & MOBILE ENHANCEMENTS */
 html, body {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
 }
 
@@ -1654,9 +1660,9 @@ html, body {
     }
 
     header.site-header {
-        position: sticky;
-        top: 0;
-        z-index: 1000;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
         width: 100%;
         box-sizing: border-box;
     }
@@ -9003,7 +9009,7 @@ input:checked + .slider:before {
 @media (max-width: 768px) {
     /* 1. Global Viewport & Boundary Guard */
     html, body {
-        overflow-x: hidden !important;
+        overflow-x: clip !important;
         max-width: 100vw !important;
         width: 100% !important;
         margin: 0 !important;
@@ -9018,7 +9024,7 @@ input:checked + .slider:before {
     html,
     body {
         max-width: 100vw !important;
-        overflow-x: hidden !important;
+        overflow-x: clip !important;
     }
 
     body {
@@ -9038,6 +9044,8 @@ input:checked + .slider:before {
         padding: 7px 0 !important;
         font-size: 0.76rem !important;
         letter-spacing: 0.5px !important;
+        position: relative !important;
+        z-index: 999 !important;
     }
 
     .announcement-track {
@@ -9051,6 +9059,9 @@ input:checked + .slider:before {
 
     /* 3. Compact Brand Header */
     .site-header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
         height: auto !important;
         overflow: visible !important;
     }
