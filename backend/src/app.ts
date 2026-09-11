@@ -5,6 +5,7 @@ import { corsMiddleware } from './config/cors';
 import {
   rateLimiter,
   orderRateLimiter,
+  payuPaymentRateLimiter,
   messageRateLimiter,
   reviewRateLimiter,
   guestLookupRateLimiter,
@@ -37,7 +38,9 @@ import {
   createPaymentOrderHandler,
   verifyPaymentHandler,
   webhookHandler,
-  refundHandler
+  refundHandler,
+  createPayUOrderHandler,
+  payuResponseHandler
 } from './payments/paymentController';
 
 import { AppError, PaymentsNotAvailableError } from './errors/AppError';
@@ -60,13 +63,45 @@ app.use(express.json({
     req.rawBody = buf;
   }
 }));
+// Support URL-encoded bodies for PayU SURL/FURL POST returns
+app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 app.use(enforceSecureCookieHeaders);
 
 // Serve static frontend assets for local development / testing
 const publicSiteDir = path.resolve(__dirname, '../../public/site');
 const publicAdminDir = path.resolve(__dirname, '../../public/admin');
-app.use(express.static(publicSiteDir));
-app.use('/admin', express.static(publicAdminDir));
+
+const routeRewrites: Record<string, string> = {
+  '/shop': '/products.html',
+  '/products': '/products.html',
+  '/cookies-policy': '/cookies-policy.html',
+  '/cancellation-policy': '/cancellation-refund-policy.html',
+  '/shipping': '/shipping-delivery-policy.html',
+  '/shipping-delivery-policy': '/shipping-delivery-policy.html',
+  '/terms': '/terms-and-conditions.html',
+  '/privacy': '/privacy-policy.html',
+  '/our-story': '/our-story.html',
+  '/why-us': '/why-us.html',
+  '/contact': '/contact.html',
+  '/faq': '/faq.html',
+  '/reviews': '/reviews.html',
+  '/profile': '/profile.html',
+  '/cancellation-refund-policy': '/cancellation-refund-policy.html',
+  '/terms-and-conditions': '/terms-and-conditions.html',
+  '/privacy-policy': '/privacy-policy.html',
+  '/cart': '/cart.html'
+};
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const cleanPath = req.path.split('?')[0];
+  if (routeRewrites[cleanPath]) {
+    return res.sendFile(path.join(publicSiteDir, routeRewrites[cleanPath]));
+  }
+  next();
+});
+
+app.use(express.static(publicSiteDir, { extensions: ['html'] }));
+app.use('/admin', express.static(publicAdminDir, { extensions: ['html'] }));
 
 // Global Security Response Headers
 app.use((_req: Request, res: Response, next: NextFunction) => {
@@ -74,7 +109,7 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
   res.locals.cspNonce = nonce;
   res.setHeader(
     'Content-Security-Policy',
-    `default-src 'self'; script-src 'self' 'nonce-${nonce}' https://www.gstatic.com https://apis.google.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.firebaseapp.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://satvik-spot-backend-staging.onrender.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.gstatic.com https://api.razorpay.com https://lumberjack.razorpay.com http://127.0.0.1:*; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://recaptcha.google.com/ https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests;`
+    `default-src 'self'; script-src 'self' 'nonce-${nonce}' https://checkout.payu.in https://secure.payu.in https://test.payu.in https://www.gstatic.com https://apis.google.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.firebaseapp.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://secure.payu.in https://test.payu.in https://info.payu.in https://satvik-spot-backend-staging.onrender.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.gstatic.com https://api.razorpay.com https://lumberjack.razorpay.com http://127.0.0.1:*; frame-src 'self' https://secure.payu.in https://test.payu.in https://checkout.payu.in https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://recaptcha.google.com/ https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://secure.payu.in https://test.payu.in; object-src 'none'; upgrade-insecure-requests;`
   );
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
@@ -118,6 +153,12 @@ app.post('/api/v1/orders/guest-lookup', guestLookupRateLimiter, handleGuestLooku
 app.post('/api/v1/messages', messageRateLimiter, handleCreateMessage);
 app.get('/api/v1/reviews', handleGetApprovedReviews);
 app.post('/api/v1/reviews', reviewRateLimiter, handleCreateReview);
+
+// PayU Live / Test Payment Gateway Endpoints (Blueprint Specification)
+app.post('/api/v1/payments/payu/create-order', payuPaymentRateLimiter, createPayUOrderHandler);
+app.post('/api/billing/payu/create-order', payuPaymentRateLimiter, createPayUOrderHandler);
+app.post('/api/v1/payments/payu/response', payuResponseHandler);
+app.post('/api/billing/payu/response', payuResponseHandler);
 
 // Razorpay Payment Gateway Endpoints
 app.post('/api/v1/payments/create-order', orderRateLimiter, createPaymentOrderHandler);

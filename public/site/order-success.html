@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -82,6 +82,21 @@
             <svg class="header-wave-svg" viewBox="0 0 1440 16" preserveAspectRatio="none">
                 <path d="M0,0 L1440,0 L1440,6 C1380,10 1320,4 1260,8 C1200,12 1140,5 1080,7 C1020,10 960,4 900,8 C840,11 780,5 720,7 C660,10 600,4 540,8 C480,12 420,5 360,7 C300,10 240,4 180,8 C120,12 60,5 0,7 Z" fill="#FAF5EB"/>
             </svg>
+        </div>
+
+        <!-- HEADER DROPDOWN MENU (COMPACT, NON-BLURRING, PROFESSIONAL) -->
+        <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
+            <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
+                <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
+            </button>
+            <a href="index.html#hero" class="dropdown-nav-link" role="menuitem">🏠 Home</a>
+            <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Shop Products</a>
+            <a href="why-us.html" class="dropdown-nav-link" role="menuitem">✨ Why Us</a>
+            <a href="our-story.html#about" class="dropdown-nav-link" role="menuitem">📜 Our Story</a>
+            <a href="reviews.html" class="dropdown-nav-link" role="menuitem">⭐ Customer Reviews</a>
+            <a href="faq.html" class="dropdown-nav-link" role="menuitem">❓ FAQ</a>
+            <a href="contact.html" class="dropdown-nav-link" role="menuitem">📞 Contact Us</a>
+            <a href="profile.html" class="dropdown-nav-link profile-link" id="mobile-nav-profile" role="menuitem">👤 My Account & Orders</a>
         </div>
     </header>
 
@@ -370,12 +385,28 @@
                 ? new Date(lastOrder.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
                 : new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
 
+            const queryTxnid = params.get('txnid');
             const isCod = (queryMethod === 'cod') || (lastOrder?.paymentMethod && lastOrder.paymentMethod.toLowerCase().includes('cash'));
-            const paymentModeText = isCod ? '📦 Cash on Delivery (Pay on Arrival)' : (queryPaymentId ? `🔒 Online Paid (Razorpay: ${queryPaymentId.slice(-8)})` : '🔒 Online Payment (Verified)');
+            const paymentModeText = isCod 
+                ? '📦 Cash on Delivery (Pay on Arrival)' 
+                : (queryTxnid 
+                    ? `🔒 Online Paid (PayU: #${queryTxnid.slice(-8).toUpperCase()})` 
+                    : (queryPaymentId ? `🔒 Online Paid (#${queryPaymentId.slice(-8).toUpperCase()})` : '🔒 Online Payment (PayU Verified)'));
 
             const addressText = lastOrder?.deliveryAddress || 'Saved Delivery Address';
 
-            document.getElementById('succ-order-id').textContent = '#' + orderId;
+            // Clear active carts on successful order confirmation
+            try {
+                localStorage.removeItem('satwikCart_v2');
+                localStorage.removeItem('satwikCart');
+                localStorage.removeItem('satvik_cart');
+                localStorage.removeItem('satvik_pending_payu_txnid');
+                localStorage.removeItem('satvik_pending_payu_order');
+            } catch (clearErr) {
+                console.warn('Cart clear on order success warning:', clearErr);
+            }
+
+            document.getElementById('succ-order-id').textContent = '#' + (queryTxnid || orderId);
             document.getElementById('succ-order-date').textContent = dateStr;
             document.getElementById('succ-payment-mode').textContent = paymentModeText;
             document.getElementById('succ-total-amount').textContent = '₹' + total;

@@ -21,7 +21,7 @@ function auditLinks() {
     let match;
     while ((match = hrefRegex.exec(content)) !== null) {
       let target = match[1].trim();
-      if (!target || target.startsWith('http:') || target.startsWith('https:') || target.startsWith('mailto:') || target.startsWith('tel:') || target.startsWith('javascript:')) {
+      if (!target || target.startsWith('http:') || target.startsWith('https:') || target.startsWith('mailto:') || target.startsWith('tel:') || target.startsWith('javascript:') || target.includes('${')) {
         continue;
       }
       // Remove query string
@@ -31,7 +31,7 @@ function auditLinks() {
 
     while ((match = srcRegex.exec(content)) !== null) {
       let target = match[1].trim();
-      if (!target || target.startsWith('http:') || target.startsWith('https:') || target.startsWith('data:')) {
+      if (!target || target.startsWith('http:') || target.startsWith('https:') || target.startsWith('data:') || target.includes('${')) {
         continue;
       }
       target = target.split('?')[0];
@@ -183,7 +183,19 @@ module.exports = { auditLinks, testAllRoutes };
 
 if (require.main === module) {
   auditLinks();
-  testAllRoutes(5000).then(res => {
-    console.log('\nRoute Testing Complete. Overall OK:', res.allOk);
+
+  const { app } = require('../../backend/dist/app');
+  const server = app.listen(0, '127.0.0.1', async () => {
+    const port = server.address().port;
+    try {
+      const res = await testAllRoutes(port);
+      console.log('\nRoute Testing Complete. Overall OK:', res.allOk);
+      server.close();
+      process.exit(res.allOk ? 0 : 1);
+    } catch (err) {
+      console.error('Route testing error:', err);
+      server.close();
+      process.exit(1);
+    }
   });
 }

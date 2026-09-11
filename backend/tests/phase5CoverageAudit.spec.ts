@@ -1394,8 +1394,8 @@ describe('Phase 5 Test Coverage & Security Audit Verification', () => {
       expect(err.errorCode).toBe('RATE_LIMIT_EXCEEDED');
     });
 
-    it('Global rateLimiter emits HTTP 429 RATE_LIMIT_EXCEEDED when 60 req/min threshold is exceeded', async () => {
-      const err = await executeRateLimiterTest(rateLimiter, { url: '/api/v1/public-endpoint' }, 60, 60);
+    it('Global rateLimiter emits HTTP 429 RATE_LIMIT_EXCEEDED when 100 req/min threshold is exceeded', async () => {
+      const err = await executeRateLimiterTest(rateLimiter, { url: '/api/v1/public-endpoint' }, 100, 100);
       expect(err).toBeInstanceOf(AppError);
       expect(err.statusCode).toBe(429);
       expect(err.errorCode).toBe('RATE_LIMIT_EXCEEDED');

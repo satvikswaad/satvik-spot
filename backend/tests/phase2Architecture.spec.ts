@@ -29,12 +29,14 @@ describe('Phase 2 Architecture & Network Boundary Security Tests', () => {
       expect(firebaseJson.functions).toBeUndefined();
     });
 
-    it('firebase.json hosting rewrites target index.html only and no Functions', () => {
+    it('firebase.json hosting rewrites target static html destinations only and no Functions', () => {
       const firebaseJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../../firebase.json'), 'utf8'));
       for (const target of firebaseJson.hosting) {
         expect(target.rewrites).toBeDefined();
-        expect(target.rewrites[0].destination).toBe('/index.html');
-        expect(target.rewrites[0].function).toBeUndefined();
+        for (const rw of target.rewrites) {
+          expect(rw.destination).toMatch(/\.html$/);
+          expect(rw.function).toBeUndefined();
+        }
       }
     });
 

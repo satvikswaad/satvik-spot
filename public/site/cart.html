@@ -64,6 +64,7 @@
                 <a href="profile.html" class="ref-icon-btn" aria-label="My Account" title="My Account" style="text-decoration: none; font-size: 1.1rem; color: #1D552C;">
                     👤
                 </a>
+                <button type="button" id="mobile-menu-btn" class="ref-mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
             </div>
         </div>
         
@@ -71,6 +72,21 @@
             <svg class="header-wave-svg" viewBox="0 0 1440 16" preserveAspectRatio="none">
                 <path d="M0,0 L1440,0 L1440,6 C1380,10 1320,4 1260,8 C1200,12 1140,5 1080,7 C1020,10 960,4 900,8 C840,11 780,5 720,7 C660,10 600,4 540,8 C480,12 420,5 360,7 C300,10 240,4 180,8 C120,12 60,5 0,7 Z" fill="#FAF5EB"/>
             </svg>
+        </div>
+
+        <!-- HEADER DROPDOWN MENU (COMPACT, NON-BLURRING, PROFESSIONAL) -->
+        <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
+            <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
+                <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
+            </button>
+            <a href="index.html#hero" class="dropdown-nav-link" role="menuitem">🏠 Home</a>
+            <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Shop Products</a>
+            <a href="why-us.html" class="dropdown-nav-link" role="menuitem">✨ Why Us</a>
+            <a href="our-story.html#about" class="dropdown-nav-link" role="menuitem">📜 Our Story</a>
+            <a href="reviews.html" class="dropdown-nav-link" role="menuitem">⭐ Customer Reviews</a>
+            <a href="faq.html" class="dropdown-nav-link" role="menuitem">❓ FAQ</a>
+            <a href="contact.html" class="dropdown-nav-link" role="menuitem">📞 Contact Us</a>
+            <a href="profile.html" class="dropdown-nav-link profile-link" id="mobile-nav-profile" role="menuitem">👤 My Account & Orders</a>
         </div>
     </header>
 
@@ -107,6 +123,125 @@
         </div>
 
     </main>
+
+    <!-- SITE FOOTER -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- COL 1: BRAND ESSENCE & SOCIALS -->
+                <div class="footer-col footer-col-brand">
+                    <a href="index.html" class="footer-brand-header" aria-label="Satvik Swaad Home">
+                        <img src="assets/logo.png" alt="Satvik Swaad Logo" class="footer-brand-logo" width="44" height="44" loading="lazy" />
+                        <span class="footer-brand-name">Satvik Swaad</span>
+                    </a>
+                    <p class="footer-desc">At Satvik Swaad, we craft authentic, homemade pickles and traditional delicacies that bring the sacred essence of generational purity to your everyday life.</p>
+                    <div class="footer-social-row" aria-label="Social and contact links">
+                        <a href="tel:+919236587600" class="footer-social-btn" aria-label="Phone Support" title="Call Us">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        </a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Instagram" title="Instagram">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        <a href="https://wa.me/919236587600?text=Namaste%2C%20I%20have%20an%20inquiry%20about%20Satvik%20Swaad" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="WhatsApp" title="WhatsApp">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                        </a>
+                        <a href="mailto:satvikswaad.care@gmail.com" class="footer-social-btn" aria-label="Email Support" title="Email Us">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- COL 2: QUICK LINKS -->
+                <div class="footer-col footer-col-links">
+                    <details class="footer-accordion" open>
+                        <summary class="footer-accordion-summary">
+                            <span class="footer-heading-text">QUICK LINKS</span>
+                            <span class="footer-accordion-icon" aria-hidden="true"></span>
+                        </summary>
+                        <div class="footer-accordion-content">
+                            <ul class="footer-nav-list">
+                                <li><a href="products.html">Our Collection</a></li>
+                                <li><a href="products.html?category=achar">Pickles &amp; Achar</a></li>
+                                <li><a href="products.html?category=sweets">Sweets &amp; Murabba</a></li>
+                                <li><a href="our-story.html">Our Heritage Story</a></li>
+                                <li><a href="why-us.html">Health &amp; Purity Promise</a></li>
+                                <li><a href="faq.html">FAQs</a></li>
+                                <li><a href="cancellation-refund-policy.html">Return &amp; Refund Policy</a></li>
+                                <li><a href="shipping-delivery-policy.html">Shipping Policy</a></li>
+                                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                                <li><a href="cookies-policy.html">Cookies Policy</a></li>
+                                <li><a href="terms-and-conditions.html">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- COL 3: CONTACT -->
+                <div class="footer-col footer-col-contact">
+                    <details class="footer-accordion" open>
+                        <summary class="footer-accordion-summary">
+                            <span class="footer-heading-text">CONTACT</span>
+                            <span class="footer-accordion-icon" aria-hidden="true"></span>
+                        </summary>
+                        <div class="footer-accordion-content">
+                            <div class="footer-contact-list">
+                                <div class="footer-contact-item">
+                                    <div class="footer-contact-icon-circle" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                    </div>
+                                    <div class="footer-contact-info">
+                                        <a href="tel:+919236587600" class="footer-contact-main">+91 92365 87600</a>
+                                        <span class="footer-contact-label">CALL SUPPORT</span>
+                                    </div>
+                                </div>
+                                <div class="footer-contact-item">
+                                    <div class="footer-contact-icon-circle" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                                    </div>
+                                    <div class="footer-contact-info">
+                                        <a href="https://wa.me/919236587600?text=Namaste%2C%20I%20have%20an%20inquiry%20about%20Satvik%20Swaad" target="_blank" rel="noopener noreferrer" class="footer-contact-main">WhatsApp</a>
+                                        <span class="footer-contact-label">MESSAGE US</span>
+                                    </div>
+                                </div>
+                                <div class="footer-contact-item">
+                                    <div class="footer-contact-icon-circle" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                    </div>
+                                    <div class="footer-contact-info">
+                                        <a href="mailto:satvikswaad.care@gmail.com" class="footer-contact-main">satvikswaad.care@gmail.com</a>
+                                        <span class="footer-contact-label">DIRECT SUPPORT</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- COL 4: DIRECT COMMUNICATION GUARANTEE -->
+                <div class="footer-col footer-col-newsletter">
+                    <div class="footer-newsletter-card" style="background: rgba(30, 86, 49, 0.05); border: 1.5px dashed var(--color-green); border-radius: 14px; padding: 20px;">
+                        <div class="footer-newsletter-title-wrap">
+                            <span class="footer-newsletter-title" style="color: var(--color-green); font-size: 1.05rem;">🛡️ Secure Direct Care</span>
+                        </div>
+                        <p class="footer-newsletter-desc" style="font-size: 0.82rem; line-height: 1.45; color: var(--color-sub); margin-top: 8px;">
+                            <strong>Zero Spam Guarantee:</strong> Satvik Swaad does not send or provide third-party message or promotional mail services. All communication is 100% direct and secured via our verified WhatsApp (+91 92365 87600) and official care inbox (satvikswaad.care@gmail.com).
+                        </p>
+                        <span class="footer-newsletter-footnote" style="color: var(--color-green); font-weight: 700; margin-top: 10px; display: block;">100% Direct &bull; Zero Marketing Blasts</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM COPYRIGHT BAR -->
+            <div class="footer-bottom-bar">
+                <div class="footer-bottom-copy">
+                    &copy; 2026 Satvik Swaad. All rights reserved.
+                </div>
+                <div class="footer-bottom-tagline">
+                    Crafted with ❤️ in India | Pure Taste of Tradition
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <!-- FIXED MOBILE BOTTOM NAVIGATION BAR -->
     <nav class="mobile-bottom-nav" aria-label="Mobile Navigation" style="z-index: 1000;">
@@ -357,5 +492,6 @@
             window.addEventListener('cartUpdated', renderCartPage);
         })();
     </script>
+    <script type="module" src="./script.js"></script>
 </body>
 </html>

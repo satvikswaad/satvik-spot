@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang='hi'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Satvik Swaad — 6 Homepage UI Options</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #FAF6F0; color: #201815; }
+        header { background: #1A4329; color: white; padding: 16px 24px; border-bottom: 4px solid #D49A24; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        .brand-info { display: flex; align-items: center; gap: 16px; }
+        .brand-logo { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #D49A24; background: white; object-fit: cover; }
+        .brand-title { font-size: 1.5rem; font-weight: 800; color: #FFFFFF; }
+        .brand-sub { font-size: 0.9rem; color: #F8E8C9; }
+        .nav-btn-info { background: rgba(255,255,255,0.12); padding: 8px 14px; border-radius: 8px; font-size: 0.88rem; border: 1px solid #D49A24; color: #F8E8C9; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .notice-box { background: #FFF3CD; border: 1.5px solid #FFEEBA; color: #856404; padding: 14px 20px; border-radius: 10px; margin-bottom: 24px; font-weight: 600; font-size: 0.95rem; }
+        .tabs-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+        .tab-btn { background: white; border: 2px solid #1A4329; color: #1A4329; font-weight: 800; font-size: 1rem; padding: 10px 18px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: #1A4329; color: white; }
+        .tab-btn:hover { background: #8C3A27; color: white; border-color: #8C3A27; }
+        .option-panel { display: none; background: white; border: 2px solid #E0D6C8; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+        .option-panel.active { display: block; }
+        .option-header { margin-bottom: 20px; border-bottom: 2px solid #FAF6F0; padding-bottom: 12px; }
+        .option-title { font-size: 1.6rem; color: #8C3A27; font-weight: 800; }
+        .option-desc { font-size: 1.05rem; color: #555; margin-top: 4px; }
+        .screens-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start; }
+        @media (max-width: 900px) { .screens-grid { grid-template-columns: 1fr; } }
+        .screen-card { background: #FAF6F0; border: 1.5px solid #D49A24; border-radius: 12px; overflow: hidden; padding: 12px; }
+        .screen-label { font-weight: 800; color: #1A4329; font-size: 1rem; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .screen-img { width: 100%; height: auto; border-radius: 8px; display: block; box-shadow: 0 4px 14px rgba(0,0,0,0.12); cursor: pointer; transition: transform 0.2s; }
+        .screen-img:hover { transform: scale(1.01); }
+        .open-btn { background: #1A4329; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class='brand-info'>
+            <img src='public/site/assets/new_logo.jpg' alt='Satvik Swaad Logo' class='brand-logo'>
+            <div>
+                <div class='brand-title'>Satvik Swaad — 6 Homepage UI Options</div>
+                <div class='brand-sub'>माँ के स्वाद की विरासत • Laptop & Mobile UI Designs</div>
+            </div>
+        </div>
+        <div class='nav-btn-info'>
+            <b>Hindi Buttons:</b> Home = <b>होम</b> | Products = <b>उत्पाद</b> | Cart = <b>कार्ट / थैला</b>
+        </div>
+    </header>
+
+    <div class='container'>
+        <div class='notice-box'>
+            💡 <b>Notice:</b> You can view all high-resolution UI pictures below. To view the PDF file with pictures (and avoid opening in Notepad), right-click <code>Satvik_Swaad_PICTURES_ONLY.pdf</code> &rarr; <b>Open With &rarr; Microsoft Edge or Google Chrome</b>.
+        </div>
+
+        
+        <!-- NEW HERO BANNER OPTIONS SECTION -->
+        <div style="background: white; border: 2px solid #1A4329; border-radius: 16px; padding: 24px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
+            <div style="border-bottom: 2px solid #FAF6F0; padding-bottom: 12px; margin-bottom: 20px;">
+                <h2 style="font-size: 1.6rem; color: #1A4329; font-weight: 800;">🌟 3 New Village Hero Banner Options (With Updated Logo & Slogans)</h2>
+                <p style="font-size: 1.05rem; color: #555; margin-top: 4px;">Crafted specifically for your hero slider without any square blocking boxes. Currently applied directly to your live site!</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px;">
+                
+                <div style="background: #FAF6F0; border: 1.5px solid #D49A24; border-radius: 12px; padding: 12px;">
+                    <div style="font-weight: 800; color: #8C3A27; font-size: 1.05rem; margin-bottom: 8px;">Banner Option A: Aangan & Maa-Beti Swaad</div>
+                    <img src="public/site/assets/SatvikSwaad_hero_village_aangan.jpg" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <div style="font-size: 0.9rem; color: #444; margin-top: 8px;"><b>Slogan:</b> <i>'Achaar jo dil se bana, maa ke haathon ka asli swaad ❤️'</i></div>
+                </div>
+
+                <div style="background: #FAF6F0; border: 1.5px solid #D49A24; border-radius: 12px; padding: 12px;">
+                    <div style="font-weight: 800; color: #8C3A27; font-size: 1.05rem; margin-bottom: 8px;">Banner Option B: Terrace Sun-Cured Barnis</div>
+                    <img src="public/site/assets/SatvikSwaad_hero_village_terrace.jpg" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <div style="font-size: 0.9rem; color: #444; margin-top: 8px;"><b>Slogan:</b> <i>'100% Sun-Cured in Kachi Ghani Mustard Oil • Zero Chemicals'</i></div>
+                </div>
+
+                <div style="background: #FAF6F0; border: 1.5px solid #D49A24; border-radius: 12px; padding: 12px;">
+                    <div style="font-weight: 800; color: #8C3A27; font-size: 1.05rem; margin-bottom: 8px;">Banner Option C: Mustard Bloom & Farm Harvest</div>
+                    <img src="public/site/assets/SatvikSwaad_hero_village_harvest.jpg" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <div style="font-size: 0.9rem; color: #444; margin-top: 8px;"><b>Slogan:</b> <i>'maa ke swaad ki virasat, beti ke sapno ki pehchaan'</i></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class='tabs-row'>
+            <button class='tab-btn active' onclick='showOption(1)'>Option 1: Courtyard Heritage</button>
+            <button class='tab-btn' onclick='showOption(2)'>Option 2: Mustard Harvest</button>
+            <button class='tab-btn' onclick='showOption(3)'>Option 3: Royal Haveli</button>
+            <button class='tab-btn' onclick='showOption(4)'>Option 4: Mud Aangan & Stories</button>
+            <button class='tab-btn' onclick='showOption(5)'>Option 5: Desi Taste Catalog</button>
+            <button class='tab-btn' onclick='showOption(6)'>Option 6: Sun-Curing Journey</button>
+        </div>
+
+        <!-- Option 1 -->
+        <div id='opt-1' class='option-panel active'>
+            <div class='option-header'>
+                <h2 class='option-title'>Option 1: Aangan Ki Dhoop & Maa Ke Haath Ka Swaad</h2>
+                <p class='option-desc'>अचार जो दिल से बना, माँ के हाथों का असली स्वाद ❤️ • Mother & daughter tasting pickles from traditional earthen pot (matka).</p>
+            </div>
+            <div class='screens-grid'>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>💻 Laptop Homepage (16:9 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/01_Option_1_Laptop_Village_Courtyard.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/01_Option_1_Laptop_Village_Courtyard.jpg' class='screen-img' alt='Option 1 Laptop'>
+                </div>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>📱 Mobile App Homepage (9:16 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/02_Option_1_Mobile_Village_Courtyard.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/02_Option_1_Mobile_Village_Courtyard.jpg' class='screen-img' alt='Option 1 Mobile'>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 2 -->
+        <div id='opt-2' class='option-panel'>
+            <div class='option-header'>
+                <h2 class='option-title'>Option 2: Khet Se Rasoi Tak (Mustard Bloom & Harvest)</h2>
+                <p class='option-desc'>खेतों की ताज़गी, गाँव की शुद्धता • 100% कच्ची घानी सरसों का तेल • Sunlit yellow sarson fields & wooden oil press.</p>
+            </div>
+            <div class='screens-grid'>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>💻 Laptop Homepage (16:9 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/03_Option_2_Laptop_Mustard_Bloom_Harvest.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/03_Option_2_Laptop_Mustard_Bloom_Harvest.jpg' class='screen-img' alt='Option 2 Laptop'>
+                </div>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>📱 Mobile App Homepage (9:16 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/04_Option_2_Mobile_Mustard_Bloom_Harvest.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/04_Option_2_Mobile_Mustard_Bloom_Harvest.jpg' class='screen-img' alt='Option 2 Mobile'>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 3 -->
+        <div id='opt-3' class='option-panel'>
+            <div class='option-header'>
+                <h2 class='option-title'>Option 3: Rajwada Desi Rasoi (Royal Heritage Pantry)</h2>
+                <p class='option-desc'>पीढ़ियों पुरानी पारंपरिक रेसिपीज़ • शुद्ध देसी स्वाद • Carved haveli arches, antique brass spice dabbas & gold caps.</p>
+            </div>
+            <div class='screens-grid'>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>💻 Laptop Homepage (16:9 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/05_Option_3_Laptop_Rajwada_Royal_Heritage.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/05_Option_3_Laptop_Rajwada_Royal_Heritage.jpg' class='screen-img' alt='Option 3 Laptop'>
+                </div>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>📱 Mobile App Homepage (9:16 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/06_Option_3_Mobile_Rajwada_Royal_Heritage.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/06_Option_3_Mobile_Rajwada_Royal_Heritage.jpg' class='screen-img' alt='Option 3 Mobile'>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 4 -->
+        <div id='opt-4' class='option-panel'>
+            <div class='option-header'>
+                <h2 class='option-title'>Option 4: Mitti Ka Aangan & Live Village Stories</h2>
+                <p class='option-desc'>माँ के स्वाद की विरासत, गाँव की शुद्धता • Glazed ceramic martaban (अचार की बरनी) & live video story circles.</p>
+            </div>
+            <div class='screens-grid'>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>💻 Laptop Homepage (16:9 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/07_Option_4_Laptop_Mitti_Aangan_Martaban.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/07_Option_4_Laptop_Mitti_Aangan_Martaban.jpg' class='screen-img' alt='Option 4 Laptop'>
+                </div>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>📱 Mobile App Homepage (9:16 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/08_Option_4_Mobile_Live_Village_Stories.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/08_Option_4_Mobile_Live_Village_Stories.jpg' class='screen-img' alt='Option 4 Mobile'>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 5 -->
+        <div id='opt-5' class='option-panel'>
+            <div class='option-header'>
+                <h2 class='option-title'>Option 5: Desi Taste-Profile Catalog & Audio Provenance</h2>
+                <p class='option-desc'>हाथों का प्यार, परंपरा का स्वाद • 0% मिलावट • Flavor filters (खट्टा, मीठा, तीखा) & Grandma's audio story note.</p>
+            </div>
+            <div class='screens-grid'>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>💻 Laptop Homepage / Catalog (16:9 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/09_Option_5_Laptop_Desi_Taste_Catalog.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/09_Option_5_Laptop_Desi_Taste_Catalog.jpg' class='screen-img' alt='Option 5 Laptop'>
+                </div>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>📱 Mobile Product Audio View (9:16 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/10_Option_5_Mobile_Audio_Story_Product.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/10_Option_5_Mobile_Audio_Story_Product.jpg' class='screen-img' alt='Option 5 Mobile'>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 6 -->
+        <div id='opt-6' class='option-panel'>
+            <div class='option-header'>
+                <h2 class='option-title'>Option 6: Terrace Sun-Curing Journey & Voice Checkout</h2>
+                <p class='option-desc'>फैक्ट्री का केमिकल नहीं, गाँव की धूप और माँ का दुलार • 14-day rooftop sun curing & Hindi voice checkout.</p>
+            </div>
+            <div class='screens-grid'>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>💻 Laptop Homepage / Process (16:9 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/11_Option_6_Laptop_Terrace_SunCuring_Heritage.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/11_Option_6_Laptop_Terrace_SunCuring_Heritage.jpg' class='screen-img' alt='Option 6 Laptop'>
+                </div>
+                <div class='screen-card'>
+                    <div class='screen-label'>
+                        <span>📱 Mobile Voice Checkout (9:16 View)</span>
+                        <a href='UI_HOMEPAGE_OPTIONS/12_Option_6_Mobile_Tier3_Voice_Checkout.jpg' target='_blank' class='open-btn'>Open Full Image ↗</a>
+                    </div>
+                    <img src='UI_HOMEPAGE_OPTIONS/12_Option_6_Mobile_Tier3_Voice_Checkout.jpg' class='screen-img' alt='Option 6 Mobile'>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showOption(num) {
+            document.querySelectorAll('.option-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('opt-' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

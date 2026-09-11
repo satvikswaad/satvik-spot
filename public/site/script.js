@@ -1,6 +1,7 @@
 import { sanitizeText, validateUrl, createSafeElement, isSafeNavigationUrl } from './js/security.js';
 import { PRODUCTS_CATALOGUE } from './js/productsData.js';
 import { getCurrentLanguage, setLanguage, t, applyTranslations } from './js/translations.js';
+import { initiatePayUPayment, submitPayUForm } from './js/payuService.js';
 
 const CART_STORAGE_KEY = 'satwikCart_v2';
 const LEGACY_STORAGE_KEY = 'satwikCart';
@@ -69,6 +70,7 @@ function loadAndMigrateCart() {
     return {};
 }
 
+var updateHeaderOffsets = null;
 let cart = loadAndMigrateCart();
 let currentSlide = 0;
 let autoplayTimer = null;
@@ -590,7 +592,7 @@ function initScrollToTop() {
 }
 
 /* ── STICKY HEADER & SCROLL INTERACTIONS ── */
-let updateHeaderOffsets = null;
+// updateHeaderOffsets declared at top
 
 function initStickyHeader() {
     const header = document.querySelector('.site-header');
@@ -1148,10 +1150,10 @@ function ensureModalsInDOM() {
                                         <input type="radio" name="payment-method" id="pm-online-dom" value="Online Payment" checked />
                                         <div style="flex: 1;">
                                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">⚡ Instant Online Payment</span>
+                                                <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">⚡ Instant Online Payment (PayU)</span>
                                                 <span style="font-size: 0.72rem; font-weight: 800; background: #D4AF37; color: #FFF; padding: 2px 7px; border-radius: 12px; letter-spacing: 0.5px;">RECOMMENDED</span>
                                             </div>
-                                            <p style="margin: 4px 0 6px; font-size: 0.8rem; color: #555; line-height: 1.35;">UPI (GPay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking via Razorpay.</p>
+                                            <p style="margin: 4px 0 6px; font-size: 0.8rem; color: #555; line-height: 1.35;">UPI (GPay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking via PayU Secure Gateway.</p>
                                             <div style="display: flex; gap: 6px; font-size: 0.75rem; color: #1F4A2C; font-weight: 700;">
                                                 <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">UPI</span>
                                                 <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">Cards</span>
@@ -4484,115 +4486,35 @@ export async function placeOrder() {
             return;
         }
 
-        // ── FLOW 3: ONLINE PAYMENT (RAZORPAY) ──
-        let paymentData = null;
-        let paymentInitError = null;
+        // ── FLOW 3: ONLINE PAYMENT (PAYU HOSTED CHECKOUT) ──
+        const payuPayload = {
+            name,
+            phone,
+            email: email || undefined,
+            house: finalHouse || undefined,
+            street: finalStreet || undefined,
+            landmark: landmark || undefined,
+            city: city || undefined,
+            state: state || 'Uttar Pradesh',
+            pincode: pincode || undefined,
+            address: fullAddress,
+            note: note || undefined,
+            paymentMethod: 'Online Payment',
+            idempotencyKey,
+            items: cartItems.map(cartItem => ({
+                productId: String(cartItem.productId || cartItem.id),
+                variantId: String(cartItem.variantId || 'var_500g'),
+                qty: Number(cartItem.qty) || 1
+            }))
+        };
 
-        try {
-            const paymentResponse = await fetch(`${apiBaseUrl}/api/v1/payments/create-order`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
-                    name,
-                    phone,
-                    email: email || undefined,
-                    house: finalHouse || undefined,
-                    street: finalStreet || undefined,
-                    landmark: landmark || undefined,
-                    city: city || undefined,
-                    state: state || 'Uttar Pradesh',
-                    pincode: pincode || undefined,
-                    address: fullAddress,
-                    note: note || undefined,
-                    paymentMethod: 'Online Payment',
-                    idempotencyKey,
-                    items: cartItems.map(cartItem => ({
-                        productId: String(cartItem.productId || cartItem.id),
-                        variantId: String(cartItem.variantId || 'var_500g'),
-                        qty: Number(cartItem.qty) || 1
-                    }))
-                })
-            });
-
-            const respJson = await paymentResponse.json().catch(() => ({}));
-            if (paymentResponse.ok && respJson.success && respJson.data) {
-                paymentData = respJson.data;
-            } else {
-                paymentInitError = respJson?.error?.message || 'Payment gateway initialization notice';
-            }
-        } catch (fErr) {
-            paymentInitError = fErr.message;
-        }
-
-        // If backend returned active Razorpay order:
-        if (paymentData && paymentData.razorpayOrderId && paymentData.razorpayKeyId) {
-            async function loadRazorpayScript() {
-                if (window.Razorpay) return true;
-                return new Promise((resolve) => {
-                    const script = document.createElement('script');
-                    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-                    script.onload = () => resolve(true);
-                    script.onerror = () => resolve(false);
-                    document.head.appendChild(script);
-                });
-            }
-
-            const scriptLoaded = await loadRazorpayScript();
-            if (!scriptLoaded) {
-                throw new Error('Unable to load payment gateway. Please check your internet connection.');
-            }
-
-            const rzpOptions = {
-                key: paymentData.razorpayKeyId,
-                amount: paymentData.amount,
-                currency: paymentData.currency || 'INR',
-                name: 'Satvik Swaad',
-                description: `Order #${String(paymentData.orderId).slice(-6).toUpperCase()}`,
-                order_id: paymentData.razorpayOrderId,
-                modal: {
-                    ondismiss: function () {
-                        // User cancelled or closed Razorpay modal - PRESERVE CART!
-                        window.location.href = `payment-failed.html?reason=cancelled_by_user&orderId=${encodeURIComponent(paymentData.orderId)}&total=${orderTotal}`;
-                    }
-                },
-                handler: async function (response) {
-                    try {
-                        const verifyRes = await fetch(`${apiBaseUrl}/api/v1/payments/verify`, {
-                            method: 'POST',
-                            headers,
-                            body: JSON.stringify({
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature
-                            })
-                        });
-                    } catch (vErr) {
-                        console.warn('Payment verification notice:', vErr);
-                    }
-
-                    saveOrderRecordLocally(paymentData.orderId, 'Online Payment (Razorpay)', response.razorpay_payment_id);
-                    showToast('🎉 Order placed and payment confirmed!');
-                    window.location.href = `order-success.html?orderId=${encodeURIComponent(paymentData.orderId)}&paymentId=${encodeURIComponent(response.razorpay_payment_id)}&method=online&total=${orderTotal}`;
-                },
-                prefill: {
-                    name,
-                    contact: phone,
-                    email: email || ''
-                },
-                theme: {
-                    color: '#7A1C1C'
-                }
-            };
-
-            const rzp = new window.Razorpay(rzpOptions);
-            rzp.on('payment.failed', function (failResp) {
-                // Payment failed at bank - PRESERVE CART!
-                const desc = failResp?.error?.description || 'Transaction declined';
-                window.location.href = `payment-failed.html?reason=${encodeURIComponent(desc)}&orderId=${encodeURIComponent(paymentData.orderId)}&total=${orderTotal}`;
-            });
-            rzp.open();
+        const payuResult = await initiatePayUPayment(payuPayload);
+        if (payuResult && payuResult.success) {
+            // Form automatically submitted to PayU hosted checkout
             return;
         }
+
+        let paymentInitError = payuResult?.error || 'PayU Payment Gateway initialization notice';
 
         // If backend payments are in preview/launch preparation mode or unavailable:
         if (errEl) {

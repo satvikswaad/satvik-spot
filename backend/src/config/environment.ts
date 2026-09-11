@@ -7,6 +7,7 @@
  */
 
 import * as fs from 'fs';
+import * as crypto from 'crypto';
 
 export interface RegulatoryConfig {
   fssaiStatus: 'pending' | 'applied' | 'verified';
@@ -32,6 +33,14 @@ export interface RazorpayConfig {
   razorpayWebhookSecret: string;
 }
 
+export interface PayUConfig {
+  payuMerchantKey: string;
+  payuMerchantSalt: string;
+  payuEnv: 'TEST' | 'PROD';
+  payuBaseUrl: string;
+  sessionSecret: string;
+}
+
 export interface ServerConfig {
   port: number;
   nodeEnv: string;
@@ -49,10 +58,14 @@ export function validateGstinFormat(gstin: string): boolean {
   return /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/.test(gstin.trim());
 }
 
-export const envConfig: FeatureGateConfig & RegulatoryConfig & ServerConfig & RazorpayConfig = {
+const fallbackSessionSecret = crypto.randomBytes(32).toString('hex');
+const payuEnvSetting = (process.env.PAYU_ENV || 'TEST').toUpperCase() === 'PROD' ? 'PROD' : 'TEST';
+const payuBaseUrlDefault = payuEnvSetting === 'PROD' ? 'https://secure.payu.in' : 'https://test.payu.in';
+
+export const envConfig: FeatureGateConfig & RegulatoryConfig & ServerConfig & RazorpayConfig & PayUConfig = {
   port: parseInt(process.env.PORT || '5000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
-  corsAllowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || 'https://satvik-spot-staging.web.app,https://satvik-spot-staging-admin.web.app,http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000,http://localhost:8080').split(',').map(s => s.trim()),
+  corsAllowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || 'https://satvik-spot-staging.web.app,https://satvik-spot-staging-admin.web.app,https://satvikswaad.com,http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000,http://localhost:8080').split(',').map(s => s.trim()),
   adminAllowedIps: process.env.ADMIN_ALLOWED_IPS ? process.env.ADMIN_ALLOWED_IPS.split(',').map(s => s.trim()).filter(Boolean) : undefined,
   fssaiStatus: (process.env.FSSAI_STATUS as any) || 'pending',
   fssaiNumber: validateFssaiFormat(process.env.FSSAI_NUMBER || '') ? (process.env.FSSAI_NUMBER || '').trim() : '',
@@ -68,7 +81,12 @@ export const envConfig: FeatureGateConfig & RegulatoryConfig & ServerConfig & Ra
   publicIndexingEnabled: process.env.PUBLIC_INDEXING_ENABLED === 'true',
   razorpayKeyId: process.env.RAZORPAY_KEY_ID || '',
   razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET || '',
-  razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || ''
+  razorpayWebhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || '',
+  payuMerchantKey: process.env.PAYU_MERCHANT_KEY || 'TEST_KEY',
+  payuMerchantSalt: process.env.PAYU_MERCHANT_SALT || 'TEST_SALT',
+  payuEnv: payuEnvSetting,
+  payuBaseUrl: process.env.PAYU_BASE_URL || payuBaseUrlDefault,
+  sessionSecret: process.env.SESSION_SECRET || fallbackSessionSecret
 };
 
 export const ALLOWED_ENV_NAMES = ['development', 'test', 'local', 'staging', 'production'];

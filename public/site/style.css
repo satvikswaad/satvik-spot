@@ -51,6 +51,10 @@
     --color-paper-note: #ece5d5;
     --color-handwrite: #853624;
     --color-bg: var(--color-cream);
+
+    /* DYNAMIC HEADER METRICS DEFAULTS */
+    --site-header-height: 70px;
+    --site-header-bottom: 70px;
 }
 
 /* ACCESSIBILITY & FOCUS */
@@ -186,6 +190,7 @@ header.site-header {
 }
 
 .site-header.is-scrolled {
+    background-color: #FAF5EB !important;
     box-shadow: 0 4px 18px rgba(74, 28, 18, 0.12), 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 .header-container {
@@ -11892,11 +11897,38 @@ input:checked + .slider:before {
         flex-direction: column;
     }
     .pd-qty-selector {
-        width: 100%;
-        justify-content: space-between;
-    }
 }
 
-
-
-
+/* ==========================================================================
+   CHECKOUT MODAL & PAYU PAYMENT RESPONSIVE RULES (360px VIEWPORT SAFE)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .checkout-modal-box {
+        padding: 18px 14px !important;
+        margin: 10px !important;
+        max-height: 94vh !important;
+    }
+    .checkout-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    .form-row-2 {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    .co-pm-card {
+        padding: 12px 10px !important;
+    }
+}
+@media (max-width: 400px) {
+    .checkout-modal-box {
+        padding: 14px 10px !important;
+        border-radius: 12px !important;
+    }
+    #checkout-title {
+        font-size: 1.3rem !important;
+    }
+    .checkout-section-title {
+        font-size: 0.95rem !important;
+    }
+}

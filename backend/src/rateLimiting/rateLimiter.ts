@@ -85,10 +85,10 @@ export function createRouteRateLimiter(options: { windowMs: number; maxRequests:
   };
 }
 
-// Global baseline rate limiter (60 req/min)
+// Global baseline rate limiter (100 req/min on general /api/ routes)
 export const rateLimiter = createRouteRateLimiter({
   windowMs: 60 * 1000,
-  maxRequests: 60,
+  maxRequests: 100,
   routeIdentifier: 'global'
 });
 
@@ -97,6 +97,13 @@ export const orderRateLimiter = createRouteRateLimiter({
   windowMs: 60 * 1000,
   maxRequests: 5,
   routeIdentifier: 'orders'
+});
+
+// Strict 10 requests per minute on payment initiation as per Blueprint
+export const payuPaymentRateLimiter = createRouteRateLimiter({
+  windowMs: 60 * 1000,
+  maxRequests: 10,
+  routeIdentifier: 'payu_payment_initiation'
 });
 
 export const messageRateLimiter = createRouteRateLimiter({
@@ -134,4 +141,5 @@ export const authRateLimiter = createRouteRateLimiter({
   maxRequests: 20,
   routeIdentifier: 'auth'
 });
+
 
