@@ -14,7 +14,8 @@ const mimeTypes = {
     '.ico': 'image/x-icon',
     '.webp': 'image/webp',
     '.xml': 'application/xml; charset=UTF-8',
-    '.txt': 'text/plain; charset=UTF-8'
+    '.txt': 'text/plain; charset=UTF-8',
+    '.md': 'text/markdown; charset=UTF-8'
 };
 
 function createStaticServer(publicDir, port, name) {
@@ -36,7 +37,9 @@ function createStaticServer(publicDir, port, name) {
             '/contact': '/contact.html',
             '/faq': '/faq.html',
             '/reviews': '/reviews.html',
-            '/profile': '/profile.html'
+            '/profile': '/profile.html',
+            '/security-report': '/security-audit-report.html',
+            '/security-audit-report': '/security-audit-report.html'
         };
 
         if (routeRewrites[reqPath]) {
