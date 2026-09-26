@@ -27,6 +27,18 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Playfair+Display:wght@700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="./style.css" />
+    <!-- Universal Continuity Language Bootstrap -->
+    <script>
+        (function() {
+            try {
+                var l = localStorage.getItem('app_language') || localStorage.getItem('satvik_lang') || 'en';
+                if (l === 'ur' || l === 'hi') {
+                    document.documentElement.lang = l;
+                    if (l === 'ur') document.documentElement.dir = 'rtl';
+                }
+            } catch(e) {}
+        })();
+    </script>
 </head>
 
 <body>
@@ -80,8 +92,23 @@
       <a href="contact.html" class="nav-link">Contact</a>
     </nav>
     <div class="header-right-actions">
-      <!-- Hidden but preserved for JS -->
-      <button type="button" class="btn-lang-toggle" id="btn-lang-toggle" style="display:none;">हिन्दी</button>
+            <!-- 3-Language Selector Dropdown -->
+      <div class="lang-selector-dropdown" id="lang-selector-wrap">
+        <button type="button" class="btn-lang-select" id="btn-lang-select" aria-expanded="false" aria-haspopup="true" aria-label="Select Language">
+          <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span class="active-lang-label" id="active-lang-label">English</span>
+          <svg class="lang-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="lang-dropdown-menu" id="lang-dropdown-menu" role="menu">
+          <button type="button" class="lang-opt" data-lang="en" role="menuitem"><span class="lang-code">EN</span> <span class="lang-name">English</span></button>
+          <button type="button" class="lang-opt" data-lang="hi" role="menuitem"><span class="lang-code">HI</span> <span class="lang-name">हिन्दी (Hindi)</span></button>
+          <button type="button" class="lang-opt" data-lang="ur" role="menuitem"><span class="lang-code">UR</span> <span class="lang-name">اردو (Urdu)</span></button>
+        </div>
+      </div>
       <div class="ref-search-bar">
         <input type="search" placeholder="Search for pickles, sweets..." class="ref-search-input" />
         <svg class="ref-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -105,9 +132,17 @@
 
   <!-- HEADER DROPDOWN MENU (COMPACT, NON-BLURRING, PROFESSIONAL) -->
   <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
-      <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
-          <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
-      </button>
+            <div class="mobile-lang-selector-group" style="padding: 10px 14px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-sub); display: inline-flex; align-items: center; gap: 6px;">
+              <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>Language:</span>
+          </span>
+          <div class="mobile-lang-pills" style="display: flex; gap: 6px;">
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="en" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">EN</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="hi" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">हिन्दी</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="ur" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">اردو</button>
+          </div>
+      </div>
       <a href="index.html#hero" class="dropdown-nav-link" role="menuitem">🏠 Home</a>
       <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Shop Products</a>
       <a href="why-us.html" class="dropdown-nav-link active" role="menuitem">✨ Why Us</a>
@@ -126,9 +161,17 @@
                 <span class="brand-title" style="font-size: 1.3rem;">Satvik Swaad</span>
                 <button id="mobile-menu-close" aria-label="Close Navigation Menu" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
             </div>
-            <button type="button" class="mobile-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;">
-                <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
-            </button>
+                  <div class="mobile-lang-selector-group" style="padding: 10px 14px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-sub); display: inline-flex; align-items: center; gap: 6px;">
+              <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>Language:</span>
+          </span>
+          <div class="mobile-lang-pills" style="display: flex; gap: 6px;">
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="en" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">EN</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="hi" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">हिन्दी</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="ur" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">اردو</button>
+          </div>
+      </div>
             <a href="index.html" class="mobile-nav-link">Home</a>
             <a href="products.html" class="mobile-nav-link">Shop Products</a>
             <a href="why-us.html" class="mobile-nav-link active">Why Us</a>
@@ -152,6 +195,43 @@
 
     <main id="main-content" class="hp-page" role="main">
 
+        <!-- PURITY MANIFESTO SECTION -->
+        <section class="hp-manifesto-section" style="max-width: 1040px; margin: 40px auto 30px; padding: 36px 28px; text-align: center; background: #FFFFFF; border: 1.5px solid var(--color-border, #E6DEC8); border-radius: var(--radius-card, 16px); box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+            <span class="hp-section-subtitle" style="display: inline-block; color: var(--color-gold, #D4AF37); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem; margin-bottom: 8px;">Sacred Preserves</span>
+            <h2 class="manifesto-heading font-script" style="color: var(--color-maroon, #7A1C1C); font-size: 2.3rem; margin-bottom: 16px;">Our Purity Manifesto</h2>
+            <p class="manifesto-text" style="font-size: 1.12rem; color: var(--color-sub, #4A5568); line-height: 1.8; max-width: 860px; margin: 0 auto;">We believe food should nourish the body and soul. In an era of mass-produced chemical condiments, Satvik Swaad returns to the sacred roots of Indian culinary preservation — where pure cold-pressed mustard oil, natural sunlight, and ancient rock salt create preserves that live, breathe, and heal.</p>
+        </section>
+
+        <!-- 4 PURITY PILLARS GRID -->
+        <section class="hp-purity-pillars-section" style="max-width: 1040px; margin: 0 auto 50px; padding: 0 16px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <!-- Pillar 1: Mustard Oil -->
+                <div class="purity-card" style="background: #FAF8F5; border: 1.5px solid #EAE0D0; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">💧</div>
+                    <h3 class="purity-card-title font-script" style="color: var(--color-maroon, #7A1C1C); font-size: 1.35rem; margin-bottom: 8px;">Cold-Pressed Mustard Oil</h3>
+                    <p class="purity-card-desc" style="color: var(--color-sub, #555); font-size: 0.95rem; line-height: 1.6;">Rich in MUFA, Omega-3 & natural antioxidants. Fights bad cholesterol and stimulates natural digestion without hexane solvents.</p>
+                </div>
+                <!-- Pillar 2: Sun Curing -->
+                <div class="purity-card" style="background: #FAF8F5; border: 1.5px solid #EAE0D0; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">☀️</div>
+                    <h3 class="purity-card-title font-script" style="color: var(--color-maroon, #7A1C1C); font-size: 1.35rem; margin-bottom: 8px;">14-Day Solar Maturity</h3>
+                    <p class="purity-card-desc" style="color: var(--color-sub, #555); font-size: 0.95rem; line-height: 1.6;">Slow solar exposure in traditional glass barnis naturally eliminates moisture, concentrates spice pungency, and cures fruits gently.</p>
+                </div>
+                <!-- Pillar 3: No Chemicals -->
+                <div class="purity-card" style="background: #FAF8F5; border: 1.5px solid #EAE0D0; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🌿</div>
+                    <h3 class="purity-card-title font-script" style="color: var(--color-maroon, #7A1C1C); font-size: 1.35rem; margin-bottom: 8px;">Zero Chemical Preservatives</h3>
+                    <p class="purity-card-desc" style="color: var(--color-sub, #555); font-size: 0.95rem; line-height: 1.6;">Free from Sodium Benzoate, Potassium Metabisulphite, synthetic vinegar, artificial colorings, and trans-fats.</p>
+                </div>
+                <!-- Pillar 4: Rock Salt -->
+                <div class="purity-card" style="background: #FAF8F5; border: 1.5px solid #EAE0D0; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🧂</div>
+                    <h3 class="purity-card-title font-script" style="color: var(--color-maroon, #7A1C1C); font-size: 1.35rem; margin-bottom: 8px;">Himalayan Pink Rock Salt</h3>
+                    <p class="purity-card-desc" style="color: var(--color-sub, #555); font-size: 0.95rem; line-height: 1.6;">Unrefined pink rock salt containing 84+ essential trace minerals, aiding alkalinity and avoiding chemical anti-caking agents.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- COMPARISON SECTION -->
         <section id="comparison" class="hp-comparison-section" aria-labelledby="comparison-heading">
             <div class="hp-section-header">
@@ -170,7 +250,7 @@
             <!-- COMPARISON TABLE CARD -->
             <div class="hp-comp-card">
                 <div class="hp-table-scroll" tabindex="0" role="region" aria-label="Comparison Table: Scroll horizontally on mobile devices">
-                    <table class="hp-comp-table">
+                    <table class="hp-comp-table comparison-table">
                         <thead>
                             <tr>
                                 <th scope="col" class="hp-th-dim">Evaluation Dimension</th>
@@ -505,18 +585,7 @@
                                         <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
                                     </div>
                                 </label>
-
-                                <label class="co-pm-card" for="pm-wa-why">
-                                    <input type="radio" name="payment-method" id="pm-wa-why" value="WhatsApp-Assisted Ordering" />
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">💬 WhatsApp Quick Order</span>
-                                            <span style="font-size: 0.72rem; font-weight: 700; background: #DCFCE7; color: #15803D; padding: 2px 7px; border-radius: 12px;">Direct Support</span>
-                                        </div>
-                                        <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Submit order via WhatsApp chat with our family kitchen directly.</p>
-                                    </div>
-                                </label>
-                            </div>
+                                </div>
                         </div>
                         <div style="margin-top: 24px;">
                             <button type="submit" id="btn-submit-order" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Proceed to Pay 💳</button>

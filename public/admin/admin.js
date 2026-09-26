@@ -19,6 +19,9 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+import adminDataAdapter from "./adminDataAdapter.js";
+import { initAdminAnalytics, refreshAdminAnalytics } from "./adminAnalytics.js";
+
 // Global Admin Reactive State
 const adminState = {
     currentUser: null,
@@ -29,13 +32,21 @@ const adminState = {
     activeView: 'view-dashboard',
     orderStatusFilter: 'all',
     orderPaymentFilter: 'all',
+    orderChannelFilter: 'all',
     orderSearchQuery: '',
     productCategoryFilter: 'all',
     productSearchQuery: '',
+    offlineSubtab: 'offline-orders',
+    offlineOrderSearchQuery: '',
     unsubOrders: null,
     unsubProducts: null,
     unsubOffline: null
 };
+
+if (typeof window !== 'undefined') {
+    window.adminState = adminState;
+    window.adminDataAdapter = adminDataAdapter;
+}
 
 // Inactivity Session Guardian (15 Minutes Total, 2 Min Warning)
 const INACTIVITY_LIMIT_MS = 15 * 60 * 1000;
@@ -61,6 +72,49 @@ document.addEventListener('DOMContentLoaded', () => {
     if (linkBack) linkBack.addEventListener('click', (e) => { e.preventDefault(); hideResetForm(); });
     if (btnLogout) btnLogout.addEventListener('click', handleAdminLogout);
     if (btnStay) btnStay.addEventListener('click', resetInactivityTimer);
+
+    // Localhost Dev Direct Access Hook
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost) {
+        const emailInput = document.getElementById('a-email');
+        if (emailInput && !emailInput.value) {
+            emailInput.value = 'admin@satvikswaad.com';
+        }
+
+        const devBox = document.getElementById('dev-quick-access');
+        if (devBox) devBox.style.display = 'block';
+
+        const btnDev = document.getElementById('btn-dev-quick-login');
+        if (btnDev) {
+            btnDev.addEventListener('click', () => {
+                const devUser = {
+                    uid: 'local-dev-owner-001',
+                    email: 'admin@satvikswaad.com',
+                    displayName: 'Satvik Admin (Dev Owner)'
+                };
+                const devClaims = { admin: true, role: 'owner', schemaVersion: 1 };
+                adminState.currentUser = devUser;
+                adminState.claims = devClaims;
+                sessionStorage.setItem('satvik_dev_admin_auth', 'true');
+                showPortalView(devUser, devClaims);
+                startInactivityTimer();
+            });
+        }
+
+        // Auto-resume dev session if already authenticated on localhost
+        if (sessionStorage.getItem('satvik_dev_admin_auth') === 'true') {
+            const devUser = {
+                uid: 'local-dev-owner-001',
+                email: 'admin@satvikswaad.com',
+                displayName: 'Satvik Admin (Dev Owner)'
+            };
+            const devClaims = { admin: true, role: 'owner', schemaVersion: 1 };
+            adminState.currentUser = devUser;
+            adminState.claims = devClaims;
+            showPortalView(devUser, devClaims);
+            startInactivityTimer();
+        }
+    }
 
     // Sidebar & View Navigation
     const navButtons = document.querySelectorAll('.nav-btn');
@@ -117,11 +171,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const selectChannelFilter = document.getElementById('select-channel-filter');
+    if (selectChannelFilter) {
+        selectChannelFilter.addEventListener('change', (e) => {
+            adminState.orderChannelFilter = e.target.value;
+            renderOrdersView();
+        });
+    }
+
     const inputSearchOrders = document.getElementById('input-search-orders');
     if (inputSearchOrders) {
         inputSearchOrders.addEventListener('input', (e) => {
             adminState.orderSearchQuery = e.target.value.trim().toLowerCase();
             renderOrdersView();
+        });
+    }
+
+    // POS Offline Order Modal Triggers
+    const btnDashNewOffline = document.getElementById('btn-dash-new-offline-order');
+    const btnOrdersNewOffline = document.getElementById('btn-orders-new-offline-order');
+    const btnOpenOfflineOrder = document.getElementById('btn-open-offline-order-modal');
+
+    if (btnDashNewOffline) btnDashNewOffline.addEventListener('click', openOfflineOrderModal);
+    if (btnOrdersNewOffline) btnOrdersNewOffline.addEventListener('click', openOfflineOrderModal);
+    if (btnOpenOfflineOrder) btnOpenOfflineOrder.addEventListener('click', openOfflineOrderModal);
+
+    const btnCloseOfflineOrder = document.getElementById('btn-close-offline-order-modal');
+    const btnCancelOfflineOrder = document.getElementById('btn-cancel-offline-order-modal');
+    if (btnCloseOfflineOrder) btnCloseOfflineOrder.addEventListener('click', closeOfflineOrderModal);
+    if (btnCancelOfflineOrder) btnCancelOfflineOrder.addEventListener('click', closeOfflineOrderModal);
+
+    const formOfflineOrder = document.getElementById('form-offline-order');
+    if (formOfflineOrder) formOfflineOrder.addEventListener('submit', handleOfflineOrderSubmit);
+
+    const btnPosAddItem = document.getElementById('btn-pos-add-item');
+    if (btnPosAddItem) btnPosAddItem.addEventListener('click', addPosItemRow);
+
+    const posDiscountInput = document.getElementById('pos-discount');
+    if (posDiscountInput) posDiscountInput.addEventListener('input', calculatePosTotal);
+
+    // Offline Business View Sub-Tabs
+    const btnSubtabPos = document.getElementById('btn-subtab-pos-orders');
+    const btnSubtabExpenses = document.getElementById('btn-subtab-expenses');
+    if (btnSubtabPos && btnSubtabExpenses) {
+        btnSubtabPos.addEventListener('click', () => switchOfflineSubtab('offline-orders'));
+        btnSubtabExpenses.addEventListener('click', () => switchOfflineSubtab('offline-expenses'));
+    }
+
+    const inputSearchOfflineOrders = document.getElementById('input-search-offline-orders');
+    if (inputSearchOfflineOrders) {
+        inputSearchOfflineOrders.addEventListener('input', (e) => {
+            adminState.offlineOrderSearchQuery = e.target.value.trim().toLowerCase();
+            renderOfflineOrdersTable();
         });
     }
 
@@ -312,6 +413,7 @@ export async function handlePasswordReset() {
 
 // Logout Handler
 export async function handleAdminLogout() {
+    sessionStorage.removeItem('satvik_dev_admin_auth');
     stopInactivityTimer();
     unsubscribeAllStreams();
     if (window.auth) {
@@ -505,39 +607,66 @@ function unsubscribeAllStreams() {
 // ─────────────────────────────────────────────────────────────────────────────
 function subscribeToOrdersStream() {
     const wrap = document.getElementById('admin-orders-stream');
-    if (!wrap || !window.db) return;
+    if (!wrap) return;
 
-    try {
-        const q = query(collection(window.db, 'orders'), orderBy('createdAt', 'desc'));
-        adminState.unsubOrders = onSnapshot(q, (snap) => {
-            adminState.orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-            // Update KPI counters
-            updateOrdersKpi();
+    // 1. Subscribe to Unified Admin Data Adapter (handles localStorage & live local mutations)
+    adminState.unsubOrders = adminDataAdapter.subscribe('orders', (orders) => {
+        adminState.orders = orders;
 
-            // Render Dashboard feed
-            renderDashboardOrdersFeed(adminState.orders.slice(0, 5));
+        // Update KPI counters
+        updateOrdersKpi();
 
-            // Render Full Orders Tab
-            renderOrdersView();
+        // Render Dashboard feed
+        renderDashboardOrdersFeed(adminState.orders.slice(0, 6));
 
-            // Refresh Analytics
-            renderAnalyticsView();
+        // Render Full Orders Tab
+        renderOrdersView();
 
-            const statusText = document.getElementById('live-status-text');
-            if (statusText) statusText.textContent = '● Live Sync Active';
-        }, (err) => {
-            console.error("Orders stream error:", err);
-            const errP = document.createElement('p');
-            errP.style.color = '#DC2626';
-            errP.textContent = 'Security Rule Error: ' + err.message;
-            wrap.replaceChildren(errP);
+        // Render Offline POS Orders Tab
+        renderOfflineOrdersTable();
 
-            const statusText = document.getElementById('live-status-text');
-            if (statusText) statusText.textContent = '⚠️ Sync Error';
-        });
-    } catch (e) {
-        console.error("Stream init error:", e);
+        // Refresh Analytics
+        renderAnalyticsView();
+
+        const statusText = document.getElementById('live-status-text');
+        if (statusText) statusText.textContent = isLocalhost ? '● Live Sync Active (Omnichannel)' : '● Live Sync Active';
+    });
+
+    // 2. Subscribe to Products & Offline Finances from Adapter
+    adminDataAdapter.subscribe('products', (products) => {
+        adminState.products = products;
+        updateStockKpi();
+        renderProductsView();
+    });
+
+    adminDataAdapter.subscribe('offline_finances', (finances) => {
+        adminState.offlineFinances = finances;
+        updateOfflineKpi();
+        renderOfflineLedgerView();
+        updateOrdersKpi();
+    });
+
+    // 3. If in production / non-localhost with live Firestore credentials, also bind Firestore snapshot
+    if (!isLocalhost && window.db) {
+        try {
+            const q = query(collection(window.db, 'orders'), orderBy('createdAt', 'desc'));
+            onSnapshot(q, (snap) => {
+                const firestoreOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (firestoreOrders.length > 0) {
+                    adminState.orders = firestoreOrders;
+                    updateOrdersKpi();
+                    renderDashboardOrdersFeed(adminState.orders.slice(0, 6));
+                    renderOrdersView();
+                    renderAnalyticsView();
+                }
+            }, (err) => {
+                console.warn("[Admin] Firestore orders stream permission notice (using local adapter):", err.message);
+            });
+        } catch (e) {
+            console.warn("[Admin] Stream init error (local adapter active):", e);
+        }
     }
 }
 
@@ -545,17 +674,34 @@ function updateOrdersKpi() {
     const orders = adminState.orders;
     const totalCount = orders.length;
 
+    let onlineGross = 0;
+    let offlineGross = 0;
+    let onlineCount = 0;
+    let offlineCount = 0;
     let pendingCount = 0;
     let unshippedCount = 0;
     let confirmedCount = 0;
     let shippedCount = 0;
     let deliveredCount = 0;
     let cancelledCount = 0;
-    let grossRevenue = 0;
 
     orders.forEach(o => {
         const status = (o.status || '').toLowerCase();
         const payStatus = (o.paymentStatus || '').toLowerCase();
+        const isOffline = o.source === 'offline' || String(o.id).startsWith('SS-OFF-');
+        const amt = Number(o.total || o.finalAmount || 0);
+
+        if (isOffline) {
+            offlineCount++;
+            if (status !== 'cancelled') {
+                offlineGross += amt;
+            }
+        } else {
+            onlineCount++;
+            if (status !== 'cancelled' && (payStatus === 'paid' || payStatus === 'completed' || status === 'delivered')) {
+                onlineGross += amt;
+            }
+        }
 
         if (status === 'pending') pendingCount++;
         else if (status === 'confirmed') {
@@ -564,25 +710,60 @@ function updateOrdersKpi() {
         } else if (status === 'shipped') shippedCount++;
         else if (status === 'delivered') deliveredCount++;
         else if (status === 'cancelled') cancelledCount++;
+    });
 
-        // Calculate Revenue from confirmed/delivered/paid orders
-        if (status !== 'cancelled' && (payStatus === 'paid' || payStatus === 'completed' || status === 'delivered')) {
-            grossRevenue += Number(o.total || o.finalAmount || 0);
+    const combinedGross = onlineGross + offlineGross;
+
+    // Calculate Raw Expenses from offlineFinances to compute Net Margins
+    let totalRawExpenses = 0;
+    adminState.offlineFinances.forEach(entry => {
+        if (entry.type === 'expense') {
+            totalRawExpenses += Number(entry.amount || 0);
         }
     });
+    const netOperatingMargin = combinedGross - totalRawExpenses;
 
     // Update Dashboard KPIs
     const elRev = document.getElementById('kpi-dash-revenue');
+    const elRevSplit = document.getElementById('kpi-dash-rev-split');
     const elTotal = document.getElementById('kpi-dash-orders-count');
+    const elOrdersSplit = document.getElementById('kpi-dash-orders-split');
     const elPending = document.getElementById('kpi-dash-pending-count');
     const elUnshipped = document.getElementById('kpi-dash-unshipped-count');
     const elBadgePending = document.getElementById('badge-pending-orders');
+    const elNet = document.getElementById('kpi-dash-offline-balance');
 
-    if (elRev) elRev.textContent = '₹' + grossRevenue.toLocaleString('en-IN');
+    if (elRev) elRev.textContent = '₹' + combinedGross.toLocaleString('en-IN');
+    if (elRevSplit) elRevSplit.textContent = `🌐 Online: ₹${onlineGross.toLocaleString('en-IN')} · 🏪 Offline: ₹${offlineGross.toLocaleString('en-IN')}`;
     if (elTotal) elTotal.textContent = String(totalCount);
+    if (elOrdersSplit) elOrdersSplit.textContent = `🌐 ${onlineCount} Online · 🏪 ${offlineCount} Offline`;
     if (elPending) elPending.textContent = String(pendingCount);
     if (elUnshipped) elUnshipped.textContent = String(unshippedCount);
     if (elBadgePending) elBadgePending.textContent = String(pendingCount + unshippedCount);
+    if (elNet) {
+        elNet.textContent = (netOperatingMargin >= 0 ? '+' : '') + '₹' + netOperatingMargin.toLocaleString('en-IN');
+        elNet.style.color = netOperatingMargin >= 0 ? '#059669' : '#DC2626';
+    }
+
+    // Update Omnichannel Quick Pulse Bar
+    const onlinePct = combinedGross > 0 ? Math.round((onlineGross / combinedGross) * 100) : 50;
+    const offlinePct = 100 - onlinePct;
+
+    const barOnline = document.getElementById('dash-bar-online');
+    const barOffline = document.getElementById('dash-bar-offline');
+    const txtOnlinePct = document.getElementById('dash-split-online-pct');
+    const txtOfflinePct = document.getElementById('dash-split-offline-pct');
+    const txtOnlineAmt = document.getElementById('dash-split-online-amt');
+    const txtOfflineAmt = document.getElementById('dash-split-offline-amt');
+    const summaryTxt = document.getElementById('dash-omnichannel-summary');
+
+    if (barOnline) barOnline.style.width = `${onlinePct}%`;
+    if (barOffline) barOffline.style.width = `${offlinePct}%`;
+    if (txtOnlinePct) txtOnlinePct.textContent = `${onlinePct}%`;
+    if (txtOfflinePct) txtOfflinePct.textContent = `${offlinePct}%`;
+    if (txtOnlineAmt) txtOnlineAmt.textContent = '₹' + onlineGross.toLocaleString('en-IN');
+    if (txtOfflineAmt) txtOfflineAmt.textContent = '₹' + offlineGross.toLocaleString('en-IN');
+    if (summaryTxt) summaryTxt.textContent = `Online: ${onlinePct}% | Offline: ${offlinePct}% (Gross ₹${combinedGross.toLocaleString('en-IN')})`;
 
     // Update Tab Counts
     setText('cnt-tab-all', String(totalCount));
@@ -699,6 +880,13 @@ function renderOrdersView() {
         });
     }
 
+    // 2.5 Channel Filter (Omnichannel)
+    if (adminState.orderChannelFilter === 'online') {
+        filtered = filtered.filter(o => o.source !== 'offline' && !String(o.id).startsWith('SS-OFF-'));
+    } else if (adminState.orderChannelFilter === 'offline') {
+        filtered = filtered.filter(o => o.source === 'offline' || String(o.id).startsWith('SS-OFF-'));
+    }
+
     // 3. Search Query Filter
     if (adminState.orderSearchQuery) {
         const q = adminState.orderSearchQuery;
@@ -706,7 +894,8 @@ function renderOrdersView() {
             const id = (o.id || '').toLowerCase();
             const name = (o.name || o.customerName || '').toLowerCase();
             const phone = (o.phone || o.customerPhone || '').toLowerCase();
-            return id.includes(q) || name.includes(q) || phone.includes(q);
+            const ch = (o.channel || '').toLowerCase();
+            return id.includes(q) || name.includes(q) || phone.includes(q) || ch.includes(q);
         });
     }
 
@@ -745,6 +934,21 @@ function renderOrdersView() {
         idTitle.className = 'order-id-title';
         idTitle.textContent = 'Order #' + (o.id || '').toUpperCase();
 
+        const isOffline = o.source === 'offline' || String(o.id).startsWith('SS-OFF-');
+        const channelPill = document.createElement('span');
+        channelPill.className = 'status-pill';
+        if (isOffline) {
+            channelPill.style.background = '#ECFDF5';
+            channelPill.style.color = '#065F46';
+            channelPill.style.border = '1px solid #A7F3D0';
+            channelPill.textContent = '🏪 ' + (o.channel || 'OFFLINE POS').toUpperCase();
+        } else {
+            channelPill.style.background = '#EFF6FF';
+            channelPill.style.color = '#1D4ED8';
+            channelPill.style.border = '1px solid #BFDBFE';
+            channelPill.textContent = '🌐 ONLINE STORE';
+        }
+
         const statusPill = document.createElement('span');
         const stLower = (o.status || 'pending').toLowerCase();
         statusPill.className = 'status-pill status-' + stLower;
@@ -756,6 +960,7 @@ function renderOrdersView() {
         payPill.textContent = isPaid ? '💳 PAID' : '⏳ UNPAID';
 
         idGroup.appendChild(idTitle);
+        idGroup.appendChild(channelPill);
         idGroup.appendChild(statusPill);
         idGroup.appendChild(payPill);
 
@@ -909,6 +1114,18 @@ function renderOrdersView() {
             actionsCol.appendChild(btnVerifyPay);
         }
 
+        // Action: Print Receipt (for Offline POS Orders)
+        if (isOffline) {
+            const btnReceipt = document.createElement('button');
+            btnReceipt.type = 'button';
+            btnReceipt.className = 'btn-action';
+            btnReceipt.style.background = '#0F766E';
+            btnReceipt.style.color = '#FFFFFF';
+            btnReceipt.textContent = '🖨️ Receipt';
+            btnReceipt.addEventListener('click', () => printOfflineReceipt(o.id));
+            actionsCol.appendChild(btnReceipt);
+        }
+
         // Action: Cancel Order
         if (stLower !== 'cancelled' && stLower !== 'delivered') {
             const btnCancel = document.createElement('button');
@@ -936,34 +1153,50 @@ function renderOrdersView() {
 
 // Order Mutation Actions
 async function updateOrderStatus(orderId, newStatus) {
-    if (!window.db) return;
-    try {
-        const orderRef = doc(window.db, 'orders', orderId);
-        await updateDoc(orderRef, {
-            status: newStatus,
-            updatedAt: serverTimestamp()
-        });
-        console.log(`Order ${orderId} transitioned to ${newStatus}`);
-    } catch (err) {
-        console.error("Failed to update order status:", err);
-        alert("Failed to update order status: " + err.message);
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isOffline = String(orderId).startsWith('SS-OFF-') || adminState.orders.some(o => o.id === orderId && o.source === 'offline');
+
+    if (isOffline || isLocalhost) {
+        adminDataAdapter.updateOrderStatus(orderId, newStatus);
+        console.log(`[Adapter] Order ${orderId} transitioned to ${newStatus}`);
+    }
+
+    if (window.db && !isOffline) {
+        try {
+            const orderRef = doc(window.db, 'orders', orderId);
+            await updateDoc(orderRef, {
+                status: newStatus,
+                updatedAt: serverTimestamp()
+            });
+            console.log(`[Firestore] Order ${orderId} transitioned to ${newStatus}`);
+        } catch (err) {
+            console.warn("Firestore status update skipped or failed (local adapter active):", err.message);
+        }
     }
 }
 
 // Admin decision control reference: /api/v1/admin/orders/:id/verify-payment
 async function verifyOrderPayment(orderId) {
-    if (!window.db) return;
-    try {
-        const orderRef = doc(window.db, 'orders', orderId);
-        await updateDoc(orderRef, {
-            paymentStatus: 'paid',
-            paymentVerified: true,
-            verifiedAt: serverTimestamp()
-        });
-        console.log(`Payment for order ${orderId} verified successfully.`);
-    } catch (err) {
-        console.error("Failed to verify payment:", err);
-        alert("Failed to verify payment: " + err.message);
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isOffline = String(orderId).startsWith('SS-OFF-') || adminState.orders.some(o => o.id === orderId && o.source === 'offline');
+
+    if (isOffline || isLocalhost) {
+        adminDataAdapter.updateOrderStatus(orderId, undefined, 'paid');
+        console.log(`[Adapter] Payment for order ${orderId} verified.`);
+    }
+
+    if (window.db && !isOffline) {
+        try {
+            const orderRef = doc(window.db, 'orders', orderId);
+            await updateDoc(orderRef, {
+                paymentStatus: 'paid',
+                paymentVerified: true,
+                verifiedAt: serverTimestamp()
+            });
+            console.log(`Payment for order ${orderId} verified successfully.`);
+        } catch (err) {
+            console.warn("Firestore verify payment skipped (local adapter active):", err.message);
+        }
     }
 }
 
@@ -1448,7 +1681,6 @@ function renderOfflineLedgerView() {
 
 async function handleOfflineEntrySubmit(e) {
     e.preventDefault();
-    if (!window.db) return;
 
     const type = document.getElementById('off-type').value;
     const category = document.getElementById('off-category').value;
@@ -1461,13 +1693,27 @@ async function handleOfflineEntrySubmit(e) {
         return;
     }
 
+    const payload = {
+        type,
+        category,
+        amount,
+        date,
+        desc,
+        createdAt: new Date().toISOString()
+    };
+
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost || !window.db) {
+        adminDataAdapter.addOfflineExpense(payload);
+        closeModal('modal-offline');
+        document.getElementById('off-amount').value = '';
+        document.getElementById('off-desc').value = '';
+        return;
+    }
+
     try {
         await addDoc(collection(window.db, 'offline_finances'), {
-            type,
-            category,
-            amount,
-            date,
-            desc,
+            ...payload,
             createdAt: serverTimestamp()
         });
         closeModal('modal-offline');
@@ -1481,7 +1727,11 @@ async function handleOfflineEntrySubmit(e) {
 }
 
 async function deleteOfflineEntry(docId) {
-    if (!window.db) return;
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost || !window.db) {
+        adminDataAdapter.deleteOfflineExpense(docId);
+        return;
+    }
     try {
         await deleteDoc(doc(window.db, 'offline_finances', docId));
     } catch (err) {
@@ -1491,9 +1741,590 @@ async function deleteOfflineEntry(docId) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 3.5 OFFLINE POS ORDER ENTRY & RECEIPT ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+function openOfflineOrderModal() {
+    const form = document.getElementById('form-offline-order');
+    if (form) form.reset();
+
+    const dateInput = document.getElementById('pos-order-date');
+    if (dateInput) {
+        const now = new Date();
+        const localIso = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+        dateInput.value = localIso;
+    }
+
+    const itemsContainer = document.getElementById('pos-items-container');
+    if (itemsContainer) {
+        itemsContainer.replaceChildren();
+        addPosItemRow();
+    }
+
+    const discountInput = document.getElementById('pos-discount');
+    if (discountInput) discountInput.value = '0';
+
+    calculatePosTotal();
+    openModal('modal-offline-order');
+}
+
+function closeOfflineOrderModal() {
+    closeModal('modal-offline-order');
+}
+
+function addPosItemRow() {
+    const container = document.getElementById('pos-items-container');
+    if (!container) return;
+
+    const products = adminDataAdapter.getProducts();
+    if (!products || products.length === 0) {
+        alert("No products available in inventory.");
+        return;
+    }
+
+    const row = document.createElement('div');
+    row.className = 'pos-item-row';
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = '2fr 1.6fr 0.8fr 1.2fr 36px';
+    row.style.gap = '8px';
+    row.style.alignItems = 'center';
+    row.style.background = '#FFFFFF';
+    row.style.border = '1px solid #E8DFD3';
+    row.style.borderRadius = '8px';
+    row.style.padding = '8px 10px';
+
+    // 1. Product Select
+    const selectProd = document.createElement('select');
+    selectProd.className = 'pos-item-prod';
+    selectProd.style.padding = '6px 8px';
+    selectProd.style.borderRadius = '6px';
+    selectProd.style.border = '1px solid #D5C9B8';
+    selectProd.style.fontSize = '0.82rem';
+    selectProd.style.fontWeight = '600';
+    products.forEach((p, idx) => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name;
+        if (idx === 0) opt.selected = true;
+        selectProd.appendChild(opt);
+    });
+
+    // 2. Variant Select
+    const selectVariant = document.createElement('select');
+    selectVariant.className = 'pos-item-variant';
+    selectVariant.style.padding = '6px 8px';
+    selectVariant.style.borderRadius = '6px';
+    selectVariant.style.border = '1px solid #D5C9B8';
+    selectVariant.style.fontSize = '0.82rem';
+
+    // 3. Qty Stepper
+    const inputQty = document.createElement('input');
+    inputQty.type = 'number';
+    inputQty.min = '1';
+    inputQty.value = '1';
+    inputQty.className = 'pos-item-qty';
+    inputQty.style.padding = '6px 6px';
+    inputQty.style.borderRadius = '6px';
+    inputQty.style.border = '1px solid #D5C9B8';
+    inputQty.style.textAlign = 'center';
+    inputQty.style.fontSize = '0.84rem';
+    inputQty.style.fontWeight = '700';
+
+    // 4. Line Subtotal / Unit Price
+    const lineTotal = document.createElement('div');
+    lineTotal.className = 'pos-item-subtotal';
+    lineTotal.style.fontSize = '0.88rem';
+    lineTotal.style.fontWeight = '800';
+    lineTotal.style.color = '#7A1C1C';
+    lineTotal.style.textAlign = 'right';
+    lineTotal.textContent = '₹0';
+
+    // 5. Remove Button
+    const btnRemove = document.createElement('button');
+    btnRemove.type = 'button';
+    btnRemove.style.background = '#FEE2E2';
+    btnRemove.style.color = '#DC2626';
+    btnRemove.style.border = 'none';
+    btnRemove.style.borderRadius = '6px';
+    btnRemove.style.width = '32px';
+    btnRemove.style.height = '32px';
+    btnRemove.style.cursor = 'pointer';
+    btnRemove.style.fontWeight = '900';
+    btnRemove.style.display = 'flex';
+    btnRemove.style.alignItems = 'center';
+    btnRemove.style.justifyContent = 'center';
+    btnRemove.textContent = '✕';
+    btnRemove.title = 'Remove item';
+    btnRemove.addEventListener('click', () => {
+        if (container.children.length > 1) {
+            row.remove();
+            calculatePosTotal();
+        } else {
+            alert("At least one product item is required for the order.");
+        }
+    });
+
+    function populateVariants() {
+        const prodId = selectProd.value;
+        const currentProd = products.find(p => p.id === prodId) || products[0];
+        selectVariant.replaceChildren();
+
+        if (Array.isArray(currentProd.variants) && currentProd.variants.length > 0) {
+            currentProd.variants.forEach((v, vIdx) => {
+                const opt = document.createElement('option');
+                opt.value = v.weight || v.label || 'Standard';
+                opt.dataset.price = v.price;
+                opt.dataset.stock = v.stock;
+                opt.textContent = `${v.weight || v.label || 'Pack'} - ₹${v.price} (Stock: ${v.stock})`;
+                if (vIdx === 0) opt.selected = true;
+                selectVariant.appendChild(opt);
+            });
+        } else {
+            const opt = document.createElement('option');
+            opt.value = 'Standard';
+            opt.dataset.price = currentProd.price || 0;
+            opt.dataset.stock = currentProd.stock || 0;
+            opt.textContent = `Standard - ₹${currentProd.price || 0} (Stock: ${currentProd.stock || 0})`;
+            selectVariant.appendChild(opt);
+        }
+        updateLineTotal();
+    }
+
+    function updateLineTotal() {
+        const selectedOpt = selectVariant.selectedOptions[0];
+        const unitPrice = selectedOpt ? Number(selectedOpt.dataset.price || 0) : 0;
+        const qty = Math.max(1, parseInt(inputQty.value, 10) || 1);
+        const sub = unitPrice * qty;
+        lineTotal.textContent = '₹' + sub.toLocaleString('en-IN');
+        lineTotal.dataset.price = unitPrice;
+        lineTotal.dataset.subtotal = sub;
+        calculatePosTotal();
+    }
+
+    selectProd.addEventListener('change', populateVariants);
+    selectVariant.addEventListener('change', updateLineTotal);
+    inputQty.addEventListener('input', updateLineTotal);
+
+    row.appendChild(selectProd);
+    row.appendChild(selectVariant);
+    row.appendChild(inputQty);
+    row.appendChild(lineTotal);
+    row.appendChild(btnRemove);
+
+    container.appendChild(row);
+    populateVariants();
+}
+
+function calculatePosTotal() {
+    const rows = document.querySelectorAll('#pos-items-container .pos-item-row');
+    let subtotal = 0;
+    rows.forEach(r => {
+        const line = r.querySelector('.pos-item-subtotal');
+        if (line && line.dataset.subtotal) {
+            subtotal += Number(line.dataset.subtotal);
+        }
+    });
+
+    const discountInput = document.getElementById('pos-discount');
+    const discount = discountInput ? Math.max(0, Number(discountInput.value) || 0) : 0;
+    const finalTotal = Math.max(0, subtotal - discount);
+
+    const totalDisplay = document.getElementById('pos-total-display');
+    if (totalDisplay) {
+        totalDisplay.value = '₹' + finalTotal.toLocaleString('en-IN');
+        totalDisplay.dataset.subtotal = subtotal;
+        totalDisplay.dataset.total = finalTotal;
+    }
+}
+
+async function handleOfflineOrderSubmit(e) {
+    e.preventDefault();
+    const custName = (document.getElementById('pos-cust-name').value || '').trim();
+    const custPhone = (document.getElementById('pos-cust-phone').value || '').trim();
+    const channel = document.getElementById('pos-channel').value;
+    const orderDate = document.getElementById('pos-order-date').value;
+    const paymentMode = document.getElementById('pos-payment-mode').value;
+    const paymentStatus = document.getElementById('pos-payment-status').value;
+    const notes = (document.getElementById('pos-order-notes').value || '').trim();
+
+    const discountInput = document.getElementById('pos-discount');
+    const discount = discountInput ? Math.max(0, Number(discountInput.value) || 0) : 0;
+
+    const rows = document.querySelectorAll('#pos-items-container .pos-item-row');
+    if (rows.length === 0) {
+        alert("Please add at least one item to the order.");
+        return;
+    }
+
+    const items = [];
+    let subtotal = 0;
+    const products = adminDataAdapter.getProducts();
+
+    rows.forEach(r => {
+        const prodSelect = r.querySelector('.pos-item-prod');
+        const variantSelect = r.querySelector('.pos-item-variant');
+        const qtyInput = r.querySelector('.pos-item-qty');
+
+        const prodId = prodSelect ? prodSelect.value : '';
+        const prod = products.find(p => p.id === prodId) || {};
+        const variantOpt = variantSelect ? variantSelect.selectedOptions[0] : null;
+        const variantName = variantOpt ? variantOpt.value : 'Standard';
+        const price = variantOpt ? Number(variantOpt.dataset.price || 0) : Number(prod.price || 0);
+        const qty = qtyInput ? Math.max(1, parseInt(qtyInput.value, 10) || 1) : 1;
+        const lineSub = price * qty;
+
+        subtotal += lineSub;
+        items.push({
+            productId: prodId,
+            name: prod.name || 'Handcrafted Pickle',
+            productName: prod.name || 'Handcrafted Pickle',
+            variant: variantName,
+            price: price,
+            qty: qty,
+            quantity: qty,
+            total: lineSub
+        });
+    });
+
+    const finalTotal = Math.max(0, subtotal - discount);
+
+    const payload = {
+        name: custName,
+        customerName: custName,
+        phone: custPhone,
+        customerPhone: custPhone,
+        channel: channel,
+        paymentMethod: paymentMode,
+        paymentMode: paymentMode,
+        paymentStatus: paymentStatus,
+        paymentVerified: paymentStatus === 'paid',
+        items: items,
+        subtotal: subtotal,
+        discount: discount,
+        total: finalTotal,
+        finalAmount: finalTotal,
+        notes: notes,
+        createdAt: orderDate ? new Date(orderDate).toISOString() : new Date().toISOString()
+    };
+
+    const submitBtn = document.getElementById('btn-save-offline-order');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Recording & Deducting Stock...';
+    }
+
+    try {
+        const newOrder = await adminDataAdapter.addOfflineOrder(payload);
+        closeOfflineOrderModal();
+        alert(`✅ Offline Order #${newOrder.id} successfully recorded!\nStock deducted from inventory.\nGross Total: ₹${finalTotal.toLocaleString('en-IN')}`);
+
+        // Switch to Offline POS tab to view the recorded order
+        switchAdminView('view-offline');
+        switchOfflineSubtab('offline-orders');
+    } catch (err) {
+        console.error("Failed to add offline order:", err);
+        alert("Failed to save offline order: " + err.message);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '💾 Save Order & Deduct Stock';
+        }
+    }
+}
+
+function switchOfflineSubtab(tabName) {
+    adminState.offlineSubtab = tabName;
+    const btnPos = document.getElementById('btn-subtab-pos-orders');
+    const btnExp = document.getElementById('btn-subtab-expenses');
+    const cardOrders = document.getElementById('card-offline-orders-table');
+    const cardExp = document.getElementById('card-offline-expenses-table');
+
+    if (tabName === 'offline-orders') {
+        if (btnPos) btnPos.classList.add('active');
+        if (btnExp) btnExp.classList.remove('active');
+        if (cardOrders) cardOrders.style.display = 'block';
+        if (cardExp) cardExp.style.display = 'none';
+        renderOfflineOrdersTable();
+    } else {
+        if (btnPos) btnPos.classList.remove('active');
+        if (btnExp) btnExp.classList.add('active');
+        if (cardOrders) cardOrders.style.display = 'none';
+        if (cardExp) cardExp.style.display = 'block';
+        renderOfflineLedgerView();
+    }
+}
+
+function renderOfflineOrdersTable() {
+    const tbody = document.getElementById('offline-orders-table-body');
+    if (!tbody) return;
+
+    // Filter offline orders
+    let offlineOrders = adminState.orders.filter(o => o.source === 'offline' || String(o.id).startsWith('SS-OFF-'));
+
+    // Count updates
+    const cntTab = document.getElementById('cnt-subtab-offline-orders');
+    if (cntTab) cntTab.textContent = String(offlineOrders.length);
+    const cntKpi = document.getElementById('kpi-offline-orders-count');
+    if (cntKpi) cntKpi.textContent = `${offlineOrders.length} Recorded POS Orders`;
+
+    // Filter by search query
+    if (adminState.offlineOrderSearchQuery) {
+        const q = adminState.offlineOrderSearchQuery;
+        offlineOrders = offlineOrders.filter(o => {
+            const id = (o.id || '').toLowerCase();
+            const name = (o.name || o.customerName || '').toLowerCase();
+            const phone = (o.phone || o.customerPhone || '').toLowerCase();
+            const ch = (o.channel || '').toLowerCase();
+            return id.includes(q) || name.includes(q) || phone.includes(q) || ch.includes(q);
+        });
+    }
+
+    if (offlineOrders.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 8;
+        td.style.textAlign = 'center';
+        td.style.color = '#888';
+        td.style.padding = '28px';
+        td.innerHTML = `No offline POS orders found. <br><button type="button" class="btn-primary" style="margin-top:10px;padding:6px 14px;font-size:0.8rem;" id="btn-empty-add-offline">➕ Record First POS Order</button>`;
+        tr.appendChild(td);
+        tbody.replaceChildren(tr);
+
+        const btn = document.getElementById('btn-empty-add-offline');
+        if (btn) btn.addEventListener('click', openOfflineOrderModal);
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    offlineOrders.forEach(o => {
+        const tr = document.createElement('tr');
+
+        // Order ID
+        const tdId = document.createElement('td');
+        tdId.style.fontFamily = 'monospace';
+        tdId.style.fontWeight = '700';
+        tdId.style.color = '#7A1C1C';
+        tdId.textContent = '#' + (o.id || '');
+
+        // Date & Time
+        const tdDate = document.createElement('td');
+        tdDate.style.fontSize = '0.78rem';
+        let dateStr = 'N/A';
+        if (o.createdAt) {
+            const d = o.createdAt.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+            dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        }
+        tdDate.textContent = dateStr;
+
+        // Customer & Channel
+        const tdCust = document.createElement('td');
+        const strongName = document.createElement('strong');
+        strongName.textContent = o.name || o.customerName || 'Walk-in Customer';
+        const divMeta = document.createElement('div');
+        divMeta.style.fontSize = '0.75rem';
+        divMeta.style.color = '#6B625B';
+        divMeta.textContent = `${o.phone || 'No phone'} · 📍 ${o.channel || 'Counter'}`;
+        tdCust.appendChild(strongName);
+        tdCust.appendChild(divMeta);
+
+        // Items Ordered
+        const tdItems = document.createElement('td');
+        tdItems.style.fontSize = '0.78rem';
+        if (Array.isArray(o.items)) {
+            o.items.forEach(it => {
+                const itemDiv = document.createElement('div');
+                itemDiv.style.whiteSpace = 'nowrap';
+                itemDiv.textContent = `• ${it.name || it.productName || 'Item'} (${it.variant || ''}) × ${it.qty || it.quantity || 1}`;
+                tdItems.appendChild(itemDiv);
+            });
+        } else {
+            tdItems.textContent = '1 Item';
+        }
+
+        // Payment Mode
+        const tdPay = document.createElement('td');
+        const payPill = document.createElement('span');
+        payPill.style.padding = '3px 8px';
+        payPill.style.borderRadius = '12px';
+        payPill.style.fontSize = '0.72rem';
+        payPill.style.fontWeight = '700';
+        payPill.style.background = '#EFF6FF';
+        payPill.style.color = '#1D4ED8';
+        payPill.style.border = '1px solid #BFDBFE';
+        payPill.textContent = `${o.paymentMethod || o.paymentMode || 'Cash'} (${(o.paymentStatus || 'paid').toUpperCase()})`;
+        tdPay.appendChild(payPill);
+
+        // Total (₹)
+        const tdTotal = document.createElement('td');
+        tdTotal.style.fontWeight = '800';
+        tdTotal.style.color = '#059669';
+        tdTotal.style.fontSize = '0.92rem';
+        tdTotal.textContent = '₹' + Number(o.total || o.finalAmount || 0).toLocaleString('en-IN');
+
+        // Status
+        const tdStatus = document.createElement('td');
+        const stPill = document.createElement('span');
+        const st = (o.status || 'delivered').toLowerCase();
+        stPill.className = `status-pill status-${st}`;
+        stPill.textContent = st.toUpperCase();
+        tdStatus.appendChild(stPill);
+
+        // Actions
+        const tdActions = document.createElement('td');
+        tdActions.style.display = 'flex';
+        tdActions.style.gap = '6px';
+        tdActions.style.alignItems = 'center';
+
+        const btnReceipt = document.createElement('button');
+        btnReceipt.type = 'button';
+        btnReceipt.className = 'btn-secondary';
+        btnReceipt.style.padding = '3px 8px';
+        btnReceipt.style.fontSize = '0.74rem';
+        btnReceipt.textContent = '🖨️ Receipt';
+        btnReceipt.addEventListener('click', () => printOfflineReceipt(o.id));
+
+        const btnCancel = document.createElement('button');
+        btnCancel.type = 'button';
+        btnCancel.className = 'btn-secondary';
+        btnCancel.style.padding = '3px 8px';
+        btnCancel.style.fontSize = '0.74rem';
+        btnCancel.style.color = '#DC2626';
+        btnCancel.textContent = '❌ Cancel';
+        btnCancel.addEventListener('click', () => {
+            if (confirm(`Cancel offline order #${o.id}? This will automatically restore inventory stock.`)) {
+                updateOrderStatus(o.id, 'cancelled');
+            }
+        });
+
+        tdActions.appendChild(btnReceipt);
+        if (st !== 'cancelled') {
+            tdActions.appendChild(btnCancel);
+        }
+
+        tr.appendChild(tdId);
+        tr.appendChild(tdDate);
+        tr.appendChild(tdCust);
+        tr.appendChild(tdItems);
+        tr.appendChild(tdPay);
+        tr.appendChild(tdTotal);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdActions);
+
+        fragment.appendChild(tr);
+    });
+
+    tbody.replaceChildren(fragment);
+}
+
+function printOfflineReceipt(orderId) {
+    const order = adminState.orders.find(o => o.id === orderId);
+    if (!order) {
+        alert("Order not found: " + orderId);
+        return;
+    }
+
+    const receiptWindow = window.open('', '_blank', 'width=450,height=600');
+    if (!receiptWindow) {
+        alert("Please allow popups to print receipt.");
+        return;
+    }
+
+    let itemsHtml = '';
+    if (Array.isArray(order.items)) {
+        order.items.forEach(it => {
+            itemsHtml += `
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;">
+                <div>${it.name || it.productName || 'Item'} (${it.variant || ''}) × ${it.qty || 1}</div>
+                <div style="font-weight:700;">₹${it.total || ((it.price || 0) * (it.qty || 1))}</div>
+            </div>`;
+        });
+    }
+
+    const d = order.createdAt ? (order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt)) : new Date();
+    const dateFormatted = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    receiptWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Receipt - Order #${order.id}</title>
+            <style>
+                body { font-family: 'Courier New', monospace; padding: 20px; color: #111; max-width: 380px; margin: 0 auto; }
+                .center { text-align: center; }
+                .divider { border-top: 1px dashed #666; margin: 10px 0; }
+                .bold { font-weight: bold; }
+                .text-right { text-align: right; }
+                @media print {
+                    body { padding: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="center">
+                <h2 style="margin:0 0 4px 0;font-size:18px;">SATVIK SWAAD</h2>
+                <div style="font-size:11px;">Authentic Traditional Pickles & Delicacies</div>
+                <div style="font-size:11px;">Varanasi, Uttar Pradesh, India</div>
+                <div style="font-size:11px;">📞 +91 91702 46665 | satvikswaad.com</div>
+            </div>
+            <div class="divider"></div>
+            <div style="font-size:12px;line-height:1.5;">
+                <div><strong>INVOICE / RECEIPT:</strong> #${order.id}</div>
+                <div><strong>DATE:</strong> ${dateFormatted}</div>
+                <div><strong>CHANNEL:</strong> ${order.channel || 'Varanasi Store'}</div>
+                <div><strong>CUSTOMER:</strong> ${order.name || order.customerName || 'Walk-in'}</div>
+                <div><strong>PHONE:</strong> ${order.phone || order.customerPhone || 'N/A'}</div>
+            </div>
+            <div class="divider"></div>
+            <div style="font-size:12px;font-weight:bold;margin-bottom:6px;">ITEMS PURCHASED</div>
+            ${itemsHtml}
+            <div class="divider"></div>
+            <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:3px;">
+                <div>Subtotal:</div>
+                <div>₹${order.subtotal || order.total || 0}</div>
+            </div>
+            ${order.discount ? `
+            <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:3px;color:#B91C1C;">
+                <div>Discount:</div>
+                <div>- ₹${order.discount}</div>
+            </div>` : ''}
+            <div class="divider"></div>
+            <div style="font-size:16px;font-weight:bold;display:flex;justify-content:space-between;">
+                <div>GRAND TOTAL:</div>
+                <div>₹${order.total || order.finalAmount || 0}</div>
+            </div>
+            <div style="font-size:12px;margin-top:6px;">
+                <strong>PAYMENT:</strong> ${order.paymentMethod || order.paymentMode || 'Cash'} (${(order.paymentStatus || 'paid').toUpperCase()})
+            </div>
+            ${order.notes ? `<div style="font-size:11px;margin-top:6px;font-style:italic;">Notes: ${order.notes}</div>` : ''}
+            <div class="divider"></div>
+            <div class="center" style="font-size:11px;line-height:1.4;">
+                <p>Made with 100% Cold-Pressed Mustard Oil & Himalayan Pink Salt.<br>Zero Artificial Preservatives.</p>
+                <p style="font-weight:bold;">Thank you for supporting traditional Indian artisans!</p>
+            </div>
+            <script>
+                window.onload = function() { window.print(); }
+            </script>
+        </body>
+        </html>
+    `);
+    receiptWindow.document.close();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 4. ANALYTICS & MONTHLY REPORTS ENGINE (ZERO innerHTML concatenation)
 // ─────────────────────────────────────────────────────────────────────────────
 function renderAnalyticsView() {
+    try {
+        const mount = document.getElementById('satvik-bi-mount-root');
+        if (!mount) {
+            initAdminAnalytics('view-analytics', adminDataAdapter);
+        } else {
+            refreshAdminAnalytics();
+        }
+    } catch (e) {
+        console.warn("[Admin] Analytics init notice:", e);
+    }
+
     const orders = adminState.orders;
 
     let totalRevenue = 0;

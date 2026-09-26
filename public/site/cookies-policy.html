@@ -119,6 +119,18 @@
             box-sizing: border-box;
         }
     </style>
+    <!-- Universal Continuity Language Bootstrap -->
+    <script>
+        (function() {
+            try {
+                var l = localStorage.getItem('app_language') || localStorage.getItem('satvik_lang') || 'en';
+                if (l === 'ur' || l === 'hi') {
+                    document.documentElement.lang = l;
+                    if (l === 'ur') document.documentElement.dir = 'rtl';
+                }
+            } catch(e) {}
+        })();
+    </script>
 </head>
 
 <body>
@@ -172,7 +184,23 @@
           <a href="contact.html" class="nav-link">Contact</a>
         </nav>
         <div class="header-right-actions">
-          <button type="button" class="btn-lang-toggle" id="btn-lang-toggle" style="display:none;">हिन्दी</button>
+                <!-- 3-Language Selector Dropdown -->
+      <div class="lang-selector-dropdown" id="lang-selector-wrap">
+        <button type="button" class="btn-lang-select" id="btn-lang-select" aria-expanded="false" aria-haspopup="true" aria-label="Select Language">
+          <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span class="active-lang-label" id="active-lang-label">English</span>
+          <svg class="lang-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="lang-dropdown-menu" id="lang-dropdown-menu" role="menu">
+          <button type="button" class="lang-opt" data-lang="en" role="menuitem"><span class="lang-code">EN</span> <span class="lang-name">English</span></button>
+          <button type="button" class="lang-opt" data-lang="hi" role="menuitem"><span class="lang-code">HI</span> <span class="lang-name">हिन्दी (Hindi)</span></button>
+          <button type="button" class="lang-opt" data-lang="ur" role="menuitem"><span class="lang-code">UR</span> <span class="lang-name">اردو (Urdu)</span></button>
+        </div>
+      </div>
           <div class="ref-search-bar">
             <input type="search" placeholder="Search for pickles, sweets..." class="ref-search-input" />
             <svg class="ref-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -196,9 +224,17 @@
 
       <!-- HEADER DROPDOWN MENU -->
       <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
-          <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
-              <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
-          </button>
+                <div class="mobile-lang-selector-group" style="padding: 10px 14px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-sub); display: inline-flex; align-items: center; gap: 6px;">
+              <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>Language:</span>
+          </span>
+          <div class="mobile-lang-pills" style="display: flex; gap: 6px;">
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="en" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">EN</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="hi" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">हिन्दी</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="ur" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">اردو</button>
+          </div>
+      </div>
           <a href="index.html#hero" class="dropdown-nav-link" role="menuitem">🏠 Home</a>
           <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Shop Products</a>
           <a href="why-us.html" class="dropdown-nav-link" role="menuitem">✨ Why Us</a>
@@ -217,9 +253,17 @@
                 <span class="brand-title" style="font-size: 1.3rem;">Satvik Swaad</span>
                 <button id="mobile-menu-close" aria-label="Close Navigation Menu" style="background: none; border: none; font-size: 1.6rem; cursor: pointer;">✕</button>
             </div>
-            <button type="button" class="mobile-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle-drawer" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;">
-                <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
-            </button>
+                  <div class="mobile-lang-selector-group" style="padding: 10px 14px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-sub); display: inline-flex; align-items: center; gap: 6px;">
+              <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>Language:</span>
+          </span>
+          <div class="mobile-lang-pills" style="display: flex; gap: 6px;">
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="en" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">EN</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="hi" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">हिन्दी</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="ur" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">اردو</button>
+          </div>
+      </div>
             <a href="index.html" class="mobile-nav-link">Home</a>
             <a href="products.html" class="mobile-nav-link">Shop Products</a>
             <a href="why-us.html" class="mobile-nav-link">Why Us</a>

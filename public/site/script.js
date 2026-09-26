@@ -1,7 +1,22 @@
 import { sanitizeText, validateUrl, createSafeElement, isSafeNavigationUrl } from './js/security.js';
 import { PRODUCTS_CATALOGUE } from './js/productsData.js';
-import { getCurrentLanguage, setLanguage, t, applyTranslations } from './js/translations.js';
+import { getCurrentLanguage, setLanguage, t, applyTranslations, initLanguageSelector, updateLanguageSelectorUI } from './js/translations.js';
 import { initiatePayUPayment, submitPayUForm } from './js/payuService.js';
+import { initFloatingAgent } from './js/satvikAssistant.js';
+
+// Immediate execution upon module evaluation for zero-flicker Universal Continuity
+(function initEarlyLang() {
+    try {
+        const stored = (typeof localStorage !== 'undefined') ? (localStorage.getItem('app_language') || localStorage.getItem('satvik_lang') || 'en') : 'en';
+        const initialLang = (stored === 'ur' || stored === 'hi') ? stored : 'en';
+        if (typeof document !== 'undefined' && document.documentElement) {
+            document.documentElement.lang = initialLang;
+            document.documentElement.dir = (initialLang === 'ur') ? 'rtl' : 'ltr';
+        }
+    } catch (e) {
+        console.warn('Early lang init error:', e);
+    }
+})();
 
 const CART_STORAGE_KEY = 'satwikCart_v2';
 const LEGACY_STORAGE_KEY = 'satwikCart';
@@ -79,25 +94,28 @@ let touchEndX = 0;
 const AUTOPLAY_DELAY = 3500; // 3.5 seconds fast transition between village banners
 
 function runInitializers() {
-    ensureModalsInDOM();
-    initLanguage();
-    initUI();
-    initStickyHeader();
-    initUniversalSearch();
-    initHeroSlider();
-    initScrollReveal();
-    initScrollToTop();
-    initMobileNav();
-    initFaqSearch();
-    initProductsSort();
-    initReviewsData();
-    initContactForm();
-    initProductDetailsPage();
-    initProfilePage();
-    initReorderSection();
-    initFloatingAgent();
-    initFooterAccordion();
-    renderCart();
+    const safeRun = (fn, name) => {
+        try { fn(); } catch (err) { console.warn(`Initializer "${name}" warning:`, err); }
+    };
+    safeRun(ensureModalsInDOM, 'ensureModalsInDOM');
+    safeRun(initLanguage, 'initLanguage');
+    safeRun(initUI, 'initUI');
+    safeRun(initStickyHeader, 'initStickyHeader');
+    safeRun(initUniversalSearch, 'initUniversalSearch');
+    safeRun(initHeroSlider, 'initHeroSlider');
+    safeRun(initScrollReveal, 'initScrollReveal');
+    safeRun(initScrollToTop, 'initScrollToTop');
+    safeRun(initMobileNav, 'initMobileNav');
+    safeRun(initFaqSearch, 'initFaqSearch');
+    safeRun(initProductsSort, 'initProductsSort');
+    safeRun(initReviewsData, 'initReviewsData');
+    safeRun(initContactForm, 'initContactForm');
+    safeRun(initProductDetailsPage, 'initProductDetailsPage');
+    safeRun(initProfilePage, 'initProfilePage');
+    safeRun(initReorderSection, 'initReorderSection');
+    safeRun(initFloatingAgent, 'initFloatingAgent');
+    safeRun(initFooterAccordion, 'initFooterAccordion');
+    safeRun(renderCart, 'renderCart');
 }
 
 function initFooterAccordion() {
@@ -136,48 +154,88 @@ window.handleFooterSubscribe = function(form) {
 };
 
 function initLanguage() {
-    const activeLang = getCurrentLanguage();
-    applyTranslations(activeLang);
+    const rawStored = (typeof localStorage !== 'undefined') ? (localStorage.getItem('app_language') || localStorage.getItem('satvik_lang') || 'en') : 'en';
+    const activeLang = (rawStored === 'ur' || rawStored === 'hi') ? rawStored : 'en';
+
+    document.documentElement.dir = (activeLang === 'ur') ? 'rtl' : 'ltr';
     document.documentElement.lang = activeLang;
+
+    applyTranslations(activeLang);
+    initLanguageSelector();
+    updateLanguageSelectorUI(activeLang);
     updateProductCardsLanguage();
 
+    // Expose helpers globally on window for QA automation & cross-component continuity
+    if (typeof window !== 'undefined') {
+        window.setLanguage = setLanguage;
+        window.getCurrentLanguage = getCurrentLanguage;
+        window.applyTranslations = applyTranslations;
+        window.initLanguageSelector = initLanguageSelector;
+    }
+
+    // Support legacy toggle button if clicked (cycle: en -> hi -> ur -> en)
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.btn-lang-toggle, #btn-lang-toggle, #mobile-lang-toggle, .mobile-lang-toggle');
         if (btn) {
             e.preventDefault();
-            const current = getCurrentLanguage();
-            const next = current === 'hi' ? 'en' : 'hi';
+            const curr = getCurrentLanguage();
+            const next = curr === 'en' ? 'hi' : (curr === 'hi' ? 'ur' : 'en');
             setLanguage(next);
-            updateProductCardsLanguage();
-            initReorderSection();
-            renderCart();
-            showToast(next === 'hi' ? 'भाषा हिन्दी में बदल दी गई है 🇮🇳' : 'Language switched to English 🌐');
+            showToast(next === 'hi' ? 'भाषा हिन्दी में बदल दी गई है 🇮🇳' : (next === 'ur' ? 'زبان اردو میں تبدیل کر دی گئی ہے 🇵🇰' : 'Language switched to English 🌐'));
         }
     });
 
-    window.addEventListener('languageChanged', (e) => {
-        applyTranslations(e.detail.language);
+    const handleLanguageChange = (e) => {
+        const lang = e.detail?.language || getCurrentLanguage();
+        document.documentElement.lang = lang;
+        document.documentElement.dir = (lang === 'ur') ? 'rtl' : 'ltr';
+        applyTranslations(lang);
+        updateLanguageSelectorUI(lang);
         updateProductCardsLanguage();
         initReorderSection();
         renderCart();
-    });
+    };
+
+    window.addEventListener('languagechange', handleLanguageChange);
+    window.addEventListener('languageChanged', handleLanguageChange);
 }
 
 function updateProductCardsLanguage() {
-    const isHi = getCurrentLanguage() === 'hi';
-    const cards = document.querySelectorAll('.product-card');
+    const currentLang = getCurrentLanguage();
+    const isHi = currentLang === 'hi';
+    const isUr = currentLang === 'ur';
+
+    // 1. Update Product Cards
+    const cards = document.querySelectorAll('.product-card, .ref-product-card');
     cards.forEach(card => {
         const pId = card.getAttribute('data-product-id');
         const prod = PRODUCTS_CATALOGUE.find(p => p.id === pId);
         if (!prod) return;
 
-        const titleEl = card.querySelector('.product-title');
+        const titleEl = card.querySelector('.product-title, .ref-card-title');
         const hindiTitleEl = card.querySelector('.product-hindi-title');
         if (titleEl) {
-            titleEl.textContent = isHi ? (prod.hindiName || prod.name) : prod.name;
+            if (isUr) {
+                titleEl.textContent = prod.urduName || prod.name;
+            } else if (isHi) {
+                titleEl.textContent = prod.hindiName || prod.name;
+            } else {
+                titleEl.textContent = prod.name;
+            }
         }
         if (hindiTitleEl) {
-            hindiTitleEl.textContent = isHi ? prod.name : (prod.hindiName || '');
+            hindiTitleEl.textContent = (isHi || isUr) ? prod.name : (prod.hindiName || '');
+        }
+
+        const descEl = card.querySelector('.product-desc, .ref-card-desc');
+        if (descEl) {
+            if (isUr) {
+                descEl.textContent = prod.urduDesc || prod.shortDesc;
+            } else if (isHi) {
+                descEl.textContent = prod.hindiDesc || prod.shortDesc;
+            } else {
+                descEl.textContent = prod.shortDesc;
+            }
         }
 
         const viewBtn = card.querySelector('.btn-view-details');
@@ -185,20 +243,142 @@ function updateProductCardsLanguage() {
 
         const addBtn = card.querySelector('.btn-add-cart');
         if (addBtn && !addBtn.classList.contains('added')) {
-            addBtn.textContent = t('catalog.btnAddCart');
+            const span = addBtn.querySelector('span');
+            if (span) {
+                span.textContent = t('catalog.btnAddCart');
+            } else {
+                addBtn.textContent = t('catalog.btnAddCart');
+            }
         }
 
-        const badge = card.querySelector('.product-badge');
+        const badge = card.querySelector('.product-badge, .ref-card-badge');
         if (badge) {
-            if (prod.badge === 'Bestseller') badge.textContent = t('catalog.bestseller');
-            else if (prod.badge === 'Healthy Choice') badge.textContent = t('catalog.healthyChoice');
+            const b = prod.badge || badge.textContent.trim();
+            if (b === 'Bestseller') badge.textContent = t('catalog.bestseller');
+            else if (b === 'Healthy Choice') badge.textContent = t('catalog.healthyChoice');
+            else if (b === 'New') badge.textContent = t('catalog.newBadge');
+            else if (b === 'Traditional Recipe') badge.textContent = t('catalog.traditionalRecipe');
+            else if (b === 'Banarasi Special') badge.textContent = isUr ? 'بنارسی خاص' : (isHi ? 'बनारसी स्पेशल' : 'Banarasi Special');
+            else if (b === 'Tangy Special') badge.textContent = isUr ? 'چٹپٹا خاص' : (isHi ? 'चटपटा स्पेशल' : 'Tangy Special');
+            else if (b === 'Spicy Favorite') badge.textContent = isUr ? 'چٹپٹا پسندیدہ' : (isHi ? 'तीखा पसंदीदा' : 'Spicy Favorite');
+            else if (b === 'Digestive Remedy') badge.textContent = isUr ? 'ہاضم نسخہ' : (isHi ? 'पाचक औषधि' : 'Digestive Remedy');
+            else if (b === 'Heart Healthy') badge.textContent = isUr ? 'صحتِ قلب کے لیے مفید' : (isHi ? 'हृदय के लिए लाभकारी' : 'Heart Healthy');
+            else if (b === 'Winter Classic' || b === 'Winter Special') badge.textContent = isUr ? 'موسم سرما کی سوغات' : (isHi ? 'सर्दियों का खास' : 'Winter Classic');
+            else if (b === 'Rasayana Classic') badge.textContent = isUr ? 'طبیعت بخش نسخہ' : (isHi ? 'आयुर्वेदिक रसायन' : 'Rasayana Classic');
+            else if (b === 'Premium Preserve') badge.textContent = isUr ? 'اعلیٰ روایتی سوغات' : (isHi ? 'प्रीमियम मुरब्बा' : 'Premium Preserve');
+            else if (b === 'Festive Favorite') badge.textContent = isUr ? 'تہواروں کی پسند' : (isHi ? 'त्योहारी मिष्ठान्न' : 'Festive Favorite');
+            else if (b === '100% Pure') badge.textContent = isUr ? '100% خالص' : (isHi ? '100% शुद्ध' : '100% Pure');
+            else if (b === 'Ayurvedic Elixir') badge.textContent = isUr ? 'طبی امرت' : (isHi ? 'आयुर्वेदिक अमृत' : 'Ayurvedic Elixir');
         }
 
         const stock = card.querySelector('.stock-status-badge');
         if (stock) {
             stock.textContent = t('catalog.inStock');
         }
+
+        // Savings / Discount tag
+        const cardDisc = card.querySelector('.ref-card-discount, .savings-tag');
+        if (cardDisc) {
+            const match = cardDisc.textContent.match(/(\d+%\s*OFF|\d+%)/i);
+            if (match) {
+                if (isUr) cardDisc.textContent = `${match[1].replace('OFF','').trim()} بچت`;
+                else if (isHi) cardDisc.textContent = `${match[1].replace('OFF','').trim()} छूट`;
+                else cardDisc.textContent = `${t('catalog.saveTag') || 'Save'} ${match[1].replace('OFF','').trim()}`;
+            }
+        }
     });
+
+    // 2. Update Category Circle Items (Index page)
+    const catEyebrow = document.querySelector('.category-circles-eyebrow');
+    if (catEyebrow) catEyebrow.textContent = t('catalog.villageCategoriesBadge');
+    const catMainTitle = document.querySelector('.category-circles-main-title');
+    if (catMainTitle) catMainTitle.textContent = t('catalog.villageCategoriesTitle');
+
+    const catCircles = document.querySelectorAll('.category-circle-item');
+    catCircles.forEach(circle => {
+        const href = circle.getAttribute('href') || '';
+        const titleEl = circle.querySelector('.category-circle-title');
+        const badgeEl = circle.querySelector('.category-circle-badge');
+
+        if (href.includes('category=achar')) {
+            if (titleEl) titleEl.textContent = t('catalog.catAcharTitle');
+            if (badgeEl) badgeEl.textContent = t('catalog.catAcharCount');
+            circle.setAttribute('aria-label', `${t('catalog.catAcharTitle')} - ${t('catalog.catAcharCount')}`);
+        } else if (href.includes('category=sweets')) {
+            if (titleEl) titleEl.textContent = t('catalog.catSweetsTitle');
+            if (badgeEl) badgeEl.textContent = t('catalog.catSweetsCount');
+            circle.setAttribute('aria-label', `${t('catalog.catSweetsTitle')} - ${t('catalog.catSweetsCount')}`);
+        } else if (href.includes('category=health')) {
+            if (titleEl) titleEl.textContent = t('catalog.catHealthTitle');
+            if (badgeEl) badgeEl.textContent = t('catalog.catHealthCount');
+            circle.setAttribute('aria-label', `${t('catalog.catHealthTitle')} - ${t('catalog.catHealthCount')}`);
+        } else {
+            if (titleEl) titleEl.textContent = t('catalog.catAllTitle');
+            if (badgeEl) badgeEl.textContent = t('catalog.catAllCount');
+            circle.setAttribute('aria-label', `${t('catalog.catAllTitle')} - ${t('catalog.catAllCount')}`);
+        }
+    });
+
+    // 3. Update Sidebar & Filters (Products page)
+    const filterHeadSpan = document.querySelector('.ref-filter-heading span');
+    if (filterHeadSpan) filterHeadSpan.textContent = t('catalog.filterBy');
+
+    const filterSubheads = document.querySelectorAll('.ref-filter-subheading');
+    filterSubheads.forEach(sh => {
+        const text = sh.textContent.trim().toLowerCase();
+        if (text.includes('price') || text.includes('कीमत') || text.includes('मूल्य') || text.includes('قیمت')) {
+            sh.textContent = t('catalog.price');
+        } else if (text.includes('avail') || text.includes('उपलब्ध') || text.includes('دستیاب')) {
+            sh.textContent = t('catalog.availability');
+        }
+    });
+
+    const cbUnder200 = document.querySelector('input[data-price="under-200"]');
+    if (cbUnder200 && cbUnder200.parentElement) {
+        const sp = cbUnder200.parentElement.querySelector('span');
+        if (sp) sp.textContent = t('catalog.under200');
+    }
+    const cb200_400 = document.querySelector('input[data-price="200-400"]');
+    if (cb200_400 && cb200_400.parentElement) {
+        const sp = cb200_400.parentElement.querySelector('span');
+        if (sp) sp.textContent = t('catalog.price200_400');
+    }
+    const cb401_600 = document.querySelector('input[data-price="401-600"]');
+    if (cb401_600 && cb401_600.parentElement) {
+        const sp = cb401_600.parentElement.querySelector('span');
+        if (sp) sp.textContent = t('catalog.price401_600');
+    }
+    const cbAbove600 = document.querySelector('input[data-price="above-600"]');
+    if (cbAbove600 && cbAbove600.parentElement) {
+        const sp = cbAbove600.parentElement.querySelector('span');
+        if (sp) sp.textContent = t('catalog.above600');
+    }
+
+    const cbInStock = document.getElementById('filter-instock');
+    if (cbInStock && cbInStock.parentElement) {
+        const sp = cbInStock.parentElement.querySelector('span');
+        if (sp) sp.textContent = t('catalog.inStock');
+    }
+    const cbOutOfStock = document.getElementById('filter-outofstock');
+    if (cbOutOfStock && cbOutOfStock.parentElement) {
+        const sp = cbOutOfStock.parentElement.querySelector('span');
+        if (sp) sp.textContent = t('catalog.outOfStock');
+    }
+
+    const sortLabel = document.querySelector('.ref-sort-label');
+    if (sortLabel) sortLabel.textContent = `${t('catalog.sortBy')}:`;
+
+    const pickFavImg = document.querySelector('.ref-shop-pick-favourite img, .ref-favourite-doodle-img');
+    if (pickFavImg) pickFavImg.alt = t('catalog.pickYourFavourite');
+
+    const catAllBtn = document.querySelector('.ref-cat-btn-all span');
+    if (catAllBtn) catAllBtn.textContent = t('catalog.tabs.all');
+    const tabAchar = document.querySelector('.category-tab[data-category="achar"] span');
+    if (tabAchar) tabAchar.textContent = t('catalog.tabs.achar');
+    const tabSweets = document.querySelector('.category-tab[data-category="sweets"] span');
+    if (tabSweets) tabSweets.textContent = t('catalog.tabs.sweets');
+    const tabHealth = document.querySelector('.category-tab[data-category="health"] span');
+    if (tabHealth) tabHealth.textContent = t('catalog.tabs.health');
 }
 
 if (document.readyState === 'loading') {
@@ -951,12 +1131,14 @@ function renderCart() {
     }
 
     const listFragment = document.createDocumentFragment();
-    const isHi = getCurrentLanguage() === 'hi';
+    const currLang = getCurrentLanguage();
+    const isHi = currLang === 'hi';
+    const isUr = currLang === 'ur';
 
     items.forEach(item => {
         const itemRow = createSafeElement('div', { className: 'cart-item-row' });
         const prod = PRODUCTS_CATALOGUE.find(p => p.id === (item.productId || item.id));
-        const displayName = isHi ? (prod?.hindiName || item.name) : item.name;
+        const displayName = isUr ? (prod?.urduName || item.name) : (isHi ? (prod?.hindiName || item.name) : item.name);
 
         const infoDiv = createSafeElement('div', { className: 'cart-item-info' });
         const nameEl = createSafeElement('span', { className: 'cart-item-name', text: `${displayName} (${item.variantLabel || 'Standard'})` });
@@ -1173,17 +1355,6 @@ function ensureModalsInDOM() {
                                             <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
                                         </div>
                                     </label>
-
-                                    <label class="co-pm-card" for="pm-wa-dom">
-                                        <input type="radio" name="payment-method" id="pm-wa-dom" value="WhatsApp-Assisted Ordering" />
-                                        <div style="flex: 1;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">💬 WhatsApp Quick Order</span>
-                                                <span style="font-size: 0.72rem; font-weight: 700; background: #DCFCE7; color: #15803D; padding: 2px 7px; border-radius: 12px;">Direct Support</span>
-                                            </div>
-                                            <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Submit order via WhatsApp chat with our family kitchen directly.</p>
-                                        </div>
-                                    </label>
                                 </div>
                             </div>
 
@@ -1281,10 +1452,8 @@ function ensureModalsInDOM() {
                         <input type="text" id="agent-input" class="agent-input" placeholder="Ask about purity, orders, or recipes..." aria-label="Ask Satvik Assistant a question" autocomplete="off" />
                         <button type="submit" id="agent-send-btn" class="agent-send-btn" aria-label="Send Message">➤</button>
                     </form>
-                    <div class="agent-direct-wa">
-                        <a href="https://wa.me/919236587600?text=Namaste%2C%20I%20need%20assistance%20with%20Satvik%20Swaad" target="_blank" rel="noopener noreferrer" class="agent-wa-link">
-                            <span>📲 Direct WhatsApp: <strong>+91 92365 87600</strong></span>
-                        </a>
+                    <div class="agent-security-badge">
+                        <span>🛡️ 100% Encrypted &bull; Direct Satvik Intelligence</span>
                     </div>
                 </div>
             </div>
@@ -1365,18 +1534,20 @@ function initReorderSection() {
     const subEl = reorderSection ? reorderSection.querySelector('.section-subtitle') : null;
     const leadEl = reorderSection ? reorderSection.querySelector('.section-lead') : null;
 
-    const isHi = getCurrentLanguage() === 'hi';
+    const currLang = getCurrentLanguage();
+    const isHi = currLang === 'hi';
+    const isUr = currLang === 'ur';
 
     if (hasPastOrders && displayItems.length > 0) {
         // REORDER MODE: User has placed an order in the past
-        if (titleEl) titleEl.textContent = isHi ? '🔄 दोबारा खरीदें और त्वरित ऑर्डर' : '🔄 Buy Again & Quick Reorder';
-        if (subEl) subEl.textContent = isHi ? 'त्वरित और आसान' : 'Quick & Easy';
-        if (leadEl) leadEl.textContent = isHi ? 'अपने पसंदीदा पारंपरिक स्वादों को एक ही टैप में दोबारा ऑर्डर करें।' : 'Reorder your handcrafted traditional favorites in a single tap.';
+        if (titleEl) titleEl.textContent = isUr ? '🔄 دوبارہ آرڈر کریں' : (isHi ? '🔄 दोबारा खरीदें और त्वरित ऑर्डर' : '🔄 Buy Again & Quick Reorder');
+        if (subEl) subEl.textContent = isUr ? 'تیز اور آسان' : (isHi ? 'त्वरित और आसान' : 'Quick & Easy');
+        if (leadEl) leadEl.textContent = isUr ? 'اپنے پسندیدہ روایتی ذائقے ایک کلک میں دوبارہ حاصل کریں۔' : (isHi ? 'अपने पसंदीदा पारंपरिक स्वादों को एक ही टैप में दोबारा ऑर्डर करें।' : 'Reorder your handcrafted traditional favorites in a single tap.');
     } else {
         // SUGGESTIONS MODE: No past orders, show recommendations based on cache files & favorites
-        if (titleEl) titleEl.textContent = isHi ? '✨ आपके लिए चुनिंदा सुझाव' : '✨ Handpicked Suggestions For You';
-        if (subEl) subEl.textContent = isHi ? 'आपके लिए विशेष' : 'Curated For You';
-        if (leadEl) leadEl.textContent = isHi ? 'आपकी पसंद और सबसे लोकप्रिय व्यंजनों के आधार पर अनुशंसित स्वादिष्ट उत्पाद।' : 'Artisanal favorites recommended based on your browsing taste and top kitchen bestsellers.';
+        if (titleEl) titleEl.textContent = isUr ? '✨ آپ کے لیے خاص تجاویز' : (isHi ? '✨ आपके लिए चुनिंदा सुझाव' : '✨ Handpicked Suggestions For You');
+        if (subEl) subEl.textContent = isUr ? 'خصوصی انتخاب' : (isHi ? 'आपके लिए विशेष' : 'Curated For You');
+        if (leadEl) leadEl.textContent = isUr ? 'آپ کی پسند اور مشہور روایتی ذائقوں پر مبنی بہترین سفارشات۔' : (isHi ? 'आपकी पसंद और सबसे लोकप्रिय व्यंजनों के आधार पर अनुशंसित स्वादिष्ट उत्पाद।' : 'Artisanal favorites recommended based on your browsing taste and top kitchen bestsellers.');
 
         // Read cache files: recently viewed & cart items
         let viewedIds = [];
@@ -1544,115 +1715,8 @@ function initReorderSection() {
     track.style.setProperty('animation-play-state', 'running', 'important');
 }
 
-/* GLOBAL FLOATING ARTISANAL SUPPORT AGENT */
-function initFloatingAgent() {
-    const trigger = document.getElementById('satvik-agent-trigger');
-    const card = document.getElementById('satvik-agent-card');
-    const closeBtn = document.getElementById('agent-close-btn');
-    const form = document.getElementById('agent-chat-form');
-    const input = document.getElementById('agent-input');
-    const messages = document.getElementById('agent-messages-container');
-    const chipsContainer = document.getElementById('agent-quick-chips');
-
-    if (!trigger || !card) return;
-    if (trigger._boundAgent) return;
-    trigger._boundAgent = true;
-
-    function openAgent() {
-        card.classList.add('active');
-        card.setAttribute('aria-hidden', 'false');
-        trigger.setAttribute('aria-expanded', 'true');
-        if (input) input.focus();
-    }
-
-    function closeAgent() {
-        card.classList.remove('active');
-        card.setAttribute('aria-hidden', 'true');
-        trigger.setAttribute('aria-expanded', 'false');
-    }
-
-    trigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (card.classList.contains('active')) {
-            closeAgent();
-        } else {
-            openAgent();
-        }
-    });
-
-    if (closeBtn) {
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeAgent();
-        });
-    }
-
-    document.addEventListener('click', (e) => {
-        if (card.classList.contains('active')) {
-            const widget = document.getElementById('satvik-agent-widget');
-            if (widget && !widget.contains(e.target)) {
-                closeAgent();
-            }
-        }
-    });
-
-    function appendMessage(text, isUser = false) {
-        if (!messages) return;
-        const msg = document.createElement('div');
-        msg.className = `agent-msg ${isUser ? 'agent-msg-user' : 'agent-msg-bot'}`;
-        msg.innerHTML = `<p>${sanitizeText(text)}</p>`;
-        messages.appendChild(msg);
-        messages.scrollTop = messages.scrollHeight;
-    }
-
-    if (chipsContainer) {
-        chipsContainer.addEventListener('click', (e) => {
-            const chip = e.target.closest('.agent-chip');
-            if (!chip) return;
-            const action = chip.getAttribute('data-action');
-            const chipText = chip.textContent;
-            appendMessage(chipText, true);
-
-            setTimeout(() => {
-                if (action === 'track') {
-                    appendMessage("📦 To track an active order, visit your Profile (👤) in navigation, or send your Order ID / phone number directly to our WhatsApp support team!");
-                } else if (action === 'whatsapp') {
-                    appendMessage("💬 Connecting you to our artisanal support team on WhatsApp...");
-                    window.open('https://wa.me/919236587600?text=Namaste!%20I%20need%20assistance%20with%20Satvik%20Swaad', '_blank');
-                } else if (action === 'purity') {
-                    appendMessage("🌿 All Satvik Swaad pickles and murabbas are 100% handcrafted with pure Kachi Ghani cold-pressed mustard oil, sendha namak (rock salt), and traditional sun-curing. Absolutely zero chemical preservatives (INS 211 / INS 224), synthetic vinegar, or artificial colors!");
-                } else if (action === 'recommend') {
-                    appendMessage("🍯 Our top 3 customer favorites are:\n1. Aam Ka Achar (Sun-Cured Raw Mango Pickle)\n2. Amla Murabba (Prepared with Desi Khand)\n3. Traditional Satvik Chyawanprash.");
-                }
-            }, 350);
-        });
-    }
-
-    if (form && input) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const text = input.value.trim();
-            if (!text) return;
-            appendMessage(text, true);
-            input.value = '';
-
-            const lower = text.toLowerCase();
-            setTimeout(() => {
-                if (lower.includes('track') || lower.includes('order') || lower.includes('status')) {
-                    appendMessage("📦 For instant order tracking, you can check your Profile page or WhatsApp our team at +91 92365 87600 with your Order ID!");
-                } else if (lower.includes('oil') || lower.includes('purity') || lower.includes('chemical') || lower.includes('preservative')) {
-                    appendMessage("🌿 We strictly use 100% pure cold-pressed mustard oil and ancestral sun-curing. No artificial preservatives or synthetic vinegar are ever used.");
-                } else if (lower.includes('price') || lower.includes('offer') || lower.includes('discount')) {
-                    appendMessage("🏷️ Enjoy Free Delivery across India on all orders above ₹499! Check out our catalog for current batch offerings.");
-                } else if (lower.includes('delivery') || lower.includes('shipping') || lower.includes('days')) {
-                    appendMessage("🚚 Orders are dispatched within 24-48 hours via premium express couriers and typically delivered within 3-5 business days across India.");
-                } else {
-                    appendMessage("🙏 Thank you for your question! For personalized assistance or bulk orders, tap below to chat with our team on WhatsApp.");
-                }
-            }, 450);
-        });
-    }
-}
+/* GLOBAL FLOATING ARTISANAL SUPPORT AGENT (Powered by satvikAssistant.js) */
+// initFloatingAgent imported at top of script.js from ./js/satvikAssistant.js
 
 export function openCheckout() {
     ensureModalsInDOM();
@@ -3755,26 +3819,28 @@ function initProductDetailsPage() {
         }
     };
 
-    // Validate ID param
-    if (!pId || typeof pId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(pId)) {
-        showProductLoadError('Invalid Product Request', 'This product could not be loaded. Please return to Products and try again.');
-        return;
+    // Robust product lookup: if no id param or not found, fallback to first catalogue product so page is NEVER empty or ₹0
+    let prod = null;
+    if (pId && typeof pId === 'string' && /^[a-zA-Z0-9_-]+$/.test(pId)) {
+        prod = PRODUCTS_CATALOGUE.find(p => p.id === pId || p.productId === pId || p.slug === pId);
     }
-
-    const prod = PRODUCTS_CATALOGUE.find(p => p.id === pId || p.productId === pId || p.slug === pId);
     if (!prod) {
-        showProductLoadError('Product Not Found', 'This product could not be loaded. Please return to Products and try again.');
-        return;
+        prod = PRODUCTS_CATALOGUE[0];
     }
 
     mainSec.style.display = 'grid';
     if (errBox) errBox.style.display = 'none';
 
+    let selectedVariant = (prod.variants || []).find(v => v.active && v.stock > 0) || (prod.variants && prod.variants[0]);
+    let selectedQty = 1;
+
     // Render product details
     function renderProductDetailsLocalized() {
-        const isHi = getCurrentLanguage() === 'hi';
-        const primaryTitle = isHi ? (prod.hindiName || prod.name) : prod.name;
-        const secondaryTitle = isHi ? prod.name : (prod.hindiName || '');
+        const currLang = getCurrentLanguage();
+        const isHi = currLang === 'hi';
+        const isUr = currLang === 'ur';
+        const primaryTitle = isUr ? (prod.urduName || prod.name) : (isHi ? (prod.hindiName || prod.name) : prod.name);
+        const secondaryTitle = (isHi || isUr) ? prod.name : (prod.hindiName || '');
 
         document.title = `${primaryTitle} – Satvik Swaad`;
         const breadcrumbTitle = document.getElementById('pd-breadcrumb-title');
@@ -3787,8 +3853,50 @@ function initProductDetailsPage() {
 
         const shortDescEl = document.getElementById('pd-short-desc');
         const fullDescEl = document.getElementById('pd-full-desc');
-        if (shortDescEl) shortDescEl.textContent = prod.shortDesc || '';
-        if (fullDescEl) fullDescEl.textContent = prod.fullDesc || prod.shortDesc;
+        if (shortDescEl) shortDescEl.textContent = isUr ? (prod.urduDesc || prod.shortDesc) : (isHi ? (prod.hindiDesc || prod.shortDesc) : (prod.shortDesc || ''));
+        if (fullDescEl) fullDescEl.textContent = isUr ? (prod.urduFullDesc || prod.fullDesc) : (isHi ? (prod.hindiFullDesc || prod.fullDesc) : (prod.fullDesc || prod.shortDesc));
+
+        const ingredientsEl = document.getElementById('pd-ingredients') || document.getElementById('pd-spec-ingredients');
+        const storageEl = document.getElementById('pd-storage-info') || document.getElementById('pd-spec-storage');
+        const shelfLifeEl = document.getElementById('pd-shelf-life') || document.getElementById('pd-spec-shelflife');
+        const allergensEl = document.getElementById('pd-allergens') || document.getElementById('pd-spec-allergens');
+        const packagingEl = document.getElementById('pd-packaging') || document.getElementById('pd-spec-packaging');
+
+        if (ingredientsEl) ingredientsEl.textContent = isUr ? (prod.urduIngredients || prod.ingredients) : (isHi ? (prod.hindiIngredients || prod.ingredients) : (prod.ingredients || 'Verified traditional ingredients.'));
+        if (storageEl) storageEl.textContent = isUr ? (prod.urduStorage || prod.storageInfo) : (isHi ? (prod.hindiStorage || prod.storageInfo) : (prod.storageInfo || 'Store in a cool, dry place.'));
+        if (shelfLifeEl) shelfLifeEl.textContent = isUr ? (prod.urduShelfLife || prod.shelfLife) : (isHi ? (prod.hindiShelfLife || prod.shelfLife) : (prod.shelfLife || '12 Months'));
+        if (allergensEl) allergensEl.textContent = isUr ? (prod.urduAllergens || prod.allergens) : (isHi ? (prod.hindiAllergens || prod.allergens) : (prod.allergens || 'None declared.'));
+        if (packagingEl) packagingEl.textContent = isUr ? (prod.urduPackaging || prod.packaging) : (isHi ? (prod.hindiPackaging || prod.packaging) : (prod.packaging || 'Sealed Glass Jar'));
+
+        // Specs Titles and Content
+        const specsTitle = document.querySelector('.pd-specs-title');
+        if (specsTitle) specsTitle.textContent = t('productDetails.specsTitle');
+
+        const specSubheads = document.querySelectorAll('.pd-spec-subhead');
+        specSubheads.forEach(sh => {
+            const tText = sh.textContent.toLowerCase();
+            if (tText.includes('heritage') || tText.includes('विरासत') || tText.includes('ورثہ') || tText.includes('description')) {
+                sh.textContent = `📋 ${t('productDetails.heritageDescTitle')}`;
+            } else if (tText.includes('ingredient') || tText.includes('सामग्री') || tText.includes('اجزاء')) {
+                sh.textContent = `🌿 ${t('productDetails.ingredientsTitle')}`;
+            } else if (tText.includes('storage') || tText.includes('रखरखाव') || tText.includes('حفاظت') || tText.includes('shelf life')) {
+                sh.textContent = `🪔 ${t('productDetails.storageTitle')}`;
+            } else if (tText.includes('allergen') || tText.includes('एलर्जन') || tText.includes('الرجی') || tText.includes('packaging')) {
+                sh.textContent = `⚠️ ${t('productDetails.allergenTitle')}`;
+            }
+        });
+
+        const specTexts = document.querySelectorAll('.pd-spec-text strong');
+        specTexts.forEach(st => {
+            const tText = st.textContent.toLowerCase();
+            if (tText.includes('shelf life') || tText.includes('शेल्फ') || tText.includes('میعاد')) {
+                st.textContent = t('productDetails.shelfLifeLabel');
+            } else if (tText.includes('allergen') || tText.includes('एलर्जन') || tText.includes('الرجی')) {
+                st.textContent = t('productDetails.allergensLabel');
+            } else if (tText.includes('packaging') || tText.includes('पैकेजिंग') || tText.includes('پیکجنگ')) {
+                st.textContent = t('productDetails.packagingLabel');
+            }
+        });
 
         // Tabs
         const tabIng = document.getElementById('tab-btn-ingredients');
@@ -3800,41 +3908,73 @@ function initProductDetailsPage() {
         const tabRev = document.getElementById('tab-btn-reviews');
         if (tabRev) tabRev.textContent = t('productDetails.tabReviews');
 
+        // Pack & Quantity Labels
+        const pdPackLabel = document.querySelector('#pd-pack-label, .pd-pack-label, .pd-variant-label');
+        if (pdPackLabel) pdPackLabel.textContent = `⚖️ ${t('productDetails.selectPack')}`;
+        const pdQtyLabel = document.querySelector('#pd-qty-label, .pd-qty-label');
+        if (pdQtyLabel) pdQtyLabel.textContent = t('productDetails.quantity');
+
         // Buttons
-        if (btnAddCart && !btnAddCart.disabled) {
+        if (btnAddCart && !btnAddCart.disabled && !btnAddCart.classList.contains('added')) {
             btnAddCart.textContent = t('productDetails.btnAddToCart');
         }
         const btnBuyNow = document.getElementById('pd-btn-buy-now');
         if (btnBuyNow) btnBuyNow.textContent = t('productDetails.btnBuyNow');
-    }
 
-    const ingredientsEl = document.getElementById('pd-ingredients') || document.getElementById('pd-spec-ingredients');
-    const storageEl = document.getElementById('pd-storage-info') || document.getElementById('pd-spec-storage');
-    const shelfLifeEl = document.getElementById('pd-shelf-life') || document.getElementById('pd-spec-shelflife');
-    const allergensEl = document.getElementById('pd-allergens') || document.getElementById('pd-spec-allergens');
-    const packagingEl = document.getElementById('pd-packaging') || document.getElementById('pd-spec-packaging');
-    const ratingValEl = document.getElementById('pd-rating-val');
-    const reviewCountEl = document.getElementById('pd-review-count-text') || document.getElementById('pd-review-count');
-    const badgeEl = document.getElementById('pd-badge');
+        // Reviews & Related Section Headings
+        const revHeading = document.querySelector('.pd-reviews-card h2');
+        if (revHeading) revHeading.textContent = `✦ ${t('productDetails.verifiedReviews')}`;
+        const revSub = document.querySelector('.pd-reviews-card p');
+        if (revSub) revSub.textContent = t('productDetails.reviewsSub');
+        const revAllBtn = document.querySelector('.pd-reviews-card .btn-secondary');
+        if (revAllBtn) revAllBtn.textContent = t('productDetails.allReviewsBtn');
+
+        const relHeading = document.querySelector('.pd-related-section h2');
+        if (relHeading) relHeading.textContent = `✦ ${t('productDetails.relatedTitle')}`;
+        const relSub = document.querySelector('.pd-related-section p');
+        if (relSub) relSub.textContent = t('productDetails.relatedSub');
+
+        const taxNote = document.querySelector('.pd-tax-note');
+        if (taxNote) taxNote.textContent = t('productDetails.inclusiveTaxes');
+
+        const ratingValEl = document.getElementById('pd-rating-val');
+        const reviewCountEl = document.getElementById('pd-review-count-text') || document.getElementById('pd-review-count');
+        const badgeEl = document.getElementById('pd-badge');
+
+        if (ratingValEl) ratingValEl.textContent = `★ ${prod.rating || 5.0}`;
+        if (reviewCountEl) reviewCountEl.textContent = `(${prod.reviewCount || 0} ${t('catalog.verifiedReviews') || 'verified reviews'})`;
+
+        if (badgeEl) {
+            if (prod.badge) {
+                const b = prod.badge;
+                let bText = b;
+                if (b === 'Bestseller') bText = t('catalog.bestseller');
+                else if (b === 'Healthy Choice') bText = t('catalog.healthyChoice');
+                else if (b === 'New') bText = t('catalog.newBadge');
+                else if (b === 'Traditional Recipe') bText = t('catalog.traditionalRecipe');
+                else if (b === 'Banarasi Special') bText = isUr ? 'بنارسی خاص' : (isHi ? 'बनारसी स्पेशल' : 'Banarasi Special');
+                else if (b === 'Tangy Special') bText = isUr ? 'چٹپٹا خاص' : (isHi ? 'चटपटा स्पेशल' : 'Tangy Special');
+                else if (b === 'Spicy Favorite') bText = isUr ? 'چٹپٹا پسندیدہ' : (isHi ? 'तीखा पसंदीदा' : 'Spicy Favorite');
+                else if (b === 'Digestive Remedy') bText = isUr ? 'ہاضم نسخہ' : (isHi ? 'पाचक औषधि' : 'Digestive Remedy');
+                else if (b === 'Heart Healthy') bText = isUr ? 'صحتِ قلب کے لیے مفید' : (isHi ? 'हृदय के लिए लाभकारी' : 'Heart Healthy');
+                else if (b === 'Winter Classic' || b === 'Winter Special') bText = isUr ? 'موسم سرما کی سوغات' : (isHi ? 'सर्दियों का खास' : 'Winter Classic');
+                else if (b === 'Rasayana Classic') bText = isUr ? 'طبیعت بخش نسخہ' : (isHi ? 'आयुर्वेदिक रसायन' : 'Rasayana Classic');
+                else if (b === 'Premium Preserve') bText = isUr ? 'اعلیٰ روایتی سوغات' : (isHi ? 'प्रीमियम मुरब्बा' : 'Premium Preserve');
+                else if (b === 'Festive Favorite') bText = isUr ? 'تہواروں کی پسند' : (isHi ? 'त्योहारी मिष्ठान्न' : 'Festive Favorite');
+                else if (b === '100% Pure') bText = isUr ? '100% خالص' : (isHi ? '100% शुद्ध' : '100% Pure');
+                else if (b === 'Ayurvedic Elixir') bText = isUr ? 'طبی امرت' : (isHi ? 'आयुर्वेदिक अमृत' : 'Ayurvedic Elixir');
+                badgeEl.textContent = bText;
+                badgeEl.style.display = 'inline-block';
+            } else {
+                badgeEl.style.display = 'none';
+            }
+        }
+        if (typeof updateVariantDisplay === 'function') updateVariantDisplay();
+    }
 
     renderProductDetailsLocalized();
     window.addEventListener('languageChanged', renderProductDetailsLocalized);
-    if (ingredientsEl) ingredientsEl.textContent = prod.ingredients || 'Verified traditional ingredients.';
-    if (storageEl) storageEl.textContent = prod.storageInfo || 'Store in a cool, dry place.';
-    if (shelfLifeEl) shelfLifeEl.textContent = prod.shelfLife || '12 Months';
-    if (allergensEl) allergensEl.textContent = prod.allergens || 'None declared.';
-    if (packagingEl) packagingEl.textContent = prod.packaging || 'Sealed Glass Jar';
-    if (ratingValEl) ratingValEl.textContent = `★ ${prod.rating || 5.0}`;
-    if (reviewCountEl) reviewCountEl.textContent = `(${prod.reviewCount || 0} verified reviews)`;
-
-    if (badgeEl) {
-        if (prod.badge) {
-            badgeEl.textContent = prod.badge;
-            badgeEl.style.display = 'inline-block';
-        } else {
-            badgeEl.style.display = 'none';
-        }
-    }
+    window.addEventListener('languagechange', renderProductDetailsLocalized);
 
     // Render Image Gallery
     const mainImg = document.getElementById('pd-main-img');
@@ -3875,8 +4015,8 @@ function initProductDetailsPage() {
 
     // Render Variants Pill Selector
     const variantsBox = document.getElementById('pd-variants-container');
-    let selectedVariant = (prod.variants || []).find(v => v.active && v.stock > 0) || (prod.variants && prod.variants[0]);
-    let selectedQty = 1;
+    selectedVariant = (prod.variants || []).find(v => v.active && v.stock > 0) || (prod.variants && prod.variants[0]);
+    selectedQty = 1;
 
     function updateVariantDisplay() {
         const priceVal = document.getElementById('pd-price-val');
@@ -3893,7 +4033,8 @@ function initProductDetailsPage() {
                 mrpVal.style.display = 'inline';
                 if (savingsTag) {
                     const savePct = Math.round(((selectedVariant.mrp - selectedVariant.price) / selectedVariant.mrp) * 100);
-                    savingsTag.textContent = `Save ${savePct}%`;
+                    const cLang = getCurrentLanguage();
+                    savingsTag.textContent = cLang === 'ur' ? `${savePct}% بچت` : (cLang === 'hi' ? `${savePct}% छूट` : `Save ${savePct}%`);
                     savingsTag.style.display = 'inline-block';
                 }
             } else {
@@ -3902,43 +4043,37 @@ function initProductDetailsPage() {
             }
         }
 
-        if (skuDisplay) skuDisplay.textContent = `SKU: ${selectedVariant.sku || 'N/A'}`;
+        if (skuDisplay) skuDisplay.textContent = `${t('productDetails.skuLabel')} ${selectedVariant.sku || 'N/A'}`;
 
         if (stockBadge) {
             if (!selectedVariant.active || selectedVariant.stock <= 0) {
-                stockBadge.textContent = '● Out of Stock';
+                stockBadge.textContent = t('productDetails.outOfStock');
                 stockBadge.style.background = '#ff4d4f';
                 if (btnAddCart) {
                     btnAddCart.disabled = true;
-                    btnAddCart.textContent = 'Out of Stock ❌';
+                    btnAddCart.textContent = t('catalog.outOfStock') + ' ❌';
                     btnAddCart.style.opacity = '0.5';
                     btnAddCart.style.cursor = 'not-allowed';
                 }
             } else if (selectedVariant.stock < 10) {
-                stockBadge.textContent = `● Only ${selectedVariant.stock} left — Hurry!`;
+                stockBadge.textContent = t('productDetails.onlyLeft').replace('{count}', String(selectedVariant.stock));
                 stockBadge.style.background = '#fa8c16';
                 if (btnAddCart) {
                     btnAddCart.disabled = false;
-                    btnAddCart.textContent = 'Add to Cart 🛒';
+                    btnAddCart.textContent = t('productDetails.btnAddToCart');
                     btnAddCart.style.opacity = '1';
                     btnAddCart.style.cursor = 'pointer';
                 }
             } else {
-                stockBadge.textContent = '● In Stock';
+                stockBadge.textContent = t('productDetails.inStock');
                 stockBadge.style.background = '#52c41a';
                 if (btnAddCart) {
                     btnAddCart.disabled = false;
-                    btnAddCart.textContent = 'Add to Cart 🛒';
+                    btnAddCart.textContent = t('productDetails.btnAddToCart');
                     btnAddCart.style.opacity = '1';
                     btnAddCart.style.cursor = 'pointer';
                 }
             }
-        }
-
-        const btnWhatsAppOrder = document.getElementById('pd-btn-whatsapp');
-        if (btnWhatsAppOrder && selectedVariant) {
-            const msg = encodeURIComponent(`Namaste Satvik Swaad! I would like to order:\n• Product: ${prod.name} (${prod.hindiName || ''})\n• Pack Size: ${selectedVariant.label}\n• Price: ₹${selectedVariant.price}\n• Quantity: ${selectedQty}\n\nPlease confirm availability and share payment details.`);
-            btnWhatsAppOrder.href = `https://wa.me/919236587600?text=${msg}`;
         }
     }
 
@@ -3953,13 +4088,13 @@ function initProductDetailsPage() {
                 border-radius: 12px;
                 font-weight: 800;
                 cursor: ${isAvailable ? 'pointer' : 'not-allowed'};
-                border: 2px solid ${isSelected ? 'var(--color-maroon)' : 'rgba(139,69,19,0.2)'};
-                background: ${isSelected ? 'linear-gradient(135deg, var(--color-maroon), #6b1d0e)' : 'linear-gradient(135deg, #ffffff, #faf5ef)'};
-                color: ${isSelected ? '#ffffff' : 'var(--color-text)'};
+                border: 2px solid ${isSelected ? '#E5A93C' : '#E0D6C8'};
+                background: ${isSelected ? 'linear-gradient(135deg, #1A4329, #112E1C)' : '#FFFFFF'};
+                color: ${isSelected ? '#FFFFFF' : '#201815'};
                 opacity: ${isAvailable ? 1 : 0.45};
                 font-size: 0.92rem;
                 letter-spacing: 0.3px;
-                box-shadow: ${isSelected ? '0 4px 14px rgba(139,69,19,0.3)' : '0 1px 4px rgba(0,0,0,0.06)'};
+                box-shadow: ${isSelected ? '0 4px 14px rgba(26,67,41,0.3)' : '0 1px 4px rgba(0,0,0,0.06)'};
                 transition: all 0.25s ease;
                 position: relative;
                 text-decoration: ${isAvailable ? 'none' : 'line-through'};
@@ -3991,16 +4126,16 @@ function initProductDetailsPage() {
             if (isAvailable) {
                 btn.addEventListener('mouseenter', () => {
                     if (selectedVariant && selectedVariant.id !== v.id) {
-                        btn.style.border = '2px solid var(--color-maroon)';
-                        btn.style.background = 'linear-gradient(135deg, #fff5e6, #ffe8cc)';
-                        btn.style.boxShadow = '0 3px 10px rgba(139,69,19,0.15)';
+                        btn.style.border = '2px solid #1A4329';
+                        btn.style.background = 'linear-gradient(135deg, #f0f7f2, #e5f0e8)';
+                        btn.style.boxShadow = '0 3px 10px rgba(26,67,41,0.15)';
                         btn.style.transform = 'translateY(-1px)';
                     }
                 });
                 btn.addEventListener('mouseleave', () => {
                     if (selectedVariant && selectedVariant.id !== v.id) {
-                        btn.style.border = '2px solid rgba(139,69,19,0.2)';
-                        btn.style.background = 'linear-gradient(135deg, #ffffff, #faf5ef)';
+                        btn.style.border = '2px solid #E0D6C8';
+                        btn.style.background = '#FFFFFF';
                         btn.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
                         btn.style.transform = 'translateY(0)';
                     }
@@ -4019,17 +4154,17 @@ function initProductDetailsPage() {
 
                 // Reset all buttons to unselected
                 Array.from(variantsBox.children).forEach(child => {
-                    child.style.border = '2px solid rgba(139,69,19,0.2)';
-                    child.style.background = 'linear-gradient(135deg, #ffffff, #faf5ef)';
-                    child.style.color = 'var(--color-text)';
+                    child.style.border = '2px solid #E0D6C8';
+                    child.style.background = '#FFFFFF';
+                    child.style.color = '#201815';
                     child.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
                     child.style.transform = 'translateY(0)';
                 });
                 // Active state for clicked button
-                btn.style.border = '2px solid var(--color-maroon)';
-                btn.style.background = 'linear-gradient(135deg, var(--color-maroon), #6b1d0e)';
-                btn.style.color = '#ffffff';
-                btn.style.boxShadow = '0 4px 14px rgba(139,69,19,0.3)';
+                btn.style.border = '2px solid #E5A93C';
+                btn.style.background = 'linear-gradient(135deg, #1A4329, #112E1C)';
+                btn.style.color = '#FFFFFF';
+                btn.style.boxShadow = '0 4px 14px rgba(26,67,41,0.3)';
 
                 updateVariantDisplay();
             });
@@ -4085,21 +4220,6 @@ function initProductDetailsPage() {
         });
     }
 
-    const btnWhatsAppOrder = document.getElementById('pd-btn-whatsapp');
-    function updateWhatsAppOrderLink() {
-        if (!btnWhatsAppOrder || !selectedVariant) return;
-        const msg = encodeURIComponent(`Namaste Satvik Swaad! I would like to order:\n• Product: ${prod.name} (${prod.hindiName || ''})\n• Pack Size: ${selectedVariant.label}\n• Price: ₹${selectedVariant.price}\n• Quantity: ${selectedQty}\n\nPlease confirm availability and share payment details.`);
-        btnWhatsAppOrder.href = `https://wa.me/919236587600?text=${msg}`;
-    }
-    updateWhatsAppOrderLink();
-
-    if (qtyMinus) {
-        qtyMinus.addEventListener('click', updateWhatsAppOrderLink);
-    }
-    if (qtyPlus) {
-        qtyPlus.addEventListener('click', updateWhatsAppOrderLink);
-    }
-
     // Render Product-Specific Reviews
     const reviewsBox = document.getElementById('pd-reviews-container');
     if (reviewsBox) {
@@ -4108,35 +4228,88 @@ function initProductDetailsPage() {
 
     // Render Related Products
     const relatedGrid = document.getElementById('pd-related-grid');
-    if (relatedGrid) {
-        const relatedProds = PRODUCTS_CATALOGUE.filter(p => p.id !== prod.id && p.category === prod.category).slice(0, 3);
-        const frag = document.createDocumentFragment();
+    function renderRelatedProducts() {
+        if (!relatedGrid) return;
+        let relatedProds = PRODUCTS_CATALOGUE.filter(p => p.id !== prod.id && p.category === prod.category).slice(0, 4);
+        if (relatedProds.length < 4) {
+            const extra = PRODUCTS_CATALOGUE.filter(p => p.id !== prod.id && !relatedProds.includes(p)).slice(0, 4 - relatedProds.length);
+            relatedProds = relatedProds.concat(extra);
+        }
+        const frag2 = document.createDocumentFragment();
+        const cLang = getCurrentLanguage();
+        const isHi = cLang === 'hi';
+        const isUr = cLang === 'ur';
+
         relatedProds.forEach(rp => {
-            const card = createSafeElement('div', { className: 'product-card', style: 'cursor: pointer;' });
-            card.addEventListener('click', () => {
-                window.location.href = `product-details.html?id=${encodeURIComponent(rp.id)}`;
-            });
-            const topDiv = createSafeElement('div', { className: 'product-card-top' });
+            const defaultV = (rp.variants || []).find(v => v.active && v.stock > 0) || (rp.variants && rp.variants[0]);
+            if (!defaultV) return;
+
+            const card = createSafeElement('div', { className: 'product-card ref-product-card' });
+            card.setAttribute('data-product-id', rp.id);
+
+            // Image wrapper
+            const imgWrap = createSafeElement('div', { className: 'ref-card-img-wrap' });
+            const imgLink = document.createElement('a');
+            imgLink.href = `product-details.html?id=${encodeURIComponent(rp.id)}`;
             const imgUrl = (rp.images && rp.images[0]) || rp.img || 'assets/aam-ka-achar.png?v=2';
-            const img = createSafeElement('img', { src: imgUrl, alt: rp.name, className: 'product-img' });
-            topDiv.appendChild(img);
+            const img = createSafeElement('img', { src: imgUrl, alt: rp.name, className: 'ref-card-img' });
+            img.loading = 'lazy';
+            imgLink.appendChild(img);
+            imgWrap.appendChild(imgLink);
 
-            const title = createSafeElement('h3', { className: 'product-title', text: rp.name });
-            const desc = createSafeElement('p', { className: 'product-desc', text: rp.shortDesc });
-            const priceRow = createSafeElement('div', { className: 'product-price-row' });
-            const defaultV = rp.variants[0];
-            const priceSpan = createSafeElement('span', { className: 'price-val', text: `From ₹${defaultV.price}` });
+            // Card body
+            const body = createSafeElement('div', { className: 'ref-card-body' });
+
+            const titleLink = document.createElement('a');
+            titleLink.href = `product-details.html?id=${encodeURIComponent(rp.id)}`;
+            titleLink.className = 'ref-card-title';
+            titleLink.textContent = isUr ? (rp.urduName || rp.name) : (isHi ? (rp.hindiName || rp.name) : rp.name);
+
+            const catSpan = createSafeElement('span', { className: 'ref-card-cat', text: rp.categoryLabel || rp.category || 'Homemade' });
+
+            const priceRow = createSafeElement('div', { className: 'ref-card-price-row' });
+            const priceSpan = createSafeElement('span', { className: 'ref-card-price price-val', text: `₹${defaultV.price}` });
             priceRow.appendChild(priceSpan);
+            if (defaultV.mrp && defaultV.mrp > defaultV.price) {
+                const mrpSpan = createSafeElement('span', { className: 'ref-card-mrp mrp-val', text: `₹${defaultV.mrp}` });
+                const discPct = Math.round(((defaultV.mrp - defaultV.price) / defaultV.mrp) * 100);
+                const discLabel = isUr ? `${discPct}% بچت` : (isHi ? `${discPct}% छूट` : `${discPct}% OFF`);
+                const discSpan = createSafeElement('span', { className: 'ref-card-discount savings-tag', text: discLabel });
+                priceRow.appendChild(mrpSpan);
+                priceRow.appendChild(discSpan);
+            }
 
-            card.appendChild(topDiv);
-            card.appendChild(title);
-            card.appendChild(desc);
-            card.appendChild(priceRow);
+            const ratingDiv = createSafeElement('div', { className: 'ref-card-rating' });
+            const starSpan = createSafeElement('span', { className: 'ref-star', text: '★★★★★' });
+            const reviewSpan = createSafeElement('span', { className: 'ref-reviews', text: `(${rp.reviewCount || rp.reviews || 0})` });
+            ratingDiv.appendChild(starSpan);
+            ratingDiv.appendChild(reviewSpan);
 
-            frag.appendChild(card);
+            const addBtn = createSafeElement('button', { className: 'btn-add-cart ref-card-btn' });
+            addBtn.type = 'button';
+            const addBtnText = t('catalog.btnAddCart') || 'Add to Cart 🛒';
+            addBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> <span>${addBtnText}</span>`;
+            addBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                addToCart(rp.id, defaultV.id, 1);
+            });
+
+            body.appendChild(titleLink);
+            body.appendChild(catSpan);
+            body.appendChild(priceRow);
+            body.appendChild(ratingDiv);
+            body.appendChild(addBtn);
+
+            card.appendChild(imgWrap);
+            card.appendChild(body);
+            frag2.appendChild(card);
         });
-        relatedGrid.replaceChildren(frag);
+        relatedGrid.replaceChildren(frag2);
     }
+
+    renderRelatedProducts();
+    window.addEventListener('languageChanged', renderRelatedProducts);
+    window.addEventListener('languagechange', renderRelatedProducts);
 }
 
 async function fetchProductReviews(productId, container) {

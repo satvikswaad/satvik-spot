@@ -14,6 +14,18 @@
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <!-- Universal Continuity Language Bootstrap -->
+    <script>
+        (function() {
+            try {
+                var l = localStorage.getItem('app_language') || localStorage.getItem('satvik_lang') || 'en';
+                if (l === 'ur' || l === 'hi') {
+                    document.documentElement.lang = l;
+                    if (l === 'ur') document.documentElement.dir = 'rtl';
+                }
+            } catch(e) {}
+        })();
+    </script>
 </head>
 <body class="cart-page-body" style="background: #FAF5EB; min-height: 100vh; display: flex; flex-direction: column;">
 
@@ -58,6 +70,23 @@
             </nav>
 
             <div class="header-right-actions">
+      <!-- 3-Language Selector Dropdown -->
+      <div class="lang-selector-dropdown" id="lang-selector-wrap">
+        <button type="button" class="btn-lang-select" id="btn-lang-select" aria-expanded="false" aria-haspopup="true" aria-label="Select Language">
+          <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span class="active-lang-label" id="active-lang-label">English</span>
+          <svg class="lang-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="lang-dropdown-menu" id="lang-dropdown-menu" role="menu">
+          <button type="button" class="lang-opt" data-lang="en" role="menuitem"><span class="lang-code">EN</span> <span class="lang-name">English</span></button>
+          <button type="button" class="lang-opt" data-lang="hi" role="menuitem"><span class="lang-code">HI</span> <span class="lang-name">हिन्दी (Hindi)</span></button>
+          <button type="button" class="lang-opt" data-lang="ur" role="menuitem"><span class="lang-code">UR</span> <span class="lang-name">اردو (Urdu)</span></button>
+        </div>
+      </div>
                 <a href="products.html" class="ref-icon-btn" aria-label="Continue Shopping" title="Continue Shopping" style="text-decoration: none; font-size: 1.1rem; color: #1D552C;">
                     🛍️
                 </a>
@@ -76,9 +105,17 @@
 
         <!-- HEADER DROPDOWN MENU (COMPACT, NON-BLURRING, PROFESSIONAL) -->
         <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
-            <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
-                <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
-            </button>
+                  <div class="mobile-lang-selector-group" style="padding: 10px 14px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-sub); display: inline-flex; align-items: center; gap: 6px;">
+              <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>Language:</span>
+          </span>
+          <div class="mobile-lang-pills" style="display: flex; gap: 6px;">
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="en" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">EN</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="hi" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">हिन्दी</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="ur" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">اردو</button>
+          </div>
+      </div>
             <a href="index.html#hero" class="dropdown-nav-link" role="menuitem">🏠 Home</a>
             <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Shop Products</a>
             <a href="why-us.html" class="dropdown-nav-link" role="menuitem">✨ Why Us</a>
@@ -324,8 +361,29 @@
                 const clearBtn = document.getElementById('btn-clear-cart-all');
                 const mobileBadge = document.getElementById('mobile-cart-badge');
 
+                const activeLang = (typeof localStorage !== 'undefined' ? (localStorage.getItem('app_language') || localStorage.getItem('satvik_lang')) : 'en') || 'en';
+                const tDict = (window.TRANSLATIONS && window.TRANSLATIONS[activeLang] && window.TRANSLATIONS[activeLang].cartPage) ? window.TRANSLATIONS[activeLang].cartPage : {
+                    title: "Shopping Cart",
+                    backToShop: "← Back to Shop",
+                    itemCountSingular: "item",
+                    itemCountPlural: "items",
+                    clearBtn: "Clear Cart",
+                    emptyTitle: "Your Cart is Empty",
+                    emptyDesc: "You haven't added any artisanal pickles or sweet treats to your cart yet. Explore our handcrafted batches!",
+                    exploreBtn: "Explore Products Catalogue →",
+                    eachLabel: "each",
+                    removeAria: "Remove item",
+                    summaryTitle: "Order Summary",
+                    subtotalLabel: "Items Subtotal:",
+                    deliveryLabel: "Delivery Fee:",
+                    freeDeliveryText: "FREE (Inaugural Offer)",
+                    totalPayableLabel: "Total Payable:",
+                    checkoutBtn: "Proceed to Checkout",
+                    confirmClear: "Are you sure you want to clear your cart?"
+                };
+
                 const totalItemsCount = items.reduce((sum, item) => sum + (Number(item.qty || item.quantity) || 1), 0);
-                if (countBadge) countBadge.textContent = `${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'}`;
+                if (countBadge) countBadge.textContent = `${totalItemsCount} ${totalItemsCount === 1 ? tDict.itemCountSingular : tDict.itemCountPlural}`;
                 if (mobileBadge) {
                     mobileBadge.textContent = totalItemsCount;
                     mobileBadge.style.display = totalItemsCount > 0 ? 'inline-block' : 'none';
@@ -336,19 +394,22 @@
                     container.innerHTML = `
                         <div style="background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 18px; padding: 42px 20px; text-align: center; box-shadow: 0 4px 16px rgba(60,50,20,0.06); margin-top: 10px;">
                             <div style="font-size: 3.5rem; margin-bottom: 12px;">🏺</div>
-                            <h2 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.5rem; margin: 0 0 8px;">Your Cart is Empty</h2>
+                            <h2 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.5rem; margin: 0 0 8px;">${tDict.emptyTitle}</h2>
                             <p style="color: #6B7280; font-size: 0.92rem; max-width: 380px; margin: 0 auto 24px; line-height: 1.5;">
-                                You haven't added any artisanal pickles or sweet treats to your cart yet. Explore our handcrafted batches!
+                                ${tDict.emptyDesc}
                             </p>
                             <a href="products.html" style="display: inline-block; background: #164328; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(22,67,40,0.25);">
-                                Explore Products Catalogue →
+                                ${tDict.exploreBtn}
                             </a>
                         </div>
                     `;
                     return;
                 }
 
-                if (clearBtn) clearBtn.style.display = 'inline-block';
+                if (clearBtn) {
+                    clearBtn.style.display = 'inline-block';
+                    clearBtn.textContent = tDict.clearBtn;
+                }
 
                 const subtotal = items.reduce((sum, item) => sum + (Number(item.price || 0) * (Number(item.qty || item.quantity) || 1)), 0);
 
@@ -367,7 +428,7 @@
                             <img src="${img}" alt="${name}" style="width: 72px; height: 72px; object-fit: contain; background: #FAF8F5; border-radius: 10px; padding: 4px; flex-shrink: 0;" />
                             <div style="flex: 1; min-width: 0;">
                                 <div style="font-weight: 700; font-size: 0.95rem; color: #164328; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</div>
-                                <div style="font-size: 0.78rem; color: #6B7280; margin-bottom: 6px;">${variant} &bull; ₹${price} each</div>
+                                <div style="font-size: 0.78rem; color: #6B7280; margin-bottom: 6px;">${variant} &bull; ₹${price} ${tDict.eachLabel}</div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
                                     <div style="display: inline-flex; align-items: center; border: 1.5px solid #DCD2BC; border-radius: 8px; overflow: hidden; background: #FAF8F5;">
                                         <button type="button" class="btn-qty-minus" data-key="${key}" style="background: none; border: none; width: 30px; height: 30px; font-size: 1rem; cursor: pointer; color: #164328; font-weight: 800;">−</button>
@@ -377,7 +438,7 @@
                                     <div style="font-weight: 800; font-size: 1.05rem; color: #164328;">₹${lineTotal}</div>
                                 </div>
                             </div>
-                            <button type="button" class="btn-item-delete" data-key="${key}" aria-label="Remove item" style="background: none; border: none; color: #C53030; font-size: 1.2rem; cursor: pointer; padding: 6px; align-self: flex-start;">✕</button>
+                            <button type="button" class="btn-item-delete" data-key="${key}" aria-label="${tDict.removeAria}" style="background: none; border: none; color: #C53030; font-size: 1.2rem; cursor: pointer; padding: 6px; align-self: flex-start;">✕</button>
                         </div>
                     `;
                 }).join('');
@@ -391,33 +452,27 @@
 
                         <!-- BILLING SUMMARY CARD -->
                         <div style="background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 16px; padding: 18px; box-shadow: 0 4px 16px rgba(60,50,20,0.06);">
-                            <h3 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.2rem; margin: 0 0 14px; border-bottom: 1px dashed #E6DEC8; padding-bottom: 8px;">Order Summary</h3>
+                            <h3 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.2rem; margin: 0 0 14px; border-bottom: 1px dashed #E6DEC8; padding-bottom: 8px;">${tDict.summaryTitle}</h3>
                             
                             <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #4B5563; margin-bottom: 8px;">
-                                <span>Items Subtotal:</span>
+                                <span>${tDict.subtotalLabel}</span>
                                 <span style="font-weight: 700; color: #164328;">₹${subtotal}</span>
                             </div>
 
                             <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #4B5563; margin-bottom: 12px;">
-                                <span>Delivery Fee:</span>
-                                <span style="color: #1D552C; font-weight: 700;">FREE (Inaugural Offer)</span>
+                                <span>${tDict.deliveryLabel}</span>
+                                <span style="color: #1D552C; font-weight: 700;">${tDict.freeDeliveryText}</span>
                             </div>
 
                             <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; color: #164328; border-top: 2px solid #E6DEC8; padding-top: 12px; margin-bottom: 18px;">
-                                <span>Total Payable:</span>
+                                <span>${tDict.totalPayableLabel}</span>
                                 <span>₹${subtotal}</span>
                             </div>
 
                             <button type="button" id="btn-proceed-to-checkout" style="width: 100%; background: #164328; color: #FFFFFF; border: none; padding: 14px 20px; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(22,67,40,0.3); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <span>Proceed to Checkout</span>
+                                <span>${tDict.checkoutBtn}</span>
                                 <span>🔒</span>
                             </button>
-
-                            <div style="text-align: center; margin-top: 12px;">
-                                <a href="https://wa.me/919236587600?text=Namaste%2C%20I%20would%20like%20to%20place%20an%20order%20for%20Satvik%20Swaad" target="_blank" rel="noopener noreferrer" style="font-size: 0.84rem; color: #1D552C; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-                                    <span>💬 Quick Order via WhatsApp</span>
-                                </a>
-                            </div>
                         </div>
                     </div>
                 `;
@@ -477,11 +532,16 @@
                 }
             }
 
+            // Expose globally for translation reload
+            window.renderCartPage = renderCartPage;
+
             // Clear All
             const clearBtn = document.getElementById('btn-clear-cart-all');
             if (clearBtn) {
                 clearBtn.addEventListener('click', () => {
-                    if (confirm('Are you sure you want to clear your cart?')) {
+                    const activeLang = (typeof localStorage !== 'undefined' ? (localStorage.getItem('app_language') || localStorage.getItem('satvik_lang')) : 'en') || 'en';
+                    const confirmMsg = (window.TRANSLATIONS && window.TRANSLATIONS[activeLang] && window.TRANSLATIONS[activeLang].cartPage) ? window.TRANSLATIONS[activeLang].cartPage.confirmClear : 'Are you sure you want to clear your cart?';
+                    if (confirm(confirmMsg)) {
                         saveStoredCart({});
                         renderCartPage();
                     }
@@ -490,6 +550,8 @@
 
             window.addEventListener('DOMContentLoaded', renderCartPage);
             window.addEventListener('cartUpdated', renderCartPage);
+            window.addEventListener('languagechange', renderCartPage);
+            window.addEventListener('languageChanged', renderCartPage);
         })();
     </script>
     <script type="module" src="./script.js"></script>

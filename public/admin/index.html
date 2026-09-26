@@ -1603,6 +1603,14 @@
                 <p style="margin-top: 14px; font-size: 0.85rem;">
                     <a href="#" id="link-forgot" style="color: var(--saffron); text-decoration: none; font-weight: 700;">Forgot password?</a>
                 </p>
+
+                <!-- LOCALHOST DEV QUICK ACCESS (Automatically active on localhost) -->
+                <div id="dev-quick-access" style="display: none; margin-top: 18px; padding-top: 14px; border-top: 1px dashed rgba(212, 160, 23, 0.4);">
+                    <button type="button" id="btn-dev-quick-login" style="width: 100%; background: #FAF5EB; color: #164328; border: 1.5px solid #164328; padding: 10px 14px; border-radius: var(--radius-sm); font-weight: 800; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
+                        <span>⚡ Local Dev Direct Access (Owner)</span>
+                    </button>
+                    <p style="font-size: 0.72rem; color: #777; margin-top: 6px; font-weight: 600;">(Localhost development shortcut: opens admin suite directly)</p>
+                </div>
             </div>
 
             <div id="reset-form" class="d-none">
@@ -1741,35 +1749,36 @@
                 <section class="view-section active" id="view-dashboard">
                     <div class="view-header">
                         <div class="view-title-group">
-                            <h1>Executive Dashboard</h1>
-                            <p>Real-time overview of online revenue, pending dispatches, stock health, and offline business.</p>
+                            <h1>Executive Omnichannel Dashboard</h1>
+                            <p>Real-time consolidated view of Online Store dispatches, Offline POS counters, and combined revenues.</p>
                         </div>
                         <div class="view-actions">
-                            <button type="button" class="btn-primary" id="btn-dash-new-order-filter">View Pending Orders →</button>
+                            <button type="button" class="btn-primary" id="btn-dash-new-offline-order" style="background: linear-gradient(135deg, #14452F 0%, #1e6945 100%);">➕ New Offline Order (POS)</button>
+                            <button type="button" class="btn-secondary" id="btn-dash-new-order-filter">View Pending Orders →</button>
                         </div>
                     </div>
 
-                    <!-- 6 High-Level KPI Cards (2 columns on mobile, 4-6 on desktop) -->
+                    <!-- 6 High-Level Omnichannel KPI Cards -->
                     <div class="kpi-grid">
-                        <div class="kpi-card">
+                        <div class="kpi-card" style="border-top: 3.5px solid #059669;">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Online Gross</span>
+                                <span class="kpi-title">Omnichannel Gross</span>
                                 <div class="kpi-icon revenue">₹</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-revenue">₹0</div>
-                            <div class="kpi-note">Paid & confirmed orders</div>
+                            <div class="kpi-note" id="kpi-dash-rev-split">🌐 Online: ₹0 · 🏪 Offline: ₹0</div>
                         </div>
 
-                        <div class="kpi-card">
+                        <div class="kpi-card" style="border-top: 3.5px solid #2563EB;">
                             <div class="kpi-card-header">
                                 <span class="kpi-title">Total Orders</span>
                                 <div class="kpi-icon orders">📦</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-orders-count">0</div>
-                            <div class="kpi-note">Lifetime customer orders</div>
+                            <div class="kpi-note" id="kpi-dash-orders-split">🌐 0 Online · 🏪 0 Offline</div>
                         </div>
 
-                        <div class="kpi-card">
+                        <div class="kpi-card" style="border-top: 3.5px solid #D97706;">
                             <div class="kpi-card-header">
                                 <span class="kpi-title">Pending Orders</span>
                                 <div class="kpi-icon pending">⏳</div>
@@ -1778,7 +1787,7 @@
                             <div class="kpi-note">Awaiting admin review</div>
                         </div>
 
-                        <div class="kpi-card">
+                        <div class="kpi-card" style="border-top: 3.5px solid #7C3AED;">
                             <div class="kpi-card-header">
                                 <span class="kpi-title">Ready to Ship</span>
                                 <div class="kpi-icon shipping">🚚</div>
@@ -1787,7 +1796,7 @@
                             <div class="kpi-note">Confirmed to dispatch</div>
                         </div>
 
-                        <div class="kpi-card">
+                        <div class="kpi-card" style="border-top: 3.5px solid #DC2626;">
                             <div class="kpi-card-header">
                                 <span class="kpi-title">Low Stock</span>
                                 <div class="kpi-icon stock">⚠️</div>
@@ -1796,13 +1805,29 @@
                             <div class="kpi-note">Items ≤ 5 units left</div>
                         </div>
 
-                        <div class="kpi-card">
+                        <div class="kpi-card" style="border-top: 3.5px solid #C8521A;">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Offline Net</span>
-                                <div class="kpi-icon offline">💼</div>
+                                <span class="kpi-title">Net Operating Profit</span>
+                                <div class="kpi-icon offline">⚖️</div>
                             </div>
                             <div class="kpi-value" id="kpi-dash-offline-balance">₹0</div>
-                            <div class="kpi-note">Sales minus Raw Expenses</div>
+                            <div class="kpi-note">Combined Sales - Raw Expenses</div>
+                        </div>
+                    </div>
+
+                    <!-- Omnichannel Quick Pulse Bar -->
+                    <div class="content-card" style="background: linear-gradient(135deg, #FFFDF9 0%, #FAF5EB 100%); border: 1.5px solid #E8DFD3; margin-bottom: 22px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                            <h3 style="margin-bottom:0; font-size:1.12rem;">📊 Omnichannel Sales Split (Online vs Offline)</h3>
+                            <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted);" id="dash-omnichannel-summary">Consolidated Revenue Ratio</span>
+                        </div>
+                        <div style="height: 12px; border-radius: 999px; background: #E5E7EB; overflow: hidden; display: flex; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                            <div id="dash-bar-online" style="background: #2563EB; width: 50%; transition: width 0.4s ease;" title="Online"></div>
+                            <div id="dash-bar-offline" style="background: #059669; width: 50%; transition: width 0.4s ease;" title="Offline"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:0.82rem; font-weight:700; flex-wrap:wrap; gap:6px;">
+                            <span style="color:#2563EB;">🌐 Online Store: <strong id="dash-split-online-pct">50%</strong> (<span id="dash-split-online-amt">₹0</span>)</span>
+                            <span style="color:#059669;">🏪 Offline / POS: <strong id="dash-split-offline-pct">50%</strong> (<span id="dash-split-offline-amt">₹0</span>)</span>
                         </div>
                     </div>
 
@@ -1822,7 +1847,10 @@
                     <div class="view-header">
                         <div class="view-title-group">
                             <h1>Orders & Shipping Dispatch</h1>
-                            <p>Track multi-stage order lifecycles, filter by payment status, and dispatch shipments with tracking numbers.</p>
+                            <p>Track multi-stage order lifecycles, filter by channel & payment status, and dispatch shipments with tracking numbers.</p>
+                        </div>
+                        <div class="view-actions">
+                            <button type="button" class="btn-primary" id="btn-orders-new-offline-order" style="background: linear-gradient(135deg, #14452F 0%, #1e6945 100%);">➕ New Offline Order (POS)</button>
                         </div>
                     </div>
 
@@ -1843,13 +1871,23 @@
                             <span class="search-icon-svg">🔍</span>
                             <input type="text" id="input-search-orders" placeholder="Search by Order ID, Name, Phone..." />
                         </div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);">Payment:</label>
-                            <select id="select-payment-filter" style="padding:7px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border-dark);font-size:0.8rem;">
-                                <option value="all">All</option>
-                                <option value="paid">💳 Paid</option>
-                                <option value="unpaid">⏳ Unpaid</option>
-                            </select>
+                        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);">Channel:</label>
+                                <select id="select-channel-filter" style="padding:7px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border-dark);font-size:0.8rem;font-weight:700;">
+                                    <option value="all">🌐 All Channels</option>
+                                    <option value="online">🌐 Online Store</option>
+                                    <option value="offline">🏪 Offline Store / POS</option>
+                                </select>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);">Payment:</label>
+                                <select id="select-payment-filter" style="padding:7px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border-dark);font-size:0.8rem;">
+                                    <option value="all">All</option>
+                                    <option value="paid">💳 Paid</option>
+                                    <option value="unpaid">⏳ Unpaid</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -1958,48 +1996,87 @@
                 <section class="view-section" id="view-offline">
                     <div class="view-header">
                         <div class="view-title-group">
-                            <h1>Offline Business & Physical Investments</h1>
-                            <p>Track non-website raw material expenses (cold-pressed mustard oil, spices, raw mangoes, glass jars, cartons) and offline sales.</p>
+                            <h1>Offline Business & Physical Ledger</h1>
+                            <p>Record counter sales, POS orders, exhibitions, and track non-website raw material expenses (oil, spices, jars).</p>
                         </div>
                         <div class="view-actions">
-                            <button type="button" class="btn-primary" id="btn-open-offline-modal">+ Record Entry</button>
+                            <button type="button" class="btn-primary" id="btn-open-offline-order-modal" style="background: linear-gradient(135deg, #14452F 0%, #1e6945 100%);">➕ New Offline Order (POS)</button>
+                            <button type="button" class="btn-secondary" id="btn-open-offline-modal">➕ Record Raw Expense</button>
                         </div>
                     </div>
 
                     <!-- Offline Financial Summary Cards -->
                     <div class="kpi-grid">
-                        <div class="kpi-card">
+                        <div class="kpi-card" style="border-top:3px solid #059669;">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Raw Investments</span>
-                                <div class="kpi-icon stock">🛢️</div>
-                            </div>
-                            <div class="kpi-value" id="kpi-offline-expenses" style="color:#DC2626;">₹0</div>
-                            <div class="kpi-note">Oil, spices, mangoes, salt, jars</div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-card-header">
-                                <span class="kpi-title">Offline Sales</span>
+                                <span class="kpi-title">Offline Gross Sales</span>
                                 <div class="kpi-icon revenue">💰</div>
                             </div>
                             <div class="kpi-value" id="kpi-offline-sales" style="color:#059669;">₹0</div>
-                            <div class="kpi-note">Exhibitions, mela stalls, direct pickups</div>
+                            <div class="kpi-note" id="kpi-offline-orders-count">0 Recorded POS Orders</div>
                         </div>
 
-                        <div class="kpi-card">
+                        <div class="kpi-card" style="border-top:3px solid #DC2626;">
                             <div class="kpi-card-header">
-                                <span class="kpi-title">Net Cash Flow</span>
+                                <span class="kpi-title">Raw Material Expenses</span>
+                                <div class="kpi-icon stock">🛢️</div>
+                            </div>
+                            <div class="kpi-value" id="kpi-offline-expenses" style="color:#DC2626;">₹0</div>
+                            <div class="kpi-note">Oil, spices, mangoes, jars, cartons</div>
+                        </div>
+
+                        <div class="kpi-card" style="border-top:3px solid #D4A017;">
+                            <div class="kpi-card-header">
+                                <span class="kpi-title">Net Offline Cash Flow</span>
                                 <div class="kpi-icon offline">⚖️</div>
                             </div>
                             <div class="kpi-value" id="kpi-offline-net">₹0</div>
-                            <div class="kpi-note">Income minus Expenses</div>
+                            <div class="kpi-note">Sales minus Raw Material Costs</div>
                         </div>
                     </div>
 
-                    <!-- Ledger Table -->
-                    <div class="content-card">
-                        <h3>📒 Offline Ledger Entries</h3>
-                        <p class="desc">Historical log of all recorded physical purchases and offline receipts stored in Cloud Firestore.</p>
+                    <!-- Offline Sub-Navigation Tabs -->
+                    <div class="filter-tab-bar" id="offline-sub-tabs">
+                        <button type="button" class="filter-tab active" id="btn-subtab-pos-orders" data-subtab="offline-orders">🏪 Offline POS Orders <span class="badge-cnt" id="cnt-subtab-offline-orders">0</span></button>
+                        <button type="button" class="filter-tab" id="btn-subtab-expenses" data-subtab="offline-expenses">🛢️ Raw Purchases & Expenses <span class="badge-cnt" id="cnt-subtab-offline-expenses">0</span></button>
+                    </div>
+
+                    <!-- Table 1: Offline Orders Table -->
+                    <div class="content-card" id="card-offline-orders-table">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+                            <div>
+                                <h3 style="margin-bottom:2px;">🏪 Offline POS & Counter Sales History</h3>
+                                <p class="desc" style="margin-bottom:0;">Physical counter, exhibition mela stall, and phone customer sales.</p>
+                            </div>
+                            <input type="text" id="input-search-offline-orders" placeholder="Search customer, phone, ID..." style="padding:6px 12px;border:1.5px solid var(--border-dark);border-radius:20px;font-size:0.8rem;max-width:260px;" />
+                        </div>
+                        <div class="ledger-table-wrap">
+                            <table class="ledger-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Date & Time</th>
+                                        <th>Customer & Channel</th>
+                                        <th>Items Ordered</th>
+                                        <th>Payment</th>
+                                        <th>Total (₹)</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="offline-orders-table-body">
+                                    <tr>
+                                        <td colspan="8" style="text-align:center;color:#888;padding:20px;">Loading offline orders...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Table 2: Raw Material Expenses Ledger -->
+                    <div class="content-card" id="card-offline-expenses-table" style="display:none;">
+                        <h3>📒 Raw Material & Physical Purchases Ledger</h3>
+                        <p class="desc">Historical log of all recorded physical purchases (cold-pressed mustard oil, spices, jars) and operational overheads.</p>
                         <div class="ledger-table-wrap">
                             <table class="ledger-table">
                                 <thead>
@@ -2216,6 +2293,103 @@
         </div>
     </div>
 
+    <!-- ════ MODAL 4: RECORD OFFLINE ORDER (POS) MODAL ════ -->
+    <div class="suite-modal-backdrop" id="modal-offline-order" style="z-index: 2500;">
+        <div class="suite-modal-box" style="max-width: 620px; width: 95%;">
+            <div class="suite-modal-header">
+                <div>
+                    <h3 style="display:flex;align-items:center;gap:8px;">🏪 Record Offline Order (POS & Counter)</h3>
+                    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Adds direct physical sale & auto-deducts live stock from inventory</p>
+                </div>
+                <button type="button" class="btn-modal-close" id="btn-close-offline-order-modal">✕</button>
+            </div>
+            <form id="form-offline-order">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div class="form-group">
+                        <label for="pos-cust-name">Customer Name *</label>
+                        <input type="text" id="pos-cust-name" placeholder="e.g. Ramesh Gupta" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="pos-cust-phone">Customer Phone / WhatsApp</label>
+                        <input type="tel" id="pos-cust-phone" placeholder="e.g. 98765 43210" />
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div class="form-group">
+                        <label for="pos-channel">Sales Channel / Source</label>
+                        <select id="pos-channel" required>
+                            <option value="Store Pickup">🏪 Varanasi Store Pickup</option>
+                            <option value="Walk-in Counter">🚶 Walk-in Counter Sale</option>
+                            <option value="Phone Order">📞 Phone / WhatsApp Order</option>
+                            <option value="Mela Stall">🎪 Exhibition / Mela Stall</option>
+                            <option value="Kitchen Delivery">🚚 Direct Kitchen Delivery</option>
+                            <option value="Corporate Bulk">🎁 Bulk Corporate Gifting</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pos-order-date">Date & Time</label>
+                        <input type="datetime-local" id="pos-order-date" required />
+                    </div>
+                </div>
+
+                <!-- Products Selection Section -->
+                <div style="background: #FAF7F2; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <label style="font-size:0.78rem;font-weight:800;color:var(--maroon);text-transform:uppercase;">📦 Order Items & Quantities</label>
+                        <button type="button" id="btn-pos-add-item" style="background:#FFFFFF;border:1.5px solid var(--gold);color:var(--maroon);border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:800;cursor:pointer;">+ Add Item</button>
+                    </div>
+                    <div id="pos-items-container" style="display:flex;flex-direction:column;gap:10px;">
+                        <!-- Dynamic item rows injected here -->
+                    </div>
+                </div>
+
+                <!-- Financial Calculation & Payment Row -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div class="form-group">
+                        <label for="pos-payment-mode">Payment Mode</label>
+                        <select id="pos-payment-mode" required>
+                            <option value="Cash">💵 Cash</option>
+                            <option value="UPI">📱 UPI / QR Code (GPay, PhonePe, Paytm)</option>
+                            <option value="Card">💳 Card Swipe (POS)</option>
+                            <option value="Khata">📒 Khata (Store Credit)</option>
+                            <option value="Bank Transfer">🏦 Bank Transfer (NEFT/IMPS)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pos-payment-status">Payment Status</label>
+                        <select id="pos-payment-status" required>
+                            <option value="paid">✅ Full Paid</option>
+                            <option value="partial">⏳ Partial Advance</option>
+                            <option value="pending">⏳ Pending (Khata)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div class="form-group">
+                        <label for="pos-discount">Special Discount (₹)</label>
+                        <input type="number" id="pos-discount" min="0" value="0" placeholder="0" />
+                    </div>
+                    <div class="form-group">
+                        <label for="pos-total-display">Final Total (₹)</label>
+                        <input type="text" id="pos-total-display" readonly style="font-weight:900;font-size:1.15rem;color:#059669;background:#ECFDF5;border-color:#10B981;" value="₹0" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pos-order-notes">Notes / Special Packaging</label>
+                    <textarea id="pos-order-notes" rows="2" placeholder="e.g. Traditional earthen pot packaging, delivered at Godowlia store"></textarea>
+                </div>
+
+                <div class="modal-btn-row">
+                    <button type="button" class="btn-secondary" id="btn-cancel-offline-order-modal">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btn-save-offline-order" style="background: linear-gradient(135deg, #14452F 0%, #1e6945 100%);">💾 Save Order & Deduct Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- ════ INACTIVITY WARNING MODAL ════ -->
     <div id="inactivity-modal">
         <div class="inactivity-box">
@@ -2227,6 +2401,8 @@
 
     <!-- Firebase SDK & Admin Controller Script -->
     <script type="module" src="./firebase-config.js"></script>
+    <script type="module" src="./adminDataAdapter.js"></script>
+    <script type="module" src="./adminAnalytics.js"></script>
     <script type="module" src="./admin.js"></script>
 
 </body>

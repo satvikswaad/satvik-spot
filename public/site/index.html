@@ -40,6 +40,18 @@
       "description": "Authentic Indian homemade pickles, murabba, and traditional sweets."
     }
     </script>
+    <!-- Universal Continuity Language Bootstrap -->
+    <script>
+        (function() {
+            try {
+                var l = localStorage.getItem('app_language') || localStorage.getItem('satvik_lang') || 'en';
+                if (l === 'ur' || l === 'hi') {
+                    document.documentElement.lang = l;
+                    if (l === 'ur') document.documentElement.dir = 'rtl';
+                }
+            } catch(e) {}
+        })();
+    </script>
 </head>
 
 <body>
@@ -94,8 +106,23 @@
       <a href="contact.html" class="nav-link">Contact</a>
     </nav>
     <div class="header-right-actions">
-      <!-- Hidden but preserved for JS -->
-      <button type="button" class="btn-lang-toggle" id="btn-lang-toggle" style="display:none;">हिन्दी</button>
+            <!-- 3-Language Selector Dropdown -->
+      <div class="lang-selector-dropdown" id="lang-selector-wrap">
+        <button type="button" class="btn-lang-select" id="btn-lang-select" aria-expanded="false" aria-haspopup="true" aria-label="Select Language">
+          <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span class="active-lang-label" id="active-lang-label">English</span>
+          <svg class="lang-chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="lang-dropdown-menu" id="lang-dropdown-menu" role="menu">
+          <button type="button" class="lang-opt" data-lang="en" role="menuitem"><span class="lang-code">EN</span> <span class="lang-name">English</span></button>
+          <button type="button" class="lang-opt" data-lang="hi" role="menuitem"><span class="lang-code">HI</span> <span class="lang-name">हिन्दी (Hindi)</span></button>
+          <button type="button" class="lang-opt" data-lang="ur" role="menuitem"><span class="lang-code">UR</span> <span class="lang-name">اردو (Urdu)</span></button>
+        </div>
+      </div>
       <div class="ref-search-bar">
         <input type="search" placeholder="Search for pickles, sweets..." class="ref-search-input" />
         <svg class="ref-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -119,9 +146,17 @@
 
   <!-- HEADER DROPDOWN MENU (COMPACT, NON-BLURRING, PROFESSIONAL) -->
   <div class="header-dropdown-menu" id="header-dropdown-menu" role="menu" aria-label="Navigation Menu">
-      <button type="button" class="dropdown-nav-link btn-lang-toggle mobile-lang-toggle" id="mobile-lang-toggle" style="background:none; border:none; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:8px;" role="menuitem">
-          <span class="lang-icon">🌐</span> <span class="lang-toggle-text">हिन्दी / English</span>
-      </button>
+            <div class="mobile-lang-selector-group" style="padding: 10px 14px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-sub); display: inline-flex; align-items: center; gap: 6px;">
+              <svg class="lang-globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>Language:</span>
+          </span>
+          <div class="mobile-lang-pills" style="display: flex; gap: 6px;">
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="en" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">EN</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="hi" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">हिन्दी</button>
+              <button type="button" class="lang-opt mobile-lang-pill" data-lang="ur" role="menuitem" style="padding: 4px 9px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-card-bg); cursor: pointer; font-weight: 600;">اردو</button>
+          </div>
+      </div>
       <a href="index.html#hero" class="dropdown-nav-link active" role="menuitem">🏠 Home</a>
       <a href="products.html#catalog" class="dropdown-nav-link" role="menuitem">🛍️ Shop Products</a>
       <a href="why-us.html" class="dropdown-nav-link" role="menuitem">✨ Why Us</a>
@@ -143,16 +178,30 @@
                 <!-- SLIDE 1: AANGAN & MAA-BETI SWAAD -->
                 <div class="hero-slide active" role="group" aria-roledescription="slide" aria-label="1 of 3: Aangan & Maa-Beti Swaad">
                     <img src="assets/SatvikSwaad_hero_village_aangan.jpg" alt="Satvik Swaad Authentic Indian Homemade Pickles - Achaar jo dil se bana, maa ke haathon ka asli swaad" class="hero-slide-img" />
+                    <div class="visually-hidden">
+                        <h2 class="hero-title">Achaar jo dil se bana, maa ke haathon ka asli swaad ❤️</h2>
+                        <p class="slider-caption">Handcrafted in Nizamabad with Ancestral Love</p>
+                        <a href="products.html" class="btn-hero-cta">Shop Now</a>
+                    </div>
                 </div>
 
                 <!-- SLIDE 2: TERRACE SUN-CURED BARNIS -->
                 <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="2 of 3: 14-Day Sun Cured">
                     <img src="assets/SatvikSwaad_hero_village_terrace.jpg" alt="Satvik Swaad 14-Day Sun-Cured Pickles in Kachi Ghani Mustard Oil" class="hero-slide-img" />
+                    <div class="visually-hidden">
+                        <p class="slider-caption">14-Day Sun-Cured in Pure Mustard Oil</p>
+                        <a href="why-us.html" class="btn-hero-cta">Explore Pure Preserves</a>
+                    </div>
                 </div>
 
                 <!-- SLIDE 3: MUSTARD HARVEST & FULL SPREAD -->
                 <div class="hero-slide" role="group" aria-roledescription="slide" aria-label="3 of 3: Mustard Harvest & Farm Fresh">
                     <img src="assets/SatvikSwaad_hero_village_harvest.jpg" alt="Satvik Swaad Farm Fresh Ingredients - Maa ke swaad ki virasat, beti ke sapno ki pehchaan" class="hero-slide-img" />
+                    <div class="visually-hidden">
+                        <p class="hero-subtitle">maa ke swaad ki virasat, beti ke sapno ki pehchaan</p>
+                        <p class="slider-caption">Farm Fresh Ingredients & Pure Generational Taste</p>
+                        <a href="our-story.html" class="btn-hero-cta">Our Story</a>
+                    </div>
                 </div>
 
             </div>
@@ -2048,18 +2097,7 @@
                                         <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
                                     </div>
                                 </label>
-
-                                <label class="co-pm-card" for="pm-wa-idx">
-                                    <input type="radio" name="payment-method" id="pm-wa-idx" value="WhatsApp-Assisted Ordering" />
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">💬 WhatsApp Quick Order</span>
-                                            <span style="font-size: 0.72rem; font-weight: 700; background: #DCFCE7; color: #15803D; padding: 2px 7px; border-radius: 12px;">Direct Support</span>
-                                        </div>
-                                        <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Submit order via WhatsApp chat with our family kitchen directly.</p>
-                                    </div>
-                                </label>
-                            </div>
+                                </div>
 
                             <div class="security-trust-box">
                                 <span>🔒</span>
@@ -2283,10 +2321,8 @@
                     <input type="text" id="agent-input" class="agent-input" placeholder="Ask about purity, orders, or recipes..." aria-label="Ask Satvik Assistant a question" autocomplete="off" />
                     <button type="submit" id="agent-send-btn" class="agent-send-btn" aria-label="Send Message">➤</button>
                 </form>
-                <div class="agent-direct-wa">
-                    <a href="https://wa.me/919236587600?text=Namaste%2C%20I%20need%20assistance%20with%20Satvik%20Swaad" target="_blank" rel="noopener noreferrer" class="agent-wa-link">
-                        <span>📲 Direct WhatsApp: <strong>+91 92365 87600</strong></span>
-                    </a>
+                <div class="agent-security-badge">
+                    <span>🛡️ 100% Encrypted &bull; Direct Satvik Intelligence</span>
                 </div>
             </div>
         </div>
