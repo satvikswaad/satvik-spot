@@ -1067,7 +1067,7 @@ header.site-header {
     left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw;
 }
 .hero-slider-container {
-    position: relative; width: 100vw; aspect-ratio: 16 / 9; height: auto; min-height: unset; max-height: calc(100vh - 70px); background: #FAF5EB;
+    position: relative; width: 100vw; height: 480px; max-height: 500px; min-height: 380px; background: #FAF5EB;
     overflow: hidden;
 }
 
@@ -1112,7 +1112,7 @@ header.site-header {
 }
 
 .hero-slide-img {
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: #FAF5EB;
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; background: #FAF5EB;
     transform: none !important; transition: none !important;
 }
 .hero-slide.active .hero-slide-img {
@@ -9524,7 +9524,7 @@ input:checked + .slider:before {
     .hero-slide-img {
         width: 100% !important;
         height: 100% !important;
-        object-fit: contain !important;
+        object-fit: cover !important;
         object-position: center !important;
         background: #FAF5EB !important;
     }
