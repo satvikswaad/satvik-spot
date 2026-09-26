@@ -89,6 +89,20 @@ body {
 }
 body.menu-open { overflow: hidden !important; }
 
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    display: none !important;
+    visibility: hidden !important;
+}
+
 a { color: var(--color-saffron); text-decoration: none; transition: all var(--transition-fast); }
 a:hover { color: var(--color-maroon); }
 
@@ -1053,8 +1067,35 @@ header.site-header {
     left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw;
 }
 .hero-slider-container {
-    position: relative; width: 100vw; height: 360px; max-height: 360px; min-height: 360px; background: var(--color-maroon-dark);
+    position: relative; width: 100vw; height: 480px; max-height: 520px; min-height: 400px; background: #FAF5EB;
     overflow: hidden;
+}
+
+/* SINGLE SIGNATURE HOMEPAGE HERO SPLASH */
+.hero-splash-section {
+    width: 100vw; margin: 0; padding: 0; position: relative; overflow: hidden;
+    left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; background: #FAF5EB;
+}
+.hero-splash-container {
+    position: relative; width: 100vw; height: auto !important; min-height: auto !important;
+    max-height: none !important; background: #FAF5EB; overflow: hidden;
+}
+.hero-splash-slide {
+    position: relative !important; inset: auto !important; width: 100% !important; height: auto !important;
+    opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;
+    display: block !important; z-index: 1 !important;
+}
+.hero-splash-img {
+    position: relative !important; inset: auto !important; width: 100% !important; height: auto !important;
+    max-height: 480px; object-fit: cover !important; object-position: center !important;
+    display: block !important; margin: 0 auto;
+}
+@media (max-width: 768px) {
+    .hero-splash-container { height: auto !important; min-height: auto !important; max-height: none !important; }
+    .hero-splash-img { width: 100% !important; height: auto !important; min-height: 180px !important; max-height: 280px !important; object-fit: cover !important; }
+}
+@media (max-width: 480px) {
+    .hero-splash-img { min-height: 140px !important; max-height: 200px !important; object-fit: cover !important; }
 }
 
 .hero-slides-track {
