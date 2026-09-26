@@ -1067,7 +1067,7 @@ header.site-header {
     left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw;
 }
 .hero-slider-container {
-    position: relative; width: 100vw; height: 480px; max-height: 520px; min-height: 400px; background: #FAF5EB;
+    position: relative; width: 100vw; aspect-ratio: 16 / 9; height: auto; min-height: unset; max-height: calc(100vh - 70px); background: #FAF5EB;
     overflow: hidden;
 }
 
@@ -1112,7 +1112,7 @@ header.site-header {
 }
 
 .hero-slide-img {
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 25%;
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: #FAF5EB;
     transform: none !important; transition: none !important;
 }
 .hero-slide.active .hero-slide-img {
@@ -2097,10 +2097,10 @@ html, body {
     .hero-slider-container {
         display: block !important;
         width: 100% !important;
-        min-height: 220px !important;
-        height: 220px !important;
-        max-height: 220px !important;
-        aspect-ratio: unset !important;
+        aspect-ratio: 16 / 9 !important;
+        height: auto !important;
+        min-height: unset !important;
+        max-height: unset !important;
     }
     .hero-slides-track, .hero-slide {
         width: 100% !important;
@@ -9514,16 +9514,19 @@ input:checked + .slider:before {
     }
 
     .hero-slider-container {
-        height: 220px !important;
-        max-height: 220px !important;
-        min-height: 220px !important;
+        width: 100% !important;
+        aspect-ratio: 16 / 9 !important;
+        height: auto !important;
+        max-height: unset !important;
+        min-height: unset !important;
     }
 
     .hero-slide-img {
         width: 100% !important;
         height: 100% !important;
-        object-fit: cover !important;
+        object-fit: contain !important;
         object-position: center !important;
+        background: #FAF5EB !important;
     }
 
     .hero-slider-arrow {
