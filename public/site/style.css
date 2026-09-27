@@ -11763,6 +11763,12 @@ input:checked + .slider:before {
     gap: 8px;
     font-size: 0.88rem;
     color: var(--color-sub, #5C5248);
+    padding-left: 72px;
+}
+@media (max-width: 768px) {
+    .breadcrumb-inner {
+        padding-left: 54px;
+    }
 }
 .breadcrumb-inner a {
     color: var(--color-maroon, #731B16);
@@ -12441,6 +12447,13 @@ html[dir="rtl"] .breadcrumb-inner {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding-left: 0 !important;
+    padding-right: 72px !important;
+}
+@media (max-width: 768px) {
+    html[dir="rtl"] .breadcrumb-inner {
+        padding-right: 54px !important;
+    }
 }
 
 html[dir="rtl"] .breadcrumb-inner a,
