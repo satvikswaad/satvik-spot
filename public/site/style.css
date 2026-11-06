@@ -13224,16 +13224,23 @@ html[dir="rtl"] .why-choose-right-doodles {
 }
 
 .ratings-marquee-track {
-    display: flex;
-    gap: 24px;
-    width: max-content;
-    will-change: transform;
-    animation: marqueeLeftToRight 42s linear infinite;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 24px !important;
+    width: max-content !important;
+    min-width: max-content !important;
+    will-change: transform !important;
+    animation-name: marqueeLeftToRight !important;
+    animation-duration: 38s !important;
+    animation-timing-function: linear !important;
+    animation-iteration-count: infinite !important;
+    animation-play-state: running !important;
 }
 
 /* PAUSE ON HOVER OR KEYBOARD FOCUS */
-.ratings-marquee-viewport:hover .ratings-marquee-track,
-.ratings-marquee-viewport:focus-within .ratings-marquee-track {
+.ratings-marquee-track:hover,
+.ratings-marquee-track:focus-within {
     animation-play-state: paused !important;
 }
 
@@ -13435,13 +13442,7 @@ html[dir="rtl"] .why-choose-right-doodles {
 }
 
 /* Accessibility & Responsive */
-@media (prefers-reduced-motion: reduce) {
-    .ratings-marquee-track {
-        animation: none !important;
-        overflow-x: auto;
-        padding-bottom: 10px;
-    }
-}
+/* prefers-reduced-motion disabled for ratings-marquee to guarantee smooth continuous sliding */
 
 @media (max-width: 640px) {
     .customer-ratings-marquee-section {
@@ -13555,4 +13556,43 @@ html[dir="rtl"] .why-choose-right-doodles {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.88);
+}
+
+
+/* UNIVERSAL LEAF & BOTANICAL SUPPRESSION (100% CLEAN HOMEPAGE) */
+.catalog-corner-foliage,
+.card-botanical-twig,
+.foliage-tl,
+.foliage-tr,
+.foliage-bl,
+.ref-story-leaf,
+.ref-story-leaf-top-right,
+.ref-story-leaf-bot-right,
+.ref-story-leaf-bot-left,
+.ref-story-leaf-top-left,
+.ref-story-leaf-right-top,
+.ref-story-leaf-right-bot,
+.hp-corner-leaves-wrap,
+.hp-corner-leaf-left,
+.hp-corner-leaf-right,
+.hero-corner-leaf,
+.corner-leaf,
+.fold-leaf,
+.pillar-leaf-bg,
+.leaf-bl,
+.leaf-tr,
+.leaf-tl,
+.cat-leaf-icon,
+.ref-leaf-spray,
+.leaf-sway,
+.wave-leaf-left,
+.wave-leaf-right,
+.ref-sidebar-bottom-leaf,
+.footer-branch {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
