@@ -51,31 +51,8 @@ export async function payuResponseHandler(req: Request, res: Response, next: Nex
     }
 
     // Standard PayU browser POST redirect flow:
-    // Render clean HTML redirect to frontend order success or failure page
-    res.status(200).send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>Redirecting to Satvik Swaad...</title>
-          <meta http-equiv="refresh" content="0;url=${result.redirectUrl}" />
-          <style>
-            body { font-family: sans-serif; background: #FAF5EB; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; color: #164328; }
-            .card { background: white; padding: 32px; border-radius: 16px; border: 1.5px solid #E6DEC8; text-align: center; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
-          </style>
-        </head>
-        <body>
-          <div class="card">
-            <h2>${result.success ? '🌿 Payment Confirmed!' : '⚠️ Payment Notice'}</h2>
-            <p>Redirecting you back to Satvik Swaad storefront...</p>
-            <p><a href="${result.redirectUrl}" style="color: #1D552C; font-weight: bold;">Click here if not redirected automatically</a></p>
-          </div>
-          <script>
-            window.location.href = "${result.redirectUrl}";
-          </script>
-        </body>
-      </html>
-    `);
+    // Safe HTTP 303 redirect directly to the frontend result page (prevents HTML/JS injection)
+    return res.redirect(303, result.redirectUrl);
   } catch (error) {
     logger.error('Error handling PayU response callback', { error: (error as Error).message });
     if (req.headers.accept && req.headers.accept.includes('application/json')) {

@@ -1,3 +1,4 @@
+import { BUSINESS_CONFIG } from './js/businessConfig.js';
 import { sanitizeText, validateUrl, createSafeElement, isSafeNavigationUrl } from './js/security.js';
 import { PRODUCTS_CATALOGUE } from './js/productsData.js';
 import { getCurrentLanguage, setLanguage, t, applyTranslations, initLanguageSelector, updateLanguageSelectorUI } from './js/translations.js';
@@ -24,6 +25,70 @@ const BACKUP_STORAGE_KEY = 'satwikCart_backup_v1';
 
 let currentCatalogCategory = 'all';
 let currentCatalogQuery = '';
+
+
+const DEFAULT_SEED_FEATURED_REVIEWS = [
+    {
+        id: "REV-101",
+        customerName: "Priya Sharma",
+        city: "Lucknow",
+        productName: "Aam ka Achar",
+        rating: 5,
+        title: "Taste of Nani's Hand!",
+        text: "The Aam ka Achar tastes exactly like what my Dadi used to sun-cure in big earthen barnis on the terrace in Banaras. The mustard oil aroma is unmatched!",
+        verified: true
+    },
+    {
+        id: "REV-102",
+        customerName: "Dr. Alok Tripathi",
+        city: "New Delhi",
+        productName: "Shuddh Desi Ghee Gond Laddu",
+        rating: 5,
+        title: "Incredible Quality & Purity",
+        text: "Ordered the Desi Ghee Gond Laddus for postpartum recovery for my sister. Extremely nutritious, authentic crunch of gond, not overly sweet. Pure purity.",
+        verified: true
+    },
+    {
+        id: "REV-103",
+        customerName: "Vikramaditya Rao",
+        city: "Bengaluru",
+        productName: "Ancestral Chyawanprash",
+        rating: 5,
+        title: "Vedic Recipe That Actually Works",
+        text: "Ancestral Chyawanprash is genuinely different from commercial chemical brands. Thick texture, real honey and amla tang, warms the throat immediately.",
+        verified: true
+    },
+    {
+        id: "REV-105",
+        customerName: "Rajeshwari Iyer",
+        city: "Chennai",
+        productName: "Amla Murabba",
+        rating: 5,
+        title: "Juicy and Translucent",
+        text: "Amla Murabba is translucent, juicy, and infused with real elaichi & saffron. Each piece is succulent without being overly sugary.",
+        verified: true
+    },
+    {
+        id: "REV-110",
+        customerName: "Anand Mathur",
+        city: "Ahmedabad",
+        productName: "In-Store Experience",
+        rating: 5,
+        title: "Unforgettable Varanasi Store Visit",
+        text: "Visited their store pickup in Varanasi during Dev Deepawali. The warmth of the owners and the pure satvik ingredients made me a lifetime customer.",
+        verified: true
+    },
+    {
+        id: "REV-106",
+        customerName: "K. Ramachandra",
+        city: "Hyderabad",
+        productName: "Besan Dry Fruit Laddu",
+        rating: 5,
+        title: "Fragrant Desi Ghee",
+        text: "Besan Dry Fruit Laddus were rich and fragrant with A2 ghee. Packaging was superb in a sturdy tin, zero breakage during transit to Hyderabad.",
+        verified: true
+    }
+];
 
 function loadAndMigrateCart() {
     let raw = localStorage.getItem(CART_STORAGE_KEY);
@@ -109,6 +174,8 @@ function runInitializers() {
     safeRun(initFaqSearch, 'initFaqSearch');
     safeRun(initProductsSort, 'initProductsSort');
     safeRun(initReviewsData, 'initReviewsData');
+    safeRun(initCustomerRatingsMarquee, 'initCustomerRatingsMarquee');
+    safeRun(initSatvikStoryVideoPlayer, 'initSatvikStoryVideoPlayer');
     safeRun(initContactForm, 'initContactForm');
     safeRun(initProductDetailsPage, 'initProductDetailsPage');
     safeRun(initProfilePage, 'initProfilePage');
@@ -3831,7 +3898,7 @@ function initProductDetailsPage() {
     mainSec.style.display = 'grid';
     if (errBox) errBox.style.display = 'none';
 
-    let selectedVariant = (prod.variants || []).find(v => v.active && v.stock > 0) || (prod.variants && prod.variants[0]);
+    let selectedVariant = (prod.variants || []).find(v => v.active && v.stock > 0 && v.price > 0) || (prod.variants || []).find(v => v.price > 0) || (prod.variants && prod.variants[0]);
     let selectedQty = 1;
 
     // Render product details
@@ -4241,7 +4308,7 @@ function initProductDetailsPage() {
         const isUr = cLang === 'ur';
 
         relatedProds.forEach(rp => {
-            const defaultV = (rp.variants || []).find(v => v.active && v.stock > 0) || (rp.variants && rp.variants[0]);
+            const defaultV = (rp.variants || []).find(v => v.active && v.stock > 0 && v.price > 0) || (rp.variants || []).find(v => v.price > 0) || (rp.variants && rp.variants[0]);
             if (!defaultV) return;
 
             const card = createSafeElement('div', { className: 'product-card ref-product-card' });
@@ -4897,3 +4964,227 @@ export {
 };
 
 
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// CUSTOMER RATINGS MARQUEE SLIDER (LEFT-TO-RIGHT CONTINUOUS LOOP)
+// ═════════════════════════════════════════════════════════════════════════════
+
+
+function escapeReviewText(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+export function initCustomerRatingsMarquee() {
+    const track = document.getElementById('ratings-marquee-track');
+    if (!track) return;
+
+    let reviewsToDisplay = [];
+
+    // 1. Try reading selected featured reviews from localStorage
+    try {
+        const featuredRaw = localStorage.getItem('satvik_featured_reviews');
+        if (featuredRaw) {
+            const parsed = JSON.parse(featuredRaw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                reviewsToDisplay = parsed;
+            }
+        }
+    } catch (e) {
+        console.warn("[ReviewsMarquee] Error reading satvik_featured_reviews:", e);
+    }
+
+    // 2. Fallback to admin dev reviews storage if featured reviews key is not yet set
+    if (!reviewsToDisplay.length) {
+        try {
+            const devReviewsRaw = localStorage.getItem('satvik_admin_dev_reviews');
+            if (devReviewsRaw) {
+                const parsed = JSON.parse(devReviewsRaw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    const markedFeatured = parsed.filter(r => r.featured === true);
+                    if (markedFeatured.length > 0) {
+                        reviewsToDisplay = markedFeatured;
+                    } else {
+                        // Fallback to 5-star reviews
+                        const fiveStars = parsed.filter(r => Number(r.rating) === 5);
+                        if (fiveStars.length > 0) reviewsToDisplay = fiveStars;
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("[ReviewsMarquee] Error reading satvik_admin_dev_reviews:", e);
+        }
+    }
+
+    // 3. Fallback to default rich 5-star seed dataset
+    if (!reviewsToDisplay.length) {
+        reviewsToDisplay = DEFAULT_SEED_FEATURED_REVIEWS.slice();
+    }
+
+    // Duplicate cards to guarantee seamless continuous sliding loop
+    let cardSet = reviewsToDisplay.slice();
+    while (cardSet.length < 8) {
+        cardSet = cardSet.concat(reviewsToDisplay);
+    }
+    const fullLoopList = cardSet.concat(cardSet);
+
+    const frag = document.createDocumentFragment();
+
+    fullLoopList.forEach((review) => {
+        const card = document.createElement('article');
+        card.className = 'rating-marquee-card';
+        card.setAttribute('role', 'article');
+        card.setAttribute('aria-label', `Review by ${review.customerName || review.author || 'Customer'}: ${review.title || 'Great product'}`);
+
+        const initials = (review.customerName || review.author || 'SS')
+            .split(' ')
+            .map(n => n[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase();
+
+        const ratingNum = Math.min(5, Math.max(1, Number(review.rating) || 5));
+        const starsStr = '★'.repeat(ratingNum);
+
+        const currentLang = (typeof getCurrentLanguage === 'function') ? getCurrentLanguage() : 'en';
+        const verifiedText = (typeof t === 'function' && t('reviewsSection.verified', currentLang)) || '✓ Verified Purchase';
+
+        card.innerHTML = `
+            <div class="rating-card-quote-glyph" aria-hidden="true">”</div>
+            <div>
+                <div class="rating-card-top">
+                    <span class="rating-card-stars" aria-label="${ratingNum} out of 5 stars">${starsStr}</span>
+                    <span class="rating-card-verified">${escapeReviewText(verifiedText)}</span>
+                </div>
+
+                ${review.title ? `<h3 class="rating-card-quote-title">${escapeReviewText(review.title)}</h3>` : ''}
+                <blockquote class="rating-card-quote-text">“${escapeReviewText(review.text || '')}”</blockquote>
+            </div>
+
+            <div class="rating-card-bottom">
+                <div class="rating-card-author-info">
+                    <div class="rating-card-avatar" aria-hidden="true">${escapeReviewText(initials)}</div>
+                    <div>
+                        <div class="rating-card-author-name">${escapeReviewText(review.customerName || review.author || 'Anonymous Foodie')}</div>
+                        <div class="rating-card-author-city">📍 ${escapeReviewText(review.city || 'India')}</div>
+                    </div>
+                </div>
+                <span class="rating-card-product-tag" title="${escapeReviewText(review.productName || 'Artisanal Pickle')}">🏷️ ${escapeReviewText(review.productName || 'Artisanal Pickle')}</span>
+            </div>
+        `;
+
+        frag.appendChild(card);
+    });
+
+    track.replaceChildren(frag);
+}
+
+// Make globally accessible
+if (typeof window !== 'undefined') {
+    window.initCustomerRatingsMarquee = initCustomerRatingsMarquee;
+
+    // Listen for updates from Admin Panel (both same window and cross-tab storage events)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'satvik_featured_reviews' || e.key === 'satvik_featured_reviews_sync' || e.key === 'satvik_admin_dev_reviews') {
+            initCustomerRatingsMarquee();
+        }
+    });
+
+    window.addEventListener('satvik_reviews_updated', () => {
+        initCustomerRatingsMarquee();
+    });
+
+    window.addEventListener('languagechange', () => {
+        initCustomerRatingsMarquee();
+    });
+    window.addEventListener('languageChanged', () => {
+        initCustomerRatingsMarquee();
+    });
+}
+
+
+function initSatvikStoryVideoPlayer() {
+    const playBtn = document.getElementById('btn-play-story-video');
+    const poster = document.getElementById('satvik-video-poster');
+    const container = document.getElementById('why-choose-video-container');
+    if (!container) return;
+
+    function handlePlayVideo(e) {
+        if (e) e.preventDefault();
+
+        let ytId = container.getAttribute('data-youtube-id') || '';
+        if (!ytId && typeof BUSINESS_CONFIG !== 'undefined' && BUSINESS_CONFIG.youtubeVideoId) {
+            ytId = BUSINESS_CONFIG.youtubeVideoId;
+        }
+
+        if (ytId && ytId.trim()) {
+            container.innerHTML = `
+                <iframe
+                    class="why-choose-iframe"
+                    src="https://www.youtube.com/embed/${encodeURIComponent(ytId.trim())}?autoplay=1&rel=0&modestbranding=1&playsinline=1"
+                    title="Satvik Swaad Kitchen Story"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+                </iframe>
+            `;
+        } else {
+            showSatvikStoryModal();
+        }
+    }
+
+    if (playBtn) playBtn.addEventListener('click', handlePlayVideo);
+    if (poster) poster.addEventListener('click', (e) => {
+        if (!e.target.closest('#btn-play-story-video')) {
+            handlePlayVideo(e);
+        }
+    });
+}
+
+function showSatvikStoryModal() {
+    let existing = document.getElementById('satvik-story-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'satvik-story-modal';
+    modal.className = 'suite-modal-backdrop active';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(20,15,10,0.75);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+    
+    modal.innerHTML = `
+        <div style="background:#FAF7F2;border:2px solid #8C3A27;border-radius:20px;max-width:540px;width:100%;padding:28px;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;text-align:center;">
+            <button type="button" id="btn-close-story-modal" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:24px;color:#8C3A27;cursor:pointer;font-weight:700;">✕</button>
+            <div style="width:60px;height:60px;margin:0 auto 14px;border-radius:50%;overflow:hidden;border:2px solid #D4A017;">
+                <img src="assets/satvik_logo_round.png" alt="Satvik Swaad" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <h3 style="font-family:'Playfair Display',serif;color:#7A1C1C;font-size:1.6rem;margin-bottom:8px;">Satvik Swaad Kitchen Story</h3>
+            <p style="color:#5C5248;font-size:0.95rem;line-height:1.6;margin-bottom:16px;">
+                Every batch of our pickles, murabbas, and artisanal sweets is prepared in small family kitchens by local mothers using pure cold-pressed mustard oil and sun-cured in traditional earthen barnis.
+            </p>
+            <div style="background:#FFFFFF;border:1px dashed #D4A017;border-radius:12px;padding:12px;margin-bottom:20px;">
+                <p style="font-size:0.85rem;color:#8C3A27;font-weight:600;margin:0;">
+                    💡 YouTube video setup: Add your official YouTube video ID in <code>public/site/js/businessConfig.js</code> (or in admin settings) to play your video directly here without server load!
+                </p>
+            </div>
+            <button type="button" id="btn-ok-story-modal" style="background:linear-gradient(135deg,#7A1C1C,#541212);color:#FFFFFF;border:none;border-radius:10px;padding:10px 24px;font-weight:700;cursor:pointer;font-size:0.95rem;">
+                Understood
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    function closeModal() {
+        modal.remove();
+    }
+
+    modal.querySelector('#btn-close-story-modal').addEventListener('click', closeModal);
+    modal.querySelector('#btn-ok-story-modal').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+}

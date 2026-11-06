@@ -10,6 +10,7 @@ export const BUSINESS_CONFIG = {
   brandName: 'Satvik Swaad',
   legalName: 'Satvik Swaad',
   supportEmail: 'contact@satvikswaad.com',
+  youtubeVideoId: '', // Optional: Add official YouTube video ID here (e.g. 'xyz123') when available
   whatsapp: {
     displayNumber: '+919236587600',
     waMeNumber: '919236587600',

@@ -22,8 +22,9 @@ export const STORAGE_KEYS = {
     PRODUCTS: 'satvik_admin_dev_products',
     EXPENSES: 'satvik_admin_dev_expenses',
     REVIEWS: 'satvik_admin_dev_reviews',
+    FEATURED_REVIEWS: 'satvik_featured_reviews',
     MODE: 'satvik_admin_mode',
-    SEED_VERSION: 'satvik_admin_seed_version_v3'
+    SEED_VERSION: 'satvik_admin_seed_version_v4'
 };
 
 // Lazy / Dynamic Firestore Module Loader (Enables offline dev mode and Node.js testing compatibility)
@@ -1266,6 +1267,7 @@ const SEED_REVIEWS = [
         text: "The Aam ka Achar tastes exactly like what my Dadi used to sun-cure in big earthen barnis on the terrace in Banaras. The mustard oil aroma is unmatched!",
         date: "2026-09-25",
         verified: true,
+        featured: true,
         sentiment: "positive",
         sentimentScore: 0.98
     },
@@ -1281,6 +1283,7 @@ const SEED_REVIEWS = [
         text: "Ordered the Desi Ghee Gond Laddus for postpartum recovery for my sister. Extremely nutritious, authentic crunch of gond, not overly sweet. Pure purity.",
         date: "2026-09-24",
         verified: true,
+        featured: true,
         sentiment: "positive",
         sentimentScore: 0.99
     },
@@ -1296,6 +1299,7 @@ const SEED_REVIEWS = [
         text: "Ancestral Chyawanprash is genuinely different from commercial chemical brands. Thick texture, real honey and amla tang, warms the throat immediately.",
         date: "2026-09-23",
         verified: true,
+        featured: true,
         sentiment: "positive",
         sentimentScore: 0.96
     },
@@ -1311,6 +1315,7 @@ const SEED_REVIEWS = [
         text: "Hari Mirch achar is delightfully spicy and fresh. Sliced bite-sized chillies with generous lemon-mustard tempering. Deducting 1 star only because Delhivery took 4 days.",
         date: "2026-09-22",
         verified: true,
+        featured: false,
         sentiment: "positive",
         sentimentScore: 0.82
     },
@@ -1326,6 +1331,7 @@ const SEED_REVIEWS = [
         text: "Amla Murabba is translucent, juicy, and infused with real elaichi & saffron. Each piece is succulent without being overly sugary.",
         date: "2026-09-21",
         verified: true,
+        featured: true,
         sentiment: "positive",
         sentimentScore: 0.97
     },
@@ -1341,6 +1347,7 @@ const SEED_REVIEWS = [
         text: "Besan Dry Fruit Laddus were rich and fragrant with A2 ghee. Packaging was superb in a sturdy tin, zero breakage during transit to Hyderabad.",
         date: "2026-09-20",
         verified: true,
+        featured: false,
         sentiment: "positive",
         sentimentScore: 0.88
     },
@@ -1356,6 +1363,7 @@ const SEED_REVIEWS = [
         text: "Pickle taste is genuine, but delivery courier partner arrived 2 days late without calling first. Product 5 stars, delivery service 2 stars.",
         date: "2026-09-19",
         verified: true,
+        featured: false,
         sentiment: "neutral",
         sentimentScore: 0.50
     },
@@ -1371,6 +1379,7 @@ const SEED_REVIEWS = [
         text: "The Laal Mirch Bharwa is very spicy for mild palates. Authentic Banarasi flavor definitely, but keep water handy! Would appreciate a mild spice variant option.",
         date: "2026-09-18",
         verified: true,
+        featured: false,
         sentiment: "neutral",
         sentimentScore: 0.52
     },
@@ -1386,6 +1395,7 @@ const SEED_REVIEWS = [
         text: "Outer parcel carton was heavily dented by the courier boy. Fortunately glass jar bubble wrap prevented leakage, but delivery experience was stressful.",
         date: "2026-09-17",
         verified: true,
+        featured: false,
         sentiment: "negative",
         sentimentScore: 0.15
     },
@@ -1401,6 +1411,7 @@ const SEED_REVIEWS = [
         text: "Visited their store pickup in Varanasi during Dev Deepawali. The warmth of the owners and the pure satvik ingredients made me a lifetime customer.",
         date: "2026-09-16",
         verified: true,
+        featured: true,
         sentiment: "positive",
         sentimentScore: 0.99
     }
@@ -1488,6 +1499,30 @@ export class AdminDataAdapter {
         // 4. Reviews
         if (!getStorage().getItem(STORAGE_KEYS.REVIEWS) || shouldReSeed) {
             getStorage().setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(SEED_REVIEWS));
+        } else {
+            // Ensure existing reviews have featured property defined
+            try {
+                const storedReviews = JSON.parse(getStorage().getItem(STORAGE_KEYS.REVIEWS) || '[]');
+                let modified = false;
+                storedReviews.forEach(r => {
+                    if (typeof r.featured !== 'boolean') {
+                        const seedMatch = SEED_REVIEWS.find(s => s.id === r.id);
+                        r.featured = seedMatch ? Boolean(seedMatch.featured) : (r.rating === 5);
+                        modified = true;
+                    }
+                });
+                if (modified) {
+                    getStorage().setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(storedReviews));
+                }
+            } catch (e) {}
+        }
+
+        // 4b. Sync Featured Reviews for Storefront Homepage Marquee
+        if (!getStorage().getItem(STORAGE_KEYS.FEATURED_REVIEWS) || shouldReSeed) {
+            const currentReviews = JSON.parse(getStorage().getItem(STORAGE_KEYS.REVIEWS) || '[]');
+            const featuredList = currentReviews.filter(r => r.featured === true);
+            const fallbackFeatured = featuredList.length > 0 ? featuredList : SEED_REVIEWS.filter(r => r.featured === true);
+            getStorage().setItem(STORAGE_KEYS.FEATURED_REVIEWS, JSON.stringify(fallbackFeatured));
         }
 
         getStorage().setItem(STORAGE_KEYS.SEED_VERSION, STORAGE_KEYS.SEED_VERSION);
@@ -2028,7 +2063,7 @@ export class AdminDataAdapter {
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Returns customer reviews with rating and sentiment analysis scores.
+     * Returns customer reviews with rating, featured status, and sentiment analysis scores.
      */
     getReviews() {
         try {
@@ -2039,10 +2074,102 @@ export class AdminDataAdapter {
     }
 
     /**
-     * Adds a new customer review.
+     * Returns reviews selected to be featured on the homepage.
+     */
+    getFeaturedReviews() {
+        try {
+            const featuredRaw = getStorage().getItem(STORAGE_KEYS.FEATURED_REVIEWS);
+            if (featuredRaw) {
+                const parsed = JSON.parse(featuredRaw);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+            const all = this.getReviews();
+            const featured = all.filter(r => r.featured === true);
+            if (featured.length > 0) return featured;
+            return all.filter(r => r.rating === 5);
+        } catch (e) {
+            return [];
+        }
+    }
+
+    /**
+     * Toggles the featured status of a review for the homepage marquee.
+     */
+    toggleFeaturedReview(reviewId) {
+        const reviews = this.getReviews();
+        const target = reviews.find(r => r.id === reviewId);
+        if (!target) {
+            throw new Error(`Review with ID "${reviewId}" not found.`);
+        }
+
+        target.featured = !target.featured;
+        getStorage().setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(reviews));
+
+        // Sync featured reviews storage key for homepage marquee
+        const featuredReviews = reviews.filter(r => r.featured === true);
+        getStorage().setItem(STORAGE_KEYS.FEATURED_REVIEWS, JSON.stringify(featuredReviews));
+
+        // Emit adapter and window events
+        this._emit('reviews', reviews);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('satvik_reviews_updated', {
+                detail: { reviewId, featured: target.featured, totalFeatured: featuredReviews.length }
+            }));
+            try {
+                window.localStorage.setItem('satvik_featured_reviews_sync', String(Date.now()));
+            } catch (e) {}
+        }
+
+        return { review: target, allReviews: reviews, featuredReviews };
+    }
+
+    /**
+     * Explicitly sets featured status on a review.
+     */
+    setReviewFeatured(reviewId, isFeatured) {
+        const reviews = this.getReviews();
+        const target = reviews.find(r => r.id === reviewId);
+        if (!target) return null;
+
+        target.featured = Boolean(isFeatured);
+        getStorage().setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(reviews));
+
+        const featuredReviews = reviews.filter(r => r.featured === true);
+        getStorage().setItem(STORAGE_KEYS.FEATURED_REVIEWS, JSON.stringify(featuredReviews));
+
+        this._emit('reviews', reviews);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('satvik_reviews_updated', { detail: { reviewId, featured: target.featured } }));
+        }
+        return target;
+    }
+
+    /**
+     * Publishes featured reviews directly to storefront key with sync notification.
+     */
+    publishFeaturedReviews() {
+        const reviews = this.getReviews();
+        const featuredReviews = reviews.filter(r => r.featured === true);
+        getStorage().setItem(STORAGE_KEYS.FEATURED_REVIEWS, JSON.stringify(featuredReviews));
+
+        this._emit('reviews', reviews);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('satvik_reviews_updated', {
+                detail: { totalFeatured: featuredReviews.length }
+            }));
+            try {
+                window.localStorage.setItem('satvik_featured_reviews_sync', String(Date.now()));
+            } catch (e) {}
+        }
+        return featuredReviews;
+    }
+
+    /**
+     * Adds a new customer review or testimonial with featured support.
      */
     async addReview(reviewData) {
         const reviews = this.getReviews();
+        const isFeatured = reviewData.featured === true || (reviewData.featured !== false && Number(reviewData.rating || 5) === 5);
         const newReview = {
             id: reviewData.id || `REV-${Date.now().toString().slice(-4)}`,
             author: reviewData.author || reviewData.customerName || 'Anonymous Foodie',
@@ -2055,15 +2182,49 @@ export class AdminDataAdapter {
             text: reviewData.text || reviewData.comment || '',
             date: reviewData.date || new Date().toISOString().split('T')[0],
             verified: reviewData.verified !== false,
-            sentiment: reviewData.sentiment || (reviewData.rating >= 4 ? 'positive' : reviewData.rating === 3 ? 'neutral' : 'negative'),
-            sentimentScore: reviewData.sentimentScore || (reviewData.rating === 5 ? 0.98 : reviewData.rating === 4 ? 0.85 : reviewData.rating === 3 ? 0.50 : 0.15),
+            featured: isFeatured,
+            sentiment: reviewData.sentiment || (Number(reviewData.rating || 5) >= 4 ? 'positive' : Number(reviewData.rating || 5) === 3 ? 'neutral' : 'negative'),
+            sentimentScore: reviewData.sentimentScore || (Number(reviewData.rating || 5) === 5 ? 0.98 : Number(reviewData.rating || 5) === 4 ? 0.85 : Number(reviewData.rating || 5) === 3 ? 0.50 : 0.15),
             createdAt: new Date().toISOString()
         };
 
         reviews.unshift(newReview);
         getStorage().setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(reviews));
+
+        if (isFeatured) {
+            const featuredReviews = reviews.filter(r => r.featured === true);
+            getStorage().setItem(STORAGE_KEYS.FEATURED_REVIEWS, JSON.stringify(featuredReviews));
+        }
+
         this._emit('reviews', reviews);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('satvik_reviews_updated', { detail: { reviewId: newReview.id } }));
+            try {
+                window.localStorage.setItem('satvik_featured_reviews_sync', String(Date.now()));
+            } catch (e) {}
+        }
         return newReview;
+    }
+
+    /**
+     * Deletes a customer review by ID.
+     */
+    async deleteReview(reviewId) {
+        let reviews = this.getReviews();
+        reviews = reviews.filter(r => r.id !== reviewId);
+        getStorage().setItem(STORAGE_KEYS.REVIEWS, JSON.stringify(reviews));
+
+        const featuredReviews = reviews.filter(r => r.featured === true);
+        getStorage().setItem(STORAGE_KEYS.FEATURED_REVIEWS, JSON.stringify(featuredReviews));
+
+        this._emit('reviews', reviews);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('satvik_reviews_updated', { detail: { reviewId, action: 'delete' } }));
+            try {
+                window.localStorage.setItem('satvik_featured_reviews_sync', String(Date.now()));
+            } catch (e) {}
+        }
+        return true;
     }
 
     // ─────────────────────────────────────────────────────────────────────────

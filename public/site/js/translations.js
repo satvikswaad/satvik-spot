@@ -26,10 +26,21 @@ export const TRANSLATIONS = {
       "✨ 100% HOMEMADE PICKLES & PRESERVES",
       "☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL",
       "👵 ANCESTRAL FAMILY RECIPES",
-      "🌿 ZERO ARTIFICIAL PRESERVATIVES",
+      "🚚 Delivery free in Deoria",
       "🪔 PURE TRADITIONAL DESI TASTE",
       "📦 FRESH BATCHES PREPARED WEEKLY"
     ],
+
+    // Customer Reviews & Ratings Marquee
+    reviewsSection: {
+      badge: "✦ GENERATIONAL LOVE & TRUST ✦",
+      title: "Loved by Families Across India",
+      subtitle: "Authentic taste of generational nostalgia, sun-cured in pure cold-pressed mustard oil and celebrated by discerning food lovers nationwide.",
+      ratingMeta: "⭐ 4.9 / 5.0 Rating • 500+ Verified Reviews",
+      viewAll: "View All 500+ Reviews →",
+      hint: "✨ Hover or touch any card to pause & read • 100% Verified Customer Feedback",
+      verified: "✓ Verified Purchase"
+    },
 
     // Header & Navigation
     nav: {
@@ -111,7 +122,7 @@ export const TRANSLATIONS = {
       catHealthCount: "3 Ayurvedic Preserves",
       catAllTitle: "All Products",
       catAllCount: "17 Handcrafted Items",
-      villageCategoriesBadge: "Handmade in Nizamabad",
+      villageCategoriesBadge: "Handmade in Satvik Kitchen",
       villageCategoriesTitle: "Explore Village Categories",
       filterBy: "Filter by",
       price: "Price",
@@ -275,7 +286,7 @@ export const TRANSLATIONS = {
         ctaExplore: "Explore Pure Preserves"
       },
       villageCategories: {
-        eyebrow: "Handmade in Nizamabad",
+        eyebrow: "Handmade in Satvik Kitchen",
         title: "Explore Village Categories",
         acharTitle: "Pickles & Achar",
         acharBadge: "9 Authentic Recipes",
@@ -294,7 +305,16 @@ export const TRANSLATIONS = {
         doodlePure: "Pure",
         doodleDesi: "Desi",
         doodleHealthy: "Healthy",
-        paperNote: "Pure Traditional Goodness"
+        paperNote: "Pure Traditional Goodness",
+        trustBadge1: "100% Homemade",
+        trustBadge1Sub: "Handcrafted in small batches",
+        trustBadge2: "Sun-cured in Barnis",
+        trustBadge2Sub: "14-day natural ripening",
+        trustBadge3: "Ancestral Recipes",
+        trustBadge3Sub: "Generational heritage",
+        videoTag: "Village Kitchen Story",
+        videoCaption: "Watch Our Traditional Village Kitchen & Curing Process",
+        videoMeta: "Pure mustard oil • Clay Barnis • Authentic heritage"
       },
       qualityPillars: {
         p1Title: "Sun-Cured Maturity",
@@ -388,7 +408,7 @@ export const TRANSLATIONS = {
       about: {
         subtitle: "Our Heritage & Promise",
         title: "The Satvik Swaad Story",
-        desc: "Every jar of Satvik Swaad pickle, murabba, laddu, and chyawanprash is prepared in small artisanal batches following time-tested family recipes passed down through generations. We use zero artificial preservatives, synthetic colors, or refined oils.",
+        desc: "Every jar of Satvik Swaad pickle, murabba, laddu, and chyawanprash is prepared in small artisanal batches following time-tested family recipes passed down through generations. We use 100% natural traditional ingredients without artificial colors or refined oils.",
         cta: "Read Full Brand Story & Values →"
       },
       complianceNote: "Real Ingredients. Real Trust."
@@ -989,7 +1009,7 @@ export const TRANSLATIONS = {
                   "transparency": "Transparency: 100% Desi Trust"
             },
             "highlight1Title": "Artisanal Heritage",
-            "highlight1Desc": "100% pure cold-pressed Kachi Ghani mustard oil, A2 cow ghee, and ancestral family recipes. Zero artificial preservatives or chemical shortcuts.",
+            "highlight1Desc": "100% pure cold-pressed Kachi Ghani mustard oil, A2 cow ghee, and ancestral family recipes. Chemical-free traditional artisanal preparation.",
             "highlight2Title": "Fresh Small Batches",
             "highlight2Desc": "Sun-cured in micro-batches and bottled weekly. Dispatched freshly within 24–48 business hours with complete Indian Rupee (₹) price transparency.",
             "highlight3Title": "Safe Glass Delivery & Care",
@@ -1098,10 +1118,21 @@ export const TRANSLATIONS = {
       "✨ 100% माँ के हाथों से बने असली देसी अचार",
       "☀️ शुद्ध कच्ची घानी सरसों के तेल में 14 दिन धूप में पके",
       "👵 नानी-दादी की पुरानी पारंपरिक विधियां",
-      "🌿 बिना किसी केमिकल व मिलावट के 100% शुद्ध",
+      "🚚 देवरिया में फ्री डिलीवरी",
       "🪔 असली गाँव का स्वाद व सोंधी खुशबू",
       "📦 हर हफ्ते ताजा और शुद्ध पैकिंग"
     ],
+
+    // Customer Reviews & Ratings Marquee
+    reviewsSection: {
+      badge: "✦ पीढ़ियों का विश्वास व स्नेह ✦",
+      title: "भारत भर के परिवारों का अटूट भरोसा",
+      subtitle: "शुद्ध कच्ची घानी सरसों के तेल में धूप से पकी सात्विक परंपरा, जिसे देश भर के घरों में भरपूर स्नेह मिला है।",
+      ratingMeta: "⭐ 4.9 / 5.0 रेटिंग • 500+ सत्यापित समीक्षाएं",
+      viewAll: "सभी 500+ समीक्षाएं देखें →",
+      hint: "✨ समीक्षा पढ़ने के लिए किसी भी कार्ड पर रोकें • 100% प्रामाणिक ग्राहक समीक्षाएं",
+      verified: "✓ सत्यापित खरीद"
+    },
 
     // Header & Navigation
     nav: {
@@ -1183,7 +1214,7 @@ export const TRANSLATIONS = {
       catHealthCount: "3 आयुर्वेदिक औषधियां",
       catAllTitle: "सभी उत्पाद",
       catAllCount: "17 हस्तनिर्मित उत्पाद",
-      villageCategoriesBadge: "निज़ामाबाद के गाँव से",
+      villageCategoriesBadge: "सात्विक रसोई से",
       villageCategoriesTitle: "गाँव की पारंपरिक श्रेणियां देखें",
       filterBy: "फ़िल्टर करें",
       price: "मूल्य / कीमत",
@@ -1347,7 +1378,7 @@ export const TRANSLATIONS = {
         ctaExplore: "शुद्ध उत्पाद देखें"
       },
       villageCategories: {
-        eyebrow: "निज़ामाबाद में हस्तनिर्मित",
+        eyebrow: "सात्विक रसोई में हस्तनिर्मित",
         title: "गाँव की पारंपरिक श्रेणियां",
         acharTitle: "अचार और चटपटे प्रिजर्व",
         acharBadge: "9 प्रामाणिक विधियां",
@@ -1366,7 +1397,16 @@ export const TRANSLATIONS = {
         doodlePure: "शुद्ध",
         doodleDesi: "देसी",
         doodleHealthy: "स्वास्थ्यवर्धक",
-        paperNote: "शुद्ध पारंपरिक स्वाद"
+        paperNote: "शुद्ध पारंपरिक स्वाद",
+        trustBadge1: "100% घर का बना",
+        trustBadge1Sub: "पारंपरिक तरीके से तैयार",
+        trustBadge2: "बरनियों में धूप-पक्व",
+        trustBadge2Sub: "14 दिन प्राकृतिक धूप में",
+        trustBadge3: "दादी-नानी के नुस्खे",
+        trustBadge3Sub: "पीढ़ियों की धरोहर",
+        videoTag: "पारंपरिक रसोई की झलक",
+        videoCaption: "देखें हमारी गांव की पारंपरिक रसोई और धूप में पकाने की विधि",
+        videoMeta: "शुद्ध कच्ची घानी सरसों तेल • मिट्टी की बरनी • शुद्ध स्वाद"
       },
       qualityPillars: {
         p1Title: "14 दिन प्राकृतिक धूप में पके",
@@ -2170,10 +2210,21 @@ export const TRANSLATIONS = {
       "✨ 100% گھر کے بنے اصلی روایتی اچار",
       "☀️ کولڈ پریسڈ سرسوں کے تیل میں دھوپ میں تیار",
       "👵 بزرگوں کے نایاب خاندانی نسخے",
-      "🌿 بنا کسی کیمیکل و ملاوٹ کے 100% خالص",
+      "🚚 دیوریا میں فری ڈیلیوری",
       "🪔 اصلی دیہاتی ذائقہ اور سوندھی خوشبو",
       "📦 ہر ہفتے تازہ اور خالص پیکنگ"
     ],
+
+    // Customer Reviews & Ratings Marquee
+    reviewsSection: {
+      badge: "✦ نسلوں کا اعتماد اور محبت ✦",
+      title: "پورے ہندوستان میں خاندانوں کا پسندیدہ",
+      subtitle: "خالص سرسوں کے تیل اور دھوپ میں تیار کردہ روایتی ذائقہ، جس پر ملک بھر کے گھرانوں کا غیر متزلزل اعتماد ہے۔",
+      ratingMeta: "⭐ 4.9 / 5.0 ریٹنگ • 500+ تصدیق شدہ جائزے",
+      viewAll: "تمام 500+ جائزے دیکھیں ←",
+      hint: "✨ تفصیل پڑھنے کے لیے کارڈ پر رکھیں • 100% حقیقی کسٹمر ریویوز",
+      verified: "✓ تصدیق شدہ خریداری"
+    },
 
     // Header & Navigation
     nav: {
@@ -2255,7 +2306,7 @@ export const TRANSLATIONS = {
       catHealthCount: "3 روایتی قدرتی نسخے",
       catAllTitle: "تمام مصنوعات",
       catAllCount: "17 ہاتھ سے بنی مصنوعات",
-      villageCategoriesBadge: "نظام آباد گاؤں کی سوغات",
+      villageCategoriesBadge: "ستوک باورچی خانے سے",
       villageCategoriesTitle: "دیہاتی روایتی اقسام دیکھیں",
       filterBy: "فلٹر کریں",
       price: "قیمت",
@@ -2419,7 +2470,7 @@ export const TRANSLATIONS = {
         ctaExplore: "خالص مصنوعات دیکھیں"
       },
       villageCategories: {
-        eyebrow: "نظام آباد میں دستکاری سے تیار",
+        eyebrow: "ستوک باورچی خانے میں تیار",
         title: "روایتی دیہی کیٹیگریز",
         acharTitle: "اچار اور چٹپٹے ذائقے",
         acharBadge: "9 روایتی ریسیپیز",
@@ -2438,7 +2489,16 @@ export const TRANSLATIONS = {
         doodlePure: "خالص",
         doodleDesi: "دیسی",
         doodleHealthy: "صحت بخش",
-        paperNote: "خالص روایتی غذائیت"
+        paperNote: "خالص روایتی غذائیت",
+        trustBadge1: "100% گھر کا تیار کردہ",
+        trustBadge1Sub: "روایتی انداز میں تیار",
+        trustBadge2: "مرتبانوں میں دھوپ پکا",
+        trustBadge2Sub: "14 دن قدرتی دھوپ میں",
+        trustBadge3: "بزرگوں کے نایاب نسخے",
+        trustBadge3Sub: "نسلوں کی وراثت",
+        videoTag: "روایتی کچن کی کہانی",
+        videoCaption: "ہمارے روایتی گاؤں کے کچن اور دھوپ پکائی کا عمل دیکھیں",
+        videoMeta: "خالص سرسوں کا تیل • مٹی کے برتن • اصلی ذائقہ"
       },
       qualityPillars: {
         p1Title: "14 دن قدرتی دھوپ میں پکا",
@@ -4126,6 +4186,35 @@ export function applyTranslations(lang = null) {
 
     const leftNoteText = document.querySelector('.why-choose-left-note .paper-note-text');
     if (leftNoteText) leftNoteText.textContent = dict.home.whyChoose.paperNote;
+
+    // Trust Badges
+    const pills = document.querySelectorAll('.why-choose-pill');
+    if (pills.length >= 3) {
+      const p1Title = pills[0].querySelector('.why-choose-pill-title');
+      const p1Sub = pills[0].querySelector('.why-choose-pill-sub');
+      if (p1Title && dict.home.whyChoose.trustBadge1) p1Title.textContent = dict.home.whyChoose.trustBadge1;
+      if (p1Sub && dict.home.whyChoose.trustBadge1Sub) p1Sub.textContent = dict.home.whyChoose.trustBadge1Sub;
+
+      const p2Title = pills[1].querySelector('.why-choose-pill-title');
+      const p2Sub = pills[1].querySelector('.why-choose-pill-sub');
+      if (p2Title && dict.home.whyChoose.trustBadge2) p2Title.textContent = dict.home.whyChoose.trustBadge2;
+      if (p2Sub && dict.home.whyChoose.trustBadge2Sub) p2Sub.textContent = dict.home.whyChoose.trustBadge2Sub;
+
+      const p3Title = pills[2].querySelector('.why-choose-pill-title');
+      const p3Sub = pills[2].querySelector('.why-choose-pill-sub');
+      if (p3Title && dict.home.whyChoose.trustBadge3) p3Title.textContent = dict.home.whyChoose.trustBadge3;
+      if (p3Sub && dict.home.whyChoose.trustBadge3Sub) p3Sub.textContent = dict.home.whyChoose.trustBadge3Sub;
+    }
+
+    // Video Tag & Caption
+    const videoTagText = document.querySelector('.video-card-tag-text');
+    if (videoTagText && dict.home.whyChoose.videoTag) videoTagText.textContent = dict.home.whyChoose.videoTag;
+
+    const videoCaptionTitle = document.querySelector('.video-caption-title');
+    if (videoCaptionTitle && dict.home.whyChoose.videoCaption) videoCaptionTitle.textContent = dict.home.whyChoose.videoCaption;
+
+    const videoCaptionMeta = document.querySelector('.video-caption-meta');
+    if (videoCaptionMeta && dict.home.whyChoose.videoMeta) videoCaptionMeta.textContent = dict.home.whyChoose.videoMeta;
   }
 
   // Generic .doodle query

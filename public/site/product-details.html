@@ -50,7 +50,7 @@
                 <span>✨ 100% HOMEMADE PICKLES &amp; PRESERVES</span>
                 <span>☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL</span>
                 <span>👵 ANCESTRAL FAMILY RECIPES</span>
-                <span>🌿 ZERO ARTIFICIAL PRESERVATIVES</span>
+                <span>🚚 Delivery free in Deoria</span>
                 <span>🪔 PURE TRADITIONAL DESI TASTE</span>
                 <span>📦 FRESH BATCHES PREPARED WEEKLY</span>
             </div>
@@ -58,7 +58,7 @@
                 <span>✨ 100% HOMEMADE PICKLES &amp; PRESERVES</span>
                 <span>☀️ SUN-CURED IN PURE COLD-PRESSED MUSTARD OIL</span>
                 <span>👵 ANCESTRAL FAMILY RECIPES</span>
-                <span>🌿 ZERO ARTIFICIAL PRESERVATIVES</span>
+                <span>🚚 Delivery free in Deoria</span>
                 <span>🪔 PURE TRADITIONAL DESI TASTE</span>
                 <span>📦 FRESH BATCHES PREPARED WEEKLY</span>
             </div>
@@ -296,9 +296,7 @@
                         </button>
                     </div>
                     
-                    <button id="pd-btn-buy-now" class="pd-btn-buy-now">
-                        <span>⚡ Instant Checkout (Buy Now)</span>
-                    </button>
+                    <!-- Removed WhatsApp Quick Order -->
                 </div>
 
                 <!-- PURCHASE PERKS & SECURITY GUARANTEES -->
@@ -362,12 +360,12 @@
         </section>
 
         <!-- RELATED PRODUCTS SECTION -->
-        <section class="pd-related-section" style="margin-bottom: 50px;">
-            <div style="margin-bottom: 20px;">
-                <h2 style="font-family: 'DM Serif Display', Georgia, serif; color: #1A4329; font-size: 1.6rem; margin: 0 0 4px;">✦ You Might Also Cherish</h2>
-                <p style="color: var(--color-sub); font-size: 0.92rem; margin: 0;">Complementary homemade pickles and festive preserves handcrafted with the same devotion.</p>
+        <section class="pd-related-section">
+            <div class="pd-related-header">
+                <h2 class="pd-related-title">✦ You Might Also Cherish</h2>
+                <p class="pd-related-subtitle">Complementary homemade pickles and festive preserves handcrafted with the same devotion.</p>
             </div>
-            <div class="ref-product-grid" id="pd-related-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px;">
+            <div class="ref-product-grid pd-related-grid" id="pd-related-grid">
                 <!-- Related product cards rendered dynamically -->
             </div>
         </section>
@@ -423,7 +421,7 @@
 
                 <!-- COL 2: QUICK LINKS (COLLAPSIBLE ACCORDION ON MOBILE) -->
                 <div class="footer-col footer-col-links">
-                    <details class="footer-accordion">
+                    <details class="footer-accordion" open>
                         <summary class="footer-accordion-summary">
                             <span class="footer-heading-text">QUICK LINKS</span>
                             <span class="footer-accordion-icon" aria-hidden="true"></span>
@@ -447,7 +445,7 @@
 
                 <!-- COL 3: CONTACT (COLLAPSIBLE ACCORDION ON MOBILE) -->
                 <div class="footer-col footer-col-contact">
-                    <details class="footer-accordion">
+                    <details class="footer-accordion" open>
                         <summary class="footer-accordion-summary">
                             <span class="footer-heading-text">CONTACT</span>
                             <span class="footer-accordion-icon" aria-hidden="true"></span>
@@ -544,3 +542,4 @@
     <script type="module" src="./script.js"></script>
 </body>
 </html>
+
