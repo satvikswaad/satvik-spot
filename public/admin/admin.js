@@ -41,6 +41,10 @@ const adminState = {
     reviews: [],
     reviewsFilter: 'all',
     reviewsSearchQuery: '',
+    subscribers: [],
+    subscribersFilter: 'all',
+    subscribersSearchQuery: '',
+    subscribersFormat: 'comma',
     unsubOrders: null,
     unsubProducts: null,
     unsubOffline: null,
@@ -285,7 +289,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Publish to Homepage Marquee Button
     const btnPublishReviews = document.getElementById('btn-publish-reviews');
     if (btnPublishReviews) {
-        btnPublishReviews.addEventListener('click', publishReviewsToHomepage);
+        btnPublishReviews.addEventListener('click', () => {
+            if (typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.publishFeaturedReviews === 'function') {
+                const list = adminDataAdapter.publishFeaturedReviews();
+                showAdminToast('🚀 Published ' + list.length + ' curated reviews to Homepage!', 'success');
+            } else {
+                showAdminToast('⭐ Reviews saved!', 'success');
+            }
+        });
     }
 
     // Modal: Add Customer Review / Testimonial
@@ -327,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 closeModal('modal-add-review');
                 formAddReview.reset();
-                showAdminToast(`⭐ Testimonial from <strong>${author}</strong> added successfully!`, 'success');
+                showAdminToast(`⭐ Testimonial from "${author}" added successfully!`, 'success');
                 updateReviewsKpi();
                 renderReviewsManagement();
             } catch (err) {
@@ -571,6 +582,7 @@ function showPortalView(user, claims) {
     subscribeToOrdersStream();
     subscribeToProductsStream();
     subscribeToOfflineFinancesStream();
+    updateSubscribersBadge();
 }
 
 function showLoginView() {
@@ -602,6 +614,55 @@ function showInfo(msg) {
         el.style.display = 'block';
     }
 }
+
+// Safe Toast Notifications (Uses textContent to prevent DOM XSS)
+export function showAdminToast(msg, type = 'info') {
+    let container = document.getElementById('admin-toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'admin-toast-container';
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = 'admin-toast toast-' + type;
+    if (type === 'error') {
+        toast.style.borderLeftColor = '#EF4444';
+        toast.style.background = '#3B1818';
+    } else if (type === 'warning') {
+        toast.style.borderLeftColor = '#F59E0B';
+        toast.style.background = '#3D2F14';
+    } else if (type === 'success') {
+        toast.style.borderLeftColor = '#10B981';
+        toast.style.background = '#143323';
+    } else {
+        toast.style.borderLeftColor = '#D4AF37';
+        toast.style.background = '#203325';
+    }
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+if (typeof window !== 'undefined') {
+    window.showAdminToast = showAdminToast;
+}
+
+// Strict Image URL Validator (prevents javascript: or executable injection)
+export function isValidImageUrl(url) {
+    if (typeof url !== 'string') return false;
+    const clean = url.trim();
+    if (!clean) return false;
+    if (/^(https?:\/\/|\/|\.\/|assets\/)/i.test(clean)) return true;
+    if (/^data:image\/(jpeg|png|webp|gif);base64,/i.test(clean)) return true;
+    return false;
+}
+if (typeof window !== 'undefined') {
+    window.isValidImageUrl = isValidImageUrl;
+}
+
 
 function showResetForm() {
     document.getElementById('login-form').classList.add('d-none');
@@ -650,6 +711,7 @@ function switchAdminView(viewId) {
     if (viewId === 'view-analytics') renderAnalyticsView();
     if (viewId === 'view-offline') renderOfflineLedgerView();
     if (viewId === 'view-reviews') renderReviewsManagement();
+    if (viewId === 'view-subscribers') renderSubscribersView();
 }
 
 function setOrderStatusFilter(status) {
@@ -1421,8 +1483,19 @@ function renderProductsView() {
 
         const img = document.createElement('img');
         img.className = 'product-thumb-img';
-        img.src = p.image || p.img || 'assets/aam-achar.png';
+        const defaultAsset = 'assets/aam-ka-achar.png';
+        const rawImg = (Array.isArray(p.images) && p.images.length > 0) ? p.images[0] : (p.image || p.img || defaultAsset);
+        img.src = rawImg;
         img.alt = p.name || 'Product';
+        img.onerror = () => { img.src = defaultAsset; };
+
+        // Multi-image count indicator badge
+        if (Array.isArray(p.images) && p.images.length > 1) {
+            const imgCountBadge = document.createElement('span');
+            imgCountBadge.style.cssText = 'position:absolute;bottom:8px;right:8px;background:rgba(20,20,20,0.75);color:#FFF;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:12px;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.2);';
+            imgCountBadge.textContent = '📷 ' + p.images.length + ' photos';
+            thumbWrap.appendChild(imgCountBadge);
+        }
 
         const stockBadge = document.createElement('span');
         const stockQty = Number(p.stock !== undefined ? p.stock : 10);
@@ -1530,7 +1603,12 @@ async function quickRestockProduct(productId, amount) {
     }
 }
 
-// Product Edit / Create Modal Logic
+// ─────────────────────────────────────────────────────────────────────────────
+// PRODUCT EDIT / CREATE MODAL & MULTI-IMAGE ATTACHMENT MANAGER (Min 1, Max 5)
+// ─────────────────────────────────────────────────────────────────────────────
+let currentModalImages = [];
+let imgAttachmentHandlersBound = false;
+
 function openProductModal(prod = null) {
     const title = document.getElementById('modal-product-title');
     const fieldId = document.getElementById('prod-field-id');
@@ -1542,9 +1620,10 @@ function openProductModal(prod = null) {
     const fieldMrp = document.getElementById('prod-field-mrp');
     const fieldStock = document.getElementById('prod-field-stock');
     const fieldBadge = document.getElementById('prod-field-badge');
-    const fieldImg = document.getElementById('prod-field-img');
     const fieldDesc = document.getElementById('prod-field-desc');
     const fieldAvail = document.getElementById('prod-field-available');
+    const validationMsg = document.getElementById('prod-images-validation-msg');
+    if (validationMsg) validationMsg.style.display = 'none';
 
     if (prod) {
         if (title) title.textContent = 'Edit: ' + (prod.name || prod.id);
@@ -1557,9 +1636,17 @@ function openProductModal(prod = null) {
         if (fieldMrp) fieldMrp.value = prod.mrp || '';
         if (fieldStock) fieldStock.value = prod.stock !== undefined ? prod.stock : 10;
         if (fieldBadge) fieldBadge.value = prod.badge || '';
-        if (fieldImg) fieldImg.value = prod.image || prod.img || '';
         if (fieldDesc) fieldDesc.value = prod.desc || prod.description || '';
         if (fieldAvail) fieldAvail.checked = prod.available !== false;
+
+        // Populate attached images array
+        if (Array.isArray(prod.images) && prod.images.length > 0) {
+            currentModalImages = prod.images.slice(0, 5);
+        } else if (prod.image || prod.img) {
+            currentModalImages = [prod.image || prod.img];
+        } else {
+            currentModalImages = ['assets/aam-ka-achar.png'];
+        }
     } else {
         if (title) title.textContent = 'Add New Product';
         if (fieldId) fieldId.value = '';
@@ -1571,11 +1658,14 @@ function openProductModal(prod = null) {
         if (fieldMrp) fieldMrp.value = '320';
         if (fieldStock) fieldStock.value = '50';
         if (fieldBadge) fieldBadge.value = 'Handcrafted';
-        if (fieldImg) fieldImg.value = 'assets/aam-achar.png';
         if (fieldDesc) fieldDesc.value = 'Authentic homemade recipe prepared with cold-pressed mustard oil.';
         if (fieldAvail) fieldAvail.checked = true;
+
+        currentModalImages = ['assets/aam-ka-achar.png'];
     }
 
+    renderModalAttachedImages();
+    initProductImageAttachmentHandlers();
     openModal('modal-product');
 }
 
@@ -1583,9 +1673,274 @@ function closeProductModal() {
     closeModal('modal-product');
 }
 
+function renderModalAttachedImages() {
+    const grid = document.getElementById('prod-attached-images-grid');
+    const badge = document.getElementById('prod-images-count-badge');
+    const validationMsg = document.getElementById('prod-images-validation-msg');
+
+    if (badge) {
+        badge.textContent = `${currentModalImages.length} / 5 Attached`;
+        badge.style.background = currentModalImages.length === 0 ? '#FEE2E2' : currentModalImages.length >= 5 ? '#FEF3C7' : '#FDF2F0';
+        badge.style.color = currentModalImages.length === 0 ? '#DC2626' : currentModalImages.length >= 5 ? '#92400E' : '#7A1C1C';
+    }
+
+    if (!grid) return;
+
+    if (currentModalImages.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.style.cssText = 'grid-column: 1/-1; padding: 18px 10px; text-align: center; color: #DC2626; font-size: 0.82rem; font-weight: 700;';
+        emptyDiv.textContent = '⚠️ No pictures attached! Please upload or attach at least 1 product picture (Max 5).';
+        grid.replaceChildren(emptyDiv);
+        return;
+    }
+
+    const frag = document.createDocumentFragment();
+
+    currentModalImages.forEach((imgUrl, idx) => {
+        const card = document.createElement('div');
+        card.className = 'prod-attached-card' + (idx === 0 ? ' is-cover' : '');
+
+        const img = document.createElement('img');
+        img.className = 'prod-attached-img';
+        img.src = imgUrl;
+        img.alt = `Product Photo ${idx + 1}`;
+        img.onerror = () => { img.src = 'assets/aam-ka-achar.png'; };
+        card.appendChild(img);
+
+        if (idx === 0) {
+            const coverTag = document.createElement('span');
+            coverTag.className = 'prod-cover-badge';
+            coverTag.textContent = '★ COVER';
+            card.appendChild(coverTag);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'prod-attached-actions';
+
+        if (idx > 0) {
+            const btnSetCover = document.createElement('button');
+            btnSetCover.type = 'button';
+            btnSetCover.className = 'btn-set-cover';
+            btnSetCover.textContent = 'Set Cover';
+            btnSetCover.title = 'Make this photo the primary cover image on the storefront';
+            btnSetCover.addEventListener('click', () => {
+                const targetImg = currentModalImages.splice(idx, 1)[0];
+                currentModalImages.unshift(targetImg);
+                renderModalAttachedImages();
+            });
+            actions.appendChild(btnSetCover);
+        }
+
+        const btnRemove = document.createElement('button');
+        btnRemove.type = 'button';
+        btnRemove.className = 'btn-remove-photo';
+        btnRemove.textContent = '✕';
+        btnRemove.title = 'Remove Photo';
+        btnRemove.addEventListener('click', () => {
+            if (currentModalImages.length <= 1) {
+                if (validationMsg) {
+                    validationMsg.textContent = '⚠️ Product must have at least 1 picture. Add another before removing this.';
+                    validationMsg.style.display = 'block';
+                }
+                showAdminToast('⚠️ At least 1 product photo is required.', 'warning');
+                return;
+            }
+            currentModalImages.splice(idx, 1);
+            if (validationMsg) validationMsg.style.display = 'none';
+            renderModalAttachedImages();
+        });
+        actions.appendChild(btnRemove);
+
+        card.appendChild(actions);
+        frag.appendChild(card);
+    });
+
+    grid.replaceChildren(frag);
+}
+
+function initProductImageAttachmentHandlers() {
+    if (imgAttachmentHandlersBound) return;
+    imgAttachmentHandlersBound = true;
+
+    const dropzone = document.getElementById('prod-images-dropzone');
+    const fileInput = document.getElementById('prod-file-input');
+    const btnToggleUrl = document.getElementById('btn-toggle-img-url');
+    const urlBox = document.getElementById('prod-img-url-box');
+    const btnAddUrl = document.getElementById('btn-add-img-url');
+    const manualUrlInput = document.getElementById('prod-manual-img-url');
+    const validationMsg = document.getElementById('prod-images-validation-msg');
+
+    if (dropzone && fileInput) {
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer && e.dataTransfer.files) {
+                handleUploadedFiles(e.dataTransfer.files);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                handleUploadedFiles(e.target.files);
+                fileInput.value = '';
+            }
+        });
+    }
+
+    if (btnToggleUrl && urlBox) {
+        btnToggleUrl.addEventListener('click', () => {
+            urlBox.style.display = (urlBox.style.display === 'none' || !urlBox.style.display) ? 'block' : 'none';
+        });
+    }
+
+    if (btnAddUrl && manualUrlInput) {
+        btnAddUrl.addEventListener('click', () => {
+            const raw = manualUrlInput.value.trim();
+            if (!raw) return;
+            if (!isValidImageUrl(raw)) {
+                showAdminToast('⚠️ Invalid image URL. Must start with http://, https://, assets/, or data:image/', 'error');
+                return;
+            }
+            if (currentModalImages.length >= 5) {
+                showAdminToast('⚠️ Maximum 5 pictures allowed per product.', 'warning');
+                return;
+            }
+            currentModalImages.push(raw);
+            manualUrlInput.value = '';
+            if (validationMsg) validationMsg.style.display = 'none';
+            renderModalAttachedImages();
+            showAdminToast('📸 Photo added from URL!', 'success');
+        });
+    }
+
+    // Preset chips
+    document.querySelectorAll('.btn-preset-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const url = chip.getAttribute('data-url');
+            if (!url || !isValidImageUrl(url)) return;
+            if (currentModalImages.length >= 5) {
+                showAdminToast('⚠️ Maximum 5 pictures allowed per product.', 'warning');
+                return;
+            }
+            currentModalImages.push(url);
+            if (validationMsg) validationMsg.style.display = 'none';
+            renderModalAttachedImages();
+            showAdminToast(`📸 Added preset: ${chip.textContent.trim()}`, 'success');
+        });
+    });
+}
+
+function handleUploadedFiles(fileList) {
+    const files = Array.from(fileList);
+    const validationMsg = document.getElementById('prod-images-validation-msg');
+
+    if (currentModalImages.length >= 5) {
+        showAdminToast('⚠️ Maximum 5 pictures already reached. Remove one first.', 'warning');
+        return;
+    }
+
+    const availableSlots = 5 - currentModalImages.length;
+    const toProcess = files.slice(0, availableSlots);
+
+    if (files.length > availableSlots) {
+        showAdminToast(`ℹ️ Only ${availableSlots} more photo(s) can be added (Maximum 5 photos per product).`, 'info');
+    }
+
+    toProcess.forEach(file => {
+        // MIME type validation
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+            showAdminToast(`⚠️ File "${file.name}" is not a supported image. Use PNG, JPG, or WebP.`, 'error');
+            return;
+        }
+
+        // Max raw size 5MB before canvas compression
+        if (file.size > 5 * 1024 * 1024) {
+            showAdminToast(`⚠️ File "${file.name}" exceeds 5MB limit. Please choose a smaller file.`, 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const rawDataUrl = e.target.result;
+            compressAndAttachImage(rawDataUrl, file.name);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function compressAndAttachImage(dataUrl, fileName) {
+    const img = new Image();
+    img.onload = () => {
+        const maxDim = 1024;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+            if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+            } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+            }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to optimized WebP (fallback to JPEG)
+        let optimizedDataUrl = canvas.toDataURL('image/webp', 0.85);
+        if (!optimizedDataUrl.startsWith('data:image/webp')) {
+            optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        }
+
+        if (currentModalImages.length < 5) {
+            currentModalImages.push(optimizedDataUrl);
+            renderModalAttachedImages();
+            const validationMsg = document.getElementById('prod-images-validation-msg');
+            if (validationMsg) validationMsg.style.display = 'none';
+            showAdminToast(`📸 Photo "${fileName}" attached and optimized!`, 'success');
+        }
+    };
+    img.onerror = () => {
+        showAdminToast(`⚠️ Failed to load or decode "${fileName}". Please ensure it is a valid, uncorrupted image.`, 'error');
+    };
+    img.src = dataUrl;
+}
+
 async function handleProductFormSubmit(e) {
     e.preventDefault();
-    if (!window.db) return;
+
+    const validationMsg = document.getElementById('prod-images-validation-msg');
+
+    // STRICT VALIDATION: Minimum 1 picture, Maximum 5 pictures
+    if (!currentModalImages || currentModalImages.length < 1) {
+        if (validationMsg) {
+            validationMsg.textContent = '⚠️ Validation Error: You must attach at least 1 product picture (Maximum 5).';
+            validationMsg.style.display = 'block';
+        }
+        showAdminToast('⚠️ Please attach at least 1 product picture (Maximum 5).', 'error');
+        return;
+    }
+
+    if (currentModalImages.length > 5) {
+        if (validationMsg) {
+            validationMsg.textContent = '⚠️ Validation Error: A maximum of 5 pictures can be attached per product.';
+            validationMsg.style.display = 'block';
+        }
+        showAdminToast('⚠️ Maximum 5 pictures allowed per product.', 'error');
+        return;
+    }
 
     const prodId = document.getElementById('prod-field-id').value.trim();
     const name = document.getElementById('prod-field-name').value.trim();
@@ -1596,7 +1951,6 @@ async function handleProductFormSubmit(e) {
     const mrp = Number(document.getElementById('prod-field-mrp').value);
     const stock = Number(document.getElementById('prod-field-stock').value);
     const badge = document.getElementById('prod-field-badge').value.trim();
-    const img = document.getElementById('prod-field-img').value.trim();
     const desc = document.getElementById('prod-field-desc').value.trim();
     const available = document.getElementById('prod-field-available').checked;
 
@@ -1610,28 +1964,39 @@ async function handleProductFormSubmit(e) {
         mrp,
         stock,
         badge,
-        img,
-        image: img,
+        images: currentModalImages.slice(0, 5),
+        img: currentModalImages[0],
+        image: currentModalImages[0],
         desc,
         description: desc,
         available,
-        updatedAt: serverTimestamp()
+        updatedAt: new Date().toISOString()
     };
 
     try {
-        if (prodId) {
-            const prodRef = doc(window.db, 'products', prodId);
-            await updateDoc(prodRef, payload);
-        } else {
-            const newId = 'prod_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 24) + '_' + Date.now().toString().slice(-4);
-            const prodRef = doc(window.db, 'products', newId);
-            payload.createdAt = serverTimestamp();
-            await setDoc(prodRef, payload);
+        let savedProd = null;
+        if (typeof adminDataAdapter !== 'undefined') {
+            savedProd = await adminDataAdapter.saveProduct({ ...payload, id: prodId || undefined });
         }
+
+        // Firestore live sync if active
+        if (window.db) {
+            try {
+                const targetId = prodId || (savedProd ? savedProd.id : ('prod_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 20) + '_' + Date.now().toString().slice(-4)));
+                const prodRef = doc(window.db, 'products', targetId);
+                await setDoc(prodRef, { ...payload, updatedAt: serverTimestamp() }, { merge: true });
+                console.log(`[Firestore] Product ${targetId} synchronized with ${payload.images.length} photos.`);
+            } catch (fsErr) {
+                console.warn("[Firestore] Sync notice (local adapter active):", fsErr.message);
+            }
+        }
+
+        showAdminToast(`✅ Product "${name}" saved with ${payload.images.length} photo(s) — storefront synced in real time!`, 'success');
         closeProductModal();
+        renderProductsView();
     } catch (err) {
         console.error("Failed to save product:", err);
-        alert("Error saving product: " + err.message);
+        showAdminToast("Error saving product: " + err.message, 'error');
     }
 }
 
@@ -2174,12 +2539,17 @@ function renderOfflineOrdersTable() {
         td.style.textAlign = 'center';
         td.style.color = '#888';
         td.style.padding = '28px';
-        td.innerHTML = `No offline POS orders found. <br><button type="button" class="btn-primary" style="margin-top:10px;padding:6px 14px;font-size:0.8rem;" id="btn-empty-add-offline">➕ Record First POS Order</button>`;
+        const emptyText = document.createTextNode('No offline POS orders found.');
+        const br = document.createElement('br');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-primary';
+        btn.style.cssText = 'margin-top:10px;padding:6px 14px;font-size:0.8rem;';
+        btn.textContent = '➕ Record First POS Order';
+        btn.addEventListener('click', openOfflineOrderModal);
+        td.replaceChildren(emptyText, br, btn);
         tr.appendChild(td);
         tbody.replaceChildren(tr);
-
-        const btn = document.getElementById('btn-empty-add-offline');
-        if (btn) btn.addEventListener('click', openOfflineOrderModal);
         return;
     }
 
@@ -2559,16 +2929,19 @@ function renderAnalyticsView() {
 
 
 // ═════════════════════════════════════════════════════════════════════════════
-// CUSTOMER REVIEWS & HOMEPAGE CURATION MANAGEMENT
+// 5. CUSTOMER REVIEWS & RATINGS TWO-TIER SUITE (ZERO innerHTML concatenation)
 // ═════════════════════════════════════════════════════════════════════════════
 
+let reviewsActiveTier = 'overall'; // 'overall' | 'product' | 'leaderboard'
+let reviewsSelectedProduct = 'prod_aam_achar';
+let reviewsVerifiedOnlyOverall = false;
+let reviewsVerifiedOnlyProduct = false;
+let reviewsLeaderboardSort = 'highest';
 let currentReviewsFilter = 'all';
 let currentReviewsQuery = '';
+let reviewsEventsInitialized = false;
 
 function renderReviewsManagement() {
-    const listContainer = document.getElementById('reviews-list-container');
-    if (!listContainer) return;
-
     const allReviews = (typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.getReviews === 'function')
         ? adminDataAdapter.getReviews()
         : (adminState.reviews || []);
@@ -2589,9 +2962,12 @@ function renderReviewsManagement() {
     const navBadge = document.getElementById('badge-featured-reviews');
     if (navBadge) navBadge.textContent = featuredIds.size;
 
-    const fiveStars = allReviews.filter(r => Number(r.rating) === 5);
-    const stat5Star = document.getElementById('stat-5star-reviews');
-    if (stat5Star) stat5Star.textContent = fiveStars.length;
+    const verifiedCount = allReviews.filter(r => r.verified === true).length;
+    const statVerified = document.getElementById('stat-verified-reviews');
+    if (statVerified) statVerified.textContent = verifiedCount;
+
+    const badgeVerifiedOverall = document.getElementById('badge-verified-overall-count');
+    if (badgeVerifiedOverall) badgeVerifiedOverall.textContent = verifiedCount;
 
     const statAvg = document.getElementById('stat-avg-rating');
     if (statAvg) {
@@ -2603,12 +2979,40 @@ function renderReviewsManagement() {
         }
     }
 
-    // Filter
+    // Update Tier Counts
+    const badgeTierOverall = document.getElementById('badge-tier-overall-cnt');
+    if (badgeTierOverall) badgeTierOverall.textContent = allReviews.length;
+
+    const prodSpecificReviews = (typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.getReviewsByProduct === 'function')
+        ? adminDataAdapter.getReviewsByProduct(reviewsSelectedProduct)
+        : [];
+    const badgeTierProduct = document.getElementById('badge-tier-product-cnt');
+    if (badgeTierProduct) badgeTierProduct.textContent = prodSpecificReviews.length;
+
+    // Render active tier panel
+    if (reviewsActiveTier === 'overall') {
+        renderTierOverallReviews(allReviews, featuredIds);
+    } else if (reviewsActiveTier === 'product') {
+        renderTierProductReviews();
+    } else if (reviewsActiveTier === 'leaderboard') {
+        renderTierLeaderboard();
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TIER 1: OVERALL STORE REVIEWS (Common Reviews)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderTierOverallReviews(allReviews, featuredIds) {
+    const listContainer = document.getElementById('reviews-list-container');
+    if (!listContainer) return;
+
     let filtered = allReviews.filter(r => {
         const isFeat = featuredIds.has(r.id) || r.featured === true;
         if (currentReviewsFilter === 'featured' && !isFeat) return false;
         if (currentReviewsFilter === '5star' && Number(r.rating) !== 5) return false;
         if (currentReviewsFilter === 'unfeatured' && isFeat) return false;
+
+        if (reviewsVerifiedOnlyOverall && r.verified !== true) return false;
 
         if (currentReviewsQuery) {
             const q = currentReviewsQuery.toLowerCase();
@@ -2625,18 +3029,384 @@ function renderReviewsManagement() {
     });
 
     if (filtered.length === 0) {
-        listContainer.innerHTML = `
-            <div style="grid-column: 1/-1; padding: 36px 20px; text-align: center; background: #FFFFFF; border-radius: 12px; border: 1px dashed #D4A017;">
-                <p style="font-size: 1.1rem; color: #7A1C1C; font-weight: 700; margin-bottom: 6px;">No reviews found matching filter.</p>
-                <p style="font-size: 0.85rem; color: #6B625B;">Try choosing 'All Reviews' or clearing the search query.</p>
-            </div>
-        `;
+        const emptyDiv = document.createElement('div');
+        emptyDiv.style.cssText = 'grid-column: 1/-1; padding: 36px 20px; text-align: center; background: #FFFFFF; border-radius: 12px; border: 1px dashed #D4A017;';
+        const p1 = document.createElement('p');
+        p1.style.cssText = 'font-size: 1.1rem; color: #7A1C1C; font-weight: 700; margin-bottom: 6px;';
+        p1.textContent = 'No reviews found matching active filter.';
+        const p2 = document.createElement('p');
+        p2.style.cssText = 'font-size: 0.85rem; color: #6B625B;';
+        p2.textContent = "Try choosing 'All Reviews' or toggle off the verified purchases filter.";
+        emptyDiv.appendChild(p1);
+        emptyDiv.appendChild(p2);
+        listContainer.replaceChildren(emptyDiv);
         return;
     }
 
+    renderReviewsCardsInto(listContainer, filtered, featuredIds);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TIER 2: PRODUCT-SPECIFIC REVIEWS & PRODUCT LOVE SCORECARD
+// ─────────────────────────────────────────────────────────────────────────────
+function renderTierProductReviews() {
+    const selectProduct = document.getElementById('select-reviews-product');
+    const chipsContainer = document.getElementById('product-quick-select-chips');
+    const bannerContainer = document.getElementById('product-love-banner-container');
+    const listContainer = document.getElementById('product-specific-reviews-container');
+
+    const products = (typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.getProducts === 'function')
+        ? adminDataAdapter.getProducts()
+        : [];
+
+    if (products.length === 0) return;
+
+    // Ensure valid selected product
+    if (!products.some(p => p.id === reviewsSelectedProduct)) {
+        reviewsSelectedProduct = products[0].id;
+    }
+
+    // 1. Populate Dropdown Options
+    if (selectProduct && selectProduct.children.length !== products.length) {
+        const frag = document.createDocumentFragment();
+        products.forEach(p => {
+            const metrics = adminDataAdapter.getProductReviewMetrics(p.id);
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = `${p.name} (${metrics.totalReviews} reviews · ${metrics.avgRating} ★)`;
+            frag.appendChild(opt);
+        });
+        selectProduct.replaceChildren(frag);
+    }
+    if (selectProduct) {
+        selectProduct.value = reviewsSelectedProduct;
+    }
+
+    // 2. Populate Quick Pick Chips (first 5 popular products)
+    if (chipsContainer && chipsContainer.querySelectorAll('.btn-preset-chip').length === 0) {
+        const frag = document.createDocumentFragment();
+        const popularProds = products.slice(0, 6);
+        popularProds.forEach(p => {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'btn-preset-chip' + (p.id === reviewsSelectedProduct ? ' active' : '');
+            chip.textContent = p.name.split(' ')[0] + ' ' + (p.name.split(' ')[1] || '');
+            chip.addEventListener('click', () => {
+                reviewsSelectedProduct = p.id;
+                renderReviewsManagement();
+            });
+            frag.appendChild(chip);
+        });
+        chipsContainer.appendChild(frag);
+    }
+
+    // Update active class on quick chips
+    if (chipsContainer) {
+        chipsContainer.querySelectorAll('.btn-preset-chip').forEach(c => {
+            const matchingProd = products.find(p => c.textContent.trim().startsWith(p.name.split(' ')[0]));
+            if (matchingProd && matchingProd.id === reviewsSelectedProduct) {
+                c.style.background = '#7A1C1C';
+                c.style.color = '#FFF';
+                c.style.borderColor = '#7A1C1C';
+            } else {
+                c.style.background = '#FFFFFF';
+                c.style.color = '#4A3B32';
+                c.style.borderColor = '#D4C7B5';
+            }
+        });
+    }
+
+    // 3. Render Product Love Scorecard Banner
+    const currentProd = products.find(p => p.id === reviewsSelectedProduct) || products[0];
+    const metrics = adminDataAdapter.getProductReviewMetrics(currentProd.id);
+
+    if (bannerContainer) {
+        const prodImgSrc = (Array.isArray(currentProd.images) && currentProd.images[0]) || currentProd.image || currentProd.img || 'assets/aam-ka-achar.png';
+        const starsText = '★'.repeat(Math.round(metrics.avgRating)) + '☆'.repeat(5 - Math.round(metrics.avgRating));
+
+        const banner = document.createElement('div');
+        banner.className = 'product-love-banner';
+
+        const img = document.createElement('img');
+        img.src = prodImgSrc;
+        img.alt = currentProd.name || 'Product Photo';
+        img.className = 'product-love-img';
+        img.addEventListener('error', () => { img.src = 'assets/aam-ka-achar.png'; });
+        banner.appendChild(img);
+
+        const info = document.createElement('div');
+        info.className = 'product-love-info';
+
+        const h2 = document.createElement('h2');
+        h2.textContent = currentProd.name || '';
+        info.appendChild(h2);
+
+        const hindiDiv = document.createElement('div');
+        hindiDiv.className = 'hindi-name';
+        hindiDiv.textContent = (currentProd.hindiName || currentProd.nameHindi || '') + ' • ';
+        const catSpan = document.createElement('span');
+        catSpan.style.cssText = 'text-transform:capitalize;color:#7A1C1C;font-weight:700;';
+        catSpan.textContent = currentProd.category || currentProd.cat || 'Artisanal';
+        hindiDiv.appendChild(catSpan);
+        info.appendChild(hindiDiv);
+
+        const badgesRow = document.createElement('div');
+        badgesRow.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px;';
+
+        const lovePill = document.createElement('span');
+        lovePill.className = 'love-meter-pill';
+        lovePill.textContent = `❤️ ${metrics.loveScore}% Customer Love Score`;
+
+        const reviewsNote = document.createElement('span');
+        reviewsNote.style.cssText = 'font-size:0.82rem;color:#6B625B;font-weight:700;';
+        reviewsNote.textContent = `📊 Based on ${metrics.totalReviews} authentic customer reviews`;
+
+        badgesRow.appendChild(lovePill);
+        badgesRow.appendChild(reviewsNote);
+        info.appendChild(badgesRow);
+        banner.appendChild(info);
+
+        const scoreCol = document.createElement('div');
+        scoreCol.className = 'product-love-score';
+
+        const bigStars = document.createElement('div');
+        bigStars.className = 'big-stars';
+        bigStars.textContent = `${metrics.avgRating} `;
+        const goldStar = document.createElement('span');
+        goldStar.style.cssText = 'font-size:1.4rem;color:#D4A017;';
+        goldStar.textContent = '★';
+        bigStars.appendChild(goldStar);
+        scoreCol.appendChild(bigStars);
+
+        const starsDiv = document.createElement('div');
+        starsDiv.style.cssText = 'font-size:0.82rem;color:#856404;font-weight:700;margin-bottom:4px;';
+        starsDiv.textContent = starsText;
+        scoreCol.appendChild(starsDiv);
+
+        const verifiedBadge = document.createElement('div');
+        verifiedBadge.className = 'verified-badge-cnt';
+        verifiedBadge.textContent = `✔ ${metrics.verifiedReviews} Verified Purchases`;
+        scoreCol.appendChild(verifiedBadge);
+
+        banner.appendChild(scoreCol);
+        bannerContainer.replaceChildren(banner);
+    }
+
+    // 4. Render Product Specific Reviews List
+    if (listContainer) {
+        let prodReviews = adminDataAdapter.getReviewsByProduct(reviewsSelectedProduct);
+        if (reviewsVerifiedOnlyProduct) {
+            prodReviews = prodReviews.filter(r => r.verified === true);
+        }
+
+        const featuredReviews = adminDataAdapter.getFeaturedReviews();
+        const featuredIds = new Set(featuredReviews.map(r => r.id));
+
+        if (prodReviews.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.cssText = 'grid-column: 1/-1; padding: 36px 20px; text-align: center; background: #FFFFFF; border-radius: 12px; border: 1px dashed #D4A017;';
+            const p1 = document.createElement('p');
+            p1.style.cssText = 'font-size: 1.1rem; color: #7A1C1C; font-weight: 700; margin-bottom: 6px;';
+            p1.textContent = `No reviews yet for ${currentProd.name}.`;
+            const p2 = document.createElement('p');
+            p2.style.cssText = 'font-size: 0.85rem; color: #6B625B;';
+            p2.textContent = 'Click "+ Add New Testimonial" above to add customer feedback for this item.';
+            emptyDiv.appendChild(p1);
+            emptyDiv.appendChild(p2);
+            listContainer.replaceChildren(emptyDiv);
+            return;
+        }
+
+        renderReviewsCardsInto(listContainer, prodReviews, featuredIds);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TIER 3: PRODUCT PERFORMANCE LEADERBOARD (Top vs Lower Rated)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderTierLeaderboard() {
+    const topListEl = document.getElementById('leaderboard-top-list');
+    const lowListEl = document.getElementById('leaderboard-low-list');
+
+    if (!topListEl || !lowListEl) return;
+
+    const data = adminDataAdapter.getProductPerformanceLeaderboard(reviewsLeaderboardSort);
+
+    // Render Top Performers
+    if (data.topPerformers.length === 0) {
+        const p = document.createElement('p');
+        p.style.cssText = 'color:#888;padding:12px;text-align:center;';
+        p.textContent = 'No items currently above 4.8★';
+        topListEl.replaceChildren(p);
+    } else {
+        const frag = document.createDocumentFragment();
+        data.topPerformers.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'leaderboard-item-row';
+
+            const leftDiv = document.createElement('div');
+            leftDiv.style.cssText = 'display:flex;align-items:center;gap:10px;flex:1;';
+
+            const rankCircle = document.createElement('div');
+            rankCircle.className = 'rank-circle rank-top';
+            rankCircle.textContent = `#${idx + 1}`;
+            leftDiv.appendChild(rankCircle);
+
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.alt = item.name || 'Product';
+            img.style.cssText = 'width:42px;height:42px;object-fit:cover;border-radius:8px;border:1px solid #D4A017;';
+            img.addEventListener('error', () => { img.src = 'assets/aam-ka-achar.png'; });
+            leftDiv.appendChild(img);
+
+            const nameWrap = document.createElement('div');
+            const nameEl = document.createElement('div');
+            nameEl.style.cssText = 'font-weight:800;font-size:0.9rem;color:#2A211D;';
+            nameEl.textContent = item.name;
+
+            const subEl = document.createElement('div');
+            subEl.style.cssText = 'font-size:0.75rem;color:#8C6D46;';
+            subEl.textContent = (item.hindiName || '') + ' • ';
+            const loveSpan = document.createElement('span');
+            loveSpan.style.cssText = 'color:#059669;font-weight:700;';
+            loveSpan.textContent = `❤️ ${item.loveScore}% Love`;
+            subEl.appendChild(loveSpan);
+
+            nameWrap.appendChild(nameEl);
+            nameWrap.appendChild(subEl);
+            leftDiv.appendChild(nameWrap);
+            row.appendChild(leftDiv);
+
+            const rightDiv = document.createElement('div');
+            rightDiv.style.cssText = 'text-align:right;display:flex;align-items:center;gap:12px;';
+
+            const ratingCol = document.createElement('div');
+            const ratingVal = document.createElement('div');
+            ratingVal.style.cssText = 'font-weight:900;font-size:1.05rem;color:#065F46;';
+            ratingVal.textContent = `${item.avgRating} ★`;
+            const countVal = document.createElement('div');
+            countVal.style.cssText = 'font-size:0.74rem;color:#6B625B;';
+            countVal.textContent = `${item.totalReviews} reviews`;
+            ratingCol.appendChild(ratingVal);
+            ratingCol.appendChild(countVal);
+            rightDiv.appendChild(ratingCol);
+
+            const inspectBtn = document.createElement('button');
+            inspectBtn.type = 'button';
+            inspectBtn.className = 'btn-inspect-prod-rev';
+            inspectBtn.setAttribute('data-product-id', item.id);
+            inspectBtn.style.cssText = 'background:#FAF5EB;border:1px solid #D4A017;color:#7A1C1C;font-size:0.74rem;font-weight:800;padding:5px 9px;border-radius:6px;cursor:pointer;';
+            inspectBtn.textContent = 'Inspect →';
+            inspectBtn.addEventListener('click', () => {
+                switchToProductReviewsTier(item.id);
+            });
+            rightDiv.appendChild(inspectBtn);
+            row.appendChild(rightDiv);
+
+            frag.appendChild(row);
+        });
+        topListEl.replaceChildren(frag);
+    }
+
+    // Render Lower Rated / Needs Attention
+    if (data.lowerRated.length === 0) {
+        const p = document.createElement('p');
+        p.style.cssText = 'color:#065F46;font-weight:700;padding:12px;text-align:center;';
+        p.textContent = '🎉 Fantastic! All catalog items are performing exceptionally with 4.8★+ ratings!';
+        lowListEl.replaceChildren(p);
+    } else {
+        const frag = document.createDocumentFragment();
+        data.lowerRated.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'leaderboard-item-row';
+
+            const leftDiv = document.createElement('div');
+            leftDiv.style.cssText = 'display:flex;align-items:center;gap:10px;flex:1;';
+
+            const rankCircle = document.createElement('div');
+            rankCircle.className = 'rank-circle rank-low';
+            rankCircle.textContent = `#${idx + 1}`;
+            leftDiv.appendChild(rankCircle);
+
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.alt = item.name || 'Product';
+            img.style.cssText = 'width:42px;height:42px;object-fit:cover;border-radius:8px;border:1px solid #F87171;';
+            img.addEventListener('error', () => { img.src = 'assets/aam-ka-achar.png'; });
+            leftDiv.appendChild(img);
+
+            const nameWrap = document.createElement('div');
+            const nameEl = document.createElement('div');
+            nameEl.style.cssText = 'font-weight:800;font-size:0.9rem;color:#2A211D;';
+            nameEl.textContent = item.name;
+
+            const subEl = document.createElement('div');
+            subEl.style.cssText = 'font-size:0.75rem;color:#991B1B;';
+            subEl.textContent = '⚠️ Customer feedback: check spice/salt balance';
+
+            nameWrap.appendChild(nameEl);
+            nameWrap.appendChild(subEl);
+            leftDiv.appendChild(nameWrap);
+            row.appendChild(leftDiv);
+
+            const rightDiv = document.createElement('div');
+            rightDiv.style.cssText = 'text-align:right;display:flex;align-items:center;gap:12px;';
+
+            const ratingCol = document.createElement('div');
+            const ratingVal = document.createElement('div');
+            ratingVal.style.cssText = 'font-weight:900;font-size:1.05rem;color:#B45309;';
+            ratingVal.textContent = `${item.avgRating} ★`;
+            const countVal = document.createElement('div');
+            countVal.style.cssText = 'font-size:0.74rem;color:#6B625B;';
+            countVal.textContent = `${item.totalReviews} reviews`;
+            ratingCol.appendChild(ratingVal);
+            ratingCol.appendChild(countVal);
+            rightDiv.appendChild(ratingCol);
+
+            const inspectBtn = document.createElement('button');
+            inspectBtn.type = 'button';
+            inspectBtn.className = 'btn-inspect-prod-rev';
+            inspectBtn.setAttribute('data-product-id', item.id);
+            inspectBtn.style.cssText = 'background:#FFF1F2;border:1px solid #FCA5A5;color:#991B1B;font-size:0.74rem;font-weight:800;padding:5px 9px;border-radius:6px;cursor:pointer;';
+            inspectBtn.textContent = 'Inspect →';
+            inspectBtn.addEventListener('click', () => {
+                switchToProductReviewsTier(item.id);
+            });
+            rightDiv.appendChild(inspectBtn);
+            row.appendChild(rightDiv);
+
+            frag.appendChild(row);
+        });
+        lowListEl.replaceChildren(frag);
+    }
+}
+
+function switchToProductReviewsTier(productId) {
+    reviewsSelectedProduct = productId;
+    reviewsActiveTier = 'product';
+
+    document.querySelectorAll('.tier-tab-btn').forEach(b => b.classList.remove('active'));
+    const btnProdTier = document.getElementById('btn-tier-product');
+    if (btnProdTier) btnProdTier.classList.add('active');
+
+    const panelOverall = document.getElementById('reviews-tier-overall-panel');
+    const panelProduct = document.getElementById('reviews-tier-product-panel');
+    const panelLeaderboard = document.getElementById('reviews-tier-leaderboard-panel');
+
+    if (panelOverall) panelOverall.style.display = 'none';
+    if (panelProduct) panelProduct.style.display = 'block';
+    if (panelLeaderboard) panelLeaderboard.style.display = 'none';
+
+    renderReviewsManagement();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REUSABLE REVIEW CARD BUILDER WITH REAL-TIME HOMEPAGE CURATION TOGGLE
+// ─────────────────────────────────────────────────────────────────────────────
+function renderReviewsCardsInto(container, reviewsList, featuredIds) {
     const frag = document.createDocumentFragment();
 
-    filtered.forEach(r => {
+    reviewsList.forEach(r => {
         const isFeat = featuredIds.has(r.id) || r.featured === true;
         const card = document.createElement('article');
         card.className = 'rev-admin-card';
@@ -2655,78 +3425,123 @@ function renderReviewsManagement() {
         const stars = '★'.repeat(Math.min(5, Math.max(1, Number(r.rating) || 5)));
         const initials = (r.customerName || r.author || 'SS').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
-        card.innerHTML = `
-            <div>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 38px; height: 38px; border-radius: 50%; background: ${isFeat ? '#FAF5EB' : '#F4EFE6'}; color: #7A1C1C; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; border: 1.5px solid ${isFeat ? '#D4A017' : '#D4C7B5'};">
-                            ${initials}
-                        </div>
-                        <div>
-                            <div style="font-weight: 800; font-size: 0.92rem; color: #2A211D;">${r.customerName || r.author || 'Anonymous'}</div>
-                            <div style="font-size: 0.74rem; color: #6B625B;">📍 ${r.city || 'India'} ${r.verified ? '• <span style="color:#2C5E3B;font-weight:700;">✓ Verified</span>' : ''}</div>
-                        </div>
-                    </div>
-                    <span style="color: #D4A017; font-size: 1.15rem; letter-spacing: 1px;">${stars}</span>
-                </div>
+        const topRow = document.createElement('div');
+        const userHeader = document.createElement('div');
+        userHeader.style.cssText = 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;';
 
-                <div style="margin-bottom: 10px;">
-                    <span style="display: inline-block; background: #FAF5EB; color: #7A1C1C; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(212,160,23,0.3);">
-                        🏷️ ${r.productName || 'Artisanal Delicacy'}
-                    </span>
-                    ${r.date ? `<span style="font-size: 0.72rem; color: #8C827A; margin-left: 6px;">${r.date}</span>` : ''}
-                </div>
+        const userLeft = document.createElement('div');
+        userLeft.style.cssText = 'display: flex; align-items: center; gap: 10px;';
 
-                ${r.title ? `<div style="font-weight: 700; font-size: 0.95rem; color: #7A1C1C; margin-bottom: 4px;">"${r.title}"</div>` : ''}
-                <p style="font-size: 0.86rem; color: #4A3E39; line-height: 1.5; margin-bottom: 16px; font-style: italic;">
-                    "${r.text || r.comment || ''}"
-                </p>
-            </div>
+        const avatar = document.createElement('div');
+        avatar.style.cssText = `width: 38px; height: 38px; border-radius: 50%; background: ${isFeat ? '#FAF5EB' : '#F4EFE6'}; color: #7A1C1C; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; border: 1.5px solid ${isFeat ? '#D4A017' : '#D4C7B5'};`;
+        avatar.textContent = initials;
+        userLeft.appendChild(avatar);
 
-            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #F4EFE6; padding-top: 12px; margin-top: auto;">
-                <button type="button" class="rev-toggle-btn ${isFeat ? 'active' : ''}" data-review-id="${r.id}" style="
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    background: ${isFeat ? 'linear-gradient(135deg, #FAF5EB, #FFF8E7)' : '#F4EFE6'};
-                    color: ${isFeat ? '#856404' : '#6B625B'};
-                    border: 1.5px solid ${isFeat ? '#D4A017' : '#D4C7B5'};
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    font-size: 0.78rem;
-                    font-weight: 800;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                ">
-                    <span>${isFeat ? '⭐ Live on Homepage' : 'Hidden from Homepage'}</span>
-                </button>
+        const userInfo = document.createElement('div');
+        const nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-weight: 800; font-size: 0.92rem; color: #2A211D;';
+        nameEl.textContent = r.customerName || r.author || 'Anonymous';
+        userInfo.appendChild(nameEl);
 
-                <button type="button" class="btn-delete-review" data-review-id="${r.id}" aria-label="Delete Review" style="background: none; border: none; color: #C0392B; cursor: pointer; font-size: 0.82rem; padding: 4px 6px;">
-                    🗑️
-                </button>
-            </div>
-        `;
+        const cityEl = document.createElement('div');
+        cityEl.style.cssText = 'font-size: 0.74rem; color: #6B625B;';
+        cityEl.textContent = `📍 ${r.city || 'India'} `;
+        if (r.verified) {
+            const verSpan = document.createElement('span');
+            verSpan.style.cssText = 'color:#2C5E3B;font-weight:700;';
+            verSpan.textContent = '• ✓ Verified Buyer';
+            cityEl.appendChild(verSpan);
+        }
+        userInfo.appendChild(cityEl);
+        userLeft.appendChild(userInfo);
+        userHeader.appendChild(userLeft);
+
+        const starsSpan = document.createElement('span');
+        starsSpan.style.cssText = 'color: #D4A017; font-size: 1.15rem; letter-spacing: 1px;';
+        starsSpan.textContent = stars;
+        userHeader.appendChild(starsSpan);
+        topRow.appendChild(userHeader);
+
+        const metaRow = document.createElement('div');
+        metaRow.style.cssText = 'margin-bottom: 10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;';
+
+        const jumpBtn = document.createElement('button');
+        jumpBtn.type = 'button';
+        jumpBtn.className = 'btn-jump-product-rev';
+        jumpBtn.setAttribute('data-product-id', r.productId || '');
+        jumpBtn.style.cssText = 'display: inline-block; background: #FAF5EB; color: #7A1C1C; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(212,160,23,0.3); cursor:pointer;';
+        jumpBtn.textContent = `📦 ${r.productName || 'Artisanal Delicacy'}`;
+        jumpBtn.addEventListener('click', () => {
+            if (r.productId) switchToProductReviewsTier(r.productId);
+        });
+        metaRow.appendChild(jumpBtn);
+
+        if (r.date) {
+            const dateSpan = document.createElement('span');
+            dateSpan.style.cssText = 'font-size: 0.72rem; color: #8C827A;';
+            dateSpan.textContent = r.date;
+            metaRow.appendChild(dateSpan);
+        }
+        topRow.appendChild(metaRow);
+
+        if (r.title) {
+            const titleEl = document.createElement('div');
+            titleEl.style.cssText = 'font-weight: 700; font-size: 0.95rem; color: #7A1C1C; margin-bottom: 4px;';
+            titleEl.textContent = `"${r.title}"`;
+            topRow.appendChild(titleEl);
+        }
+
+        const textEl = document.createElement('p');
+        textEl.style.cssText = 'font-size: 0.86rem; color: #4A3E39; line-height: 1.5; margin-bottom: 16px; font-style: italic;';
+        textEl.textContent = `"${r.text || r.comment || ''}"`;
+        topRow.appendChild(textEl);
+        card.appendChild(topRow);
+
+        const bottomRow = document.createElement('div');
+        bottomRow.style.cssText = 'display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #F4EFE6; padding-top: 12px; margin-top: auto;';
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = `rev-toggle-btn ${isFeat ? 'active' : ''}`;
+        toggleBtn.setAttribute('data-review-id', r.id);
+        toggleBtn.style.cssText = `display: inline-flex; align-items: center; gap: 8px; background: ${isFeat ? 'linear-gradient(135deg, #FAF5EB, #FFF8E7)' : '#F4EFE6'}; color: ${isFeat ? '#856404' : '#6B625B'}; border: 1.5px solid ${isFeat ? '#D4A017' : '#D4C7B5'}; padding: 6px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease;`;
+
+        const toggleSpan = document.createElement('span');
+        toggleSpan.textContent = isFeat ? '⭐ Live on Homepage' : 'Hidden from Homepage';
+        toggleBtn.appendChild(toggleSpan);
+        bottomRow.appendChild(toggleBtn);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn-delete-review';
+        deleteBtn.setAttribute('data-review-id', r.id);
+        deleteBtn.setAttribute('aria-label', 'Delete Review');
+        deleteBtn.style.cssText = 'background: none; border: none; color: #C0392B; cursor: pointer; font-size: 0.82rem; padding: 4px 6px;';
+        deleteBtn.textContent = '🗑️';
+        bottomRow.appendChild(deleteBtn);
+
+        card.appendChild(bottomRow);
 
         frag.appendChild(card);
     });
 
-    listContainer.replaceChildren(frag);
+    container.replaceChildren(frag);
 
     // Bind toggles
-    listContainer.querySelectorAll('.rev-toggle-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    container.querySelectorAll('.rev-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
             const revId = btn.getAttribute('data-review-id');
             if (revId && typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.toggleFeaturedReview === 'function') {
                 const res = adminDataAdapter.toggleFeaturedReview(revId);
-                showAdminToast(`⭐ Review ${res.featured ? 'added to' : 'removed from'} Homepage marquee!`, 'success');
+                showAdminToast(`⭐ Review ${res.review.featured ? 'added to' : 'removed from'} Homepage marquee!`, 'success');
                 renderReviewsManagement();
             }
         });
     });
 
     // Bind deletes
-    listContainer.querySelectorAll('.btn-delete-review').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    container.querySelectorAll('.btn-delete-review').forEach(btn => {
+        btn.addEventListener('click', () => {
             const revId = btn.getAttribute('data-review-id');
             if (revId && confirm('Delete this review permanently?')) {
                 adminDataAdapter.deleteReview(revId);
@@ -2737,8 +3552,84 @@ function renderReviewsManagement() {
     });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// REVIEWS & RATINGS EVENT BINDINGS
+// ─────────────────────────────────────────────────────────────────────────────
 function initReviewsManagementEvents() {
-    // Publish button
+    if (reviewsEventsInitialized) return;
+    reviewsEventsInitialized = true;
+
+    // 1. Two-Tier Navigation Tabs
+    const btnOverall = document.getElementById('btn-tier-overall');
+    const btnProduct = document.getElementById('btn-tier-product');
+    const btnLeaderboard = document.getElementById('btn-tier-leaderboard');
+
+    const panelOverall = document.getElementById('reviews-tier-overall-panel');
+    const panelProduct = document.getElementById('reviews-tier-product-panel');
+    const panelLeaderboard = document.getElementById('reviews-tier-leaderboard-panel');
+
+    const setTier = (tier) => {
+        reviewsActiveTier = tier;
+        [btnOverall, btnProduct, btnLeaderboard].forEach(b => b && b.classList.remove('active'));
+        if (panelOverall) panelOverall.style.display = 'none';
+        if (panelProduct) panelProduct.style.display = 'none';
+        if (panelLeaderboard) panelLeaderboard.style.display = 'none';
+
+        if (tier === 'overall') {
+            if (btnOverall) btnOverall.classList.add('active');
+            if (panelOverall) panelOverall.style.display = 'block';
+        } else if (tier === 'product') {
+            if (btnProduct) btnProduct.classList.add('active');
+            if (panelProduct) panelProduct.style.display = 'block';
+        } else if (tier === 'leaderboard') {
+            if (btnLeaderboard) btnLeaderboard.classList.add('active');
+            if (panelLeaderboard) panelLeaderboard.style.display = 'block';
+        }
+        renderReviewsManagement();
+    };
+
+    if (btnOverall) btnOverall.addEventListener('click', () => setTier('overall'));
+    if (btnProduct) btnProduct.addEventListener('click', () => setTier('product'));
+    if (btnLeaderboard) btnLeaderboard.addEventListener('click', () => setTier('leaderboard'));
+
+    // 2. Product Selector Dropdown
+    const selectProd = document.getElementById('select-reviews-product');
+    if (selectProd) {
+        selectProd.addEventListener('change', (e) => {
+            reviewsSelectedProduct = e.target.value;
+            renderReviewsManagement();
+        });
+    }
+
+    // 3. Verified Purchases Filter Toggles
+    const btnVerifiedOverall = document.getElementById('btn-filter-verified-overall');
+    if (btnVerifiedOverall) {
+        btnVerifiedOverall.addEventListener('click', () => {
+            reviewsVerifiedOnlyOverall = !reviewsVerifiedOnlyOverall;
+            btnVerifiedOverall.classList.toggle('active', reviewsVerifiedOnlyOverall);
+            renderReviewsManagement();
+        });
+    }
+
+    const btnVerifiedProduct = document.getElementById('btn-filter-verified-product');
+    if (btnVerifiedProduct) {
+        btnVerifiedProduct.addEventListener('click', () => {
+            reviewsVerifiedOnlyProduct = !reviewsVerifiedOnlyProduct;
+            btnVerifiedProduct.classList.toggle('active', reviewsVerifiedOnlyProduct);
+            renderReviewsManagement();
+        });
+    }
+
+    // 4. Leaderboard Sort Dropdown
+    const selectSort = document.getElementById('select-leaderboard-sort');
+    if (selectSort) {
+        selectSort.addEventListener('change', (e) => {
+            reviewsLeaderboardSort = e.target.value;
+            renderTierLeaderboard();
+        });
+    }
+
+    // 5. Publish to Homepage Button
     const btnPublish = document.getElementById('btn-publish-reviews');
     if (btnPublish) {
         btnPublish.addEventListener('click', () => {
@@ -2751,7 +3642,7 @@ function initReviewsManagementEvents() {
         });
     }
 
-    // Filter tabs
+    // 6. Sub-Filter tabs in Overall panel
     const tabs = document.querySelectorAll('#reviews-filter-tabs .filter-tab');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -2762,7 +3653,7 @@ function initReviewsManagementEvents() {
         });
     });
 
-    // Search input
+    // 7. Search input
     const searchInput = document.getElementById('input-search-reviews');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -2771,52 +3662,6 @@ function initReviewsManagementEvents() {
         });
     }
 
-    // Add review modal
-    const btnOpenModal = document.getElementById('btn-open-add-review-modal');
-    const modal = document.getElementById('modal-add-review');
-    const btnCloseModal = document.getElementById('btn-close-modal-review');
-    const formAdd = document.getElementById('form-add-review');
-
-    if (btnOpenModal && modal) {
-        btnOpenModal.addEventListener('click', () => {
-            modal.classList.add('active');
-        });
-    }
-    if (btnCloseModal && modal) {
-        btnCloseModal.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-    }
-    if (formAdd && modal) {
-        formAdd.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('review-customer-name')?.value;
-            const city = document.getElementById('review-city')?.value;
-            const prod = document.getElementById('review-product-name')?.value;
-            const rating = Number(document.getElementById('review-rating')?.value || 5);
-            const title = document.getElementById('review-title')?.value;
-            const text = document.getElementById('review-text')?.value;
-            const featured = document.getElementById('review-featured')?.checked !== false;
-
-            if (typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.addReview === 'function') {
-                adminDataAdapter.addReview({
-                    customerName: name,
-                    author: name,
-                    city: city || 'India',
-                    productName: prod,
-                    rating: rating,
-                    title: title,
-                    text: text,
-                    featured: featured,
-                    verified: true
-                });
-                showAdminToast('✅ New testimonial added successfully!', 'success');
-                formAdd.reset();
-                modal.classList.remove('active');
-                renderReviewsManagement();
-            }
-        });
-    }
 }
 
 // Subscribe to reviews updates
@@ -2833,4 +3678,430 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initReviewsManagementEvents);
 } else {
     initReviewsManagementEvents();
+}
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 8. NEWSLETTER SUBSCRIBERS & EMAIL CAMPAIGN DISPATCH SUITE
+// ═════════════════════════════════════════════════════════════════════════════
+
+let subscribersEventsInitialized = false;
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+export function updateSubscribersBadge() {
+    const badge = document.getElementById('badge-subscribers-count');
+    if (!badge) return;
+    try {
+        const subs = adminDataAdapter.getSubscribers();
+        const activeCount = subs.filter(s => s.status !== 'unsubscribed').length;
+        badge.textContent = activeCount;
+    } catch (e) {
+        badge.textContent = '0';
+    }
+}
+
+export function copyTextToClipboard(text, onSuccess) {
+    if (!text) {
+        showAdminToast('No emails to copy.', 'warning');
+        return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            if (onSuccess) onSuccess();
+        }).catch(() => {
+            fallbackCopyText(text, onSuccess);
+        });
+    } else {
+        fallbackCopyText(text, onSuccess);
+    }
+}
+
+function fallbackCopyText(text, onSuccess) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        if (onSuccess) onSuccess();
+    } catch (e) {
+        showAdminToast('Could not copy to clipboard. Please copy manually.', 'error');
+    }
+    document.body.removeChild(textarea);
+}
+
+export function updateSubscribersPreview(allSubs) {
+    const preview = document.getElementById('subscribers-clipboard-preview');
+    if (!preview) return;
+    const subs = allSubs || adminDataAdapter.getSubscribers();
+    const activeEmails = subs.filter(s => s.status !== 'unsubscribed').map(s => s.email);
+
+    const format = adminState.subscribersFormat || 'comma';
+    let delimiter = ', ';
+    if (format === 'newline') delimiter = '\n';
+    if (format === 'semi') delimiter = '; ';
+
+    preview.value = activeEmails.join(delimiter);
+}
+
+export async function renderSubscribersView() {
+    if (typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.syncLocalSubscribers === 'function') {
+        try { await adminDataAdapter.syncLocalSubscribers(); } catch (e) {}
+    }
+    updateSubscribersBadge();
+    const allSubs = adminDataAdapter.getSubscribers();
+    const kpis = adminDataAdapter.getSubscribersKPIs();
+
+    // Update KPI elements
+    const statTotal = document.getElementById('stat-total-subscribers');
+    const statActive = document.getElementById('stat-active-subscribers');
+    const statMonth = document.getElementById('stat-month-subscribers');
+    const countAll = document.getElementById('count-filter-all');
+    const countActive = document.getElementById('count-filter-active');
+
+    if (statTotal) statTotal.textContent = kpis.total;
+    if (statActive) statActive.textContent = kpis.active;
+    if (statMonth) statMonth.textContent = kpis.thisMonth;
+    if (countAll) countAll.textContent = kpis.total;
+    if (countActive) countActive.textContent = kpis.active;
+
+    // Update formatted emails preview in Quick Campaign Toolkit
+    updateSubscribersPreview(allSubs);
+
+    // Filter subscribers according to tab and search query
+    let filtered = allSubs.slice();
+    const filter = adminState.subscribersFilter || 'all';
+    if (filter === 'active') {
+        filtered = filtered.filter(s => s.status !== 'unsubscribed');
+    } else if (filter === 'recent') {
+        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+        filtered = filtered.filter(s => new Date(s.createdAt || 0).getTime() >= sevenDaysAgo);
+    }
+
+    const query = (adminState.subscribersSearchQuery || '').trim().toLowerCase();
+    if (query) {
+        filtered = filtered.filter(s => (s.email || '').toLowerCase().includes(query) || (s.source || '').toLowerCase().includes(query));
+    }
+
+    // Render table rows
+    const tbody = document.getElementById('subscribers-table-body');
+    if (!tbody) return;
+
+    tbody.replaceChildren();
+
+    if (filtered.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 6;
+        td.style.textAlign = 'center';
+        td.style.padding = '30px 16px';
+        td.style.color = '#7A6B5D';
+        td.innerHTML = `
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <span style="font-size:1.8rem;">📭</span>
+                <strong style="font-size:0.95rem;">No subscribers found</strong>
+                <span style="font-size:0.8rem;color:#998774;">${query ? 'Try adjusting your search query.' : 'New storefront footer subscribers will appear here automatically.'}</span>
+            </div>
+        `;
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+    }
+
+    filtered.forEach((sub, idx) => {
+        const tr = document.createElement('tr');
+
+        // # Index
+        const tdIdx = document.createElement('td');
+        tdIdx.style.color = '#8C7A68';
+        tdIdx.style.fontWeight = '700';
+        tdIdx.textContent = idx + 1;
+        tr.appendChild(tdIdx);
+
+        // Email with avatar
+        const tdEmail = document.createElement('td');
+        const initial = (sub.email ? sub.email.charAt(0).toUpperCase() : 'S');
+        tdEmail.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:32px;height:32px;border-radius:50%;background:#E8F5E9;color:#2E7D32;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;border:1.5px solid #C8E6C9;flex-shrink:0;">
+                    ${initial}
+                </div>
+                <div>
+                    <div style="font-weight:800;color:var(--dark);font-size:0.88rem;">${escapeHtml(sub.email)}</div>
+                    <div style="font-size:0.72rem;color:#8C7A68;">ID: ${escapeHtml(sub.id || 'N/A')}</div>
+                </div>
+            </div>
+        `;
+        tr.appendChild(tdEmail);
+
+        // Source
+        const tdSource = document.createElement('td');
+        const isFooter = sub.source === 'storefront_footer';
+        tdSource.innerHTML = `
+            <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;padding:3px 9px;border-radius:12px;background:${isFooter ? '#E8F5E9' : '#FFF3E0'};color:${isFooter ? '#1D552C' : '#E65100'};border:1px solid ${isFooter ? '#A5D6A7' : '#FFE082'};	e;">
+                ${isFooter ? '🌿 Storefront Footer' : '⚙️ ' + escapeHtml(sub.source || 'Manual')}
+            </span>
+        `;
+        tr.appendChild(tdSource);
+
+        // Date & Time
+        const tdDate = document.createElement('td');
+        const dateObj = new Date(sub.createdAt || 0);
+        const dateStr = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : 'Recently';
+        tdDate.innerHTML = `<span style="font-size:0.82rem;color:#55483D;">${dateStr}</span>`;
+        tr.appendChild(tdDate);
+
+        // Status
+        const tdStatus = document.createElement('td');
+        const isActive = sub.status !== 'unsubscribed';
+        tdStatus.innerHTML = `
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;padding:2px 8px;border-radius:10px;background:${isActive ? '#E8F5E9' : '#ECEFF1'};color:${isActive ? '#2E7D32' : '#607D8B'};	e;">
+                ● ${isActive ? 'Active' : 'Unsubscribed'}
+            </span>
+        `;
+        tr.appendChild(tdStatus);
+
+        // Actions
+        const tdActions = document.createElement('td');
+        tdActions.style.textAlign = 'right';
+        tdActions.style.whiteSpace = 'nowrap';
+
+        // Copy single email button
+        const btnCopy = document.createElement('button');
+        btnCopy.type = 'button';
+        btnCopy.className = 'btn-secondary';
+        btnCopy.style.padding = '4px 9px';
+        btnCopy.style.fontSize = '0.75rem';
+        btnCopy.style.marginRight = '6px';
+        btnCopy.title = 'Copy email address';
+        btnCopy.innerHTML = '📋 Copy';
+        btnCopy.addEventListener('click', () => {
+            copyTextToClipboard(sub.email, () => {
+                btnCopy.innerHTML = '✅ Copied!';
+                btnCopy.style.background = '#E8F5E9';
+                btnCopy.style.color = '#2E7D32';
+                showAdminToast(`Copied ${sub.email} to clipboard!`, 'success');
+                setTimeout(() => {
+                    btnCopy.innerHTML = '📋 Copy';
+                    btnCopy.style.background = '';
+                    btnCopy.style.color = '';
+                }, 2000);
+            });
+        });
+
+        // Mailto button
+        const aMail = document.createElement('a');
+        aMail.href = `mailto:${encodeURIComponent(sub.email)}?subject=Special%20Offer%20from%20Satvik%20Swaad`;
+        aMail.className = 'btn-secondary';
+        aMail.style.padding = '4px 9px';
+        aMail.style.fontSize = '0.75rem';
+        aMail.style.marginRight = '6px';
+        aMail.style.textDecoration = 'none';
+        aMail.title = 'Send email';
+        aMail.innerHTML = '✉️ Mail';
+
+        // Delete button
+        const btnDelete = document.createElement('button');
+        btnDelete.type = 'button';
+        btnDelete.className = 'btn-secondary';
+        btnDelete.style.padding = '4px 8px';
+        btnDelete.style.fontSize = '0.75rem';
+        btnDelete.style.color = '#DC2626';
+        btnDelete.style.borderColor = '#FCA5A5';
+        btnDelete.style.background = '#FFF5F5';
+        btnDelete.title = 'Remove subscriber';
+        btnDelete.innerHTML = '🗑️';
+        btnDelete.addEventListener('click', () => {
+            if (confirm(`Remove "${sub.email}" from newsletter subscribers?`)) {
+                adminDataAdapter.deleteSubscriber(sub.id);
+                showAdminToast(`Removed ${sub.email}`, 'info');
+                renderSubscribersView();
+            }
+        });
+
+        tdActions.appendChild(btnCopy);
+        tdActions.appendChild(aMail);
+        tdActions.appendChild(btnDelete);
+        tr.appendChild(tdActions);
+
+        tbody.appendChild(tr);
+    });
+}
+
+export function initSubscribersManagementEvents() {
+    if (subscribersEventsInitialized) return;
+    subscribersEventsInitialized = true;
+
+    // 1. Copy All Buttons
+    const btnCopyAll = document.getElementById('btn-copy-all-subscribers');
+    const btnCopyPreview = document.getElementById('btn-copy-preview-emails');
+
+    const handleCopyAll = (btn) => {
+        const preview = document.getElementById('subscribers-clipboard-preview');
+        const text = preview ? preview.value : '';
+        const activeCount = adminDataAdapter.getSubscribers().filter(s => s.status !== 'unsubscribed').length;
+        if (!text || activeCount === 0) {
+            showAdminToast('No active subscribers to copy.', 'warning');
+            return;
+        }
+        copyTextToClipboard(text, () => {
+            showAdminToast(`📋 Copied ${activeCount} subscriber email addresses to clipboard! Ready to paste into Gmail BCC.`, 'success');
+            if (btn) {
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '✅ Copied to Clipboard!';
+                setTimeout(() => { btn.innerHTML = originalHtml; }, 2500);
+            }
+        });
+    };
+
+    if (btnCopyAll) btnCopyAll.addEventListener('click', () => handleCopyAll(btnCopyAll));
+    if (btnCopyPreview) btnCopyPreview.addEventListener('click', () => handleCopyAll(btnCopyPreview));
+
+    // 2. Format Switcher Tabs
+    ['comma', 'newline', 'semi'].forEach(fmt => {
+        const btn = document.getElementById('btn-format-' + fmt);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#view-subscribers button[data-format]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                adminState.subscribersFormat = fmt;
+                updateSubscribersPreview();
+            });
+        }
+    });
+
+    // 3. Export CSV Button
+    const btnExport = document.getElementById('btn-export-subscribers-csv');
+    if (btnExport) {
+        btnExport.addEventListener('click', () => {
+            const subs = adminDataAdapter.getSubscribers();
+            if (subs.length === 0) {
+                showAdminToast('No subscribers available to export.', 'warning');
+                return;
+            }
+            const header = ['ID', 'Email', 'Source', 'Status', 'DateSubscribed'];
+            const rows = subs.map(s => [
+                `"${s.id || ''}"`,
+                `"${s.email || ''}"`,
+                `"${s.source || ''}"`,
+                `"${s.status || 'active'}"`,
+                `"${s.createdAt || ''}"`
+            ].join(','));
+            const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent([header.join(','), ...rows].join('\n'));
+            const link = document.createElement('a');
+            link.setAttribute('href', csvContent);
+            const dateStr = new Date().toISOString().slice(0, 10);
+            link.setAttribute('download', `satvik_subscribers_${dateStr}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showAdminToast('📥 Exported subscribers CSV successfully!', 'success');
+        });
+    }
+
+    // 4. Sub-Filter Tabs
+    document.querySelectorAll('#subscribers-filter-tabs .filter-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('#subscribers-filter-tabs .filter-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            adminState.subscribersFilter = tab.getAttribute('data-sub-filter') || 'all';
+            renderSubscribersView();
+        });
+    });
+
+    // 5. Search Input
+    const searchInput = document.getElementById('input-search-subscribers');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            adminState.subscribersSearchQuery = e.target.value;
+            renderSubscribersView();
+        });
+    }
+
+    // 6. Manual Add Subscriber Modal
+    const btnOpenModal = document.getElementById('btn-open-add-subscriber-modal');
+    const btnCloseModal = document.getElementById('btn-close-subscriber-modal');
+    const btnCancelModal = document.getElementById('btn-cancel-subscriber-modal');
+    const formAddSub = document.getElementById('form-add-subscriber');
+
+    if (btnOpenModal) btnOpenModal.addEventListener('click', () => openModal('modal-subscriber'));
+    if (btnCloseModal) btnCloseModal.addEventListener('click', () => closeModal('modal-subscriber'));
+    if (btnCancelModal) btnCancelModal.addEventListener('click', () => closeModal('modal-subscriber'));
+
+    if (formAddSub) {
+        formAddSub.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('sub-field-email');
+            const sourceInput = document.getElementById('sub-field-source');
+            const email = emailInput ? emailInput.value.trim() : '';
+            const source = sourceInput ? sourceInput.value : 'admin_manual';
+
+            try {
+                adminDataAdapter.addSubscriber({ email, source });
+                showAdminToast(`Subscriber "${email}" added successfully!`, 'success');
+                closeModal('modal-subscriber');
+                formAddSub.reset();
+                renderSubscribersView();
+            } catch (err) {
+                showAdminToast(err.message, 'error');
+            }
+        });
+    }
+
+    // 7. Realtime cross-tab and data adapter events
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'satvik_subscribers_sync' || e.key === 'satvik_newsletter_subscribers') {
+            if (adminState.activeView === 'view-subscribers') {
+                renderSubscribersView();
+            } else {
+                updateSubscribersBadge();
+            }
+        }
+    });
+
+    window.addEventListener('satvik_subscribers_updated', () => {
+        if (adminState.activeView === 'view-subscribers') {
+            renderSubscribersView();
+        } else {
+            updateSubscribersBadge();
+        }
+    });
+
+    if (typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.subscribe === 'function') {
+        adminDataAdapter.subscribe('subscribers', () => {
+            if (adminState.activeView === 'view-subscribers') {
+                renderSubscribersView();
+            } else {
+                updateSubscribersBadge();
+            }
+        });
+    }
+
+    // Initial badge update
+    updateSubscribersBadge();
+}
+
+// Auto-run initSubscribersManagementEvents when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSubscribersManagementEvents);
+} else {
+    initSubscribersManagementEvents();
 }

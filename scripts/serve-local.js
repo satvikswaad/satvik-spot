@@ -20,8 +20,70 @@ const mimeTypes = {
 
 function createStaticServer(publicDir, port, name) {
     const server = http.createServer((req, res) => {
+        // Handle CORS preflight
+        if (req.method === 'OPTIONS') {
+            res.writeHead(204, {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            });
+            res.end();
+            return;
+        }
+
         let reqPath = req.url.split('?')[0];
         if (reqPath === '/') reqPath = '/index.html';
+
+        // Local development subscribers bridge across ports 5000 and 5001
+        if (reqPath === '/api/subscribers') {
+            const dataDir = path.resolve(__dirname, '../data');
+            if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+            const subsFile = path.join(dataDir, 'newsletter_subscribers.json');
+
+            if (req.method === 'GET') {
+                let subs = [];
+                if (fs.existsSync(subsFile)) {
+                    try { subs = JSON.parse(fs.readFileSync(subsFile, 'utf-8')); } catch (e) { subs = []; }
+                }
+                res.writeHead(200, {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                });
+                res.end(JSON.stringify(subs));
+                return;
+            }
+
+            if (req.method === 'POST') {
+                let body = '';
+                req.on('data', chunk => { body += chunk; });
+                req.on('end', () => {
+                    try {
+                        const newSub = JSON.parse(body);
+                        let subs = [];
+                        if (fs.existsSync(subsFile)) {
+                            try { subs = JSON.parse(fs.readFileSync(subsFile, 'utf-8')); } catch (e) { subs = []; }
+                        }
+                        const email = (newSub.email || '').toLowerCase().trim();
+                        if (email && !subs.some(s => (s.email || '').toLowerCase().trim() === email)) {
+                            subs.unshift(newSub);
+                            fs.writeFileSync(subsFile, JSON.stringify(subs, null, 2), 'utf-8');
+                        }
+                        res.writeHead(200, {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        });
+                        res.end(JSON.stringify({ success: true, subscribers: subs }));
+                    } catch (err) {
+                        res.writeHead(400, {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        });
+                        res.end(JSON.stringify({ error: err.message }));
+                    }
+                });
+                return;
+            }
+        }
 
         const routeRewrites = {
             '/shop': '/products.html',

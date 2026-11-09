@@ -10,12 +10,16 @@ export const BUSINESS_CONFIG = {
   brandName: 'Satvik Swaad',
   legalName: 'Satvik Swaad',
   supportEmail: 'contact@satvikswaad.com',
+  supportEmailCare: 'satvikswaad.care@gmail.com',
+  instagramUrl: 'https://www.instagram.com/satvikswaad.in?obrf=Z3J0cWR6dzIwZGg0',
+  whatsappChannelUrl: 'https://whatsapp.com/channel/0029VbDSwoMK0IBkxANEdc2c',
   youtubeVideoId: '', // Optional: Add official YouTube video ID here (e.g. 'xyz123') when available
   whatsapp: {
     displayNumber: '+919236587600',
     waMeNumber: '919236587600',
     subscriberNumber: '9236587600',
-    countryCode: '91'
+    countryCode: '91',
+    channelUrl: 'https://whatsapp.com/channel/0029VbDSwoMK0IBkxANEdc2c'
   }
 };
 

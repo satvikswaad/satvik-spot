@@ -23,8 +23,9 @@ export const STORAGE_KEYS = {
     EXPENSES: 'satvik_admin_dev_expenses',
     REVIEWS: 'satvik_admin_dev_reviews',
     FEATURED_REVIEWS: 'satvik_featured_reviews',
+    SUBSCRIBERS: 'satvik_newsletter_subscribers',
     MODE: 'satvik_admin_mode',
-    SEED_VERSION: 'satvik_admin_seed_version_v4'
+    SEED_VERSION: 'satvik_admin_seed_version_v5'
 };
 
 // Lazy / Dynamic Firestore Module Loader (Enables offline dev mode and Node.js testing compatibility)
@@ -59,6 +60,7 @@ const SEED_PRODUCTS = [
         mrp: 320,
         stock: 105,
         sku: "SAT-AAM-MASTER",
+        images: ["assets/aam-ka-achar.png", "assets/pickle-bowl.png", "assets/clay-pot.png"],
         image: "assets/aam-ka-achar.png?v=2",
         img: "assets/aam-ka-achar.png?v=2",
         available: true,
@@ -83,6 +85,7 @@ const SEED_PRODUCTS = [
         mrp: 340,
         stock: 80,
         sku: "SAT-KAR-MASTER",
+        images: ["assets/karela-ka-achar.png", "assets/pickle-bowl.png"],
         image: "assets/karela-ka-achar.png?v=2",
         img: "assets/karela-ka-achar.png?v=2",
         available: true,
@@ -107,6 +110,7 @@ const SEED_PRODUCTS = [
         mrp: 330,
         stock: 93,
         sku: "SAT-AML-MASTER",
+        images: ["assets/amla-ka-achar.png", "assets/clay-pot.png"],
         image: "assets/amla-ka-achar.png?v=2",
         img: "assets/amla-ka-achar.png?v=2",
         available: true,
@@ -131,6 +135,7 @@ const SEED_PRODUCTS = [
         mrp: 310,
         stock: 55,
         sku: "SAT-ACH-MASTER",
+        images: ["assets/amla-ki-chutney.png", "assets/clay-pot.png"],
         image: "assets/amla-ki-chutney.png?v=2",
         img: "assets/amla-ki-chutney.png?v=2",
         available: true,
@@ -154,6 +159,7 @@ const SEED_PRODUCTS = [
         mrp: 380,
         stock: 67,
         sku: "SAT-LMC-MASTER",
+        images: ["assets/lal-mirch-ka-achar.png", "assets/product-laal-mirch.png"],
         image: "assets/lal-mirch-ka-achar.png?v=2",
         img: "assets/lal-mirch-ka-achar.png?v=2",
         available: true,
@@ -178,6 +184,7 @@ const SEED_PRODUCTS = [
         mrp: 290,
         stock: 65,
         sku: "SAT-HMC-MASTER",
+        images: ["assets/hari-mirch-ka-achar.png", "assets/hara-mirch-jar.png"],
         image: "assets/hari-mirch-ka-achar.png?v=2",
         img: "assets/hari-mirch-ka-achar.png?v=2",
         available: true,
@@ -201,6 +208,7 @@ const SEED_PRODUCTS = [
         mrp: 310,
         stock: 95,
         sku: "SAT-NIM-MASTER",
+        images: ["assets/nimbu-mirch-ka-achar.png", "assets/pickle-bowl.png"],
         image: "assets/nimbu-mirch-ka-achar.png?v=2",
         img: "assets/nimbu-mirch-ka-achar.png?v=2",
         available: true,
@@ -271,6 +279,7 @@ const SEED_PRODUCTS = [
         mrp: 350,
         stock: 50,
         sku: "SAT-MUR-MASTER",
+        images: ["assets/amla-murabba-sugar.png", "assets/amla-murabba-jaggery.png"],
         image: "assets/amla-murabba-sugar.png?v=2",
         img: "assets/amla-murabba-sugar.png?v=2",
         available: true,
@@ -294,6 +303,7 @@ const SEED_PRODUCTS = [
         mrp: 440,
         stock: 40,
         sku: "SAT-SEB-MASTER",
+        images: ["assets/amla-murabba-jaggery.png", "assets/clay-pot.png"],
         image: "assets/amla-murabba-jaggery.png?v=2",
         img: "assets/amla-murabba-jaggery.png?v=2",
         available: true,
@@ -317,6 +327,7 @@ const SEED_PRODUCTS = [
         mrp: 620,
         stock: 35,
         sku: "SAT-GND-MASTER",
+        images: ["assets/amla-laddu-jaggery.png", "assets/product-ghee-laddoo.png"],
         image: "assets/amla-laddu-jaggery.png?v=2",
         img: "assets/amla-laddu-jaggery.png?v=2",
         available: true,
@@ -340,6 +351,7 @@ const SEED_PRODUCTS = [
         mrp: 560,
         stock: 40,
         sku: "SAT-BSN-MASTER",
+        images: ["assets/amla-laddu-sugar.png", "assets/product-besan-barfi.png"],
         image: "assets/amla-laddu-sugar.png?v=2",
         img: "assets/amla-laddu-sugar.png?v=2",
         available: true,
@@ -363,6 +375,7 @@ const SEED_PRODUCTS = [
         mrp: 250,
         stock: 55,
         sku: "SAT-JUC-MASTER",
+        images: ["assets/amla-juice.png"],
         image: "assets/amla-juice.png?v=2",
         img: "assets/amla-juice.png?v=2",
         available: true,
@@ -386,6 +399,7 @@ const SEED_PRODUCTS = [
         mrp: 750,
         stock: 40,
         sku: "SAT-CHW-MASTER",
+        images: ["assets/chyawanprash.png", "assets/product-chyawanprash.png"],
         image: "assets/chyawanprash.png?v=2",
         img: "assets/chyawanprash.png?v=2",
         available: true,
@@ -409,6 +423,7 @@ const SEED_PRODUCTS = [
         mrp: 349,
         stock: 45,
         sku: "SAT-BRF-MASTER",
+        images: ["assets/product-besan-barfi.png"],
         image: "assets/product-besan-barfi.png",
         img: "assets/product-besan-barfi.png",
         available: true,
@@ -432,6 +447,7 @@ const SEED_PRODUCTS = [
         mrp: 259,
         stock: 65,
         sku: "SAT-AML-POW-MASTER",
+        images: ["assets/product-amla-powder.png"],
         image: "assets/product-amla-powder.png",
         img: "assets/product-amla-powder.png",
         available: true,
@@ -1256,6 +1272,135 @@ const SEED_EXPENSES = [
 
 const SEED_REVIEWS = [
     {
+        id: "REV-111",
+        author: "Shalini Bansal",
+        customerName: "Shalini Bansal",
+        city: "Chandigarh",
+        productId: "prod_amla_achar",
+        productName: "Amla ka Achar",
+        rating: 5,
+        title: "Tangy & Immunity Booster",
+        text: "The spicy amla achar is packed with hing and mustard seeds. Extremely appetizing with parathas and pure cold-pressed mustard oil flavor.",
+        date: "2026-09-15",
+        verified: true,
+        featured: true,
+        sentiment: "positive",
+        sentimentScore: 0.96
+    },
+    {
+        id: "REV-112",
+        author: "Girish Mehra",
+        customerName: "Girish Mehra",
+        city: "Dehradun",
+        productId: "prod_amla_chutney",
+        productName: "Amla ki Chutney",
+        rating: 4,
+        title: "Zesty Banarasi Chutney",
+        text: "Sour and sweet balance is top notch. Slightly finer amla grating would make it 5/5, but taste is authentically handmade.",
+        date: "2026-09-14",
+        verified: true,
+        featured: false,
+        sentiment: "positive",
+        sentimentScore: 0.85
+    },
+    {
+        id: "REV-113",
+        author: "Manish Tewari",
+        customerName: "Manish Tewari",
+        city: "Kanpur",
+        productId: "prod_kathal_achar",
+        productName: "Kathal ka Achar",
+        rating: 4,
+        title: "Meaty Jackfruit Texture",
+        text: "Very few brands make traditional Kathal achar right. The tender raw jackfruit chunks retain a juicy bite. Perfect oil preservation.",
+        date: "2026-09-13",
+        verified: true,
+        featured: false,
+        sentiment: "positive",
+        sentimentScore: 0.87
+    },
+    {
+        id: "REV-114",
+        author: "Divya Nambiar",
+        customerName: "Divya Nambiar",
+        city: "Kochi",
+        productId: "prod_amda_achar",
+        productName: "Banarasi Amda ka Achar",
+        rating: 5,
+        title: "Rare Heritage Taste!",
+        text: "So thrilled to find authentic Indian Hog Plum (Amda) pickle online. The tanginess mixed with Banarasi roasted spices is exceptional.",
+        date: "2026-09-12",
+        verified: true,
+        featured: true,
+        sentiment: "positive",
+        sentimentScore: 0.98
+    },
+    {
+        id: "REV-115",
+        author: "Sanjay Singhal",
+        customerName: "Sanjay Singhal",
+        city: "Gurugram",
+        productId: "prod_seb_murabba",
+        productName: "Kashmiri Seb Murabba",
+        rating: 4,
+        title: "Delicious Crisp Apples",
+        text: "Whole organic apples steeped in light saffron syrup. My parents love having one every morning for cardiac wellness.",
+        date: "2026-09-11",
+        verified: true,
+        featured: false,
+        sentiment: "positive",
+        sentimentScore: 0.86
+    },
+    {
+        id: "REV-116",
+        author: "Kiran Mazumdar",
+        customerName: "Kiran Mazumdar",
+        city: "Indore",
+        productId: "prod_besan_barfi",
+        productName: "Besan Barfi",
+        rating: 5,
+        title: "Melt in Mouth Desi Ghee",
+        text: "Slow-roasted chana flour roasted to golden bliss with desi ghee. Pistachio topping adds great crunch.",
+        date: "2026-09-10",
+        verified: true,
+        featured: true,
+        sentiment: "positive",
+        sentimentScore: 0.97
+    },
+    {
+        id: "REV-117",
+        author: "Vikas Pathak",
+        customerName: "Vikas Pathak",
+        city: "Varanasi",
+        productId: "prod_amla_powder",
+        productName: "Shuddh Organic Amla Powder",
+        rating: 3,
+        title: "Pure but Bitter for Kids",
+        text: "Zero chemical preservatives definitely, very bitter and potent. Adults can drink with warm water, difficult for children without honey.",
+        date: "2026-09-09",
+        verified: false,
+        featured: false,
+        sentiment: "neutral",
+        sentimentScore: 0.54
+    },
+    {
+        id: "REV-118",
+        author: "Ritu Saxena",
+        customerName: "Ritu Saxena",
+        city: "Bhopal",
+        productId: "prod_amla_juice",
+        productName: "Cold-Pressed Amla Juice",
+        rating: 4,
+        title: "Pure Vitamin C Kick",
+        text: "No added water, true fresh amla extract. Packaging was completely leak-proof.",
+        date: "2026-09-08",
+        verified: true,
+        featured: false,
+        sentiment: "positive",
+        sentimentScore: 0.89
+    },
+
+    {
         id: "REV-101",
         author: "Priya Sharma",
         customerName: "Priya Sharma",
@@ -1437,6 +1582,58 @@ function getStorage() {
     return memoryStore;
 }
 
+const SEED_SUBSCRIBERS = [
+    {
+        id: "sub_1730001001",
+        email: "priya.sharma92@gmail.com",
+        source: "storefront_footer",
+        status: "active",
+        createdAt: "2026-11-08T18:45:00.000Z"
+    },
+    {
+        id: "sub_1730001002",
+        email: "alok.tripathi.delhi@yahoo.com",
+        source: "storefront_footer",
+        status: "active",
+        createdAt: "2026-11-08T14:30:00.000Z"
+    },
+    {
+        id: "sub_1730001003",
+        email: "rajeshwari.iyer@outlook.com",
+        source: "storefront_footer",
+        status: "active",
+        createdAt: "2026-11-07T11:15:00.000Z"
+    },
+    {
+        id: "sub_1730001004",
+        email: "vikramaditya.rao.blr@gmail.com",
+        source: "storefront_footer",
+        status: "active",
+        createdAt: "2026-11-06T09:20:00.000Z"
+    },
+    {
+        id: "sub_1730001005",
+        email: "sunita.verma.lucknow@gmail.com",
+        source: "storefront_footer",
+        status: "active",
+        createdAt: "2026-11-05T16:05:00.000Z"
+    },
+    {
+        id: "sub_1730001006",
+        email: "amit.deshmukh.pune@rediffmail.com",
+        source: "storefront_footer",
+        status: "active",
+        createdAt: "2026-11-03T12:40:00.000Z"
+    },
+    {
+        id: "sub_1730001007",
+        email: "meenakshi.sundaram@gmail.com",
+        source: "storefront_footer",
+        status: "active",
+        createdAt: "2026-10-28T10:10:00.000Z"
+    }
+];
+
 export class AdminDataAdapter {
     constructor() {
         this._listeners = new Map();
@@ -1472,6 +1669,9 @@ export class AdminDataAdapter {
     /**
      * Initializes storage with seed data if absent or outdated.
      */
+
+
+
     _initStorage() {
 
         const currentSeedVer = getStorage().getItem(STORAGE_KEYS.SEED_VERSION);
@@ -1523,6 +1723,20 @@ export class AdminDataAdapter {
             const featuredList = currentReviews.filter(r => r.featured === true);
             const fallbackFeatured = featuredList.length > 0 ? featuredList : SEED_REVIEWS.filter(r => r.featured === true);
             getStorage().setItem(STORAGE_KEYS.FEATURED_REVIEWS, JSON.stringify(fallbackFeatured));
+        }
+
+        // 5. Newsletter Subscribers
+        if (!getStorage().getItem(STORAGE_KEYS.SUBSCRIBERS)) {
+            getStorage().setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(SEED_SUBSCRIBERS));
+        } else {
+            try {
+                const existing = JSON.parse(getStorage().getItem(STORAGE_KEYS.SUBSCRIBERS) || '[]');
+                if (!Array.isArray(existing) || existing.length === 0) {
+                    getStorage().setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(SEED_SUBSCRIBERS));
+                }
+            } catch (e) {
+                getStorage().setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(SEED_SUBSCRIBERS));
+            }
         }
 
         getStorage().setItem(STORAGE_KEYS.SEED_VERSION, STORAGE_KEYS.SEED_VERSION);
@@ -1728,6 +1942,13 @@ export class AdminDataAdapter {
         if (changed) {
             getStorage().setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
             this._emit('products', products);
+        if (typeof window !== 'undefined') {
+            try {
+                window.localStorage.setItem('satvik_products_sync', String(Date.now()));
+                window.localStorage.setItem('satvik_admin_dev_products', JSON.stringify(products));
+                window.dispatchEvent(new CustomEvent('satvik_products_updated', { detail: { productId: target.id, product: target } }));
+            } catch (e) {}
+        }
         }
     }
 
@@ -1946,6 +2167,25 @@ export class AdminDataAdapter {
             target = products.find(p => p.id === productData.id);
         }
 
+        // Strictly enforce min 1, max 5 images (and sanitize out any javascript: injection)
+        if (productData.images && Array.isArray(productData.images)) {
+            const validImages = productData.images.filter(im => typeof im === 'string' && im.trim().length > 0 && !/^javascript:/i.test(im.trim())).slice(0, 5);
+            if (validImages.length > 0) {
+                productData.images = validImages;
+                productData.img = validImages[0];
+                productData.image = validImages[0];
+            } else {
+                const fallback = productData.img || productData.image || 'assets/aam-ka-achar.png';
+                productData.images = [fallback];
+                productData.img = fallback;
+                productData.image = fallback;
+            }
+        } else {
+            const fallback = productData.img || productData.image || (target && target.images && target.images[0]) || 'assets/aam-ka-achar.png';
+            productData.images = (target && target.images && target.images.length > 0) ? target.images : [fallback];
+            productData.img = productData.images[0];
+            productData.image = productData.images[0];
+        }
         if (target) {
             Object.assign(target, productData, { updatedAt: new Date().toISOString() });
         } else {
@@ -2065,6 +2305,97 @@ export class AdminDataAdapter {
     /**
      * Returns customer reviews with rating, featured status, and sentiment analysis scores.
      */
+    
+    /**
+     * Returns reviews filtered by specific product ID or product name.
+     */
+    getReviewsByProduct(productId) {
+        if (!productId || productId === 'all') return this.getReviews();
+        const all = this.getReviews();
+        const prod = this.getProduct(productId);
+        const prodName = prod ? (prod.name || '').toLowerCase() : '';
+        return all.filter(r => {
+            if (r.productId && r.productId === productId) return true;
+            if (prodName && (r.productName || '').toLowerCase() === prodName) return true;
+            return false;
+        });
+    }
+
+    /**
+     * Returns computed review health & satisfaction metrics for a specific product.
+     */
+    getProductReviewMetrics(productId) {
+        const prodReviews = this.getReviewsByProduct(productId);
+        const total = prodReviews.length;
+        if (total === 0) {
+            const prod = this.getProduct(productId);
+            return {
+                avgRating: prod && prod.rating ? Number(prod.rating) : 5.0,
+                totalReviews: 0,
+                verifiedReviews: 0,
+                loveScore: 100,
+                breakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+            };
+        }
+        let sum = 0;
+        let verifiedCount = 0;
+        let lovedCount = 0;
+        const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        prodReviews.forEach(r => {
+            const stars = Math.min(5, Math.max(1, Math.round(Number(r.rating) || 5)));
+            breakdown[stars] = (breakdown[stars] || 0) + 1;
+            sum += stars;
+            if (r.verified) verifiedCount++;
+            if (stars >= 4) lovedCount++;
+        });
+        const avg = Number((sum / total).toFixed(1));
+        const loveScore = Math.round((lovedCount / total) * 100);
+        return {
+            avgRating: avg,
+            totalReviews: total,
+            verifiedReviews: verifiedCount,
+            loveScore: loveScore,
+            breakdown
+        };
+    }
+
+    /**
+     * Returns product comparison leaderboard data with top performers vs lower rated.
+     */
+    getProductPerformanceLeaderboard(sortBy = 'highest') {
+        const products = this.getProducts();
+        const list = products.map(p => {
+            const metrics = this.getProductReviewMetrics(p.id);
+            return {
+                product: p,
+                id: p.id,
+                name: p.name,
+                hindiName: p.hindiName || p.nameHindi || '',
+                category: p.category || p.cat || 'achar',
+                image: (p.images && p.images[0]) || p.image || p.img || 'assets/aam-ka-achar.png',
+                avgRating: metrics.avgRating,
+                totalReviews: metrics.totalReviews,
+                verifiedReviews: metrics.verifiedReviews,
+                loveScore: metrics.loveScore,
+                breakdown: metrics.breakdown
+            };
+        });
+
+        if (sortBy === 'lowest') {
+            list.sort((a, b) => a.avgRating - b.avgRating || a.totalReviews - b.totalReviews);
+        } else if (sortBy === 'most_reviews') {
+            list.sort((a, b) => b.totalReviews - a.totalReviews || b.avgRating - a.avgRating);
+        } else {
+            // default highest
+            list.sort((a, b) => b.avgRating - a.avgRating || b.totalReviews - a.totalReviews);
+        }
+
+        const topPerformers = list.filter(item => item.avgRating >= 4.8);
+        const lowerRated = list.filter(item => item.avgRating < 4.8);
+
+        return { all: list, topPerformers, lowerRated };
+    }
+
     getReviews() {
         try {
             return JSON.parse(getStorage().getItem(STORAGE_KEYS.REVIEWS) || '[]');
@@ -2253,6 +2584,131 @@ export class AdminDataAdapter {
     /**
      * Explicitly toggle runtime mode between 'dev', 'firestore', or 'auto'.
      */
+    /**
+     * Returns list of all newsletter subscribers.
+     */
+    async syncLocalSubscribers() {
+        if (typeof window === 'undefined') return this.getSubscribers();
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (!isLocal) return this.getSubscribers();
+        try {
+            const port = window.location.port === '5001' ? '5000' : '5001';
+            const res = await fetch(`http://localhost:${port}/api/subscribers`);
+            if (res.ok) {
+                const remoteSubs = await res.json();
+                if (Array.isArray(remoteSubs) && remoteSubs.length > 0) {
+                    const localSubs = this.getSubscribers();
+                    let modified = false;
+                    remoteSubs.forEach(r => {
+                        const rEmail = (r.email || '').toLowerCase().trim();
+                        if (rEmail && !localSubs.some(s => (s.email || '').toLowerCase().trim() === rEmail)) {
+                            localSubs.unshift(r);
+                            modified = true;
+                        }
+                    });
+                    if (modified) {
+                        getStorage().setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(localSubs));
+                        this._emit('subscribers', localSubs);
+                        return localSubs;
+                    }
+                }
+            }
+        } catch (e) {}
+        return this.getSubscribers();
+    }
+
+    getSubscribers() {
+        try {
+            const raw = getStorage().getItem(STORAGE_KEYS.SUBSCRIBERS);
+            if (!raw) return [];
+            const list = JSON.parse(raw);
+            if (!Array.isArray(list)) return [];
+            return list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        } catch (e) {
+            return [];
+        }
+    }
+
+    /**
+     * Returns computed subscriber KPIs (total, active, new this month).
+     */
+    getSubscribersKPIs() {
+        const list = this.getSubscribers();
+        const total = list.length;
+        const active = list.filter(s => s.status !== 'unsubscribed').length;
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        const thisMonth = list.filter(s => {
+            const d = new Date(s.createdAt || 0).getTime();
+            return d >= startOfMonth;
+        }).length;
+
+        return {
+            total,
+            active,
+            thisMonth,
+            growth: total > 0 ? '+100%' : '0%'
+        };
+    }
+
+    /**
+     * Add a new newsletter subscriber.
+     */
+    addSubscriber(subscriberData) {
+        if (!subscriberData || !subscriberData.email) {
+            throw new Error("Subscriber email is required.");
+        }
+        const email = subscriberData.email.trim().toLowerCase();
+        const list = this.getSubscribers();
+        const existing = list.find(s => (s.email || '').toLowerCase() === email);
+        if (existing) {
+            throw new Error(`Email "${email}" is already subscribed.`);
+        }
+
+        const newSub = {
+            id: subscriberData.id || ('sub_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6)),
+            email: email,
+            source: subscriberData.source || 'admin_suite',
+            status: subscriberData.status || 'active',
+            createdAt: subscriberData.createdAt || new Date().toISOString()
+        };
+
+        list.unshift(newSub);
+        getStorage().setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(list));
+        this._emit('subscribers', list);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('satvik_subscribers_updated', { detail: newSub }));
+            try {
+                window.localStorage.setItem('satvik_subscribers_sync', String(Date.now()));
+            } catch (e) {}
+        }
+        return newSub;
+    }
+
+    /**
+     * Delete a subscriber by ID.
+     */
+    deleteSubscriber(subscriberId) {
+        const list = this.getSubscribers();
+        const filtered = list.filter(s => s.id !== subscriberId);
+        getStorage().setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(filtered));
+        this._emit('subscribers', filtered);
+        if (typeof window !== 'undefined') {
+            try {
+                window.localStorage.setItem('satvik_subscribers_sync', String(Date.now()));
+            } catch (e) {}
+        }
+        return true;
+    }
+
+    /**
+     * Formats all active subscriber emails into a single delimited string for 1-click clipboard copy.
+     */
+    getSubscriberEmailsString(delimiter = ', ') {
+        const list = this.getSubscribers().filter(s => s.status !== 'unsubscribed');
+        return list.map(s => s.email).join(delimiter);
+    }
+
     setMode(mode) {
         if (!['dev', 'firestore', 'auto'].includes(mode)) {
             throw new Error("Invalid mode. Choose 'dev', 'firestore', or 'auto'.");
