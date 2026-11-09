@@ -160,29 +160,34 @@ const AUTOPLAY_DELAY = 3500; // 3.5 seconds fast transition between village bann
 
 function runInitializers() {
     const safeRun = (fn, name) => {
-        try { fn(); } catch (err) { console.warn(`Initializer "${name}" warning:`, err); }
+        try {
+            if (typeof fn === 'function') fn();
+        } catch (err) {
+            console.warn(`Initializer "${name}" warning:`, err);
+        }
     };
-    safeRun(ensureModalsInDOM, 'ensureModalsInDOM');
-    safeRun(initLanguage, 'initLanguage');
-    safeRun(initUI, 'initUI');
-    safeRun(initStickyHeader, 'initStickyHeader');
-    safeRun(initUniversalSearch, 'initUniversalSearch');
-    safeRun(initHeroSlider, 'initHeroSlider');
-    safeRun(initScrollReveal, 'initScrollReveal');
-    safeRun(initScrollToTop, 'initScrollToTop');
-    safeRun(initMobileNav, 'initMobileNav');
-    safeRun(initFaqSearch, 'initFaqSearch');
-    safeRun(initProductsSort, 'initProductsSort');
-    safeRun(initReviewsData, 'initReviewsData');
-    safeRun(initCustomerRatingsMarquee, 'initCustomerRatingsMarquee');
-    safeRun(initSatvikStoryVideoPlayer, 'initSatvikStoryVideoPlayer');
-    safeRun(initContactForm, 'initContactForm');
-    safeRun(initProductDetailsPage, 'initProductDetailsPage');
-    safeRun(initProfilePage, 'initProfilePage');
-    safeRun(initReorderSection, 'initReorderSection');
-    safeRun(initFloatingAgent, 'initFloatingAgent');
-    safeRun(initFooterAccordion, 'initFooterAccordion');
-    safeRun(renderCart, 'renderCart');
+    safeRun(() => ensureModalsInDOM(), 'ensureModalsInDOM');
+    safeRun(() => initLanguage(), 'initLanguage');
+    safeRun(() => initUI(), 'initUI');
+    safeRun(() => initStickyHeader(), 'initStickyHeader');
+    safeRun(() => initUniversalSearch(), 'initUniversalSearch');
+    safeRun(() => initHeroSlider(), 'initHeroSlider');
+    safeRun(() => initScrollReveal(), 'initScrollReveal');
+    safeRun(() => initScrollToTop(), 'initScrollToTop');
+    safeRun(() => initMobileNav(), 'initMobileNav');
+    safeRun(() => initFaqSearch(), 'initFaqSearch');
+    safeRun(() => initProductsSort(), 'initProductsSort');
+    safeRun(() => initReviewsData(), 'initReviewsData');
+    safeRun(() => syncProductsWithStorage(), 'syncProductsWithStorage');
+    safeRun(() => initCustomerRatingsMarquee(), 'initCustomerRatingsMarquee');
+    safeRun(() => initSatvikStoryVideoPlayer(), 'initSatvikStoryVideoPlayer');
+    safeRun(() => initContactForm(), 'initContactForm');
+    safeRun(() => initProductDetailsPage(), 'initProductDetailsPage');
+    safeRun(() => initProfilePage(), 'initProfilePage');
+    safeRun(() => initReorderSection(), 'initReorderSection');
+    safeRun(() => initFloatingAgent(), 'initFloatingAgent');
+    safeRun(() => initFooterAccordion(), 'initFooterAccordion');
+    safeRun(() => renderCart(), 'renderCart');
 }
 
 function initFooterAccordion() {
@@ -2101,6 +2106,7 @@ function initProfilePage() {
     }
 
     renderProfileInfo();
+    updateAuthUI(window.auth?.currentUser || null);
 
     // Toggle Edit Profile Form
     if (btnToggleEdit) {
@@ -2163,19 +2169,23 @@ function initProfilePage() {
     }
 
     function updateAuthUI(user) {
-        if (user) {
-            if (btnSignIn) btnSignIn.style.display = 'none';
-            if (btnSignOut) btnSignOut.style.display = 'flex';
+        const isExplicitlyLoggedOut = localStorage.getItem('satvik_logged_out') === 'true';
+        const hasValidLocalProfile = Boolean(savedProfile && savedProfile.email && savedProfile.email !== 'guest@example.com' && savedProfile.name !== 'Guest User');
+        const isUserLoggedIn = Boolean(user) || (!isExplicitlyLoggedOut && hasValidLocalProfile);
+
+        if (isUserLoggedIn) {
+            if (btnSignIn) btnSignIn.style.setProperty('display', 'none', 'important');
+            if (btnSignOut) btnSignOut.style.setProperty('display', 'flex', 'important');
             if (avatarCircle) avatarCircle.classList.remove('guest');
 
-            const name = user.displayName || savedProfile.name || 'Ddu';
-            const email = user.email || savedProfile.email || 'ddu@example.com';
+            const name = (user && user.displayName) || savedProfile.name || 'Ddu';
+            const email = (user && user.email) || savedProfile.email || 'ddu@example.com';
 
             if (displayName) displayName.textContent = name;
             if (displayPhone) displayPhone.textContent = email;
             if (googleBadgeText) googleBadgeText.textContent = 'Google Account ✓';
 
-            if (user.photoURL && displayInitial) {
+            if (user && user.photoURL && displayInitial) {
                 displayInitial.innerHTML = `<img src="${user.photoURL}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
             } else if (displayInitial) {
                 displayInitial.textContent = name.trim().charAt(0).toUpperCase();
@@ -2184,11 +2194,16 @@ function initProfilePage() {
             savedProfile.name = name;
             savedProfile.email = email;
             localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
+            localStorage.removeItem('satvik_logged_out');
             renderProfileInfo();
         } else {
-            if (btnSignIn) btnSignIn.style.display = 'flex';
-            if (btnSignOut) btnSignOut.style.display = 'none';
+            if (btnSignIn) btnSignIn.style.setProperty('display', 'flex', 'important');
+            if (btnSignOut) btnSignOut.style.setProperty('display', 'none', 'important');
             if (googleBadgeText) googleBadgeText.textContent = 'Google Account';
+            if (avatarCircle) avatarCircle.classList.add('guest');
+            if (displayInitial) displayInitial.textContent = '👤';
+            if (displayName) displayName.textContent = 'Guest User';
+            if (displayPhone) displayPhone.textContent = 'Please sign in';
         }
     }
 
@@ -2235,16 +2250,13 @@ function initProfilePage() {
 
     if (btnSignOut) {
         btnSignOut.addEventListener('click', async () => {
+            localStorage.setItem('satvik_logged_out', 'true');
             if (window.auth && window.signOut) {
                 try { await window.signOut(window.auth); } catch (e) {}
             }
-            if (displayName) displayName.textContent = 'Guest User';
-            if (displayPhone) displayPhone.textContent = 'Please sign in';
-            if (displayInitial) displayInitial.textContent = '👤';
-            if (avatarCircle) avatarCircle.classList.add('guest');
-            if (btnSignIn) btnSignIn.style.display = 'flex';
-            if (btnSignOut) btnSignOut.style.display = 'none';
-            if (googleBadgeText) googleBadgeText.textContent = 'Google Account';
+            savedProfile = { name: 'Guest User', email: '', phone: '', joined: '' };
+            localStorage.setItem('satvik_user_profile', JSON.stringify(savedProfile));
+            updateAuthUI(null);
             showToast('🚪 Signed out successfully');
         });
     }
@@ -5158,11 +5170,127 @@ export function initCustomerRatingsMarquee() {
 if (typeof window !== 'undefined') {
     window.initCustomerRatingsMarquee = initCustomerRatingsMarquee;
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REAL-TIME STOREFRONT PRODUCT SYNCHRONIZATION FROM ADMIN PANEL
+// ─────────────────────────────────────────────────────────────────────────────
+function syncProductsWithStorage() {
+    try {
+        const raw = localStorage.getItem('satvik_admin_dev_products');
+        if (!raw) return;
+        const storedProducts = JSON.parse(raw);
+        if (!Array.isArray(storedProducts) || storedProducts.length === 0) return;
+
+        let hasModified = false;
+
+        storedProducts.forEach(sp => {
+            if (!sp || !sp.id) return;
+            const existing = PRODUCTS_CATALOGUE.find(p => p.id === sp.id);
+            if (existing) {
+                if (sp.images && Array.isArray(sp.images) && sp.images.length > 0) {
+                    existing.images = sp.images;
+                    existing.img = sp.images[0];
+                    existing.image = sp.images[0];
+                } else if (sp.image || sp.img) {
+                    existing.images = [sp.image || sp.img];
+                    existing.img = sp.image || sp.img;
+                    existing.image = sp.image || sp.img;
+                }
+                if (sp.name) existing.name = sp.name;
+                if (sp.hindiName) existing.hindiName = sp.hindiName;
+                if (sp.price) existing.price = Number(sp.price);
+                if (sp.mrp) existing.mrp = Number(sp.mrp);
+                if (sp.stock !== undefined) existing.stock = Number(sp.stock);
+                if (sp.available !== undefined) existing.available = sp.available;
+                if (sp.badge !== undefined) existing.badge = sp.badge;
+                hasModified = true;
+            } else {
+                const newImgs = (Array.isArray(sp.images) && sp.images.length > 0)
+                    ? sp.images
+                    : (sp.image || sp.img ? [sp.image || sp.img] : ['assets/aam-ka-achar.png']);
+                PRODUCTS_CATALOGUE.push({
+                    ...sp,
+                    images: newImgs,
+                    img: newImgs[0],
+                    image: newImgs[0],
+                    variants: sp.variants || [
+                        { id: 'var_default', label: '500 g', weightGrams: 500, price: sp.price || 249, mrp: sp.mrp || 320, stock: sp.stock || 50, active: true }
+                    ]
+                });
+                hasModified = true;
+            }
+        });
+
+        if (hasModified) {
+            // 1. Update product cards on current page (products.html, index.html)
+            const cards = document.querySelectorAll('.product-card, .ref-product-card');
+            cards.forEach(card => {
+                const pId = card.getAttribute('data-product-id');
+                if (!pId) return;
+                const prod = PRODUCTS_CATALOGUE.find(p => p.id === pId);
+                if (!prod) return;
+
+                const img = card.querySelector('.product-img, .ref-product-img');
+                const newSrc = (Array.isArray(prod.images) && prod.images.length > 0) ? prod.images[0] : (prod.img || prod.image);
+                if (img && newSrc && img.getAttribute('src') !== newSrc) {
+                    img.src = newSrc;
+                }
+
+                const priceEl = card.querySelector('.price-val');
+                if (priceEl && prod.price) {
+                    priceEl.textContent = `₹${prod.price}`;
+                }
+            });
+
+            // 2. Update dedicated product details page gallery & images if currently open
+            const pdMain = document.getElementById('pd-main-section');
+            if (pdMain) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentPId = urlParams.get('id') || urlParams.get('productId') || urlParams.get('slug');
+                const currProd = PRODUCTS_CATALOGUE.find(p => p.id === currentPId);
+                if (currProd && Array.isArray(currProd.images) && currProd.images.length > 0) {
+                    const mainImg = document.getElementById('pd-main-img');
+                    const thumbsBox = document.getElementById('pd-thumbnails-container');
+                    if (mainImg) {
+                        mainImg.src = currProd.images[0];
+                    }
+                    if (thumbsBox) {
+                        const frag = document.createDocumentFragment();
+                        currProd.images.forEach((imgUrl, i) => {
+                            const thumb = createSafeElement('img', {
+                                src: imgUrl,
+                                alt: `${currProd.name} — Photo ${i + 1}`,
+                                style: `width: 72px; height: 72px; object-fit: cover; border-radius: 10px; border: 3px solid ${i === 0 ? 'var(--color-maroon)' : 'transparent'}; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.08); flex-shrink: 0;`
+                            });
+                            thumb.addEventListener('click', () => {
+                                if (mainImg) mainImg.src = imgUrl;
+                                Array.from(thumbsBox.children).forEach(c => c.style.borderColor = 'transparent');
+                                thumb.style.borderColor = 'var(--color-maroon)';
+                            });
+                            frag.appendChild(thumb);
+                        });
+                        thumbsBox.replaceChildren(frag);
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("[Storefront] Real-time product sync notice:", e);
+    }
+}
+
     // Listen for updates from Admin Panel (both same window and cross-tab storage events)
     window.addEventListener('storage', (e) => {
         if (e.key === 'satvik_featured_reviews' || e.key === 'satvik_featured_reviews_sync' || e.key === 'satvik_admin_dev_reviews') {
             initCustomerRatingsMarquee();
         }
+        if (e.key === 'satvik_admin_dev_products' || e.key === 'satvik_products_sync') {
+            syncProductsWithStorage();
+        }
+    });
+
+    window.addEventListener('satvik_products_updated', () => {
+        syncProductsWithStorage();
     });
 
     window.addEventListener('satvik_reviews_updated', () => {

@@ -4953,7 +4953,7 @@ export function translateProfilePage(dict, activeLang) {
   if (sidebarDoodle) sidebarDoodle.innerHTML = p.sidebar.doodleText.replace(' ↴ ♡', '<br><span>Happy You ↴ ♡</span>');
 
   const profCardTitle = document.querySelector('#tab-panel-profile .profile-card:first-child .profile-card-title');
-  if (profCardTitle) profCardTitle.textContent = `🌿 ${p.personalInfo.title}`;
+  if (profCardTitle) profCardTitle.textContent = p.personalInfo.title;
 
   const btnEditText = document.getElementById('btn-edit-text');
   if (btnEditText) btnEditText.textContent = p.personalInfo.editBtn;

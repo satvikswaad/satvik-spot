@@ -13717,3 +13717,47 @@ html[dir="rtl"] .why-choose-right-doodles {
 .polaroid-caption .brush-underline {
     font-family: inherit !important;
 }
+
+
+/* ==========================================================================
+   PROFILE PAGE COMPACT LAYOUT (DECREASE GAPS & REMOVE SIDEBAR DOODLE)
+   ========================================================================== */
+.profile-main-layout {
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 20px 24px 44px !important;
+    display: grid !important;
+    grid-template-columns: 260px minmax(0, 1fr) 280px !important;
+    gap: 22px !important; /* Decreased gap from 32px */
+    align-items: start !important;
+    background-color: #FAF5EB !important;
+    box-sizing: border-box !important;
+}
+
+.profile-sidebar-card {
+    background: #FAF7F0 !important;
+    border: 1.5px solid #E5DEC9 !important;
+    border-radius: 20px !important;
+    padding: 20px 18px !important;
+    box-shadow: 0 8px 24px rgba(40, 30, 20, 0.04) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important; /* Decreased gap from 18px */
+}
+
+.profile-nav-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+.profile-sidebar-doodle,
+.profile-sidebar-doodle-text,
+.profile-sidebar-doodle-img {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
