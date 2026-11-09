@@ -5086,10 +5086,10 @@ export function initCustomerRatingsMarquee() {
 
     // Apply inline animation with high priority (Left-To-Right continuous slide)
     track.style.setProperty('animation-name', 'marqueeLeftToRight', 'important');
-    track.style.setProperty('animation-duration', '36s', 'important');
+    track.style.setProperty('animation-duration', '38s', 'important');
     track.style.setProperty('animation-timing-function', 'linear', 'important');
     track.style.setProperty('animation-iteration-count', 'infinite', 'important');
-    track.style.setProperty('animation-play-state', 'running', 'important');
+    track.style.removeProperty('animation-play-state'); // Let CSS hover handle it, or JS dynamically toggle
 
     // JS-based continuous slider fallback:
     // If computed animationName is 'none' (e.g. OS reduced motion active), JS smoothly moves track left-to-right!
@@ -5098,10 +5098,35 @@ export function initCustomerRatingsMarquee() {
     }
 
     let isPaused = false;
-    track.addEventListener('mouseenter', () => { isPaused = true; });
-    track.addEventListener('mouseleave', () => { isPaused = false; });
-    track.addEventListener('touchstart', () => { isPaused = true; }, { passive: true });
-    track.addEventListener('touchend', () => { isPaused = false; }, { passive: true });
+    const pauseMarquee = () => {
+        isPaused = true;
+        track.style.setProperty('animation-play-state', 'paused', 'important');
+    };
+    const resumeMarquee = () => {
+        isPaused = false;
+        track.style.setProperty('animation-play-state', 'running', 'important');
+    };
+
+    const reviewsSection = document.getElementById('customer-ratings-section');
+    const marqueeViewport = track.parentElement;
+
+    if (reviewsSection) {
+        reviewsSection.addEventListener('mouseenter', pauseMarquee);
+        reviewsSection.addEventListener('mouseleave', resumeMarquee);
+    }
+    if (marqueeViewport) {
+        marqueeViewport.addEventListener('mouseenter', pauseMarquee);
+        marqueeViewport.addEventListener('mouseleave', resumeMarquee);
+        marqueeViewport.addEventListener('touchstart', pauseMarquee, { passive: true });
+        marqueeViewport.addEventListener('touchend', resumeMarquee, { passive: true });
+    }
+    track.addEventListener('mouseenter', pauseMarquee);
+    track.addEventListener('mouseleave', resumeMarquee);
+
+    track.querySelectorAll('.rating-marquee-card').forEach(card => {
+        card.addEventListener('mouseenter', pauseMarquee);
+        card.addEventListener('mouseleave', resumeMarquee);
+    });
 
     setTimeout(() => {
         const computedStyle = window.getComputedStyle(track);

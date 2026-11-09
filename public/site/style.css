@@ -13235,7 +13235,6 @@ html[dir="rtl"] .why-choose-right-doodles {
     animation-duration: 38s !important;
     animation-timing-function: linear !important;
     animation-iteration-count: infinite !important;
-    animation-play-state: running !important;
 }
 
 /* PAUSE ON HOVER OR KEYBOARD FOCUS */
@@ -13595,4 +13594,126 @@ html[dir="rtl"] .why-choose-right-doodles {
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
+}
+
+
+/* PAUSE REVIEWS CAROUSEL ON MOUSE HOVER OR KEYBOARD FOCUS */
+.customer-ratings-marquee-section:hover .ratings-marquee-track,
+.ratings-marquee-viewport:hover .ratings-marquee-track,
+.ratings-marquee-track:hover,
+.ratings-marquee-track:focus-within,
+.rating-marquee-card:hover {
+    animation-play-state: paused !important;
+}
+
+
+/* ==========================================================================
+   FAQS PAGE ENHANCEMENTS: NATURAL READABLE FONTS & CLEAN ARROW CONTROLS
+   ========================================================================== */
+
+/* Natural, clean heading for FAQ */
+.script-title,
+.script-title-wrapper h2,
+.faq-accordion-container .script-title {
+    font-family: var(--font-heading, 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif) !important;
+    font-size: clamp(2rem, 3.5vw, 2.75rem) !important;
+    font-weight: 700 !important;
+    color: var(--color-green, #154D2B) !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.5px !important;
+}
+
+.faq-accordion-subtitle {
+    font-family: var(--font-main, 'Plus Jakarta Sans', system-ui, sans-serif) !important;
+    font-size: 1.05rem !important;
+    color: var(--color-sub, #5A554E) !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+}
+
+/* Natural readable typography on FAQ question items */
+.faq-summary {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 18px 24px !important;
+    font-family: var(--font-main, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif) !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    color: var(--color-green, #154D2B) !important;
+    cursor: pointer !important;
+    list-style: none !important;
+    line-height: 1.45 !important;
+    letter-spacing: -0.2px !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+.faq-summary:hover {
+    background: #F7F5EE !important;
+    color: var(--color-green-dark, #0E351D) !important;
+}
+
+.faq-item[open] .faq-summary {
+    background: #F4EEDC !important;
+    color: var(--color-green-dark, #0E351D) !important;
+    border-bottom: 1px solid rgba(220, 205, 175, 0.4) !important;
+}
+
+/* Hide duplicate middle chevron entirely */
+.faq-summary .chevron {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Single elegant right-aligned arrow */
+.faq-summary::after {
+    content: '❯' !important;
+    font-size: 0.95rem !important;
+    color: var(--color-saffron, #D49A24) !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
+    margin-left: auto !important;
+    display: inline-block !important;
+    flex-shrink: 0 !important;
+}
+
+.faq-item[open] .faq-summary::after {
+    transform: rotate(90deg) !important;
+    color: var(--color-green, #154D2B) !important;
+}
+
+/* Natural readable FAQ Answer text */
+.faq-content {
+    padding: 18px 24px 22px !important;
+    font-family: var(--font-main, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif) !important;
+    font-size: 0.98rem !important;
+    color: #3D443F !important;
+    line-height: 1.7 !important;
+}
+
+/* Suppress arrow doodle and heart doodle permanently on FAQs */
+.heart-doodle,
+.arrow-doodle,
+.doodle-group,
+.sparkle-mark {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Polaroid caption with natural clean font */
+.polaroid-caption {
+    margin-top: 12px !important;
+    text-align: center !important;
+    font-family: var(--font-main, 'Plus Jakarta Sans', system-ui, sans-serif) !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    color: var(--color-maroon, #8c3a27) !important;
+    display: block !important;
+}
+
+.polaroid-caption .brush-underline {
+    font-family: inherit !important;
 }
