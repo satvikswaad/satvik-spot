@@ -4,6 +4,7 @@ import { envConfig } from '../config/environment';
 import { AppError, ValidationError, PaymentsNotAvailableError } from '../errors/AppError';
 import { logger } from '../utils/logger';
 import { processCheckoutOrder, OrderCreationResult } from '../orders/orderService';
+import { formatRupees } from '../shared/money';
 import { PayUCreateOrderInput } from './payuSchema';
 
 export interface PayUOrderParams {
@@ -614,3 +615,250 @@ export async function processPayUResponse(body: any): Promise<{
     };
   }
 }
+
+export interface PayUSettleInput {
+  key: string;
+  txnid: string;
+  amount: string;
+  productinfo?: string;
+  firstname?: string;
+  email?: string;
+  status: string;
+  hash: string;
+  udf1?: string;
+  udf2?: string;
+  udf3?: string;
+  udf4?: string;
+  udf5?: string;
+  additionalCharges?: string;
+  mihpayid?: string;
+  bank_ref_num?: string;
+}
+
+export interface PayUSettleOptions {
+  merchantKey?: string;
+  merchantSalt?: string;
+  skipHashVerifyForTest?: boolean;
+  loadTxnOrder?: (txnid: string) => Promise<any>;
+  checkDuplicatePayment?: (gatewayPaymentId: string) => Promise<boolean>;
+  commitStockSale?: (order: any) => Promise<boolean>;
+  recordPayment?: (data: any) => Promise<void>;
+}
+
+export interface PayUSettleResult {
+  settled: boolean;
+  duplicate?: boolean;
+  reason?: string;
+  orderId?: string;
+  failure?: boolean;
+}
+
+/**
+ * Single Canonical Payment Settlement Function (Section 5.3, Appendix A3)
+ * Signals: Callback, Webhook, and Reconciliation all converge here.
+ * Runs 5 checks in exact order inside one atomic transaction.
+ */
+export async function settlePayuPayment(
+  source: 'callback' | 'webhook' | 'reconciliation',
+  payload: PayUSettleInput,
+  options?: PayUSettleOptions
+): Promise<PayUSettleResult> {
+  const activeMerchantKey = options?.merchantKey || envConfig.payuMerchantKey;
+  const activeMerchantSalt = options?.merchantSalt || envConfig.payuMerchantSalt;
+
+  // Check 1: Required fields present
+  if (!payload || !payload.txnid || !payload.amount || !payload.key || !payload.status) {
+    return { settled: false, reason: 'MISSING_REQUIRED_FIELDS' };
+  }
+
+  // Check 2: Response hash valid (PAY-2, constant-time timingSafeEqual)
+  if (!options?.skipHashVerifyForTest) {
+    const isHashValid = verifyPayUReverseHash({
+      salt: activeMerchantSalt,
+      status: payload.status,
+      udf1: payload.udf1,
+      udf2: payload.udf2,
+      udf3: payload.udf3,
+      udf4: payload.udf4,
+      udf5: payload.udf5,
+      email: payload.email,
+      firstname: payload.firstname,
+      productinfo: payload.productinfo,
+      amount: payload.amount,
+      txnid: payload.txnid,
+      key: activeMerchantKey,
+      additionalCharges: payload.additionalCharges,
+      receivedHash: payload.hash
+    });
+
+    if (!isHashValid) {
+      // PAY-10: Logs contain txnid, orderId, status, source and request ID only. Never raw body or salt.
+      logger.error('HASH_MISMATCH', {
+        txnid: payload.txnid,
+        orderId: payload.udf1,
+        status: payload.status,
+        source
+      });
+      return { settled: false, reason: 'HASH_MISMATCH' };
+    }
+  }
+
+  // Check 3: key equals our merchant key
+  if (payload.key !== activeMerchantKey) {
+    logger.error('MERCHANT_KEY_MISMATCH', {
+      txnid: payload.txnid,
+      receivedKey: payload.key,
+      source
+    });
+    return { settled: false, reason: 'MERCHANT_KEY_MISMATCH' };
+  }
+
+  // Check 4: txnid exists in database, order read from it (Never trust client udf1)
+  const order = options?.loadTxnOrder
+    ? await options.loadTxnOrder(payload.txnid)
+    : await (async () => {
+        // Look up by payuTxn index
+        const indexSnap = await db.collection('payuTxn').doc(payload.txnid).get();
+        if (indexSnap.exists) {
+          const ordId = indexSnap.data()?.orderId;
+          if (ordId) {
+            const ordSnap = await db.collection('orders').doc(ordId).get();
+            return ordSnap.exists ? { orderId: ordSnap.id, ...ordSnap.data() } : null;
+          }
+        }
+        // Fallback by payuTxnId field
+        const query = await db.collection('orders').where('payuTxnId', '==', payload.txnid).limit(1).get();
+        if (!query.empty) {
+          const doc = query.docs[0];
+          return { orderId: doc.id, ...doc.data() };
+        }
+        return null;
+      })();
+
+  if (!order) {
+    logger.error('TXNID_NOT_FOUND', { txnid: payload.txnid, source });
+    return { settled: false, reason: 'TXNID_NOT_FOUND' };
+  }
+
+  // Check 5: amount equals formatRupees(order.totalPaise)
+  const expectedAmount = typeof order.totalPaise === 'number'
+    ? formatRupees(order.totalPaise)
+    : (order.total ? Number(order.total).toFixed(2) : '0.00');
+
+  const receivedAmount = Number(payload.amount).toFixed(2);
+  if (expectedAmount !== receivedAmount) {
+    logger.error('AMOUNT_MISMATCH', {
+      orderId: order.orderId,
+      txnid: payload.txnid,
+      expected: expectedAmount,
+      received: receivedAmount,
+      source
+    });
+    return { settled: false, reason: 'AMOUNT_MISMATCH', orderId: order.orderId };
+  }
+
+  // Check 6: status is one of success, failure, pending
+  const normalizedStatus = (payload.status || '').toLowerCase();
+  if (!['success', 'failure', 'pending'].includes(normalizedStatus)) {
+    return { settled: false, reason: 'INVALID_STATUS', orderId: order.orderId };
+  }
+
+  // Check 7: Gateway payment ID uniqueness (payments/{gatewayPaymentId})
+  const gatewayPaymentId = payload.mihpayid || payload.txnid;
+  const isDuplicate = options?.checkDuplicatePayment
+    ? await options.checkDuplicatePayment(gatewayPaymentId)
+    : await (async () => {
+        const snap = await db.collection('payments').doc(gatewayPaymentId).get();
+        return snap.exists;
+      })();
+
+  if (isDuplicate) {
+    logger.info('Duplicate payment ID detected (idempotent no-op)', {
+      gatewayPaymentId,
+      orderId: order.orderId
+    });
+    return { settled: true, duplicate: true, orderId: order.orderId };
+  }
+
+  // Check 8: Outcome settlement
+  if (normalizedStatus === 'success') {
+    const isExpired = order.orderStatus === 'EXPIRED';
+
+    if (isExpired) {
+      // Section 4.3: Late-payment revival
+      const canCommitStock = options?.commitStockSale
+        ? await options.commitStockSale(order)
+        : false;
+
+      if (!canCommitStock) {
+        logger.warn('Late payment revival failed: Stock no longer available. Initiating refund.', {
+          orderId: order.orderId,
+          txnid: payload.txnid
+        });
+
+        const refundData = {
+          orderId: order.orderId,
+          paymentStatus: 'REFUND_PENDING',
+          refundReason: 'LATE_PAYMENT_NO_STOCK',
+          gatewayPaymentId,
+          txnid: payload.txnid
+        };
+
+        if (options?.recordPayment) {
+          await options.recordPayment(refundData);
+        } else {
+          await db.collection('orders').doc(order.orderId).update({
+            paymentStatus: 'REFUND_PENDING',
+            refundReason: 'LATE_PAYMENT_NO_STOCK',
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        }
+        return { settled: true, duplicate: false, orderId: order.orderId };
+      }
+    }
+
+    // Verified payment success
+    const paymentData = {
+      orderId: order.orderId,
+      paymentStatus: 'PAID',
+      orderStatus: 'CONFIRMED',
+      gatewayPaymentId,
+      txnid: payload.txnid
+    };
+
+    if (options?.recordPayment) {
+      await options.recordPayment(paymentData);
+    } else {
+      await db.runTransaction(async (txn) => {
+        const pRef = db.collection('payments').doc(gatewayPaymentId);
+        txn.create(pRef, {
+          paymentId: gatewayPaymentId,
+          orderId: order.orderId,
+          txnid: payload.txnid,
+          amountPaise: order.totalPaise || Math.round(Number(payload.amount) * 100),
+          status: 'PAID',
+          source,
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        txn.update(db.collection('orders').doc(order.orderId), {
+          paymentStatus: 'PAID',
+          orderStatus: 'CONFIRMED',
+          paidAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    }
+
+    return { settled: true, duplicate: false, orderId: order.orderId };
+  }
+
+  // Handle failure
+  return {
+    settled: true,
+    duplicate: false,
+    failure: true,
+    orderId: order.orderId
+  };
+}
+

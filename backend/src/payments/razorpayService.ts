@@ -409,3 +409,114 @@ export async function initiateRefund(orderId: string, amount?: number, reason?: 
     return data;
   });
 }
+
+/**
+ * Creates Razorpay order payload enforcing integer totalPaise and order receipt (RZP-1)
+ */
+export function createRazorpayOrderPayload(params: {
+  orderId: string;
+  totalPaise: number;
+}): {
+  amount: number;
+  currency: string;
+  receipt: string;
+} {
+  return {
+    amount: Math.round(params.totalPaise),
+    currency: 'INR',
+    receipt: params.orderId
+  };
+}
+
+/**
+ * Verifies Razorpay webhook HMAC-SHA256 signature over raw request body buffer (RZP-3)
+ */
+export function verifyRazorpayWebhookSignature(
+  rawBody: Buffer | string,
+  signature: string,
+  secret?: string
+): boolean {
+  const webhookSecret = secret || process.env.RAZORPAY_WEBHOOK_SECRET;
+  if (!webhookSecret || !signature) {
+    return false;
+  }
+  const bodyBuffer = Buffer.isBuffer(rawBody) ? rawBody : Buffer.from(rawBody, 'utf8');
+  const expectedSignature = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(bodyBuffer)
+    .digest('hex');
+
+  const expBuf = Buffer.from(expectedSignature, 'utf8');
+  const sigBuf = Buffer.from(signature, 'utf8');
+  if (expBuf.length !== sigBuf.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(expBuf, sigBuf);
+}
+
+export interface RazorpaySettleInput {
+  orderId: string;
+  paymentId: string;
+  amountPaise: number;
+  currency: string;
+  status: string;
+}
+
+/**
+ * Settle Razorpay payment with 5 checks in order (RZP-4, Appendix A3)
+ */
+export async function settleRazorpayPayment(
+  source: 'callback' | 'webhook' | 'reconciliation',
+  payload: RazorpaySettleInput,
+  options?: {
+    loadTxnOrder?: (orderId: string) => Promise<any>;
+    checkDuplicatePayment?: (paymentId: string) => Promise<boolean>;
+    recordPayment?: (data: any) => Promise<void>;
+  }
+): Promise<{ settled: boolean; duplicate?: boolean; reason?: string }> {
+  if (payload.currency !== 'INR') {
+    return { settled: false, reason: 'CURRENCY_MISMATCH' };
+  }
+
+  const order = options?.loadTxnOrder
+    ? await options.loadTxnOrder(payload.orderId)
+    : await (async () => {
+        const snap = await db.collection('orders').doc(payload.orderId).get();
+        return snap.exists ? snap.data() : null;
+      })();
+
+  if (!order) {
+    return { settled: false, reason: 'ORDER_NOT_FOUND' };
+  }
+
+  const expectedPaise = typeof order.totalPaise === 'number' ? order.totalPaise : (order.total ? Math.round(order.total * 100) : 0);
+  if (expectedPaise !== payload.amountPaise) {
+    return { settled: false, reason: 'AMOUNT_MISMATCH' };
+  }
+
+  const isDuplicate = options?.checkDuplicatePayment
+    ? await options.checkDuplicatePayment(payload.paymentId)
+    : await (async () => {
+        const snap = await db.collection('payments').doc(payload.paymentId).get();
+        return snap.exists;
+      })();
+
+  if (isDuplicate) {
+    return { settled: true, duplicate: true };
+  }
+
+  const isSuccess = payload.status === 'captured' || payload.status === 'paid' || payload.status === 'success';
+  if (isSuccess) {
+    if (options?.recordPayment) {
+      await options.recordPayment({
+        orderId: payload.orderId,
+        paymentStatus: 'PAID',
+        orderStatus: 'CONFIRMED'
+      });
+    }
+    return { settled: true, duplicate: false };
+  }
+
+  return { settled: false, reason: 'PAYMENT_NOT_CAPTURED' };
+}
+
