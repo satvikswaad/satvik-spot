@@ -1,11 +1,76 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // DB-1: firestore.rules denies ALL client reads and writes on EVERY collection.
-    // The browser talks to the API only.
-    // The Admin SDK in the two backend services is the only database client.
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // DB-1: Universal Default Deny All Client Reads and Writes
     match /{document=**} {
       allow read, write: if false;
+    }
+
+    // Orders: Deny direct client creation, update, and deletion (DB-1, ARCH-2)
+    match /orders/{orderId} {
+      allow create: if false;
+      allow update, delete: if false;
+    }
+
+    // Inventory Logs: Read only by verified admin, client writes strictly denied
+    match /inventory_logs/{logId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Payment Transactions: Read only by admin, client writes strictly denied
+    match /payment_transactions/{txnId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Refunds: Read only by admin, client writes strictly denied (REFUND-1)
+    match /refunds/{refundId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Audit Logs: Read only by admin, client writes strictly denied (LOG-2)
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Idempotency Records: Backend Admin SDK only
+    match /idempotency/{id} {
+      allow read, write: if false;
+    }
+
+    // Rate Limit Buckets: Backend Admin SDK only
+    match /rate_limits/{bucket} {
+      allow read, write: if false;
+    }
+
+    // User Profile Privilege Escalation Guard (AUTH-4, DB-1)
+    match /users/{userId} {
+      allow read, write: if false;
+      // Deny client setting of roles or claims
+      allow create, update: if !('admin' in request.resource.data) &&
+        !('role' in request.resource.data) &&
+        !('roles' in request.resource.data) &&
+        !('claims' in request.resource.data);
+    }
+
+    match /customers/{userId} {
+      allow read, write: if false;
+      allow create, update: if !('admin' in request.resource.data) &&
+        !('role' in request.resource.data) &&
+        !('roles' in request.resource.data) &&
+        !('claims' in request.resource.data);
     }
   }
 }
