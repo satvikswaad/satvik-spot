@@ -156,7 +156,7 @@ let currentSlide = 0;
 let autoplayTimer = null;
 let touchStartX = 0;
 let touchEndX = 0;
-const AUTOPLAY_DELAY = 3500; // 3.5 seconds fast transition between village banners
+const AUTOPLAY_DELAY = 4500; // 4.5 seconds transition between hero slides
 
 function runInitializers() {
     const safeRun = (fn, name) => {
@@ -830,6 +830,20 @@ function initHeroSlider() {
         }
     }
 
+    // Bind Hero Diwali Add-to-Cart Button
+    const heroDiwaliCartBtn = document.querySelector('.hero-diwali-cart-btn');
+    if (heroDiwaliCartBtn && !heroDiwaliCartBtn._boundHeroCart) {
+        heroDiwaliCartBtn._boundHeroCart = true;
+        heroDiwaliCartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const pId = heroDiwaliCartBtn.getAttribute('data-product-id') || 'prod_diwali_laddu';
+            const vId = heroDiwaliCartBtn.getAttribute('data-variant-id') || 'var_500g';
+            addToCart(pId, vId, 1);
+            openCart();
+        });
+    }
+
     startAutoplay();
 }
 
@@ -1284,10 +1298,6 @@ function animateCartBadge() {
 }
 
 function openCart() {
-    if (window.innerWidth <= 768 && !window.location.pathname.includes('cart.html')) {
-        window.location.href = 'cart.html';
-        return;
-    }
     const overlay = document.getElementById('cart-drawer-overlay');
     if (overlay) {
         overlay.classList.add('active');

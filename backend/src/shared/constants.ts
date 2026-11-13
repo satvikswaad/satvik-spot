@@ -74,6 +74,7 @@ export const CONFIG_LIMITS = {
   reserveOnlineMinutes: 15,    // Online gateway reservation hold (Section 8.4)
   reserveSlowMinutes: 120,     // Manual UPI & WhatsApp reservation hold (Section 8.4)
   reserveCodMinutes: 30,       // COD confirmation reservation hold (Section 8.4)
+  quoteTtlMinutes: 10,         // Quotes API TTL 10 minutes (Decision D16)
   stepUpSeconds: 300,          // Step-up re-authentication window (AUTH-5)
   adminIdleMinutes: 30         // Admin idle session timeout (AUTH-7)
 } as const;

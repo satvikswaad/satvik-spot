@@ -7,19 +7,27 @@ export interface AuthoritativeVariant {
   label: string;
   weightGrams: number;
   price: number;
+  pricePaise?: number;
   mrp: number;
   sku: string;
   stock: number;
   active: boolean;
+  taxRatePercent?: number;
+  hsn?: string;
+  batchId?: string;
+  bestBeforeDate?: string;
 }
 
 export interface AuthoritativeProduct {
   id: string;
   name: string;
   price: number;
+  pricePaise?: number;
   mrp: number;
   stock: number;
   available: boolean;
+  taxRatePercent?: number;
+  hsn?: string;
   variants?: AuthoritativeVariant[];
 }
 
@@ -70,13 +78,24 @@ export async function getAuthoritativeProductInTransaction(
     throw new ValidationError(`Invalid product price in catalog for '${productId}'`);
   }
 
+  const taxRatePercent = typeof selectedVariant?.taxRatePercent === 'number'
+    ? selectedVariant.taxRatePercent
+    : (typeof data.taxRatePercent === 'number' ? data.taxRatePercent : 12);
+  const hsn = selectedVariant?.hsn || data.hsn || '20019000';
+  const pricePaise = typeof selectedVariant?.pricePaise === 'number' && selectedVariant.pricePaise > 0
+    ? selectedVariant.pricePaise
+    : Math.round(price * 100);
+
   return {
     id: snap.id,
     name: data.name || 'Handcrafted Item',
     price,
+    pricePaise,
     mrp,
     stock,
     available: data.available,
+    taxRatePercent,
+    hsn,
     variants: data.variants || [],
     selectedVariant
   };

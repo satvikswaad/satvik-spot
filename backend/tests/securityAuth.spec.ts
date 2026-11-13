@@ -199,14 +199,18 @@ describe('Wave 2 — Security & Auth Module (AUTH-1..10, ARCH-6, 10.2, 10.3)', (
       const rawSecret = 'correct-utr-secret-67890';
       const hashedSecret = crypto.createHash('sha256').update(rawSecret).digest('hex');
 
-      const collSpy = jest.spyOn(db, 'collection').mockReturnValue({
-        doc: jest.fn().mockReturnValue({ id: orderId }),
+      const collSpy = jest.spyOn(db, 'collection').mockImplementation(((coll: string) => ({
+        doc: (docId?: string) => ({
+          id: docId || orderId,
+          get: async () => ({ exists: false }),
+          set: async () => ({})
+        }),
         where: () => ({
           limit: () => ({
             get: async () => ({ empty: true, docs: [] })
           })
         })
-      } as any);
+      })) as any);
 
       const txSpy = jest.spyOn(db, 'runTransaction').mockImplementation(async (cb: any) => {
         return cb({

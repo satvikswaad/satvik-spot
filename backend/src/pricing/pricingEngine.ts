@@ -31,10 +31,16 @@ export interface FrozenOrderLine extends OrderLineInput {
   taxPaise: number;
 }
 
+export interface DeliveryZoneConfig {
+  localPincodes?: string[];
+  serviceablePincodes?: string[];
+}
+
 export interface PricingInput {
   items: OrderLineInput[];
   pincode: string;
   discountCodeDoc?: DiscountDoc | null;
+  deliveryZones?: DeliveryZoneConfig;
 }
 
 export interface PricedOrderSummary {
@@ -60,18 +66,26 @@ export interface DiscountDoc {
 }
 
 /**
- * Calculates delivery fee strictly by destination pincode. (PRICE-3, PRICE-4, PRICE-5, PRICE-6)
+ * Calculates delivery fee strictly by destination pincode. (PRICE-3, PRICE-4, PRICE-5, PRICE-6, Decision D5, D17)
  */
-export function calculateDeliveryFeePaise(pincode: string, netSubtotalPaise: number): number {
+export function calculateDeliveryFeePaise(
+  pincode: string,
+  netSubtotalPaise: number,
+  deliveryZones?: DeliveryZoneConfig
+): number {
   assertNonNegativePaise(netSubtotalPaise);
   const cleanPincode = (pincode || '').trim();
 
-  // Deoria Local Delivery Zone (PRICE-5)
-  if (cleanPincode === '274001') {
+  // Deoria Local Delivery Zone (PRICE-5, Decision D5, D17)
+  const isLocal = deliveryZones?.localPincodes
+    ? deliveryZones.localPincodes.includes(cleanPincode)
+    : cleanPincode === '274001';
+
+  if (isLocal) {
     return 0;
   }
 
-  // Non-Local: Free delivery if net subtotal >= ₹499 (PRICE-4)
+  // Non-Local: Free delivery if net subtotal >= ₹499 (PRICE-4, Section 7.2)
   if (netSubtotalPaise >= CONFIG_LIMITS.freeShipPaise) {
     return 0;
   }
@@ -159,14 +173,15 @@ export function priceOrder(input: PricingInput): PricedOrderSummary {
   }
 
   const netSubtotalPaise = Math.max(0, subtotalPaise - discountPaise);
-  const shippingPaise = calculateDeliveryFeePaise(input.pincode, netSubtotalPaise);
+  const shippingPaise = calculateDeliveryFeePaise(input.pincode, netSubtotalPaise, input.deliveryZones);
   const totalPaise = netSubtotalPaise + shippingPaise;
 
   // PRICE-2: Flag high-value orders above ₹25,000 for manual review hold
   const needsReview = subtotalPaise > CONFIG_LIMITS.reviewHoldPaise;
 
-  // PRICE-7: Quote validity 15 minutes
-  const quoteExpiresAt = new Date(Date.now() + CONFIG_LIMITS.reserveOnlineMinutes * 60 * 1000);
+  // PRICE-7, Decision D16: Quote validity 10 minutes
+  const ttlMinutes = CONFIG_LIMITS.quoteTtlMinutes || 10;
+  const quoteExpiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
 
   return {
     lines,

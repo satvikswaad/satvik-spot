@@ -168,26 +168,77 @@
   </div>
 </header>
 
-    <!-- FULL-WIDTH HERO SHOWCASE: MAIN HYGIENIC ARTISANS & NEW BANNERS -->
+    <!-- FULL-WIDTH HERO SHOWCASE: MAIN HYGIENIC ARTISANS & DIWALI FESTIVE SLIDERS -->
     <section class="hero-slider-section" id="hero" aria-label="Hero Highlights">
         <div class="hero-slider-container" id="hero-slider-container" tabindex="0" aria-roledescription="carousel" aria-label="Satvik Swaad Highlights">
 
             <div class="hero-slides-track" id="hero-slides-track">
                 
-                <!-- SLIDE 1: MAIN HERO - GHAR JAISA SWAAD & HYGIENIC ARTISANS -->
-                <div class="hero-slide active" role="group" aria-roledescription="slide" aria-label="Ghar Jaisa Swaad - Pure Homemade Pickles">
+                <!-- SLIDE 1: DIWALI SPECIAL EDITION SPOTLIGHT (LEFT: PICTURE, RIGHT: CONTENT + BUY) -->
+                <div class="hero-slide hero-slide-diwali active" role="group" aria-roledescription="slide" aria-label="Diwali Special Edition - Festive Laddu Collection">
+                    <div class="hero-diwali-slide-inner">
+                        <!-- LEFT PART: PRODUCT PICTURE -->
+                        <div class="hero-diwali-visual-col">
+                            <span class="hero-diwali-badge-glow">🪔 Diwali Special Edition</span>
+                            <div class="hero-diwali-img-card">
+                                <img src="assets/diwali_festival_laddu.jpeg" alt="Diwali Festive Laddu Collection (Amla • Ragi • Singhada)" class="hero-diwali-img" loading="eager" />
+                            </div>
+                            <div class="hero-diwali-flair-row">
+                                <span class="hero-diwali-pill">✨ 100% Desi Cow Ghee</span>
+                                <span class="hero-diwali-pill">🍯 Natural Honey &amp; Jaggery</span>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT PART: FESTIVE CONTENT & ACTION -->
+                        <div class="hero-diwali-content-col">
+                            <div class="hero-diwali-eyebrow">
+                                <span>🪔 FESTIVE HERITAGE SWEET BOX 🪔</span>
+                            </div>
+                            <h2 class="hero-diwali-title">
+                                Diwali Festive Laddu Collection<br/>
+                                <span class="hero-diwali-subtitle">(Amla &bull; Ragi &bull; Singhada)</span>
+                            </h2>
+                            <p class="hero-diwali-desc">
+                                Handcrafted in pure A2 cow ghee with ancestral village reverence. A glorious festive harmony of Vitamin C-rich Amla, iron-packed Ragi, and fasting-pure Singhada dry fruit laddus. Zero synthetic preservatives, zero palm oil.
+                            </p>
+                            <div class="hero-diwali-price-row">
+                                <div class="hero-diwali-prices">
+                                    <span class="hero-diwali-sale-price">₹499</span>
+                                    <span class="hero-diwali-mrp">₹599</span>
+                                    <span class="hero-diwali-save-badge">Save ₹100 (17% OFF)</span>
+                                </div>
+                                <div class="hero-diwali-rating">
+                                    <span class="star" aria-hidden="true">★</span>
+                                    <span class="score">5.0</span>
+                                    <span class="count">(48 festive reviews)</span>
+                                </div>
+                            </div>
+                            <div class="hero-diwali-actions">
+                                <button type="button" class="btn-add-cart hero-diwali-cart-btn" data-product-id="prod_diwali_laddu" data-variant-id="var_500g" data-product-name="Diwali Festive Laddu Collection" data-product-price="499" aria-label="Add Diwali Festive Laddu Collection to cart">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                                    <span>Add Festive Box to Cart • ₹499</span>
+                                </button>
+                                <a href="product-details.html?id=prod_diwali_laddu" class="hero-diwali-details-link">View Gift Box Details →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 2: MAIN HERO - GHAR JAISA SWAAD & HYGIENIC ARTISANS -->
+                <div class="hero-slide hero-slide-main" role="group" aria-roledescription="slide" aria-label="Ghar Jaisa Swaad - Pure Homemade Pickles">
                     <img src="assets/SatvikSwaad_hero_main.jpg" alt="Satvik Swaad - Ghar jaisa swaad... ab har ghar tak! Authentic homemade pickles crafted by village women artisans" class="hero-slide-img" />
                 </div>
 
             </div>
 
-            <!-- CONTROLS (Hidden since single hero banner, selectors preserved for script.js) -->
-            <button class="slider-control-btn slider-control-prev" id="slider-prev" aria-label="Previous Slide" style="display: none !important;">❮</button>
-            <button class="slider-control-btn slider-control-next" id="slider-next" aria-label="Next Slide" style="display: none !important;">❯</button>
+            <!-- CONTROLS -->
+            <button class="slider-control-btn slider-control-prev" id="slider-prev" aria-label="Previous Slide">❮</button>
+            <button class="slider-control-btn slider-control-next" id="slider-next" aria-label="Next Slide">❯</button>
 
-            <!-- DOTS (Hidden since single hero banner, selectors preserved for script.js) -->
-            <div class="slider-dots-container" id="slider-dots" role="tablist" aria-label="Slider Pagination" style="display: none !important;">
+            <!-- DOTS -->
+            <div class="slider-dots-container" id="slider-dots" role="tablist" aria-label="Slider Pagination">
                 <button role="tab" class="slider-dot active" aria-selected="true" aria-label="Slide 1" data-slide="0"></button>
+                <button role="tab" class="slider-dot" aria-selected="false" aria-label="Slide 2" data-slide="1"></button>
             </div>
         </div>
     </section>
@@ -262,52 +313,7 @@
 
         <!-- FEATURED CATALOG SECTION (PRODUCTS CAROUSEL FIRST, THEN SEARCH & CATEGORY FILTERS) -->
         <section id="catalog" class="reveal catalog-section-ref" aria-label="Product Catalog">
-            <!-- GLORIOUS DIWALI FESTIVE LADDU COLLECTION SPOTLIGHT HERO BANNER -->
-            <div class="diwali-festive-hero-spotlight" id="diwali-festive-highlight">
-                <div class="diwali-spotlight-card">
-                    <div class="diwali-spotlight-visual">
-                        <span class="diwali-badge-glow">🪔 Diwali Special Edition</span>
-                        <img src="assets/diwali_festival_laddu.jpeg" alt="Diwali Festive Laddu Collection (Amla • Ragi • Singhada)" class="diwali-spotlight-img" loading="eager" />
-                        <div class="diwali-visual-flair">
-                            <span class="diwali-sparkle">✨ 100% Desi Cow Ghee</span>
-                            <span class="diwali-sparkle">🍯 Natural Honey &amp; Jaggery</span>
-                        </div>
-                    </div>
-                    <div class="diwali-spotlight-details">
-                        <div class="diwali-eyebrow">
-                            <span class="diwali-diya" aria-hidden="true">🪔</span>
-                            <span>FESTIVE HERITAGE SWEET BOX</span>
-                            <span class="diwali-diya" aria-hidden="true">🪔</span>
-                        </div>
-                        <h2 class="diwali-spotlight-title font-script">
-                            Diwali Festive Laddu Collection<br/>
-                            <span class="diwali-subtitle-trio">(Amla &bull; Ragi &bull; Singhada)</span>
-                        </h2>
-                        <p class="diwali-spotlight-desc">
-                            Handcrafted in pure A2 cow ghee with ancestral village reverence. A glorious festive harmony of Vitamin C-rich Amla, iron-packed Ragi, and fasting-pure Singhada dry fruit laddus. Zero synthetic preservatives, zero palm oil.
-                        </p>
-                        <div class="diwali-price-box">
-                            <div class="diwali-prices">
-                                <span class="diwali-sale-price price-val">₹499</span>
-                                <span class="diwali-mrp mrp-val">₹599</span>
-                                <span class="diwali-save-badge savings-tag">Save ₹100 (17% OFF)</span>
-                            </div>
-                            <div class="diwali-rating">
-                                <span class="star" aria-hidden="true">★</span>
-                                <span class="score">5.0</span>
-                                <span class="count">(48 festive reviews)</span>
-                            </div>
-                        </div>
-                        <div class="diwali-actions-row">
-                            <button type="button" class="btn-add-cart diwali-cart-btn" data-product-id="prod_diwali_laddu" data-variant-id="var_500g" data-product-name="Diwali Festive Laddu Collection" data-product-price="499" aria-label="Add Diwali Festive Laddu Collection to cart">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                                <span>Add Festive Box to Cart • ₹499</span>
-                            </button>
-                            <a href="product-details.html?id=prod_diwali_laddu" class="diwali-details-link">View Gift Box Details →</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- SEARCH + CATEGORY CONTROL ROW (ABOVE PRODUCTS) -->
             <div class="catalog-controls-bar">
@@ -2209,13 +2215,6 @@
             <span class="bottom-nav-icon">🛍️</span>
             <span class="bottom-nav-label">Products</span>
         </a>
-        <button type="button" class="bottom-nav-item" id="bottom-nav-cart" aria-label="Open Shopping Cart">
-            <div class="bottom-nav-icon-wrapper">
-                <span class="bottom-nav-icon">🛒</span>
-                <span class="bottom-cart-badge" id="bottom-cart-count-badge">0</span>
-            </div>
-            <span class="bottom-nav-label">Cart</span>
-        </button>
         <a href="profile.html" class="bottom-nav-item" id="bottom-nav-profile" aria-label="Open Account Profile">
             <span class="bottom-nav-icon">👤</span>
             <span class="bottom-nav-label">Profile</span>

@@ -21,9 +21,10 @@ export interface CreateOrderPayload {
   paymentMethod: string;
   items: OrderItemInput[];
   idempotencyKey: string;
+  discountCode?: string;
 }
 
-const ALLOWED_PAYMENT_METHODS = ['WhatsApp-Assisted Ordering', 'Cash on Delivery', 'UPI', 'Online Payment'];
+const ALLOWED_PAYMENT_METHODS = ['WhatsApp-Assisted Ordering', 'Cash on Delivery', 'UPI', 'Online Payment', 'COD', 'PAYU', 'RAZORPAY', 'UPI_MANUAL'];
 const ALLOWED_TOP_LEVEL_KEYS = new Set([
   'name',
   'phone',
@@ -38,7 +39,8 @@ const ALLOWED_TOP_LEVEL_KEYS = new Set([
   'note',
   'paymentMethod',
   'items',
-  'idempotencyKey'
+  'idempotencyKey',
+  'discountCode'
 ]);
 
 export function validateCreateOrderPayload(body: any): CreateOrderPayload {
@@ -54,7 +56,7 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
     }
   }
 
-  const { name, phone, address, email, house, street, landmark, city, state, pincode, note, paymentMethod, items, idempotencyKey } = body;
+  const { name, phone, address, email, house, street, landmark, city, state, pincode, note, paymentMethod, items, idempotencyKey, discountCode } = body;
 
   if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 100) {
     throw new ValidationError('Name must be between 2 and 100 characters');
@@ -75,6 +77,10 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
 
   if (typeof idempotencyKey !== 'string' || idempotencyKey.trim().length < 8 || idempotencyKey.trim().length > 64) {
     throw new ValidationError('Valid idempotencyKey required (8-64 characters)');
+  }
+
+  if (discountCode !== undefined && (typeof discountCode !== 'string' || discountCode.trim().length > 32)) {
+    throw new ValidationError('Invalid discountCode format');
   }
 
   if (!Array.isArray(items) || items.length === 0 || items.length > 20) {
@@ -130,7 +136,8 @@ export function validateCreateOrderPayload(body: any): CreateOrderPayload {
     ...(note ? { note: String(note).trim() } : {}),
     paymentMethod: paymentMethod ? String(paymentMethod).trim() : 'WhatsApp-Assisted Ordering',
     idempotencyKey: idempotencyKey.trim(),
-    items: validatedItems
+    items: validatedItems,
+    ...(discountCode ? { discountCode: String(discountCode).trim() } : {})
   };
 }
 

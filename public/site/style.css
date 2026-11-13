@@ -1212,6 +1212,227 @@ header.site-header {
 }
 .slider-dot.active { width: 38px; border-radius: 50px; background: var(--color-gold); border-color: var(--color-gold); }
 
+/* ==========================================================================
+   HERO SLIDER: SLIDE 1 DIWALI SPECIAL EDITION (DESKTOP & MOBILE RESPONSIVE)
+   ========================================================================== */
+.hero-slide-diwali {
+    background: linear-gradient(135deg, #FFFDF8 0%, #FFF9EE 45%, #FAF2E2 100%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.hero-diwali-slide-inner {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 60px;
+    display: grid;
+    grid-template-columns: 440px 1fr;
+    gap: 48px;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-diwali-visual-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.hero-diwali-badge-glow {
+    background: linear-gradient(135deg, #7A1F2D 0%, #A62B39 100%);
+    color: #FFFFFF;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(122, 31, 45, 0.35);
+    align-self: flex-start;
+}
+
+.hero-diwali-img-card {
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(212, 160, 23, 0.22), 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 2px solid #D4A017;
+    background: #FFFFFF;
+}
+
+.hero-diwali-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.hero-diwali-img-card:hover .hero-diwali-img {
+    transform: scale(1.03);
+}
+
+.hero-diwali-flair-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.hero-diwali-pill {
+    background: rgba(31, 74, 44, 0.9);
+    color: #FFFFFF;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.hero-diwali-content-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.hero-diwali-eyebrow {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #9C6C08;
+    margin-bottom: 6px;
+}
+
+.hero-diwali-title {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(2.2rem, 3.8vw, 2.9rem);
+    line-height: 1.1;
+    color: #1F4A2C;
+    margin: 0 0 6px 0;
+}
+
+.hero-diwali-subtitle {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #7A1F2D;
+    display: block;
+    margin-top: 3px;
+}
+
+.hero-diwali-desc {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #4A4A4A;
+    margin: 0 0 16px 0;
+    max-width: 580px;
+}
+
+.hero-diwali-price-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 18px;
+    border-radius: 14px;
+    border: 1px solid #EBDCCB;
+}
+
+.hero-diwali-prices {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.hero-diwali-sale-price {
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: #1F4A2C;
+}
+
+.hero-diwali-mrp {
+    font-size: 1.1rem;
+    color: #8C8C8C;
+    text-decoration: line-through;
+}
+
+.hero-diwali-save-badge {
+    background: #FFF0F0;
+    color: #C0392B;
+    border: 1px solid #F5C6CB;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.hero-diwali-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.88rem;
+    color: #4A4A4A;
+}
+
+.hero-diwali-rating .star {
+    color: #D4A017;
+    font-size: 1.05rem;
+}
+
+.hero-diwali-rating .score {
+    font-weight: 800;
+}
+
+.hero-diwali-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.hero-diwali-cart-btn {
+    background: linear-gradient(135deg, #1F4A2C 0%, #2A683E 100%) !important;
+    color: #FFFFFF !important;
+    padding: 12px 26px !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    border-radius: 12px !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 14px rgba(31, 74, 44, 0.28) !important;
+    transition: all 0.22s ease !important;
+}
+
+.hero-diwali-cart-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(31, 74, 44, 0.38) !important;
+}
+
+.hero-diwali-details-link {
+    font-weight: 800;
+    color: #7A1F2D;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.hero-diwali-details-link:hover {
+    color: #1F4A2C;
+    text-decoration: underline;
+}
+
 /* CATEGORY CIRCLES SHOWCASE (HOME PAGE COMPACT FEATURE) */
 .category-circles-section {
     width: 100%;
@@ -2032,7 +2253,7 @@ html, body {
     .logo-group {
         gap: 6px !important;
         max-width: calc(100% - 160px) !important;
-        overflow: hidden;
+        overflow: visible !important;
     }
 
     .logo-img {
@@ -2100,34 +2321,127 @@ html, body {
     .hero-slider-container {
         display: block !important;
         width: 100% !important;
-        aspect-ratio: 16 / 9 !important;
-        height: auto !important;
-        min-height: unset !important;
-        max-height: unset !important;
+        height: 250px !important;
+        min-height: 240px !important;
+        max-height: 260px !important;
+        aspect-ratio: unset !important;
+        position: relative !important;
+        overflow: hidden !important;
     }
     .hero-slides-track, .hero-slide {
         width: 100% !important;
         min-height: unset !important;
         height: 100% !important;
     }
+    .hero-slide-diwali {
+        background: linear-gradient(135deg, #FFFDF8 0%, #FFF9EE 45%, #FAF2E2 100%) !important;
+    }
+    .hero-diwali-slide-inner {
+        display: grid !important;
+        grid-template-columns: 125px 1fr !important;
+        gap: 10px !important;
+        padding: 8px 12px !important;
+        height: 100% !important;
+        align-items: center !important;
+        box-sizing: border-box !important;
+    }
+    .hero-diwali-visual-col {
+        gap: 0 !important;
+    }
+    .hero-diwali-badge-glow,
+    .hero-diwali-flair-row,
+    .hero-diwali-desc,
+    .hero-diwali-rating,
+    .hero-diwali-details-link {
+        display: none !important;
+    }
+    .hero-diwali-img-card {
+        border-radius: 12px !important;
+        border-width: 1.5px !important;
+        max-height: 155px !important;
+        box-shadow: 0 4px 12px rgba(212, 160, 23, 0.2) !important;
+    }
+    .hero-diwali-img {
+        width: 100% !important;
+        height: 145px !important;
+        aspect-ratio: unset !important;
+        object-fit: cover !important;
+    }
+    .hero-diwali-content-col {
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+    .hero-diwali-eyebrow {
+        font-size: 0.64rem !important;
+        letter-spacing: 0.6px !important;
+        margin-bottom: 2px !important;
+    }
+    .hero-diwali-title {
+        font-size: 1.15rem !important;
+        line-height: 1.1 !important;
+        margin: 0 0 2px 0 !important;
+    }
+    .hero-diwali-subtitle {
+        font-size: 0.75rem !important;
+        margin-top: 1px !important;
+    }
+    .hero-diwali-price-row {
+        padding: 4px 8px !important;
+        border-radius: 8px !important;
+        margin-bottom: 6px !important;
+        gap: 6px !important;
+    }
+    .hero-diwali-sale-price {
+        font-size: 1.15rem !important;
+    }
+    .hero-diwali-mrp {
+        font-size: 0.82rem !important;
+    }
+    .hero-diwali-save-badge {
+        font-size: 0.66rem !important;
+        padding: 1px 4px !important;
+    }
+    .hero-diwali-actions {
+        width: 100% !important;
+        gap: 0 !important;
+    }
+    .hero-diwali-cart-btn {
+        width: 100% !important;
+        padding: 7px 10px !important;
+        font-size: 0.78rem !important;
+        min-height: 34px !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        gap: 6px !important;
+    }
+    .hero-diwali-cart-btn svg {
+        width: 15px !important;
+        height: 15px !important;
+    }
     .mobile-hero-card {
         display: none !important;
     }
     .slider-control-btn {
-        width: 36px !important;
-        height: 36px !important;
-        font-size: 1rem !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.9rem !important;
     }
-    .slider-control-prev { left: 8px !important; }
-    .slider-control-next { right: 8px !important; }
+    .slider-control-prev { left: 6px !important; }
+    .slider-control-next { right: 6px !important; }
     .slider-dots-container {
-        bottom: 8px !important;
-        padding: 4px 12px !important;
+        bottom: 6px !important;
+        padding: 3px 10px !important;
         gap: 6px !important;
     }
     .slider-dot {
-        width: 8px !important;
-        height: 8px !important;
+        width: 6px !important;
+        height: 6px !important;
+    }
+    .slider-dot.active {
+        width: 22px !important;
+    }
     }
     .slider-dot.active {
         width: 20px !important;
@@ -7548,13 +7862,16 @@ body.story-page,
 
 @media (max-width: 768px) {
     .ref-story-col-left {
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 12px !important;
-        width: 100% !important;
-        margin: 0 auto 20px !important;
+        display: none !important;
+    }
+    .ref-story-page-main,
+    .ref-story-journey-section {
+        padding-top: 12px !important;
+        margin-top: 0 !important;
+    }
+    .ref-story-journey-container {
+        padding-top: 8px !important;
+        gap: 16px !important;
     }
     .ref-story-doodle-wrap {
         width: auto !important;
@@ -9601,31 +9918,48 @@ input:checked + .slider:before {
     }
 
     .ref-header .logo-group {
-        width: 52px !important;
+        width: 56px !important;
         height: 52px !important;
         flex-shrink: 0 !important;
         position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: visible !important;
+        z-index: 25 !important;
     }
 
     .ref-logo-ring {
-        width: 52px !important;
-        height: 52px !important;
-        top: 6px !important;
-        border-width: 1.5px !important;
+        width: 56px !important;
+        height: 56px !important;
+        top: 8px !important;
+        border-width: 2px !important;
+        border-color: rgba(229,168,37,0.85) !important;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+        background: #FFFFFF !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08) !important;
         position: relative !important;
         z-index: 5 !important;
+        display: block !important;
     }
 
     .logo-curve-svg {
+        display: block !important;
+        visibility: visible !important;
         position: absolute !important;
         top: 100% !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 80px !important;
-        height: 18px !important;
+        width: 100px !important;
+        height: 26px !important;
         pointer-events: none !important;
         z-index: 1 !important;
         margin-top: -1px !important;
+    }
+
+    .logo-curve-svg path {
+        fill: #FAF5EB !important;
     }
 
     .ref-nav {
@@ -10464,19 +10798,20 @@ input:checked + .slider:before {
     }
 
     .ref-header .logo-group {
-        width: 46px !important;
-        height: 46px !important;
+        width: 48px !important;
+        height: 48px !important;
+        overflow: visible !important;
     }
 
     .ref-logo-ring {
-        width: 46px !important;
-        height: 46px !important;
-        top: 5px !important;
+        width: 50px !important;
+        height: 50px !important;
+        top: 6px !important;
     }
 
     .logo-curve-svg {
-        width: 72px !important;
-        height: 16px !important;
+        width: 88px !important;
+        height: 22px !important;
     }
 
     .ref-product-grid {
@@ -13701,16 +14036,173 @@ html[dir="rtl"] .why-choose-right-doodles {
 /* ==========================================================================
    PROFILE PAGE COMPACT LAYOUT (DECREASE GAPS & REMOVE SIDEBAR DOODLE)
    ========================================================================== */
-.profile-main-layout {
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-    padding: 20px 24px 44px !important;
-    display: grid !important;
-    grid-template-columns: 260px minmax(0, 1fr) 280px !important;
-    gap: 22px !important; /* Decreased gap from 32px */
-    align-items: start !important;
-    background-color: #FAF5EB !important;
-    box-sizing: border-box !important;
+@media (min-width: 861px) {
+    .profile-main-layout {
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+        padding: 20px 24px 44px !important;
+        display: grid !important;
+        grid-template-columns: 260px minmax(0, 1fr) 280px !important;
+        gap: 22px !important; /* Decreased gap from 32px */
+        align-items: start !important;
+        background-color: #FAF5EB !important;
+        box-sizing: border-box !important;
+    }
+}
+
+@media (max-width: 860px) {
+    .profile-main-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 12px 14px 75px 14px !important;
+        gap: 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    .profile-sidebar {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .profile-sidebar-card {
+        width: 100% !important;
+        padding: 14px !important;
+        border-radius: 16px !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+    }
+
+    .profile-user-card-inner {
+        padding-bottom: 12px !important;
+        gap: 12px !important;
+    }
+
+    .profile-avatar-circle {
+        width: 52px !important;
+        height: 52px !important;
+        min-width: 52px !important;
+        font-size: 1.35rem !important;
+    }
+
+    .profile-user-name {
+        font-size: 1.2rem !important;
+        margin-bottom: 2px !important;
+    }
+
+    .profile-user-subtitle {
+        font-size: 0.82rem !important;
+    }
+
+    .profile-google-badge {
+        padding: 3px 8px !important;
+        font-size: 0.72rem !important;
+        margin-top: 4px !important;
+    }
+
+    /* Horizontal Tab Pills Bar for Mobile */
+    .profile-nav {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        gap: 8px !important;
+        padding: 4px 2px !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        border: none !important;
+    }
+
+    .profile-nav::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .profile-nav-btn {
+        flex: 0 0 auto !important;
+        padding: 8px 14px !important;
+        font-size: 0.85rem !important;
+        border-radius: 20px !important;
+        white-space: nowrap !important;
+        gap: 6px !important;
+        background: #FFFFFF !important;
+        border: 1px solid #E5DEC9 !important;
+        color: #234B34 !important;
+    }
+
+    .profile-nav-btn.active {
+        background: #194626 !important;
+        color: #FFFFFF !important;
+        border-color: #194626 !important;
+    }
+
+    .profile-nav-count {
+        background: rgba(255, 255, 255, 0.25) !important;
+        color: #FFFFFF !important;
+        font-size: 0.72rem !important;
+        padding: 2px 6px !important;
+        border-radius: 10px !important;
+    }
+
+    .profile-nav-btn:not(.active) .profile-nav-count {
+        background: #E5DEC9 !important;
+        color: #234B34 !important;
+    }
+
+    .profile-nav-divider {
+        display: none !important;
+    }
+
+    .profile-nav-auth-btn.profile-nav-signout {
+        color: #C0392B !important;
+        border-color: #F5C6CB !important;
+    }
+
+    /* Content Area */
+    .profile-content-area {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .profile-card {
+        border-radius: 16px !important;
+        padding: 16px !important;
+        margin-bottom: 14px !important;
+        box-sizing: border-box !important;
+    }
+
+    .profile-card-header {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        margin-bottom: 14px !important;
+    }
+
+    .profile-card-title {
+        font-size: 1.25rem !important;
+    }
+
+    .profile-info-grid,
+    .profile-form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .profile-info-item label {
+        font-size: 0.75rem !important;
+    }
+
+    .profile-info-item p {
+        font-size: 0.95rem !important;
+    }
+
+    .btn-profile-action {
+        padding: 6px 12px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .profile-right-col {
+        display: none !important;
+    }
 }
 
 .profile-sidebar-card {
@@ -14086,6 +14578,133 @@ body:has(.contact-content-section) footer.site-footer {
 .diwali-details-link:hover {
     color: #1F4A2C;
     text-decoration: underline;
+}
+
+/* ── Mobile-Specific Compact View for Diwali Spotlight (max-width: 768px) ── */
+@media (max-width: 768px) {
+    .diwali-festive-hero-spotlight {
+        max-width: 100% !important;
+        margin: 0 auto 16px auto !important;
+        padding: 0 10px !important;
+    }
+
+    .diwali-spotlight-card {
+        padding: 12px 14px !important;
+        border-radius: 16px !important;
+        gap: 12px !important;
+        border-width: 1.5px !important;
+    }
+
+    .diwali-spotlight-card::before {
+        display: none !important;
+    }
+
+    .diwali-spotlight-visual {
+        border-radius: 12px !important;
+        max-height: 180px !important;
+    }
+
+    .diwali-spotlight-img {
+        max-height: 180px !important;
+        aspect-ratio: 16/9 !important;
+        object-fit: cover !important;
+    }
+
+    .diwali-badge-glow {
+        top: 8px !important;
+        left: 8px !important;
+        font-size: 0.68rem !important;
+        padding: 3px 8px !important;
+        border-radius: 12px !important;
+    }
+
+    .diwali-visual-flair {
+        bottom: 6px !important;
+        left: 6px !important;
+        right: 6px !important;
+        gap: 4px !important;
+    }
+
+    .diwali-sparkle {
+        font-size: 0.65rem !important;
+        padding: 2px 7px !important;
+        border-radius: 8px !important;
+    }
+
+    .diwali-eyebrow {
+        font-size: 0.72rem !important;
+        letter-spacing: 0.8px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .diwali-spotlight-title {
+        font-size: 1.35rem !important;
+        line-height: 1.15 !important;
+        margin: 0 0 3px 0 !important;
+    }
+
+    .diwali-subtitle-trio {
+        font-size: 0.85rem !important;
+        margin-top: 2px !important;
+    }
+
+    .diwali-spotlight-desc {
+        font-size: 0.82rem !important;
+        line-height: 1.38 !important;
+        margin: 0 0 10px 0 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 3 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    .diwali-price-box {
+        padding: 8px 12px !important;
+        border-radius: 10px !important;
+        margin-bottom: 12px !important;
+        gap: 6px !important;
+    }
+
+    .diwali-sale-price {
+        font-size: 1.3rem !important;
+    }
+
+    .diwali-mrp {
+        font-size: 0.92rem !important;
+    }
+
+    .diwali-save-badge {
+        font-size: 0.72rem !important;
+        padding: 2px 6px !important;
+    }
+
+    .diwali-rating {
+        font-size: 0.78rem !important;
+    }
+
+    .diwali-rating .star {
+        font-size: 0.95rem !important;
+    }
+
+    .diwali-actions-row {
+        gap: 8px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .diwali-cart-btn {
+        padding: 10px 16px !important;
+        font-size: 0.88rem !important;
+        min-height: 42px !important;
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .diwali-details-link {
+        font-size: 0.82rem !important;
+        text-align: center !important;
+        padding: 4px 0 !important;
+    }
 }
 
 /* ── 2. Festive Highlight Card in Product Marquee ── */
