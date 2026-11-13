@@ -1,6 +1,6 @@
 # Satvik Swaad — Master Engineering & Security Specification
 
-Nov 9, 2026 · @satvik
+Version 2.6 · Owner approved on 2026-11-13 · @satvik
 
 ## 1. Purpose, authority and how every agent must use this document
 
@@ -25,6 +25,25 @@ This document is the single source of truth for Satvik Swaad. When code, a chat 
 | DOC-6 | Only the Architect role edits this document, through a Change Request (section 14). Other agents propose changes in the ticket. |
 | DOC-7 | This is a specification, not a certification. No agent writes "attack-proof", "bank-grade" or "OWASP compliant" in code, comments or UI. The honest target is OWASP ASVS Level 2, verified by tests in section 16 and an external review. |
 | DOC-8 | A rule is only "done" when it is implemented, covered by a named test, and ticked in section 19. Writing the code alone does not count. |
+
+### 1.1 Changelog: Version 2.6 (Owner Approved Decisions on 2026-11-13)
+The following decisions were approved by the owner and incorporated into the specification:
+1. **D1 Backend**: Always-on hosting (Cloud Run min 1 instance or Render paid) with Dockerfile.
+2. **D3 Manual UPI**: Disabled by default (`upiManualEnabled=false`).
+3. **D4 Admin Second Factor**: Cloudflare Access + Google 2-Step verification; Admin service validates `Cf-Access-Jwt-Assertion` JWT (rule AUTH-11).
+4. **D6 Messages**: Email first channel.
+5. **D7 Refunds**: Owner performs refunds in gateway dashboard; system tracks `REFUND_PENDING` and admin marks refunded with gateway refund ID (step-up & second approval per REFUND-3).
+6. **D8 Customer Claim Window**: 48 hours for food complaints.
+7. **D9 Rate Limit Store**: Firestore counters in collection `rateLimits` with TTL (Redis later).
+8. **Newsletter**: API-only endpoint (`/api/v1/newsletter/subscribe`) with Turnstile verification, rate limiting, explicit consent, and `newsletterSubscribers` collection.
+9. **Test & Path Ownership**: Disjoint path ownership per section 14.1; tests authored in `backend/tests/<area>/`; root `shared/` is the single source of truth for shared domain foundation.
+10. **Collections Finalization**: Approved additions `rateLimits`, `idempotencyKeys`, `newsletterSubscribers`, `shifts`. Merged legacy collections `inventory_logs` -> `stockMovements`, `payment_transactions` & `paymentAuditLog` -> `payments` & `audit_logs`, `messages` -> `contactMessages`, `customers` & `addresses` -> `users`, `offline_finances` -> `orders` (offline) + `shifts`. `_health` must not write to Firestore.
+11. **DB-1 Phased Migration**: API-first migration with temporary 14-day rules patch on `users`, followed by universal deny-all.
+12. **CSP Staging**: Starts as `Content-Security-Policy-Report-Only` and enforces when banned-pattern scan is 0.
+13. **Quote TTL**: 10 minutes (`POST /api/quotes`).
+14. **Pincodes**: Loaded strictly from `config/deliveryZones`.
+15. **Tax & HSN**: Bound to variants; product cannot be activated without them.
+16. **STATE-1..6**: Centralized compare-and-set `transition()` runner in Firestore transaction with `orders/{id}/events` append-only audit trail; CANCELLED, DELIVERED, RETURNED are terminal and cannot be changed.
 
 **What changed from manual v2.5.** The old manual used several names for the same state (`AWAITING_PAYMENT` / `INITIATED`, `PAID` / `PAYMENT_VERIFIED`, `PROCESSING` / `IN_KITCHEN`), two values for the step-up window (300 s and 900 s), and described features the stack cannot deliver (per-request CSP nonces on static hosting, an edge WAF that was not deployed). This document picks one name and one value for each and fixes the contradictions. Old names must not appear in new code.
 
@@ -1334,16 +1353,16 @@ Agents use the recommended default until the owner writes a different answer in 
 
 | ID | Decision | Options | Recommended default | Blocks | Owner's answer |
 | --- | --- | --- | --- | --- | --- |
-| D1 | Where the back end runs | Google Cloud Run free quota (scales to zero, short start-up delay) or Render's cheapest always-on paid plan | Always-on, so payment callbacks never reach a sleeping server. Cloud Run with one minimum instance, or Render paid. Render's free plan sleeps and must not be used for payments. | Section 3, P0 backlog |  |
-| D2 | The numeric limits in 20.2 | Keep or change each number | Keep the defaults | REFUND-3, COD-1, UPI-2, POS-3, PRICE-2, STOCK-3 |  |
-| D3 | Manual UPI with typed UTR | Off, or on with the limits in 6.2, or replace with gateway UPI QR (UPI-8) | Off at launch. Add gateway UPI QR later. | Section 6.2 |  |
-| D4 | Second factor for staff and admin | Cloudflare Access with Google 2-Step Verification (no extra cost), or Firebase multi-factor authentication (may need a plan upgrade) | Cloudflare Access with 2-Step Verification enforced, hardware key for the owner | AUTH-4 |  |
-| D5 | Free-shipping threshold basis and pincode lists | Threshold before or after discounts; the lists of Deoria and serviceable pincodes | After discounts (7.2). The owner supplies the pincode lists. | PRICE-4, 7.2 |  |
-| D6 | Customer message channel and provider | Email, WhatsApp Business, SMS | Email first (lowest cost), WhatsApp later | 12.5 |  |
-| D7 | Who performs refunds | Owner in the gateway dashboard, or the admin service through the gateway API | Dashboard until the gateway confirms API refunds can be restricted (SECRETS-6) | REFUND-1, SECRETS-6 |  |
-| D8 | Damage-claim and refund windows | Claim window of 2 to 4 hours (v2.5), 24 hours, or 48 hours; refund within 5 to 7 business days | 48-hour claim window, refund within 5 to 7 business days | CONS-5 |  |
-| D9 | Shared store for rate limits | A free-tier Redis service, or Firestore counters | A free-tier Redis service | 10.3 |  |
-| D10 | Domain names | Store, `api.`, `admin.`, `img.` hostnames | Owner provides the registered domain | Section 3 |  |
+| D1 | Where the back end runs | Google Cloud Run free quota (scales to zero, short start-up delay) or Render's cheapest always-on paid plan | Always-on, so payment callbacks never reach a sleeping server. Cloud Run with one minimum instance, or Render paid. Render's free plan sleeps and must not be used for payments. | Section 3, P0 backlog | Always-on: Cloud Run (min 1 instance) or Render paid. Code host-agnostic, with Dockerfile. |
+| D2 | The numeric limits in 20.2 | Keep or change each number | Keep the defaults | REFUND-3, COD-1, UPI-2, POS-3, PRICE-2, STOCK-3 | Keep defaults. Quote TTL 10 minutes. |
+| D3 | Manual UPI with typed UTR | Off, or on with the limits in 6.2, or replace with gateway UPI QR (UPI-8) | Off at launch. Add gateway UPI QR later. | Section 6.2 | OFF by default (flag `upiManualEnabled=false`). |
+| D4 | Second factor for staff and admin | Cloudflare Access with Google 2-Step Verification (no extra cost), or Firebase multi-factor authentication (may need a plan upgrade) | Cloudflare Access with 2-Step Verification enforced, hardware key for the owner | AUTH-4 | Cloudflare Access + Google 2-Step. Admin service verifies the `Cf-Access-Jwt-Assertion` JWT (rule AUTH-11). |
+| D5 | Free-shipping threshold basis and pincode lists | Threshold before or after discounts; the lists of Deoria and serviceable pincodes | After discounts (7.2). The owner supplies the pincode lists. | PRICE-4, 7.2 | Free shipping threshold ₹499 after discounts. Pincode lists come strictly from `config/deliveryZones`. |
+| D6 | Customer message channel and provider | Email, WhatsApp Business, SMS | Email first (lowest cost), WhatsApp later | 12.5 | Email first. |
+| D7 | Who performs refunds | Owner in the gateway dashboard, or the admin service through the gateway API | Dashboard until the gateway confirms API refunds can be restricted (SECRETS-6) | REFUND-1, SECRETS-6 | Done in gateway dashboard by owner; system records `REFUND_PENDING`, then admin marks refunded with gateway refund ID (step-up, second approval per REFUND-3). |
+| D8 | Damage-claim and refund windows | Claim window of 2 to 4 hours (v2.5), 24 hours, or 48 hours; refund within 5 to 7 business days | 48-hour claim window, refund within 5 to 7 business days | CONS-5 | 48-hour claim window, refund within 5 to 7 business days. |
+| D9 | Shared store for rate limits | A free-tier Redis service, or Firestore counters | A free-tier Redis service | 10.3 | Firestore counters in collection `rateLimits` with TTL (Redis later). |
+| D10 | Domain names | Store, `api.`, `admin.`, `img.` hostnames | Owner provides the registered domain | Section 3 | Owner provides registered domains (`satvikswaad.com`, `admin.`, `api.`, `img.`). |
 
 ### 20.2 Current limits (each is stored in `config`, so changing one needs no code change)
 

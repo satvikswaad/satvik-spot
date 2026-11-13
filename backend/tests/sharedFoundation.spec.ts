@@ -15,7 +15,9 @@ import {
   getNextValidOrderStatuses,
   getNextValidPaymentStatuses,
   validateOrderCreationPayload,
-  TransitionError
+  TransitionError,
+  transition,
+  validateAndCalculateTransition
 } from '../../shared';
 
 describe('Wave 1 — Shared Foundation & Domain Rules (Architect)', () => {
@@ -204,6 +206,171 @@ describe('Wave 1 — Shared Foundation & Domain Rules (Architect)', () => {
       expect(isValidTransition('payment', 'PAID', 'REFUND_PENDING')).toBe(true);
       expect(isValidTransition('payment', 'REFUND_PENDING', 'REFUNDED')).toBe(true);
       expect(isValidTransition('payment', 'REFUNDED', 'PAID')).toBe(false);
+    });
+
+    describe('STATE-1..6 Table-Driven Transitions & Canonical transition() Function', () => {
+      const legalOrderCases: [string, string][] = [
+        ['PLACED', 'CONFIRMED'],
+        ['PLACED', 'CANCELLED'],
+        ['PLACED', 'EXPIRED'],
+        ['CONFIRMED', 'PROCESSING'],
+        ['CONFIRMED', 'CANCELLED'],
+        ['PROCESSING', 'SHIPPED'],
+        ['PROCESSING', 'CANCELLED'],
+        ['SHIPPED', 'DELIVERED'],
+        ['SHIPPED', 'RETURNED'],
+        ['DELIVERED', 'RETURNED'],
+        ['EXPIRED', 'CONFIRMED']
+      ];
+
+      test.each(legalOrderCases)('Legal order transition: %s -> %s', (from, to) => {
+        const result = validateAndCalculateTransition({
+          currentOrderStatus: from as any,
+          targetOrderStatus: to as any,
+          actor: { uid: 'admin_test', role: 'admin_owner', authTimestampSeconds: Math.floor(Date.now() / 1000) }
+        });
+        expect(result.orderStatus).toBe(to);
+        expect(result.changed).toBe(true);
+      });
+
+      const illegalOrderCases: [string, string][] = [
+        ['CANCELLED', 'CONFIRMED'],
+        ['CANCELLED', 'PROCESSING'],
+        ['DELIVERED', 'PLACED'],
+        ['DELIVERED', 'SHIPPED'],
+        ['RETURNED', 'DELIVERED'],
+        ['EXPIRED', 'SHIPPED'],
+        ['PROCESSING', 'PLACED']
+      ];
+
+      test.each(illegalOrderCases)('Illegal order transition rejected: %s -> %s', (from, to) => {
+        expect(() => {
+          validateAndCalculateTransition({
+            currentOrderStatus: from as any,
+            targetOrderStatus: to as any,
+            actor: { uid: 'admin_test', role: 'admin_owner', authTimestampSeconds: Math.floor(Date.now() / 1000) }
+          });
+        }).toThrow(TransitionError);
+      });
+
+      it('STATE-2, STATE-3: transition() executes compare-and-set and appends event to orders/{id}/events', async () => {
+        let storedOrder: any = {
+          orderStatus: 'PLACED',
+          paymentStatus: 'UNPAID',
+          version: 1
+        };
+        const eventsAppended: any[] = [];
+
+        const mockTxn = {
+          get: async () => ({
+            exists: true,
+            data: () => ({ ...storedOrder })
+          }),
+          update: (_ref: any, data: any) => {
+            storedOrder = { ...storedOrder, ...data };
+          },
+          create: (_ref: any, data: any) => {
+            eventsAppended.push(data);
+          }
+        };
+
+        const mockDb = {
+          collection: () => ({
+            doc: () => ({
+              collection: () => ({ doc: () => ({}) })
+            })
+          }),
+          runTransaction: async (fn: any) => fn(mockTxn)
+        };
+
+        const result = await transition(mockDb, {
+          orderId: 'SS-ORDER-1234',
+          targetOrderStatus: 'CONFIRMED',
+          actor: { uid: 'staff_1', role: 'staff' },
+          reason: 'Manual phone verification'
+        });
+
+        expect(result.success).toBe(true);
+        expect(result.newOrderStatus).toBe('CONFIRMED');
+        expect(result.version).toBe(2);
+        expect(storedOrder.orderStatus).toBe('CONFIRMED');
+        expect(storedOrder.version).toBe(2);
+        expect(eventsAppended.length).toBe(1);
+        expect(eventsAppended[0].fromOrderStatus).toBe('PLACED');
+        expect(eventsAppended[0].toOrderStatus).toBe('CONFIRMED');
+        expect(eventsAppended[0].actor.uid).toBe('staff_1');
+        expect(eventsAppended[0].version).toBe(2);
+      });
+
+      it('STATE-4: transition() handles same-state as idempotent no-op without creating event', async () => {
+        const storedOrder = {
+          orderStatus: 'CONFIRMED',
+          paymentStatus: 'PAID',
+          version: 3
+        };
+        const eventsAppended: any[] = [];
+
+        const mockTxn = {
+          get: async () => ({
+            exists: true,
+            data: () => ({ ...storedOrder })
+          }),
+          update: jest.fn(),
+          create: (_ref: any, data: any) => {
+            eventsAppended.push(data);
+          }
+        };
+
+        const mockDb = {
+          collection: () => ({ doc: () => ({ collection: () => ({ doc: () => ({}) }) }) }),
+          runTransaction: async (fn: any) => fn(mockTxn)
+        };
+
+        const result = await transition(mockDb, {
+          orderId: 'SS-ORDER-1234',
+          targetOrderStatus: 'CONFIRMED',
+          actor: { uid: 'admin_1', role: 'admin_owner' }
+        });
+
+        expect(result.success).toBe(true);
+        expect(result.changed).toBe(false);
+        expect(result.version).toBe(3);
+        expect(mockTxn.update).not.toHaveBeenCalled();
+        expect(eventsAppended.length).toBe(0);
+      });
+
+      it('STATE-6: transition() throws 403 when step-up is expired on privileged transition', async () => {
+        const storedOrder = {
+          orderStatus: 'CONFIRMED',
+          paymentStatus: 'PAID',
+          version: 2
+        };
+
+        const mockTxn = {
+          get: async () => ({
+            exists: true,
+            data: () => ({ ...storedOrder })
+          }),
+          update: jest.fn(),
+          create: jest.fn()
+        };
+
+        const mockDb = {
+          collection: () => ({ doc: () => ({ collection: () => ({ doc: () => ({}) }) }) }),
+          runTransaction: async (fn: any) => fn(mockTxn)
+        };
+
+        const staleTimestamp = Math.floor(Date.now() / 1000) - 305; // 305s ago (> 300s)
+
+        await expect(
+          transition(mockDb, {
+            orderId: 'SS-ORDER-1234',
+            targetOrderStatus: 'CANCELLED',
+            actor: { uid: 'admin_1', role: 'admin_owner', authTimestampSeconds: staleTimestamp },
+            reason: 'Customer requested cancellation'
+          })
+        ).rejects.toThrow(TransitionError);
+      });
     });
   });
 });

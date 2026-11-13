@@ -6,6 +6,7 @@ import { processAuthoritativeOrder, processWhatsAppOrderRequest, submitUtrForOrd
 import { hashGuestSecret } from '../guest/guestService';
 import { db } from '../config/firebase';
 import { ValidationError, AuthorizationError, AppError, CommerceNotAvailableError } from '../errors/AppError';
+import { assertOrderOwnership } from '../auth/securityGateService';
 import { envConfig } from '../config/environment';
 import { logger } from '../utils/logger';
 
@@ -95,23 +96,22 @@ export async function lookupGuestOrderHandler(req: AuthenticatedRequest, res: Re
 
     const data = snap.data()!;
 
-    // AUTH-2, AUTH-3: Return 404 for failed guest secret / missing secret, compare with timingSafeEqual
-    if (!data.guestSecretHash) {
-      throw new AppError('Order not found', 404, 'NOT_FOUND');
-    }
-
-    const providedHash = hashGuestSecret(guestAccessSecret.trim());
-    const bufProvided = Buffer.from(providedHash, 'utf8');
-    const bufStored = Buffer.from(data.guestSecretHash, 'utf8');
-
-    const isValid = bufProvided.length === bufStored.length && crypto.timingSafeEqual(bufProvided, bufStored);
-    if (!isValid) {
-      logger.warn('Failed guest order lookup attempt with invalid secret', { orderId });
-      throw new AppError('Order not found', 404, 'NOT_FOUND');
-    }
+    // AUTH-2, AUTH-3: Enforce BOLA via canonical assertOrderOwnership (returns 404 on mismatch)
+    assertOrderOwnership(
+      {
+        orderId: data.orderId || orderId,
+        userId: data.userId,
+        guestTokenHash: data.guestSecretHash || data.guestTokenHash
+      },
+      {
+        guestToken: guestAccessSecret.trim(),
+        uid: req.user?.uid,
+        isAdmin: req.user?.isAdmin
+      }
+    );
 
     // Omit internal secret hash before sending back
-    const { guestSecretHash, ...safeOrderData } = data;
+    const { guestSecretHash, guestTokenHash, ...safeOrderData } = data;
 
     res.status(200).json({
       success: true,

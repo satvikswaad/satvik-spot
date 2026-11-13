@@ -14,19 +14,18 @@
 
 import * as crypto from 'crypto';
 import { hashGuestToken, CONFIG_LIMITS } from '../shared';
+import { AppError } from '../errors/AppError';
 
-export class ResourceNotFoundError extends Error {
-  public readonly statusCode = 404;
+export class ResourceNotFoundError extends AppError {
   constructor(resource = 'Order') {
-    super(`${resource} not found`);
+    super(`${resource} not found`, 404, 'NOT_FOUND');
     this.name = 'ResourceNotFoundError';
   }
 }
 
-export class OriginSecurityError extends Error {
-  public readonly statusCode = 403;
+export class OriginSecurityError extends AppError {
   constructor(message = 'Origin validation failed. Direct traffic not permitted.') {
-    super(message);
+    super(message, 403, 'ORIGIN_FORBIDDEN');
     this.name = 'OriginSecurityError';
   }
 }

@@ -124,11 +124,14 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
 // Health & Readiness Endpoints (Do not require auth token or rate limiting)
 app.use(healthRouter);
 
-// Origin Gate Middleware (ARCH-6): Drops direct traffic missing valid X-Origin-Auth when ORIGIN_GATE_ENABLED=true
-if (process.env.ORIGIN_GATE_ENABLED === 'true') {
-  const secret = process.env.ORIGIN_AUTH_SECRET || 'dev-fallback-origin-secret-32-bytes!';
-  app.use('/api', originGateMiddleware(secret));
-}
+// Origin Gate Middleware (ARCH-6): Drops direct traffic missing valid X-Origin-Auth when ORIGIN_GATE_ENABLED=true or in production
+const originSecret = process.env.ORIGIN_AUTH_SECRET || 'dev-fallback-origin-secret-32-bytes!';
+app.use('/api', (req, res, next) => {
+  if (process.env.ORIGIN_GATE_ENABLED === 'true' || envConfig.originGateEnabled) {
+    return originGateMiddleware(originSecret)(req, res, next);
+  }
+  next();
+});
 
 // Payment Endpoint Gate — Rejected with 503 before Auth verification when payments disabled
 app.post('/api/v1/payments/process', (_req: Request, _res: Response, next: NextFunction) => {

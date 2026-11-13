@@ -95,7 +95,7 @@ export const envConfig: FeatureGateConfig & RegulatoryConfig & ServerConfig & Ra
 
 export const ALLOWED_ENV_NAMES = ['development', 'test', 'local', 'staging', 'production'];
 
-export function validateStartupConfig(overrideEnv?: Partial<ServerConfig & FeatureGateConfig & RegulatoryConfig>): { valid: boolean; errors: string[] } {
+export function validateStartupConfig(overrideEnv?: Partial<ServerConfig & FeatureGateConfig & RegulatoryConfig & RazorpayConfig & PayUConfig>): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   const nodeEnv = overrideEnv?.nodeEnv || process.env.NODE_ENV || envConfig.nodeEnv;
@@ -181,16 +181,19 @@ export function validateStartupConfig(overrideEnv?: Partial<ServerConfig & Featu
   }
 
   // Startup Test/Live Key Check (PAY-11, AGENT-7)
+  const currentRzpKey = overrideEnv?.razorpayKeyId || envConfig.razorpayKeyId;
+  const currentPayuEnv = overrideEnv?.payuEnv || envConfig.payuEnv;
+
   if (nodeEnv === 'production') {
-    if (envConfig.razorpayKeyId && envConfig.razorpayKeyId.startsWith('rzp_test_')) {
+    if (currentRzpKey && currentRzpKey.startsWith('rzp_test_')) {
       errors.push('CRITICAL SECURITY ERROR: Razorpay test key (rzp_test_) detected in production environment');
     }
-    if (envConfig.payuEnv === 'TEST') {
+    if (currentPayuEnv === 'TEST') {
       errors.push('CRITICAL SECURITY ERROR: PayU TEST environment configured for production');
     }
   } else {
     // Non-production (dev, test, staging)
-    if (envConfig.razorpayKeyId && envConfig.razorpayKeyId.startsWith('rzp_live_')) {
+    if (currentRzpKey && currentRzpKey.startsWith('rzp_live_')) {
       errors.push('CRITICAL SECURITY ERROR: Razorpay live key (rzp_live_) forbidden in non-production environment');
     }
   }

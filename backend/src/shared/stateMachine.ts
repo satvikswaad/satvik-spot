@@ -159,10 +159,17 @@ export function validateAndCalculateTransition(params: TransitionParams): Transi
         400
       );
     }
-    // STATE-5: Terminal states CANCELLED, DELIVERED, RETURNED never change
-    if (currentOrderStatus === 'CANCELLED' || currentOrderStatus === 'DELIVERED' || currentOrderStatus === 'RETURNED') {
+    // STATE-5: Terminal states CANCELLED and RETURNED never change
+    if (currentOrderStatus === 'CANCELLED' || currentOrderStatus === 'RETURNED') {
       throw new TransitionError(
         `Terminal state '${currentOrderStatus}' cannot be transitioned to '${targetOrderStatus}'.`,
+        400
+      );
+    }
+    // DELIVERED can only transition to RETURNED (Section 4.2)
+    if (currentOrderStatus === 'DELIVERED' && targetOrderStatus !== 'RETURNED') {
+      throw new TransitionError(
+        `DELIVERED orders can only transition to RETURNED.`,
         400
       );
     }
@@ -202,4 +209,118 @@ export function validateAndCalculateTransition(params: TransitionParams): Transi
     paymentStatus: nextPaymentStatus,
     changed: true
   };
+}
+
+export interface TransitionContext {
+  orderId: string;
+  targetOrderStatus?: OrderStatus;
+  targetPaymentStatus?: PaymentStatus;
+  actor: {
+    uid: string;
+    role: string;
+    authTimestampSeconds?: number;
+  };
+  reason?: string;
+  existingTransaction?: any;
+}
+
+export interface TransitionExecutionResult {
+  success: boolean;
+  orderId: string;
+  previousOrderStatus: OrderStatus;
+  newOrderStatus: OrderStatus;
+  previousPaymentStatus?: PaymentStatus;
+  newPaymentStatus?: PaymentStatus;
+  version: number;
+  changed: boolean;
+}
+
+/**
+ * Executes a canonical order state machine transition inside a Firestore transaction (STATE-1, STATE-2, STATE-3).
+ * Enforces compare-and-set semantics, increments order.version, and writes an append-only event to orders/{id}/events.
+ */
+export async function transition(
+  db: any,
+  context: TransitionContext
+): Promise<TransitionExecutionResult> {
+  const { orderId, targetOrderStatus, targetPaymentStatus, actor, reason, existingTransaction } = context;
+
+  const executeInsideTransaction = async (txn: any): Promise<TransitionExecutionResult> => {
+    const orderRef = db.collection('orders').doc(orderId);
+    const snap = await txn.get(orderRef);
+    if (!snap.exists) {
+      throw new TransitionError(`Order ${orderId} does not exist`, 404);
+    }
+
+    const orderData = snap.data();
+    const currentOrderStatus = orderData.orderStatus as OrderStatus;
+    const currentPaymentStatus = orderData.paymentStatus as PaymentStatus | undefined;
+    const currentVersion = typeof orderData.version === 'number' ? orderData.version : 0;
+
+    const calc = validateAndCalculateTransition({
+      currentOrderStatus,
+      targetOrderStatus,
+      currentPaymentStatus,
+      targetPaymentStatus,
+      actor,
+      reason
+    });
+
+    if (!calc.changed) {
+      // STATE-4: Same-state transition is an idempotent no-op returning success
+      return {
+        success: true,
+        orderId,
+        previousOrderStatus: currentOrderStatus,
+        newOrderStatus: currentOrderStatus,
+        previousPaymentStatus: currentPaymentStatus,
+        newPaymentStatus: currentPaymentStatus,
+        version: currentVersion,
+        changed: false
+      };
+    }
+
+    const newVersion = currentVersion + 1;
+    const updatePayload: Record<string, any> = {
+      orderStatus: calc.orderStatus,
+      version: newVersion,
+      updatedAt: new Date().toISOString()
+    };
+
+    if (calc.paymentStatus) {
+      updatePayload.paymentStatus = calc.paymentStatus;
+    }
+
+    txn.update(orderRef, updatePayload);
+
+    // STATE-3: Append immutable record to orders/{id}/events
+    const eventRef = orderRef.collection('events').doc();
+    txn.create(eventRef, {
+      fromOrderStatus: currentOrderStatus,
+      toOrderStatus: calc.orderStatus,
+      fromPaymentStatus: currentPaymentStatus || null,
+      toPaymentStatus: calc.paymentStatus || null,
+      actor,
+      reason: reason || null,
+      version: newVersion,
+      timestamp: new Date().toISOString()
+    });
+
+    return {
+      success: true,
+      orderId,
+      previousOrderStatus: currentOrderStatus,
+      newOrderStatus: calc.orderStatus,
+      previousPaymentStatus: currentPaymentStatus,
+      newPaymentStatus: calc.paymentStatus,
+      version: newVersion,
+      changed: true
+    };
+  };
+
+  if (existingTransaction) {
+    return executeInsideTransaction(existingTransaction);
+  } else {
+    return db.runTransaction(executeInsideTransaction);
+  }
 }

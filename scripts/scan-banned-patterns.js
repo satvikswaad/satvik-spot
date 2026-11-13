@@ -60,18 +60,38 @@ targetDirs.forEach(d => scanDir(path.resolve(__dirname, '..', d), results));
 
 console.log('=== FORBIDDEN PATTERN SCAN (AGENT-8) ===');
 let grandTotal = 0;
+let backendOrSharedTotal = 0;
+
 for (const [name, data] of Object.entries(results)) {
   console.log(`- ${name}: ${data.total} occurrences across ${Object.keys(data.files).length} files`);
   grandTotal += data.total;
+  for (const [f, count] of Object.entries(data.files)) {
+    if (f.startsWith('backend/') || f.startsWith('shared/')) {
+      backendOrSharedTotal += count;
+      console.error(`  🚨 FORBIDDEN in backend/shared: ${f} (${count}x)`);
+    }
+  }
 }
 console.log(`----------------------------------------`);
-console.log(`Total Banned Pattern Hits: ${grandTotal}`);
+console.log(`Total Banned Pattern Hits: ${grandTotal} (backend/shared: ${backendOrSharedTotal})`);
 
+const BASELINE_PUBLIC_MAX = 101;
 const enforce = process.argv.includes('--enforce');
-if (enforce && grandTotal > 0) {
-  console.error('❌ Enforce mode active: Banned patterns detected!');
+
+if (backendOrSharedTotal > 0) {
+  console.error(`❌ AGENT-8 VIOLATION: ${backendOrSharedTotal} forbidden pattern(s) found in backend/src or shared!`);
   process.exit(1);
-} else {
-  console.log('✅ Baseline scan recorded.');
-  process.exit(0);
 }
+
+if (enforce && grandTotal > 0) {
+  console.error('❌ Enforce mode active: Banned patterns detected in codebase!');
+  process.exit(1);
+}
+
+if (grandTotal > BASELINE_PUBLIC_MAX) {
+  console.error(`❌ REGRESSION: Total banned patterns (${grandTotal}) exceeds baseline maximum (${BASELINE_PUBLIC_MAX})!`);
+  process.exit(1);
+}
+
+console.log('✅ Forbidden pattern scan passed (0 in backend/shared, within baseline limits).');
+process.exit(0);

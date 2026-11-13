@@ -55,11 +55,14 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // TEMPORARY PATCH (Expires: 2026-11-27 - 14 days): Allow authenticated users to read/write ONLY their own profile with strict field whitelist until Wave E client API migration completes (DB-1, AUTH-4)
+    // TEMPORARY PATCH (Expires: 2026-11-27 - 14 days): Allow authenticated users to read/write ONLY their own profile with strict field whitelist and type/length validation until Wave E client API migration completes (DB-1, AUTH-4)
     match /users/{userId} {
       allow read: if isSignedIn() && request.auth.uid == userId;
       allow create, update: if isSignedIn() && request.auth.uid == userId &&
         request.resource.data.keys().hasOnly(['uid', 'name', 'phone', 'email', 'address', 'addresses', 'language', 'house', 'street', 'city', 'pincode', 'updatedAt', 'createdAt']) &&
+        (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() >= 2)) &&
+        (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() >= 10)) &&
+        (!('email' in request.resource.data) || (request.resource.data.email is string && request.resource.data.email.matches('^[^@]+@[^@]+\\.[^@]+$'))) &&
         !('admin' in request.resource.data) &&
         !('role' in request.resource.data) &&
         !('roles' in request.resource.data) &&
@@ -72,6 +75,9 @@ service cloud.firestore {
       allow read: if isSignedIn() && request.auth.uid == userId;
       allow create, update: if isSignedIn() && request.auth.uid == userId &&
         request.resource.data.keys().hasOnly(['uid', 'name', 'phone', 'email', 'address', 'addresses', 'language', 'house', 'street', 'city', 'pincode', 'updatedAt', 'createdAt']) &&
+        (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() >= 2)) &&
+        (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() >= 10)) &&
+        (!('email' in request.resource.data) || (request.resource.data.email is string && request.resource.data.email.matches('^[^@]+@[^@]+\\.[^@]+$'))) &&
         !('admin' in request.resource.data) &&
         !('role' in request.resource.data) &&
         !('roles' in request.resource.data) &&

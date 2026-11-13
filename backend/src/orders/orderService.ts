@@ -645,10 +645,14 @@ export async function submitUtrForOrder(orderId: string, utr: string, guestSecre
     const orderData = orderSnap.data()!;
 
     // Validate guest secret if present (AUTH-2, AUTH-3)
-    if (orderData.guestSecretHash && guestSecret) {
-      const hashed = hashGuestSecret(guestSecret);
+    const storedSecretHash = orderData.guestSecretHash || orderData.guestTokenHash;
+    if (storedSecretHash) {
+      if (!guestSecret || typeof guestSecret !== 'string') {
+        throw new AppError('Order not found', 404, 'NOT_FOUND');
+      }
+      const hashed = hashGuestSecret(guestSecret.trim());
       const bufProvided = Buffer.from(hashed, 'utf8');
-      const bufStored = Buffer.from(orderData.guestSecretHash, 'utf8');
+      const bufStored = Buffer.from(storedSecretHash, 'utf8');
       const isValid = bufProvided.length === bufStored.length && crypto.timingSafeEqual(bufProvided, bufStored);
       if (!isValid) {
         throw new AppError('Order not found', 404, 'NOT_FOUND');
