@@ -72,7 +72,16 @@
       "ignore": [
         "firebase.json",
         "**/.*",
-        "**/node_modules/**"
+        "**/node_modules/**",
+        "assets/SatvikSwaad_hero*",
+        "assets/village-hero*",
+        "assets/pillar-*",
+        "assets/mother-child*",
+        "assets/avatar-*",
+        "assets/ref-*",
+        "assets/profile-*",
+        "assets/clay-pot*",
+        "assets/hara-mirch-jar*"
       ],
       "headers": [
         {

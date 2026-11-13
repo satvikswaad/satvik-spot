@@ -644,11 +644,14 @@ export async function submitUtrForOrder(orderId: string, utr: string, guestSecre
 
     const orderData = orderSnap.data()!;
 
-    // Validate guest secret if present
+    // Validate guest secret if present (AUTH-2, AUTH-3)
     if (orderData.guestSecretHash && guestSecret) {
       const hashed = hashGuestSecret(guestSecret);
-      if (hashed !== orderData.guestSecretHash) {
-        throw new AuthorizationError('Invalid guest access secret for order tracking');
+      const bufProvided = Buffer.from(hashed, 'utf8');
+      const bufStored = Buffer.from(orderData.guestSecretHash, 'utf8');
+      const isValid = bufProvided.length === bufStored.length && crypto.timingSafeEqual(bufProvided, bufStored);
+      if (!isValid) {
+        throw new AppError('Order not found', 404, 'NOT_FOUND');
       }
     }
 

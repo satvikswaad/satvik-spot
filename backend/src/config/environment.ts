@@ -46,6 +46,8 @@ export interface ServerConfig {
   nodeEnv: string;
   corsAllowedOrigins: string[];
   adminAllowedIps?: string[];
+  originGateEnabled: boolean;
+  originAuthSecret: string;
 }
 
 export function validateFssaiFormat(fssai: string): boolean {
@@ -86,7 +88,9 @@ export const envConfig: FeatureGateConfig & RegulatoryConfig & ServerConfig & Ra
   payuMerchantSalt: process.env.PAYU_MERCHANT_SALT || 'TEST_SALT',
   payuEnv: payuEnvSetting,
   payuBaseUrl: process.env.PAYU_BASE_URL || payuBaseUrlDefault,
-  sessionSecret: process.env.SESSION_SECRET || fallbackSessionSecret
+  sessionSecret: process.env.SESSION_SECRET || fallbackSessionSecret,
+  originGateEnabled: process.env.ORIGIN_GATE_ENABLED === 'true',
+  originAuthSecret: process.env.ORIGIN_AUTH_SECRET || ''
 };
 
 export const ALLOWED_ENV_NAMES = ['development', 'test', 'local', 'staging', 'production'];
@@ -173,6 +177,21 @@ export function validateStartupConfig(overrideEnv?: Partial<ServerConfig & Featu
     }
     if (!envConfig.razorpayKeySecret) {
       errors.push('PAYMENTS_ENABLED is true but RAZORPAY_KEY_SECRET is missing');
+    }
+  }
+
+  // Startup Test/Live Key Check (PAY-11, AGENT-7)
+  if (nodeEnv === 'production') {
+    if (envConfig.razorpayKeyId && envConfig.razorpayKeyId.startsWith('rzp_test_')) {
+      errors.push('CRITICAL SECURITY ERROR: Razorpay test key (rzp_test_) detected in production environment');
+    }
+    if (envConfig.payuEnv === 'TEST') {
+      errors.push('CRITICAL SECURITY ERROR: PayU TEST environment configured for production');
+    }
+  } else {
+    // Non-production (dev, test, staging)
+    if (envConfig.razorpayKeyId && envConfig.razorpayKeyId.startsWith('rzp_live_')) {
+      errors.push('CRITICAL SECURITY ERROR: Razorpay live key (rzp_live_) forbidden in non-production environment');
     }
   }
 

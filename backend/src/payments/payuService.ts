@@ -796,6 +796,50 @@ export async function settlePayuPayment(
 
   // Check 8: Outcome settlement
   if (normalizedStatus === 'success') {
+    // STATE-5 & Section 4.3 rule 4: CANCELLED order cannot be revived, mark REFUND_PENDING
+    if (order.orderStatus === 'CANCELLED' || order.orderStatus === 'Cancelled') {
+      logger.warn('Payment received for CANCELLED order - marking REFUND_PENDING, cannot revive (STATE-5, 4.3)', {
+        orderId: order.orderId,
+        txnid: payload.txnid,
+        gatewayPaymentId
+      });
+
+      const refundData = {
+        orderId: order.orderId,
+        paymentStatus: 'REFUND_PENDING',
+        refundReason: 'PAYMENT_AFTER_CANCEL',
+        gatewayPaymentId,
+        txnid: payload.txnid
+      };
+
+      if (options?.recordPayment) {
+        await options.recordPayment(refundData);
+      } else {
+        await db.runTransaction(async (txn) => {
+          const pRef = db.collection('payments').doc(gatewayPaymentId);
+          txn.create(pRef, {
+            paymentId: gatewayPaymentId,
+            orderId: order.orderId,
+            gateway: 'PAYU',
+            txnid: payload.txnid,
+            amountPaise: order.totalPaise,
+            status: 'REFUND_PENDING',
+            refundReason: 'PAYMENT_AFTER_CANCEL',
+            verifiedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+
+          const oRef = db.collection('orders').doc(order.orderId);
+          txn.update(oRef, {
+            paymentStatus: 'REFUND_PENDING',
+            refundReason: 'PAYMENT_AFTER_CANCEL',
+            gatewayPaymentId,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        });
+      }
+      return { settled: true, duplicate: false, orderId: order.orderId };
+    }
+
     const isExpired = order.orderStatus === 'EXPIRED';
 
     if (isExpired) {

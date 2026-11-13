@@ -31,6 +31,18 @@ jobs:
           fi
           echo "✅ Zero forbidden files tracked in Git."
 
+      - name: Verify Specification Hash Integrity (DOC)
+        run: node scripts/verify-spec-hash.js
+
+      - name: Scan Approved Firestore Collection Names
+        run: node scripts/scan-collection-names.js
+
+      - name: Scan Secrets & Credentials
+        run: node scripts/scan-secrets.js
+
+      - name: Run Forbidden Pattern Baseline Scan (AGENT-8)
+        run: node scripts/scan-banned-patterns.js
+
       - name: Install Dependencies Cleanly
         run: |
           npm ci

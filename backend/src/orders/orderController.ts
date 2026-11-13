@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../auth/verifyAuth';
 import { validateCreateOrderPayload, validateSubmitUtrPayload, validateGuestLookupPayload } from '../validation/orderSchema';
@@ -94,14 +95,19 @@ export async function lookupGuestOrderHandler(req: AuthenticatedRequest, res: Re
 
     const data = snap.data()!;
 
+    // AUTH-2, AUTH-3: Return 404 for failed guest secret / missing secret, compare with timingSafeEqual
     if (!data.guestSecretHash) {
-      throw new AuthorizationError('Guest lookup is not permitted for this order type');
+      throw new AppError('Order not found', 404, 'NOT_FOUND');
     }
 
     const providedHash = hashGuestSecret(guestAccessSecret.trim());
-    if (providedHash !== data.guestSecretHash) {
+    const bufProvided = Buffer.from(providedHash, 'utf8');
+    const bufStored = Buffer.from(data.guestSecretHash, 'utf8');
+
+    const isValid = bufProvided.length === bufStored.length && crypto.timingSafeEqual(bufProvided, bufStored);
+    if (!isValid) {
       logger.warn('Failed guest order lookup attempt with invalid secret', { orderId });
-      throw new AuthorizationError('Invalid guest access secret');
+      throw new AppError('Order not found', 404, 'NOT_FOUND');
     }
 
     // Omit internal secret hash before sending back

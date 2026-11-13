@@ -218,78 +218,8 @@ function initFooterAccordion() {
 
 window.handleFooterSubscribe = function(form) {
     if (!form) return;
-    const input = form.querySelector('.footer-newsletter-input');
-    const rawEmail = input ? input.value.trim() : '';
-    if (!rawEmail) {
-        showToast('Please enter your email address to subscribe. ✉️');
-        return;
-    }
-
-    const email = rawEmail.toLowerCase();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        showToast('Please enter a valid email address (e.g. name@example.com).');
-        return;
-    }
-
-    try {
-        const STORAGE_KEY = 'satvik_newsletter_subscribers';
-        let subscribers = [];
-        try {
-            const rawStored = localStorage.getItem(STORAGE_KEY);
-            if (rawStored) {
-                const parsed = JSON.parse(rawStored);
-                if (Array.isArray(parsed)) subscribers = parsed;
-            }
-        } catch (e) {
-            subscribers = [];
-        }
-
-        const alreadySubscribed = subscribers.some(s => {
-            const existingEmail = typeof s === 'string' ? s : (s && s.email ? s.email : '');
-            return existingEmail.toLowerCase() === email;
-        });
-
-        if (alreadySubscribed) {
-            showToast('You are already subscribed to Satvik updates! 🌿');
-            form.reset();
-            return;
-        }
-
-        const newSubscriber = {
-            id: 'sub_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-            email: email,
-            source: 'storefront_footer',
-            status: 'active',
-            createdAt: new Date().toISOString()
-        };
-
-        subscribers.unshift(newSubscriber);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(subscribers));
-
-        // Local dev cross-port bridge sync
-        if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-            try {
-                fetch('/api/subscribers', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newSubscriber)
-                }).catch(() => {});
-            } catch (e) {}
-        }
-
-        window.dispatchEvent(new CustomEvent('satvik_subscribers_updated', { detail: newSubscriber }));
-        try {
-            localStorage.setItem('satvik_subscribers_sync', String(Date.now()));
-        } catch (e) {}
-
-        showToast('Dhanyawad! You have been subscribed to Satvik updates. 🌿✨');
-        form.reset();
-    } catch (err) {
-        console.error('Footer subscribe error:', err);
-        showToast('Dhanyawad! You have been subscribed to Satvik updates. 🌿✨');
-        form.reset();
-    }
+    showToast('Newsletter subscription is coming soon! Stay tuned. 🌿 (जल्द आ रहा है)');
+    form.reset();
 };
 
 // Bind all footer newsletter forms without inline event handlers (strict CSP Level 3 compliant)

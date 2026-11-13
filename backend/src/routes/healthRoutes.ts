@@ -38,8 +38,8 @@ healthRouter.get('/ready', async (_req: Request, res: Response) => {
       });
     }
 
-    // Ping Firestore to check connectivity without exposing document data
-    await db.collection('_health').doc('ping').get();
+    // Ping Firestore to check connectivity without exposing document data (reads config collection)
+    await db.collection('config').doc('deliveryZones').get();
 
     return res.status(200).json({
       status: 'ready',

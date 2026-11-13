@@ -258,6 +258,39 @@ describe('Wave 3 — Payments Role: PayU, Razorpay, Manual UPI & Settlement (PAY
       expect(recordedData.paymentStatus).toBe('REFUND_PENDING');
       expect(recordedData.refundReason).toBe('LATE_PAYMENT_NO_STOCK');
     });
+
+    it('STATE-5, 4.3: CANCELLED order cannot be revived on payment - sets REFUND_PENDING with PAYMENT_AFTER_CANCEL', async () => {
+      const cancelledOrder = {
+        orderId: 'SS-TEST-CANCELLED',
+        totalPaise: 49900,
+        orderStatus: 'CANCELLED'
+      };
+
+      const payload: PayUSettleInput = {
+        key: TEST_KEY,
+        txnid: 'ss0123456789abcdefgh',
+        amount: '499.00',
+        status: 'success',
+        hash: 'valid',
+        udf1: 'SS-TEST-CANCELLED',
+        mihpayid: 'payu_mih_cancel_123'
+      };
+
+      let recordedData: any = null;
+      const result = await settlePayuPayment('webhook', payload, {
+        merchantKey: TEST_KEY,
+        merchantSalt: TEST_SALT,
+        skipHashVerifyForTest: true,
+        loadTxnOrder: async () => cancelledOrder,
+        checkDuplicatePayment: async () => false,
+        recordPayment: async (data) => { recordedData = data; }
+      });
+
+      expect(result.settled).toBe(true);
+      expect(recordedData.paymentStatus).toBe('REFUND_PENDING');
+      expect(recordedData.refundReason).toBe('PAYMENT_AFTER_CANCEL');
+      expect(recordedData.orderStatus).toBeUndefined();
+    });
   });
 
   describe('3. Razorpay Orders & Webhook Verification (RZP-1 to RZP-5)', () => {
