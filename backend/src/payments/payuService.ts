@@ -5,6 +5,8 @@ import { AppError, ValidationError, PaymentsNotAvailableError } from '../errors/
 import { logger } from '../utils/logger';
 import { processCheckoutOrder, OrderCreationResult } from '../orders/orderService';
 import { formatRupees } from '../shared/money';
+import { transition } from '../shared/stateMachine';
+import { formatDailyDateKey, recordSaleInDailyStatsInTransaction } from '../db/statsDailyService';
 import { PayUCreateOrderInput } from './payuSchema';
 
 export interface PayUOrderParams {
@@ -354,9 +356,9 @@ export async function createPayUPaymentOrder(params: PayUOrderParams): Promise<P
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   });
 
-  // 5. Append Payment Audit Log
+  // 5. Append Payment Audit Log (Collection: audit_logs per Decision D12)
   const auditId = `audit_${Date.now()}_${txnid}`;
-  await db.collection('paymentAuditLog').doc(auditId).set({
+  await db.collection('audit_logs').doc(auditId).set({
     auditId,
     orderId: orderResult.orderId,
     txnid,
@@ -451,7 +453,7 @@ export async function processPayUResponse(body: any): Promise<{
     });
 
     const auditId = `audit_tamper_${Date.now()}_${txnid}`;
-    await db.collection('paymentAuditLog').doc(auditId).set({
+    await db.collection('audit_logs').doc(auditId).set({
       auditId,
       txnid,
       status: 'HASH_TAMPER_DETECTED',
@@ -547,15 +549,16 @@ export async function processPayUResponse(body: any): Promise<{
 
       transaction.update(orderRef!, {
         paymentStatus: 'PAID',
-        status: 'Confirmed',
+        status: 'CONFIRMED',
+        orderStatus: 'CONFIRMED',
         payuMoneyId: payuMoneyId || null,
         bankRefNum: bank_ref_num || null,
         paidAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
 
-      // Forensic Audit Log
-      const auditRef = db.collection('paymentAuditLog').doc(`audit_${Date.now()}_${txnid}`);
+      // Forensic Audit Log (Collection: audit_logs per Decision D12)
+      const auditRef = db.collection('audit_logs').doc(`audit_${Date.now()}_${txnid}`);
       transaction.set(auditRef, {
         orderId: resolvedOrderId,
         txnid,
@@ -566,15 +569,17 @@ export async function processPayUResponse(body: any): Promise<{
         timestamp: admin.firestore.FieldValue.serverTimestamp()
       });
 
-      // Payment Transactions collection
-      const txnRef = db.collection('payment_transactions').doc(txnid);
+      // Payments collection (Collection: payments per Decision D12)
+      const txnRef = db.collection('payments').doc(txnid);
       transaction.set(txnRef, {
+        paymentId: txnid,
         orderId: resolvedOrderId,
         payuTxnId: txnid,
         payuMoneyId: payuMoneyId || null,
         amount: Number(amount),
+        amountPaise: Math.round(Number(amount) * 100),
         currency: 'INR',
-        status: 'captured',
+        status: 'PAID',
         method: 'payu',
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       });
@@ -602,12 +607,13 @@ export async function processPayUResponse(body: any): Promise<{
     // Payment Failed or Cancelled
     await orderRef.update({
       paymentStatus: 'PAYMENT_FAILED',
-      status: 'Cancelled',
+      status: 'CANCELLED',
+      orderStatus: 'CANCELLED',
       payuErrorMessage: error_Message || status,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    const auditRef = db.collection('paymentAuditLog').doc(`audit_fail_${Date.now()}_${txnid}`);
+    const auditRef = db.collection('audit_logs').doc(`audit_fail_${Date.now()}_${txnid}`);
     await auditRef.set({
       orderId: resolvedOrderId,
       txnid,
@@ -895,15 +901,48 @@ export async function settlePayuPayment(
           txnid: payload.txnid,
           amountPaise: order.totalPaise || Math.round(Number(payload.amount) * 100),
           status: 'PAID',
+          gateway: 'PAYU',
           source,
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
+        // Date in IST when paid (Section 12.4, SPEC line 798)
+        const dateIST = formatDailyDateKey(new Date());
+
+        // Canonical transition() compare-and-set and event logging
+        try {
+          await transition(db, {
+            orderId: order.orderId,
+            targetOrderStatus: 'CONFIRMED',
+            targetPaymentStatus: 'PAID',
+            actor: { uid: 'PAYU_GATEWAY', role: 'owner' },
+            reason: 'PAYMENT_SETTLED',
+            existingTransaction: txn
+          });
+        } catch (transErr) {
+          logger.warn('State machine transition warning during settlement, updating directly', { error: String(transErr) });
+          txn.update(db.collection('orders').doc(order.orderId), {
+            paymentStatus: 'PAID',
+            orderStatus: 'CONFIRMED',
+            status: 'CONFIRMED'
+          });
+        }
+
         txn.update(db.collection('orders').doc(order.orderId), {
-          paymentStatus: 'PAID',
-          orderStatus: 'CONFIRMED',
+          dateIST,
+          gatewayPaymentId,
           paidAt: admin.firestore.FieldValue.serverTimestamp(),
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Record daily stats atomically (DB-5, INV-5)
+        const totalUnits = Array.isArray(order.items)
+          ? order.items.reduce((acc: number, item: any) => acc + (Number(item.qty) || 1), 0)
+          : 1;
+        await recordSaleInDailyStatsInTransaction(txn, {
+          totalPaise: order.totalPaise || Math.round(Number(payload.amount) * 100),
+          channel: order.channel || 'ONLINE',
+          unitsCount: totalUnits
         });
       });
     }

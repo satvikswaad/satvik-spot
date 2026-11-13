@@ -21,6 +21,7 @@ import { requireAdminIpAllowlist } from './auth/adminIpFilter';
 import { requireCloudflareAccess } from './auth/cloudflareAccess';
 import { handleCreateOrder, handleCreateWhatsAppOrder, handleGuestLookup, submitUtrHandler } from './orders/orderController';
 import { createQuoteHandler } from './orders/quotesController';
+import { requireJobSecret, handleTriggerOrderExpiryJob } from './orders/expiryJob';
 import { getPublicProducts, getPublicProductById } from './products/productController';
 import { handleCreateMessage } from './messages/messageController';
 import { handleCreateReview, handleGetApprovedReviews } from './reviews/reviewController';
@@ -38,6 +39,20 @@ import {
   verifyPaymentAdmin,
   getAuditLogs
 } from './admin/adminController';
+
+import {
+  startShiftHandler,
+  closeShiftHandler,
+  sellNowHandler
+} from './admin/posController';
+
+import { markRefundedHandler } from './admin/refundsController';
+
+import {
+  grantRoleHandler,
+  getKillSwitchesHandler,
+  updateKillSwitchesHandler
+} from './admin/adminRolesController';
 
 import {
   createPaymentOrderHandler,
@@ -182,6 +197,9 @@ app.post('/api/v1/payments/create-order', orderRateLimiter, createPaymentOrderHa
 app.post('/api/v1/payments/verify', orderRateLimiter, verifyPaymentHandler);
 app.post('/api/v1/payments/webhook', webhookHandler);
 
+// Background Jobs (ARCH-8)
+app.post('/api/v1/jobs/expire-reservations', requireJobSecret, handleTriggerOrderExpiryJob);
+
 // Customer Profile & Address Management Endpoints
 app.use(['/api/v1/customer', '/api/v1/customer/*'], customerRateLimiter, requireAuthenticatedUser);
 app.get('/api/v1/customer/profile', handleGetCustomerProfile);
@@ -205,6 +223,19 @@ app.post('/api/v1/admin/refunds', requireAdmin, requireRecentAuthentication(300)
 app.post('/api/v1/admin/messages/:messageId/status', requireAdmin, updateMessageStatus);
 app.post('/api/v1/admin/reviews/:reviewId/moderate', requireAdmin, moderateReview);
 app.get('/api/v1/admin/audit-events', requireAdmin, requireRecentAuthentication(300), getAuditLogs);
+
+// POS Retail & Counter Management (POS-1 to POS-8, TAX-2, TAX-3)
+app.post('/api/v1/admin/pos/shifts/start', requireAdmin, startShiftHandler);
+app.post('/api/v1/admin/pos/shifts/:shiftId/close', requireAdmin, closeShiftHandler);
+app.post('/api/v1/admin/pos/sell-now', requireAdmin, sellNowHandler);
+
+// Admin Refund Settlement (REFUND-1 to REFUND-4, Decision D7)
+app.post('/api/v1/admin/refunds/mark-refunded', requireAdmin, requireRecentAuthentication(300), markRefundedHandler);
+
+// Role Delegation & Operational Kill Switches (AUTH-7, Decision D3, INV-7)
+app.post('/api/v1/admin/roles/grant', requireAdmin, requireRecentAuthentication(300), grantRoleHandler);
+app.get('/api/v1/admin/kill-switches', requireAdmin, getKillSwitchesHandler);
+app.put('/api/v1/admin/kill-switches', requireAdmin, requireRecentAuthentication(300), updateKillSwitchesHandler);
 
 // API 404 JSON Handler for unmatched /api routes
 app.use('/api', (_req: Request, res: Response) => {

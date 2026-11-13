@@ -256,8 +256,10 @@ export async function transition(
     }
 
     const orderData = snap.data();
-    const currentOrderStatus = orderData.orderStatus as OrderStatus;
-    const currentPaymentStatus = orderData.paymentStatus as PaymentStatus | undefined;
+    const rawStatus = orderData.orderStatus || orderData.status;
+    const currentOrderStatus = (typeof rawStatus === 'string' ? rawStatus.toUpperCase() : rawStatus) as OrderStatus;
+    const rawPayment = orderData.paymentStatus;
+    const currentPaymentStatus = (typeof rawPayment === 'string' ? rawPayment.toUpperCase() : rawPayment) as PaymentStatus | undefined;
     const currentVersion = typeof orderData.version === 'number' ? orderData.version : 0;
 
     const calc = validateAndCalculateTransition({
@@ -286,6 +288,7 @@ export async function transition(
     const newVersion = currentVersion + 1;
     const updatePayload: Record<string, any> = {
       orderStatus: calc.orderStatus,
+      status: calc.orderStatus,
       version: newVersion,
       updatedAt: new Date().toISOString()
     };

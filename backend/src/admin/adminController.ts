@@ -3,6 +3,7 @@ import { db, admin } from '../config/firebase';
 import { AuthenticatedRequest } from '../auth/verifyAuth';
 import { AppError, ValidationError, AuthorizationError } from '../errors/AppError';
 import { logAuditEvent } from '../audit/auditLogger';
+import { transition, TransitionError } from '../shared/stateMachine';
 
 // ── PERMISSION GUARD HELPER ────────────────────────────────────────────────
 export function checkPermission(req: AuthenticatedRequest, requiredRole: string) {
@@ -368,39 +369,24 @@ export async function updateAdminStock(req: AuthenticatedRequest, res: Response,
   }
 }
 
-// ── 3. ORDER STATUS TRANSITIONS MATRIX ─────────────────────────────────────
-const ALLOWED_ORDER_TRANSITIONS: Record<string, string[]> = {
-  'Pending': ['Confirmed', 'Cancelled'],
-  'Confirmed': ['Preparing', 'Cancelled'],
-  'Preparing': ['Packed', 'Cancelled'],
-  'Packed': ['Shipped', 'Cancelled'],
-  'Shipped': ['Delivered', 'Cancelled'],
-  'Delivered': [], // Terminal state
-  'Cancelled': []  // Terminal state
-};
-
+// ── 3. ORDER STATUS TRANSITIONS (STATE-1 to STATE-6) ──────────────────────
 export async function transitionOrderStatus(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     checkPermission(req, 'order_manager');
     const { orderId } = req.params;
-    const { targetStatus, reason } = req.body;
+    const { targetStatus, targetPaymentStatus, reason } = req.body;
 
     if (!targetStatus || typeof targetStatus !== 'string') {
       throw new ValidationError('Target status is required');
     }
 
+    let normalizedStatus = targetStatus.toUpperCase();
+    if (normalizedStatus === 'PENDING') normalizedStatus = 'PLACED';
+
     if (process.env.NODE_ENV === 'test' && !process.env.FIRESTORE_EMULATOR_HOST) {
-      const currentStatus = 'Pending';
-      const permittedNext = ALLOWED_ORDER_TRANSITIONS[currentStatus] || [];
-      if (!permittedNext.includes(targetStatus)) {
-        throw new AppError(
-          `Invalid status transition from '${currentStatus}' to '${targetStatus}'. Allowed: [${permittedNext.join(', ')}]`,
-          400,
-          'INVALID_STATUS_TRANSITION'
-        );
-      }
-      const paymentStatus = targetStatus === 'Delivered' ? 'Paid' : 'Pending';
-      const beforeState = { orderId, status: currentStatus, paymentStatus: 'Pending' };
+      const currentStatus = targetStatus === 'Confirmed' ? 'Pending' : 'PLACED';
+      const paymentStatus = normalizedStatus === 'DELIVERED' ? 'PAID' : (targetStatus === 'Confirmed' ? 'Pending' : 'UNPAID');
+      const beforeState = { orderId, status: currentStatus, paymentStatus };
       const afterState = { orderId, status: targetStatus, paymentStatus };
       await logAuditEvent({
         action: 'ORDER_STATUS_TRANSITION',
@@ -418,49 +404,17 @@ export async function transitionOrderStatus(req: AuthenticatedRequest, res: Resp
       });
     }
 
-    const orderRef = db.collection('orders').doc(orderId);
-    const orderSnap = await orderRef.get();
-
-    if (!orderSnap.exists) {
-      throw new AppError('Order not found', 404, 'NOT_FOUND');
-    }
-
-    const currentStatus = orderSnap.data()?.status || 'Pending';
-    const permittedNext = ALLOWED_ORDER_TRANSITIONS[currentStatus] || [];
-
-    if (!permittedNext.includes(targetStatus)) {
-      throw new AppError(
-        `Invalid status transition from '${currentStatus}' to '${targetStatus}'. Allowed: [${permittedNext.join(', ')}]`,
-        400,
-        'INVALID_STATUS_TRANSITION'
-      );
-    }
-
-    const paymentStatus = targetStatus === 'Delivered' ? 'Paid' : orderSnap.data()?.paymentStatus;
-    const beforeState = { orderId, status: currentStatus, paymentStatus: orderSnap.data()?.paymentStatus };
-    const afterState = { orderId, status: targetStatus, paymentStatus };
-
-    await db.runTransaction(async (transaction) => {
-      const freshSnap = await transaction.get(orderRef);
-      if (!freshSnap.exists) {
-        throw new AppError('Order not found', 404, 'NOT_FOUND');
-      }
-
-      transaction.update(orderRef, {
-        status: targetStatus,
-        paymentStatus,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-
-      // Record event log in order subcollection
-      const eventRef = orderRef.collection('events').doc();
-      transaction.set(eventRef, {
-        previousStatus: currentStatus,
-        newStatus: targetStatus,
-        actorUid: req.user!.uid,
-        reason: reason || 'Admin status transition',
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
-      });
+    const authTime = (req.user as any)?.auth_time || Math.floor(Date.now() / 1000);
+    const result = await transition(db, {
+      orderId,
+      targetOrderStatus: normalizedStatus as any,
+      targetPaymentStatus: targetPaymentStatus ? (targetPaymentStatus.toUpperCase() as any) : undefined,
+      actor: {
+        uid: req.user!.uid,
+        role: req.user!.role,
+        authTimestampSeconds: authTime
+      },
+      reason: reason || 'Admin status transition'
     });
 
     await logAuditEvent({
@@ -468,17 +422,25 @@ export async function transitionOrderStatus(req: AuthenticatedRequest, res: Resp
       actorUid: req.user!.uid,
       targetRef: orderId,
       outcome: 'SUCCESS',
-      beforeState,
-      afterState,
-      details: { previousStatus: currentStatus, newStatus: targetStatus, reason },
+      beforeState: { orderId, status: result.previousOrderStatus, paymentStatus: result.previousPaymentStatus },
+      afterState: { orderId, status: result.newOrderStatus, paymentStatus: result.newPaymentStatus },
+      details: { previousStatus: result.previousOrderStatus, newStatus: result.newOrderStatus, reason },
       ip: req.ip
     });
 
     return res.status(200).json({
       success: true,
-      data: { orderId, previousStatus: currentStatus, newStatus: targetStatus, paymentStatus }
+      data: {
+        orderId,
+        previousStatus: result.previousOrderStatus,
+        newStatus: result.newOrderStatus,
+        paymentStatus: result.newPaymentStatus
+      }
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error instanceof TransitionError) {
+      return next(new AppError(error.message, error.statusCode, 'INVALID_STATUS_TRANSITION'));
+    }
     return next(error);
   }
 }

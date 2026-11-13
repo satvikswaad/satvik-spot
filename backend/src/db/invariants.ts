@@ -16,6 +16,7 @@
 
 import { db } from '../config/firebase';
 import { logger } from '../utils/logger';
+import { verifyAuditHashChain } from '../audit/auditLogger';
 
 export interface InvariantViolation {
   invariantId: 'INV-1' | 'INV-2' | 'INV-3' | 'INV-4' | 'INV-5' | 'INV-6' | 'INV-7' | 'INV-8' | 'INV-9';
@@ -160,6 +161,34 @@ export async function checkInv4RefundsNotExceedPaid(): Promise<InvariantViolatio
 }
 
 /**
+ * Checks INV-6: The audit log's hash chain verifies from the first entry to the latest (LOG-2).
+ */
+export async function checkInv6AuditHashChain(): Promise<InvariantViolation[]> {
+  const violations: InvariantViolation[] = [];
+  try {
+    const verification = await verifyAuditHashChain();
+    if (!verification.valid) {
+      violations.push({
+        invariantId: 'INV-6',
+        severity: 'S0',
+        description: `Audit log cryptographic hash chain broken at sequence ${verification.brokenSequence}. Expected: ${verification.expectedHash}, Received: ${verification.actualHash}`,
+        targetRef: 'audit_logs',
+        details: verification
+      });
+    }
+  } catch (err) {
+    violations.push({
+      invariantId: 'INV-6',
+      severity: 'S0',
+      description: `Failed to verify audit log hash chain: ${(err as Error).message}`,
+      targetRef: 'audit_logs',
+      details: { error: (err as Error).message }
+    });
+  }
+  return violations;
+}
+
+/**
  * Checks INV-7: No users document holds a role-like field.
  */
 export async function checkInv7NoRolesInUserDocs(): Promise<InvariantViolation[]> {
@@ -212,6 +241,13 @@ export async function runNightlyInvariants(): Promise<InvariantCheckResult> {
     violations.push(...inv4);
   } catch (err) {
     logger.error('Failed to run INV-4 check', { error: String(err) });
+  }
+
+  try {
+    const inv6 = await checkInv6AuditHashChain();
+    violations.push(...inv6);
+  } catch (err) {
+    logger.error('Failed to run INV-6 check', { error: String(err) });
   }
 
   try {

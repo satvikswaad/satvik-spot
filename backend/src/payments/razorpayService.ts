@@ -163,20 +163,24 @@ export async function processPaymentSuccess(
     }
     
     t.update(orderDoc.ref, {
-      paymentStatus: 'PAYMENT_CONFIRMED',
-      status: 'Confirmed',
+      paymentStatus: 'PAID',
+      status: 'CONFIRMED',
+      orderStatus: 'CONFIRMED',
       razorpayPaymentId,
       paidAt: admin.firestore.FieldValue.serverTimestamp()
     });
     
-    const paymentTransactionRef = db.collection('payment_transactions').doc();
-    t.set(paymentTransactionRef, {
+    const paymentRef = db.collection('payments').doc(razorpayPaymentId);
+    const amountVal = orderData.total ?? orderData.totalAmount ?? 0;
+    t.set(paymentRef, {
+      paymentId: razorpayPaymentId,
       orderId: orderDoc.id,
       razorpayOrderId,
       razorpayPaymentId,
-      amount: orderData.total ?? orderData.totalAmount ?? 0,
+      amount: amountVal,
+      amountPaise: typeof orderData.totalPaise === 'number' ? orderData.totalPaise : Math.round(amountVal * 100),
       currency: 'INR',
-      status: 'captured',
+      status: 'PAID',
       method: 'razorpay',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
@@ -216,23 +220,27 @@ export async function processWebhookEvent(eventBody: WebhookPayload, rawBody: st
       const orderDoc = querySnapshot.docs[0];
       const orderData = orderDoc.data();
       
-      if (orderData.paymentStatus === 'PAYMENT_CONFIRMED') return;
+      if (orderData.paymentStatus === 'PAID') return;
       
       t.update(orderDoc.ref, {
-        paymentStatus: 'PAYMENT_CONFIRMED',
-        status: 'Confirmed',
+        paymentStatus: 'PAID',
+        status: 'CONFIRMED',
+        orderStatus: 'CONFIRMED',
         razorpayPaymentId,
         paidAt: admin.firestore.FieldValue.serverTimestamp()
       });
       
-      const paymentTransactionRef = db.collection('payment_transactions').doc();
-      t.set(paymentTransactionRef, {
+      const paymentRef = db.collection('payments').doc(razorpayPaymentId);
+      const amountPaise = paymentEntity.amount;
+      t.set(paymentRef, {
+        paymentId: razorpayPaymentId,
         orderId: orderDoc.id,
         razorpayOrderId,
         razorpayPaymentId,
-        amount: paymentEntity.amount / 100,
+        amount: amountPaise / 100,
+        amountPaise,
         currency: paymentEntity.currency || 'INR',
-        status: 'captured',
+        status: 'PAID',
         method: 'razorpay',
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       });
@@ -260,20 +268,22 @@ export async function processWebhookEvent(eventBody: WebhookPayload, rawBody: st
       const orderDoc = querySnapshot.docs[0];
       const orderData = orderDoc.data();
       
-      if (orderData.paymentStatus === 'PAYMENT_FAILED' || orderData.paymentStatus === 'PAYMENT_CONFIRMED') return;
+      if (orderData.paymentStatus === 'FAILED' || orderData.paymentStatus === 'PAYMENT_FAILED' || orderData.paymentStatus === 'PAID') return;
       
       t.update(orderDoc.ref, {
-        paymentStatus: 'PAYMENT_FAILED'
+        paymentStatus: 'FAILED'
       });
       
-      const paymentTransactionRef = db.collection('payment_transactions').doc();
-      t.set(paymentTransactionRef, {
+      const paymentRef = db.collection('payments').doc(paymentEntity.id);
+      t.set(paymentRef, {
+        paymentId: paymentEntity.id,
         orderId: orderDoc.id,
         razorpayOrderId,
         razorpayPaymentId: paymentEntity.id,
         amount: paymentEntity.amount / 100,
+        amountPaise: paymentEntity.amount,
         currency: paymentEntity.currency || 'INR',
-        status: 'failed',
+        status: 'FAILED',
         method: 'razorpay',
         errorDescription: paymentEntity.error_description,
         createdAt: admin.firestore.FieldValue.serverTimestamp()
