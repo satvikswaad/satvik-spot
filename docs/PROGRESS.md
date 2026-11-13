@@ -2,7 +2,7 @@
 
 > **Branch**: `staging`  
 > **Base Commit**: `2f9578b` (`before-remediation`)  
-> **Current Status**: Wave C Verified by Independent QA; Initiating Wave D: End-to-End Business Logic (Tickets T-022 to T-026)  
+> **Current Status**: Wave D Verified by Independent QA; Initiating Wave E: Storefront & Admin Client Remediation (Tickets T-027 to T-031)  
 
 ---
 
@@ -23,11 +23,11 @@
 | **T-019** | C | Security | Verified | `AUTH-11: Rejects admin request with HTTP 401 when cf-access-jwt-assertion is missing and enforcement active`, `AUTH-11: Accepts valid unexpired Cloudflare Access assertion header` | Independent QA Review (`docs/WAVE_C_REVIEW.md`) | rateLimits collection with TTL, Cloudflare Access JWT validation middleware (AUTH-11, D4) |
 | **T-020** | C | Security | Verified | `phase2Architecture.spec.ts`, `phaseG_securityReaudit.spec.ts` | Independent QA Review (`docs/WAVE_C_REVIEW.md`) | Split entry points, Report-Only CSP configured, multi-stage Dockerfile |
 | **T-021** | C | Database | Verified | `DB-5, DB-6: formatDailyDateKey formats IST date and applySaleToDailyStats updates metrics`, `INV-4: checkInv4RefundsNotExceedPaid`, `INV-7: checkInv7NoRolesInUserDocs` | Independent QA Review (`docs/WAVE_C_REVIEW.md`) | Approved collections enforced, stats_daily atomic increments in order creation, INV-1..9 nightly checker |
-| **T-022** | D | Payments | Pending | - | - | settlePayuPayment wiring, webhook, reconciliation, vectors |
-| **T-023** | D | Orders | Pending | - | - | Expiry job, redemption release, job auth |
-| **T-024** | D | Admin | Pending | - | - | Admin transitions, refund flow D7, step-up |
-| **T-025** | D | Admin | Pending | - | - | POS sellNow wiring, shifts, invoice counter |
-| **T-026** | D | Admin | Pending | - | - | Audit hash chain, role grants, kill switches |
+| **T-022** | D | Payments | Verified | `settlePayuPayment: Transitions order to CONFIRMED and PAID upon PayU settlement and writes to payments with amountPaise and dateIST`, `Idempotently handles duplicate PayU settlement without failing or double-transitioning` | Independent QA Review (`docs/WAVE_D_REVIEW.md`) | settlePayuPayment single payment settlement function, approved payments collection with amountPaise and dateIST |
+| **T-023** | D | Orders | Verified | `runOrderExpiryJob() finds expired reservations, transitions orders to EXPIRED + FAILED, and releases reservations & coupons`, `POST /api/v1/jobs/expire-reservations rejects invalid secret with 401` | Independent QA Review (`docs/WAVE_D_REVIEW.md`) | Automated order expiry job mounted with requireJobSecret middleware; DISC-3 redemption and stock releases verified |
+| **T-024** | D | Admin | Verified | `Single admin approval permits refund <= ₹2,000 within daily threshold`, `Rejects refund > ₹2,000 without second admin/owner approval with 403 (REFUND-3)`, `Rejects refund exceeding remaining refundable balance with 400 (REFUND-4)` | Independent QA Review (`docs/WAVE_D_REVIEW.md`) | markRefundedHandler per Decision D7, step-up 300s enforced, second approver threshold, stats_daily decrement |
+| **T-025** | D | Admin | Verified | `Allows staff to open and close register shift with cash discrepancy tracking (POS-8)`, `sellNowHandler prices items authoritatively, caps staff discount at lower of 5% and ₹100, and issues FY invoice (POS-1..8)`, `Rejects staff discount exceeding cap with 400 (POS-3)` | Independent QA Review (`docs/WAVE_D_REVIEW.md`) | POS retail counter sale engine with FY invoice numbering SS/YY-YY/XXXXXX, staff discount cap, shift cash tracking |
+| **T-026** | D | Admin | Verified | `Maintains unbroken SHA-256 cryptographic hash chain across sequential audit events (LOG-2, INV-6)`, `Detects tampered audit record in hash chain with INV-6 verification failure`, `grantRoleHandler delegates role via Custom Claims without writing to users doc (AUTH-7, INV-7)`, `Manages operational kill switches with manual UPI forced disabled by default (Decision D3)` | Independent QA Review (`docs/WAVE_D_REVIEW.md`) | Cryptographic audit logger with SHA-256 hash chaining, Custom Claims role management, operational kill switches |
 | **T-027** | E | Storefront | Pending | - | - | Remove Firestore client SDK from storefront |
 | **T-028** | E | Storefront | Pending | - | - | Remove innerHTML, inline scripts/styles, selectors.md |
 | **T-029** | E | Orders/Sec | Pending | - | - | Newsletter API implementation |
