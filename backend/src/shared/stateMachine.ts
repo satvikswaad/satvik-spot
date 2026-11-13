@@ -113,3 +113,93 @@ export function assertStepUpFreshness(
     );
   }
 }
+
+export interface TransitionParams {
+  currentOrderStatus: OrderStatus;
+  targetOrderStatus?: OrderStatus;
+  currentPaymentStatus?: PaymentStatus;
+  targetPaymentStatus?: PaymentStatus;
+  actor: {
+    uid: string;
+    role: string;
+    authTimestampSeconds?: number;
+  };
+  reason?: string;
+}
+
+export interface TransitionResult {
+  orderStatus: OrderStatus;
+  paymentStatus?: PaymentStatus;
+  changed: boolean;
+}
+
+/**
+ * Centrally validates state machine transition per STATE-1..6 and Section 4.
+ */
+export function validateAndCalculateTransition(params: TransitionParams): TransitionResult {
+  const { currentOrderStatus, targetOrderStatus, currentPaymentStatus, targetPaymentStatus, actor } = params;
+
+  // STATE-4: Same-state transition is an idempotent no-op returning success
+  if (
+    (!targetOrderStatus || targetOrderStatus === currentOrderStatus) &&
+    (!targetPaymentStatus || targetPaymentStatus === currentPaymentStatus)
+  ) {
+    return {
+      orderStatus: currentOrderStatus,
+      paymentStatus: currentPaymentStatus,
+      changed: false
+    };
+  }
+
+  let nextOrderStatus = currentOrderStatus;
+  if (targetOrderStatus && targetOrderStatus !== currentOrderStatus) {
+    if (!isValidTransition('order', currentOrderStatus, targetOrderStatus)) {
+      throw new TransitionError(
+        `Illegal order status transition from '${currentOrderStatus}' to '${targetOrderStatus}'.`,
+        400
+      );
+    }
+    // STATE-5: Terminal states CANCELLED, DELIVERED, RETURNED never change
+    if (currentOrderStatus === 'CANCELLED' || currentOrderStatus === 'DELIVERED' || currentOrderStatus === 'RETURNED') {
+      throw new TransitionError(
+        `Terminal state '${currentOrderStatus}' cannot be transitioned to '${targetOrderStatus}'.`,
+        400
+      );
+    }
+    // EXPIRED can only transition to CONFIRMED (Section 4.3 late payment revival)
+    if (currentOrderStatus === 'EXPIRED' && targetOrderStatus !== 'CONFIRMED') {
+      throw new TransitionError(
+        `EXPIRED orders can only transition to CONFIRMED via late payment revival.`,
+        400
+      );
+    }
+    // Check step-up if required (STATE-6, AUTH-5)
+    if (
+      (currentOrderStatus === 'CONFIRMED' && targetOrderStatus === 'CANCELLED') ||
+      targetOrderStatus === 'RETURNED'
+    ) {
+      if (!actor.authTimestampSeconds) {
+        throw new TransitionError('Step-up authentication required for this transition.', 403);
+      }
+      assertStepUpFreshness(actor.authTimestampSeconds);
+    }
+    nextOrderStatus = targetOrderStatus;
+  }
+
+  let nextPaymentStatus = currentPaymentStatus;
+  if (targetPaymentStatus && currentPaymentStatus && targetPaymentStatus !== currentPaymentStatus) {
+    if (!isValidTransition('payment', currentPaymentStatus, targetPaymentStatus)) {
+      throw new TransitionError(
+        `Illegal payment status transition from '${currentPaymentStatus}' to '${targetPaymentStatus}'.`,
+        400
+      );
+    }
+    nextPaymentStatus = targetPaymentStatus;
+  }
+
+  return {
+    orderStatus: nextOrderStatus,
+    paymentStatus: nextPaymentStatus,
+    changed: true
+  };
+}

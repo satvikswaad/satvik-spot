@@ -2101,11 +2101,23 @@ function setupTooltipListener() {
             const rev = target.getAttribute('data-rev');
             const orders = target.getAttribute('data-orders');
 
-            tooltip.innerHTML = `
-                <div style="font-weight: 800; color: #D4A017; margin-bottom: 2px;">${date}</div>
-                <div>Revenue: <strong>${rev}</strong></div>
-                <div>Volume: <strong>${orders}</strong></div>
-            `;
+            const dDate = document.createElement('div');
+            dDate.style.cssText = 'font-weight: 800; color: #D4A017; margin-bottom: 2px;';
+            dDate.textContent = date || '';
+
+            const dRev = document.createElement('div');
+            dRev.textContent = 'Revenue: ';
+            const sRev = document.createElement('strong');
+            sRev.textContent = rev || '';
+            dRev.appendChild(sRev);
+
+            const dVol = document.createElement('div');
+            dVol.textContent = 'Volume: ';
+            const sVol = document.createElement('strong');
+            sVol.textContent = orders || '';
+            dVol.appendChild(sVol);
+
+            tooltip.replaceChildren(dDate, dRev, dVol);
             tooltip.style.display = 'block';
             tooltip.style.left = e.clientX + 'px';
             tooltip.style.top = e.clientY + 'px';

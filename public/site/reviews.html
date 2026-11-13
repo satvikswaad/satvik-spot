@@ -295,7 +295,7 @@
             <div class="write-review-box mb-8 p-6 rounded-2xl bg-card border shadow-sm max-w-2xl mx-auto" style="display: none; background: #fff; border: 1px solid var(--color-border, #e5e7eb); border-radius: var(--radius-card, 16px); margin-bottom: 2rem;">
                 <h3 class="form-title text-xl font-bold text-brand-green-text mb-1" style="color: var(--brand-green-deep, #14452F); margin-bottom: 4px;">Share Your Satvik Swaad Experience</h3>
                 <p class="form-subtitle text-sm text-brand-ink opacity-70 mb-4" style="color: var(--color-sub, #666); margin-bottom: 16px;">Tell other food lovers what you loved about our handmade delights.</p>
-                <form id="write-review-form" onsubmit="event.preventDefault(); alert('Review submitted! Thank you.'); this.reset(); document.querySelector('.write-review-box').style.display='none';">
+                <form id="write-review-form">
                     <div class="mb-3" style="margin-bottom: 12px;">
                         <label for="rev-name" class="block text-xs font-semibold uppercase tracking-wider mb-1" style="display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 4px;">Your Full Name</label>
                         <input type="text" id="rev-name" class="w-full p-2 border rounded-lg" placeholder="e.g. Meera Sharma" required style="width: 100%; padding: 8px; border: 1px solid var(--color-border, #e5e7eb); border-radius: 6px; box-sizing: border-box;" />
@@ -587,7 +587,7 @@
                             <span class="footer-sparkle" aria-hidden="true">✦</span>
                         </div>
                         <p class="footer-newsletter-desc">Get fresh updates on seasonal achar, homemade amla murabba, traditional laddus &amp; festive treats.</p>
-                        <form class="footer-newsletter-form" onsubmit="event.preventDefault(); window.handleFooterSubscribe &amp;&amp; window.handleFooterSubscribe(this);">
+                        <form class="footer-newsletter-form">
                             <div class="footer-newsletter-row">
                                 <input type="email" class="footer-newsletter-input" placeholder="Enter your email address" required aria-label="Email for updates" />
                                 <button type="submit" class="footer-newsletter-btn">Subscribe</button>
@@ -647,6 +647,17 @@
                     if (isHidden) {
                         reviewBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
+                });
+            }
+
+            // Write Review Form Submit
+            const writeForm = document.getElementById('write-review-form');
+            if (writeForm) {
+                writeForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    alert('Review submitted! Thank you.');
+                    writeForm.reset();
+                    if (reviewBox) reviewBox.style.display = 'none';
                 });
             }
 

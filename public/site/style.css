@@ -413,7 +413,6 @@ header.site-header {
     }
 }
 
-
 .btn-profile-trigger {
     background: #FFFFFF; color: var(--color-maroon); border: 2px solid var(--color-gold);
     padding: 10px 20px; border-radius: var(--radius-btn);
@@ -2960,7 +2959,6 @@ html, body {
 .animate-float { animation: ss-float 6s ease-in-out infinite; }
 .leaf-sway { transform-origin: bottom center; animation: ss-sway 7s ease-in-out infinite; }
 
-
 /* === SVG INLINE STYLES === */
 .ref-leaf-spray { pointer-events: none; user-select: none; }
 .ref-wavy-divider { display: block; width: 100%; }
@@ -3525,7 +3523,6 @@ html, body {
     }
 }
 
-
 .paper-note {
     background-color: var(--color-paper-note);
     padding: 1rem 1.25rem;
@@ -3572,7 +3569,6 @@ html, body {
 .gap-4 { gap: 1rem; }
 .gap-5 { gap: 1.25rem; }
 .gap-10 { gap: 2.5rem; }
-
 
 /* POLAROID */
 .polaroid-card {
@@ -3746,8 +3742,6 @@ html, body {
     50% { transform: translateY(-10px); }
     100% { transform: translateY(0px); }
 }
-
-
 
 /* === TAILWIND SHIM UTILITIES === */
 .relative { position: relative; }
@@ -5026,7 +5020,6 @@ html, body {
   color: rgba(32, 51, 37, 0.75);
 }
 
-
 /* 3. COMPLIANCE SECTION */
 .compliance-section {
   margin: 0 auto;
@@ -5257,9 +5250,6 @@ html, body {
 .text-lg { font-size: 1.125rem; }
 .flex-items-start { align-items: flex-start; }
 
-
-
-
 /* SEARCH NOT FOUND & FALLBACK RECOMMENDATIONS */
 .search-not-found-card {
     background: #FFFFFF;
@@ -5352,10 +5342,6 @@ html, body {
         grid-template-columns: 1fr;
     }
 }
-
-
-
-
 
 /* ==========================================================================
    SATVIK SWAAD SIGNATURE PRODUCT SECTION (RIGHT-TO-LEFT MOVING ROW)
@@ -5814,7 +5800,6 @@ html, body {
     pointer-events: none;
     z-index: 5;
 }
-
 
 /* ==========================================================================
    SATVIK SWAAD SIGNATURE COMPACT BRAND FOOTER & MOBILE ACCORDIONS
@@ -13085,7 +13070,6 @@ html[dir="rtl"] .why-choose-right-doodles {
     text-align: left !important;
 }
 
-
 /* ═════════════════════════════════════════════════════════════════════════════
    CUSTOMER RATINGS & REVIEWS SECTION — ARTISANAL LTR SLIDING MARQUEE
    ═════════════════════════════════════════════════════════════════════════════ */
@@ -13457,7 +13441,6 @@ html[dir="rtl"] .why-choose-right-doodles {
     }
 }
 
-
 /* ==========================================================================
    OFFICIAL SATVIK SWAAD ARTISANAL BRANDED VIDEO POSTER & EMBED
    ========================================================================== */
@@ -13557,7 +13540,6 @@ html[dir="rtl"] .why-choose-right-doodles {
   color: rgba(255, 255, 255, 0.88);
 }
 
-
 /* UNIVERSAL LEAF & BOTANICAL SUPPRESSION (100% CLEAN HOMEPAGE) */
 .catalog-corner-foliage,
 .card-botanical-twig,
@@ -13596,7 +13578,6 @@ html[dir="rtl"] .why-choose-right-doodles {
     pointer-events: none !important;
 }
 
-
 /* PAUSE REVIEWS CAROUSEL ON MOUSE HOVER OR KEYBOARD FOCUS */
 .customer-ratings-marquee-section:hover .ratings-marquee-track,
 .ratings-marquee-viewport:hover .ratings-marquee-track,
@@ -13605,7 +13586,6 @@ html[dir="rtl"] .why-choose-right-doodles {
 .rating-marquee-card:hover {
     animation-play-state: paused !important;
 }
-
 
 /* ==========================================================================
    FAQS PAGE ENHANCEMENTS: NATURAL READABLE FONTS & CLEAN ARROW CONTROLS
@@ -13718,7 +13698,6 @@ html[dir="rtl"] .why-choose-right-doodles {
     font-family: inherit !important;
 }
 
-
 /* ==========================================================================
    PROFILE PAGE COMPACT LAYOUT (DECREASE GAPS & REMOVE SIDEBAR DOODLE)
    ========================================================================== */
@@ -13761,3 +13740,508 @@ html[dir="rtl"] .why-choose-right-doodles {
     visibility: hidden !important;
     pointer-events: none !important;
 }
+
+/* ========================================================
+   COMPACT & GAPLESS CONTACT PAGE STYLES
+   ======================================================== */
+.contact-layout {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    align-items: start !important;
+}
+@media (min-width: 1024px) {
+    .contact-layout {
+        grid-template-columns: 310px 1fr auto !important;
+        gap: 20px !important;
+        align-items: start !important;
+    }
+}
+
+.contact-info-card {
+    background: rgba(248, 245, 240, 0.6) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 14px !important;
+    padding: 16px 18px !important;
+    height: fit-content !important;
+}
+.contact-info-card .info-list {
+    gap: 12px !important;
+}
+.contact-info-card .info-item {
+    gap: 10px !important;
+    align-items: flex-start !important;
+}
+.contact-info-card .info-icon {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.9rem !important;
+}
+.contact-info-card .info-title {
+    font-size: 0.85rem !important;
+    margin-bottom: 2px !important;
+}
+.contact-info-card .info-line {
+    font-size: 0.77rem !important;
+    line-height: 1.35 !important;
+}
+
+.contact-form-block {
+    background: rgba(248, 245, 240, 0.45) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 14px !important;
+    padding: 16px 20px !important;
+}
+@media (min-width: 768px) {
+    .contact-form-block {
+        padding: 18px 22px !important;
+    }
+}
+.contact-form-block .form-grid {
+    gap: 10px !important;
+}
+.contact-form-block .field-label {
+    margin-bottom: 3px !important;
+    font-size: 0.8rem !important;
+}
+.contact-form-block .ss-input {
+    padding: 8px 12px !important;
+    font-size: 0.9rem !important;
+}
+
+.contact-trust-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    margin-top: 14px !important;
+    padding-top: 12px !important;
+    border-top: 1px dashed var(--color-border) !important;
+}
+@media (min-width: 768px) {
+    .contact-trust-row {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+.contact-trust-row .merchant-id-card {
+    padding: 10px 14px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #D4AF37 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 6px rgba(212,175,55,0.05) !important;
+    margin-top: 0 !important;
+}
+.contact-trust-row .pd-security-notice-card {
+    padding: 10px 14px !important;
+    background: rgba(30, 86, 49, 0.04) !important;
+    border: 1px dashed var(--color-green) !important;
+    border-radius: 8px !important;
+    margin-top: 0 !important;
+}
+
+/* Eliminate excessive main padding and bottom whitespace on contact page */
+body:has(.contact-content-section) main,
+main:has(.contact-content-section),
+main.page-container {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+body:has(.contact-content-section) footer.site-footer {
+    margin-top: 14px !important;
+}
+
+/* ==========================================================================
+   DIWALI FESTIVE LADDU COLLECTION & SSPICS BRAND BANNERS SHOWCASE
+   ========================================================================== */
+
+/* ── 1. Diwali Festive Spotlight Card ── */
+.diwali-festive-hero-spotlight {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 32px auto;
+    padding: 0 16px;
+}
+
+.diwali-spotlight-card {
+    background: linear-gradient(135deg, #FFFDF8 0%, #FFF9EE 45%, #FAF2E2 100%);
+    border: 2px solid #D4A017;
+    border-radius: 24px;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: center;
+    box-shadow: 0 10px 32px rgba(212, 160, 23, 0.18), 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+.diwali-spotlight-card::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(212, 160, 23, 0.25) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+@media (min-width: 860px) {
+    .diwali-spotlight-card {
+        grid-template-columns: 420px 1fr;
+        padding: 32px 36px;
+        gap: 36px;
+    }
+}
+
+.diwali-spotlight-visual {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    background: #FFFFFF;
+}
+
+.diwali-spotlight-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.diwali-spotlight-card:hover .diwali-spotlight-img {
+    transform: scale(1.03);
+}
+
+.diwali-badge-glow {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: linear-gradient(135deg, #7A1F2D 0%, #A62B39 100%);
+    color: #FFFFFF;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(122, 31, 45, 0.35);
+    z-index: 2;
+}
+
+.diwali-visual-flair {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    z-index: 2;
+}
+
+.diwali-sparkle {
+    background: rgba(31, 74, 44, 0.88);
+    backdrop-filter: blur(4px);
+    color: #FFFFFF;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.diwali-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #9C6C08;
+    margin-bottom: 8px;
+}
+
+.diwali-spotlight-title {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    line-height: 1.1;
+    color: #1F4A2C;
+    margin: 0 0 8px 0;
+}
+
+.diwali-subtitle-trio {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #7A1F2D;
+    display: block;
+    margin-top: 4px;
+}
+
+.diwali-spotlight-desc {
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: #4A4A4A;
+    margin: 0 0 18px 0;
+}
+
+.diwali-price-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #FFFFFF;
+    border: 1px solid #EBDCCB;
+    border-radius: 14px;
+    margin-bottom: 20px;
+}
+
+.diwali-prices {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.diwali-sale-price {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: #1F4A2C;
+}
+
+.diwali-mrp {
+    font-size: 1.1rem;
+    color: #8C8C8C;
+    text-decoration: line-through;
+}
+
+.diwali-save-badge {
+    background: #FFF0F0;
+    color: #C0392B;
+    border: 1px solid #F5C6CB;
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.diwali-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.88rem;
+    color: #4A4A4A;
+}
+
+.diwali-rating .star {
+    color: #D4A017;
+    font-size: 1.1rem;
+}
+
+.diwali-rating .score {
+    font-weight: 800;
+}
+
+.diwali-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.diwali-cart-btn {
+    background: linear-gradient(135deg, #1F4A2C 0%, #2A683E 100%) !important;
+    color: #FFFFFF !important;
+    padding: 12px 24px !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    border-radius: 12px !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 14px rgba(31, 74, 44, 0.28) !important;
+    transition: all 0.22s ease !important;
+}
+
+.diwali-cart-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(31, 74, 44, 0.38) !important;
+}
+
+.diwali-details-link {
+    font-weight: 800;
+    color: #7A1F2D;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.diwali-details-link:hover {
+    color: #1F4A2C;
+    text-decoration: underline;
+}
+
+/* ── 2. Festive Highlight Card in Product Marquee ── */
+.product-card.festive-highlight-card {
+    border: 2px solid #D4A017 !important;
+    background: linear-gradient(180deg, #FFFDF8 0%, #FFF8EA 100%) !important;
+    box-shadow: 0 6px 20px rgba(212, 160, 23, 0.2) !important;
+}
+
+.product-card.festive-highlight-card:hover {
+    border-color: #A62B39 !important;
+    box-shadow: 0 12px 30px rgba(166, 43, 57, 0.22) !important;
+}
+
+.product-card.festive-highlight-card .product-badge {
+    background: linear-gradient(135deg, #7A1F2D 0%, #C0392B 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(122, 31, 45, 0.35) !important;
+}
+
+/* ── 3. Brand Heritage & SSPics Showcase Grid ── */
+.brand-heritage-showcase {
+    width: 100%;
+    max-width: 1200px;
+    margin: 44px auto 36px auto;
+    padding: 0 16px;
+}
+
+.brand-heritage-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.brand-heritage-eyebrow {
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #9C6C08;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.brand-heritage-title {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(2rem, 3.8vw, 2.7rem);
+    color: #1F4A2C;
+    margin: 0 0 8px 0;
+}
+
+.brand-heritage-subtitle {
+    font-size: 1rem;
+    color: #555555;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.brand-heritage-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+}
+
+@media (min-width: 768px) {
+    .brand-heritage-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.brand-heritage-card {
+    background: #FFFFFF;
+    border: 1.5px solid #EAE3D6;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.brand-heritage-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 28px rgba(31, 74, 44, 0.12);
+    border-color: #D4A017;
+}
+
+.brand-card-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: #FAF8F5;
+}
+
+.brand-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.brand-heritage-card:hover .brand-card-img {
+    transform: scale(1.04);
+}
+
+.brand-card-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(31, 74, 44, 0.9);
+    backdrop-filter: blur(4px);
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.brand-card-body {
+    padding: 18px 18px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.brand-card-heading {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1F4A2C;
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+}
+
+.brand-card-text {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #555555;
+    margin: 0 0 14px 0;
+    flex: 1;
+}
+
+.brand-card-features {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #1F4A2C;
+}
+
+.brand-card-features span {
+    background: #F4F8F4;
+    border: 1px solid #D8E6D8;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+

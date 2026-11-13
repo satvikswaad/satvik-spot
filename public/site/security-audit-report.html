@@ -177,7 +177,7 @@
             <a href="/SATVIK_SWAAD_SECURITY_AUDIT_REPORT.md" download="SATVIK_SWAAD_SECURITY_AUDIT_REPORT.md" class="btn-action btn-gold">
                 📥 Download .md
             </a>
-            <button onclick="window.print()" class="btn-action btn-outline">
+            <button type="button" id="btn-print-audit" class="btn-action btn-outline">
                 🖨️ Print / Save PDF
             </button>
             <a href="https://satvik-spot-staging.web.app" target="_blank" class="btn-action btn-outline">
@@ -449,6 +449,11 @@ Every single requirement defined in the **Satvik Swaad Web Production Security &
             document.getElementById('rendered-report').innerHTML = marked.parse(raw);
         } else {
             document.getElementById('rendered-report').innerText = raw;
+        }
+
+        const btnPrint = document.getElementById('btn-print-audit');
+        if (btnPrint) {
+            btnPrint.addEventListener('click', () => window.print());
         }
     </script>
 </body>

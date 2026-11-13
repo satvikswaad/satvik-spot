@@ -283,14 +283,6 @@ window.handleFooterSubscribe = function(form) {
             localStorage.setItem('satvik_subscribers_sync', String(Date.now()));
         } catch (e) {}
 
-        if (window.db) {
-            try {
-                import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js').then(({ collection, addDoc }) => {
-                    addDoc(collection(window.db, 'newsletter_subscribers'), newSubscriber).catch(() => {});
-                }).catch(() => {});
-            } catch (e) {}
-        }
-
         showToast('Dhanyawad! You have been subscribed to Satvik updates. 🌿✨');
         form.reset();
     } catch (err) {
@@ -299,6 +291,28 @@ window.handleFooterSubscribe = function(form) {
         form.reset();
     }
 };
+
+// Bind all footer newsletter forms without inline event handlers (strict CSP Level 3 compliant)
+function bindFooterNewsletterForms() {
+    document.querySelectorAll('.footer-newsletter-form').forEach(form => {
+        if (!form.dataset.bound) {
+            form.dataset.bound = 'true';
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (typeof window.handleFooterSubscribe === 'function') {
+                    window.handleFooterSubscribe(form);
+                }
+            });
+        }
+    });
+}
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindFooterNewsletterForms);
+    } else {
+        bindFooterNewsletterForms();
+    }
+}
 
 function initLanguage() {
     const rawStored = (typeof localStorage !== 'undefined') ? (localStorage.getItem('app_language') || localStorage.getItem('satvik_lang') || 'en') : 'en';

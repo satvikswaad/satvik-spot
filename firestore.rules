@@ -58,8 +58,9 @@ service cloud.firestore {
     // User Profile Privilege Escalation Guard (AUTH-4, DB-1)
     match /users/{userId} {
       allow read, write: if false;
-      // Deny client setting of roles or claims
-      allow create, update: if !('admin' in request.resource.data) &&
+      // DB-1: Strict deny of client setting of roles or claims
+      allow create, update: if false &&
+        !('admin' in request.resource.data) &&
         !('role' in request.resource.data) &&
         !('roles' in request.resource.data) &&
         !('claims' in request.resource.data);
@@ -67,7 +68,8 @@ service cloud.firestore {
 
     match /customers/{userId} {
       allow read, write: if false;
-      allow create, update: if !('admin' in request.resource.data) &&
+      allow create, update: if false &&
+        !('admin' in request.resource.data) &&
         !('role' in request.resource.data) &&
         !('roles' in request.resource.data) &&
         !('claims' in request.resource.data);

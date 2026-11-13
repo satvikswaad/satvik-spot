@@ -247,7 +247,7 @@
                 <a href="#" id="btn-wa-notify" class="btn-wa-action" target="_blank" rel="noopener noreferrer">
                     <span>💬 Get Live Updates on WhatsApp</span>
                 </a>
-                <button type="button" class="btn-print-action" onclick="window.print()">
+                <button type="button" class="btn-print-action" id="btn-print-receipt">
                     <span>🖨️ Print Order Receipt</span>
                 </button>
                 <a href="profile.html#orders" class="btn-orders-action">
@@ -368,7 +368,7 @@
                             <span class="footer-sparkle" aria-hidden="true">✦</span>
                         </div>
                         <p class="footer-newsletter-desc">Get fresh updates on seasonal achar, homemade amla murabba, traditional laddus &amp; festive treats.</p>
-                        <form class="footer-newsletter-form" onsubmit="event.preventDefault(); window.handleFooterSubscribe &amp;&amp; window.handleFooterSubscribe(this);">
+                        <form class="footer-newsletter-form">
                             <div class="footer-newsletter-row">
                                 <input type="email" class="footer-newsletter-input" placeholder="Enter your email address" required aria-label="Email for updates" />
                                 <button type="submit" class="footer-newsletter-btn">Subscribe</button>
@@ -456,16 +456,47 @@
                 ? lastOrder.items
                 : [{ name: 'Handcrafted Traditional Pickle', variant: '500 g', quantity: 1, price: total, image: 'assets/aam-ka-achar.png' }];
 
-            itemsContainer.innerHTML = items.map(item => `
-                <div class="receipt-item-row">
-                    <img src="${item.image || 'assets/aam-ka-achar.png'}" alt="${item.name || 'Satvik Item'}" class="receipt-item-thumb" />
-                    <div class="receipt-item-details">
-                        <div class="receipt-item-name">${item.name || 'Satvik Swaad Product'}</div>
-                        <div class="receipt-item-variant">${item.variant || '500 g'} &bull; Qty: ${item.quantity || 1}</div>
-                    </div>
-                    <div class="receipt-item-price">₹${(item.price || 0) * (item.quantity || 1)}</div>
-                </div>
-            `).join('');
+            if (itemsContainer) {
+                const itemNodes = items.map(item => {
+                    const row = document.createElement('div');
+                    row.className = 'receipt-item-row';
+
+                    const img = document.createElement('img');
+                    img.src = item.image || 'assets/aam-ka-achar.png';
+                    img.alt = item.name || 'Satvik Item';
+                    img.className = 'receipt-item-thumb';
+                    row.appendChild(img);
+
+                    const details = document.createElement('div');
+                    details.className = 'receipt-item-details';
+
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'receipt-item-name';
+                    nameDiv.textContent = item.name || 'Satvik Swaad Product';
+                    details.appendChild(nameDiv);
+
+                    const variantDiv = document.createElement('div');
+                    variantDiv.className = 'receipt-item-variant';
+                    variantDiv.textContent = `${item.variant || '500 g'} • Qty: ${item.quantity || 1}`;
+                    details.appendChild(variantDiv);
+
+                    row.appendChild(details);
+
+                    const priceDiv = document.createElement('div');
+                    priceDiv.className = 'receipt-item-price';
+                    priceDiv.textContent = `₹${(item.price || 0) * (item.quantity || 1)}`;
+                    row.appendChild(priceDiv);
+
+                    return row;
+                });
+                itemsContainer.replaceChildren(...itemNodes);
+            }
+
+            // Print button listener
+            const printBtn = document.getElementById('btn-print-receipt');
+            if (printBtn) {
+                printBtn.addEventListener('click', () => window.print());
+            }
 
             // Build WhatsApp Notification Link
             const waBtn = document.getElementById('btn-wa-notify');

@@ -302,7 +302,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal: Add Customer Review / Testimonial
     const btnOpenAddReviewModal = document.getElementById('btn-open-add-review-modal');
     if (btnOpenAddReviewModal) {
-        btnOpenAddReviewModal.addEventListener('click', () => openModal('modal-add-review'));
+        btnOpenAddReviewModal.addEventListener('click', () => {
+            populateAddReviewProductDropdown();
+            openModal('modal-add-review');
+        });
     }
     const btnCloseAddReviewModal = document.getElementById('btn-close-add-review-modal');
     if (btnCloseAddReviewModal) {
@@ -324,11 +327,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const text = document.getElementById('rev-text').value.trim();
             const featured = document.getElementById('rev-featured').checked;
 
+            const matchingProd = (typeof adminDataAdapter !== 'undefined' && typeof adminDataAdapter.getProducts === 'function')
+                ? adminDataAdapter.getProducts().find(p => p.name.toLowerCase() === productName.toLowerCase())
+                : null;
+            const productId = matchingProd ? matchingProd.id : '';
+
             try {
                 await adminDataAdapter.addReview({
                     author,
                     customerName: author,
                     city,
+                    productId,
                     productName,
                     rating,
                     title,
@@ -347,6 +356,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+function populateAddReviewProductDropdown() {
+    const revSelect = document.getElementById('rev-product');
+    if (!revSelect || typeof adminDataAdapter === 'undefined' || typeof adminDataAdapter.getProducts !== 'function') return;
+    const products = adminDataAdapter.getProducts();
+    if (!products || products.length === 0) return;
+    const existingVal = revSelect.value;
+    const frag = document.createDocumentFragment();
+    products.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name;
+        opt.textContent = p.name;
+        if (p.name === existingVal) opt.selected = true;
+        frag.appendChild(opt);
+    });
+    const storeOpt = document.createElement('option');
+    storeOpt.value = 'Store Experience Varanasi';
+    storeOpt.textContent = 'Store Experience Varanasi';
+    if (existingVal === 'Store Experience Varanasi') storeOpt.selected = true;
+    frag.appendChild(storeOpt);
+    revSelect.replaceChildren(frag);
+}
 
     // Shipping Modal Handlers
     const btnCloseShippingModal = document.getElementById('btn-close-shipping-modal');
@@ -2688,85 +2719,185 @@ function printOfflineReceipt(orderId) {
         return;
     }
 
-    let itemsHtml = '';
-    if (Array.isArray(order.items)) {
-        order.items.forEach(it => {
-            itemsHtml += `
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;">
-                <div>${it.name || it.productName || 'Item'} (${it.variant || ''}) × ${it.qty || 1}</div>
-                <div style="font-weight:700;">₹${it.total || ((it.price || 0) * (it.qty || 1))}</div>
-            </div>`;
-        });
-    }
+    const doc = receiptWindow.document;
+    doc.title = `Receipt - Order #${order.id || ''}`;
+
+    const style = doc.createElement('style');
+    style.textContent = `
+        body { font-family: 'Courier New', monospace; padding: 20px; color: #111; max-width: 380px; margin: 0 auto; }
+        .center { text-align: center; }
+        .divider { border-top: 1px dashed #666; margin: 10px 0; }
+        .bold { font-weight: bold; }
+        .text-right { text-align: right; }
+        .row-flex { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
+        @media print { body { padding: 0; } }
+    `;
+    doc.head.appendChild(style);
+
+    const body = doc.body;
+    while (body.firstChild) body.removeChild(body.firstChild);
+
+    // Header
+    const centerHead = doc.createElement('div');
+    centerHead.className = 'center';
+
+    const h2 = doc.createElement('h2');
+    h2.style.cssText = 'margin:0 0 4px 0;font-size:18px;';
+    h2.textContent = 'SATVIK SWAAD';
+    centerHead.appendChild(h2);
+
+    const sub1 = doc.createElement('div');
+    sub1.style.fontSize = '11px';
+    sub1.textContent = 'Authentic Traditional Pickles & Delicacies';
+    centerHead.appendChild(sub1);
+
+    const sub2 = doc.createElement('div');
+    sub2.style.fontSize = '11px';
+    sub2.textContent = 'Varanasi, Uttar Pradesh, India';
+    centerHead.appendChild(sub2);
+
+    const sub3 = doc.createElement('div');
+    sub3.style.fontSize = '11px';
+    sub3.textContent = '📞 +91 91702 46665 | satvikswaad.com';
+    centerHead.appendChild(sub3);
+    body.appendChild(centerHead);
+
+    const div1 = doc.createElement('div');
+    div1.className = 'divider';
+    body.appendChild(div1);
+
+    // Order Meta
+    const metaWrap = doc.createElement('div');
+    metaWrap.style.cssText = 'font-size:12px;line-height:1.5;';
+
+    const addMetaLine = (label, val) => {
+        const line = doc.createElement('div');
+        const strong = doc.createElement('strong');
+        strong.textContent = label + ': ';
+        line.appendChild(strong);
+        line.appendChild(doc.createTextNode(String(val)));
+        metaWrap.appendChild(line);
+    };
 
     const d = order.createdAt ? (order.createdAt.toDate ? order.createdAt.toDate() : new Date(order.createdAt)) : new Date();
     const dateFormatted = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-    receiptWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Receipt - Order #${order.id}</title>
-            <style>
-                body { font-family: 'Courier New', monospace; padding: 20px; color: #111; max-width: 380px; margin: 0 auto; }
-                .center { text-align: center; }
-                .divider { border-top: 1px dashed #666; margin: 10px 0; }
-                .bold { font-weight: bold; }
-                .text-right { text-align: right; }
-                @media print {
-                    body { padding: 0; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="center">
-                <h2 style="margin:0 0 4px 0;font-size:18px;">SATVIK SWAAD</h2>
-                <div style="font-size:11px;">Authentic Traditional Pickles & Delicacies</div>
-                <div style="font-size:11px;">Varanasi, Uttar Pradesh, India</div>
-                <div style="font-size:11px;">📞 +91 91702 46665 | satvikswaad.com</div>
-            </div>
-            <div class="divider"></div>
-            <div style="font-size:12px;line-height:1.5;">
-                <div><strong>INVOICE / RECEIPT:</strong> #${order.id}</div>
-                <div><strong>DATE:</strong> ${dateFormatted}</div>
-                <div><strong>CHANNEL:</strong> ${order.channel || 'Varanasi Store'}</div>
-                <div><strong>CUSTOMER:</strong> ${order.name || order.customerName || 'Walk-in'}</div>
-                <div><strong>PHONE:</strong> ${order.phone || order.customerPhone || 'N/A'}</div>
-            </div>
-            <div class="divider"></div>
-            <div style="font-size:12px;font-weight:bold;margin-bottom:6px;">ITEMS PURCHASED</div>
-            ${itemsHtml}
-            <div class="divider"></div>
-            <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:3px;">
-                <div>Subtotal:</div>
-                <div>₹${order.subtotal || order.total || 0}</div>
-            </div>
-            ${order.discount ? `
-            <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:3px;color:#B91C1C;">
-                <div>Discount:</div>
-                <div>- ₹${order.discount}</div>
-            </div>` : ''}
-            <div class="divider"></div>
-            <div style="font-size:16px;font-weight:bold;display:flex;justify-content:space-between;">
-                <div>GRAND TOTAL:</div>
-                <div>₹${order.total || order.finalAmount || 0}</div>
-            </div>
-            <div style="font-size:12px;margin-top:6px;">
-                <strong>PAYMENT:</strong> ${order.paymentMethod || order.paymentMode || 'Cash'} (${(order.paymentStatus || 'paid').toUpperCase()})
-            </div>
-            ${order.notes ? `<div style="font-size:11px;margin-top:6px;font-style:italic;">Notes: ${order.notes}</div>` : ''}
-            <div class="divider"></div>
-            <div class="center" style="font-size:11px;line-height:1.4;">
-                <p>Made with 100% Cold-Pressed Mustard Oil & Himalayan Pink Salt.<br>Zero Artificial Preservatives.</p>
-                <p style="font-weight:bold;">Thank you for supporting traditional Indian artisans!</p>
-            </div>
-            <script>
-                window.onload = function() { window.print(); }
-            </script>
-        </body>
-        </html>
-    `);
-    receiptWindow.document.close();
+    addMetaLine('INVOICE / RECEIPT', '#' + (order.id || ''));
+    addMetaLine('DATE', dateFormatted);
+    addMetaLine('CHANNEL', order.channel || 'Varanasi Store');
+    addMetaLine('CUSTOMER', order.name || order.customerName || 'Walk-in');
+    addMetaLine('PHONE', order.phone || order.customerPhone || 'N/A');
+    body.appendChild(metaWrap);
+
+    const div2 = doc.createElement('div');
+    div2.className = 'divider';
+    body.appendChild(div2);
+
+    // Items Purchased
+    const itemsTitle = doc.createElement('div');
+    itemsTitle.style.cssText = 'font-size:12px;font-weight:bold;margin-bottom:6px;';
+    itemsTitle.textContent = 'ITEMS PURCHASED';
+    body.appendChild(itemsTitle);
+
+    if (Array.isArray(order.items)) {
+        order.items.forEach(it => {
+            const row = doc.createElement('div');
+            row.style.cssText = 'display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;';
+
+            const nameDiv = doc.createElement('div');
+            const itName = it.name || it.productName || 'Item';
+            const itVariant = it.variant ? ` (${it.variant})` : '';
+            const itQty = it.qty || 1;
+            nameDiv.textContent = `${itName}${itVariant} × ${itQty}`;
+
+            const totalDiv = doc.createElement('div');
+            totalDiv.style.fontWeight = '700';
+            const amt = it.total || ((it.price || 0) * (it.qty || 1));
+            totalDiv.textContent = `₹${amt}`;
+
+            row.appendChild(nameDiv);
+            row.appendChild(totalDiv);
+            body.appendChild(row);
+        });
+    }
+
+    const div3 = doc.createElement('div');
+    div3.className = 'divider';
+    body.appendChild(div3);
+
+    // Totals
+    const subtotalRow = doc.createElement('div');
+    subtotalRow.className = 'row-flex';
+    const subLabel = doc.createElement('div');
+    subLabel.textContent = 'Subtotal:';
+    const subVal = doc.createElement('div');
+    subVal.textContent = `₹${order.subtotal || order.total || 0}`;
+    subtotalRow.appendChild(subLabel);
+    subtotalRow.appendChild(subVal);
+    body.appendChild(subtotalRow);
+
+    if (order.discount) {
+        const discRow = doc.createElement('div');
+        discRow.className = 'row-flex';
+        discRow.style.color = '#B91C1C';
+        const discLabel = doc.createElement('div');
+        discLabel.textContent = 'Discount:';
+        const discVal = doc.createElement('div');
+        discVal.textContent = `- ₹${order.discount}`;
+        discRow.appendChild(discLabel);
+        discRow.appendChild(discVal);
+        body.appendChild(discRow);
+    }
+
+    const div4 = doc.createElement('div');
+    div4.className = 'divider';
+    body.appendChild(div4);
+
+    const grandRow = doc.createElement('div');
+    grandRow.style.cssText = 'font-size:16px;font-weight:bold;display:flex;justify-content:space-between;';
+    const grandLabel = doc.createElement('div');
+    grandLabel.textContent = 'GRAND TOTAL:';
+    const grandVal = doc.createElement('div');
+    grandVal.textContent = `₹${order.total || order.finalAmount || 0}`;
+    grandRow.appendChild(grandLabel);
+    grandRow.appendChild(grandVal);
+    body.appendChild(grandRow);
+
+    const payDiv = doc.createElement('div');
+    payDiv.style.cssText = 'font-size:12px;margin-top:6px;';
+    const payStrong = doc.createElement('strong');
+    payStrong.textContent = 'PAYMENT: ';
+    payDiv.appendChild(payStrong);
+    payDiv.appendChild(doc.createTextNode(`${order.paymentMethod || order.paymentMode || 'Cash'} (${(order.paymentStatus || 'paid').toUpperCase()})`));
+    body.appendChild(payDiv);
+
+    if (order.notes) {
+        const notesDiv = doc.createElement('div');
+        notesDiv.style.cssText = 'font-size:11px;margin-top:6px;font-style:italic;';
+        notesDiv.textContent = `Notes: ${order.notes}`;
+        body.appendChild(notesDiv);
+    }
+
+    const div5 = doc.createElement('div');
+    div5.className = 'divider';
+    body.appendChild(div5);
+
+    const footDiv = doc.createElement('div');
+    footDiv.className = 'center';
+    footDiv.style.cssText = 'font-size:11px;line-height:1.4;';
+    const p1 = doc.createElement('p');
+    p1.textContent = 'Made with 100% Cold-Pressed Mustard Oil & Himalayan Pink Salt.\nZero Artificial Preservatives.';
+    const p2 = doc.createElement('p');
+    p2.style.fontWeight = 'bold';
+    p2.textContent = 'Thank you for supporting traditional Indian artisans!';
+    footDiv.appendChild(p1);
+    footDiv.appendChild(p2);
+    body.appendChild(footDiv);
+
+    receiptWindow.focus();
+    setTimeout(() => {
+        try { receiptWindow.print(); } catch (e) {}
+    }, 250);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3067,53 +3198,44 @@ function renderTierProductReviews() {
     }
 
     // 1. Populate Dropdown Options
-    if (selectProduct && selectProduct.children.length !== products.length) {
+    if (selectProduct) {
         const frag = document.createDocumentFragment();
         products.forEach(p => {
             const metrics = adminDataAdapter.getProductReviewMetrics(p.id);
             const opt = document.createElement('option');
             opt.value = p.id;
             opt.textContent = `${p.name} (${metrics.totalReviews} reviews · ${metrics.avgRating} ★)`;
+            if (p.id === reviewsSelectedProduct) opt.selected = true;
             frag.appendChild(opt);
         });
         selectProduct.replaceChildren(frag);
-    }
-    if (selectProduct) {
         selectProduct.value = reviewsSelectedProduct;
     }
 
-    // 2. Populate Quick Pick Chips (first 5 popular products)
-    if (chipsContainer && chipsContainer.querySelectorAll('.btn-preset-chip').length === 0) {
+    // 2. Populate Quick Pick Chips (Top products & new festive specials)
+    if (chipsContainer) {
         const frag = document.createDocumentFragment();
-        const popularProds = products.slice(0, 6);
-        popularProds.forEach(p => {
+        const lbl = document.createElement('span');
+        lbl.style.cssText = 'font-size:0.75rem;font-weight:700;color:var(--text-muted);';
+        lbl.textContent = 'Quick Pick:';
+        frag.appendChild(lbl);
+
+        products.forEach(p => {
+            const isSelected = p.id === reviewsSelectedProduct;
             const chip = document.createElement('button');
             chip.type = 'button';
-            chip.className = 'btn-preset-chip' + (p.id === reviewsSelectedProduct ? ' active' : '');
-            chip.textContent = p.name.split(' ')[0] + ' ' + (p.name.split(' ')[1] || '');
+            chip.className = 'btn-preset-chip' + (isSelected ? ' active' : '');
+            chip.textContent = p.name;
+            chip.style.cssText = isSelected
+                ? 'background: #7A1C1C; color: #FFF; border-color: #7A1C1C; font-weight: 700;'
+                : 'background: #FFFFFF; color: #4A3B32; border-color: #D4C7B5; font-weight: 600;';
             chip.addEventListener('click', () => {
                 reviewsSelectedProduct = p.id;
                 renderReviewsManagement();
             });
             frag.appendChild(chip);
         });
-        chipsContainer.appendChild(frag);
-    }
-
-    // Update active class on quick chips
-    if (chipsContainer) {
-        chipsContainer.querySelectorAll('.btn-preset-chip').forEach(c => {
-            const matchingProd = products.find(p => c.textContent.trim().startsWith(p.name.split(' ')[0]));
-            if (matchingProd && matchingProd.id === reviewsSelectedProduct) {
-                c.style.background = '#7A1C1C';
-                c.style.color = '#FFF';
-                c.style.borderColor = '#7A1C1C';
-            } else {
-                c.style.background = '#FFFFFF';
-                c.style.color = '#4A3B32';
-                c.style.borderColor = '#D4C7B5';
-            }
-        });
+        chipsContainer.replaceChildren(frag);
     }
 
     // 3. Render Product Love Scorecard Banner
@@ -3808,13 +3930,19 @@ export async function renderSubscribersView() {
         td.style.textAlign = 'center';
         td.style.padding = '30px 16px';
         td.style.color = '#7A6B5D';
-        td.innerHTML = `
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <span style="font-size:1.8rem;">📭</span>
-                <strong style="font-size:0.95rem;">No subscribers found</strong>
-                <span style="font-size:0.8rem;color:#998774;">${query ? 'Try adjusting your search query.' : 'New storefront footer subscribers will appear here automatically.'}</span>
-            </div>
-        `;
+        const emptyDiv = document.createElement('div');
+        emptyDiv.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px;';
+        const emptyIcon = document.createElement('span');
+        emptyIcon.style.fontSize = '1.8rem';
+        emptyIcon.textContent = '📭';
+        const emptyStrong = document.createElement('strong');
+        emptyStrong.style.fontSize = '0.95rem';
+        emptyStrong.textContent = 'No subscribers found';
+        const emptySub = document.createElement('span');
+        emptySub.style.cssText = 'font-size:0.8rem;color:#998774;';
+        emptySub.textContent = query ? 'Try adjusting your search query.' : 'New storefront footer subscribers will appear here automatically.';
+        emptyDiv.replaceChildren(emptyIcon, emptyStrong, emptySub);
+        td.appendChild(emptyDiv);
         tr.appendChild(td);
         tbody.appendChild(tr);
         return;
@@ -3833,27 +3961,30 @@ export async function renderSubscribersView() {
         // Email with avatar
         const tdEmail = document.createElement('td');
         const initial = (sub.email ? sub.email.charAt(0).toUpperCase() : 'S');
-        tdEmail.innerHTML = `
-            <div style="display:flex;align-items:center;gap:10px;">
-                <div style="width:32px;height:32px;border-radius:50%;background:#E8F5E9;color:#2E7D32;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;border:1.5px solid #C8E6C9;flex-shrink:0;">
-                    ${initial}
-                </div>
-                <div>
-                    <div style="font-weight:800;color:var(--dark);font-size:0.88rem;">${escapeHtml(sub.email)}</div>
-                    <div style="font-size:0.72rem;color:#8C7A68;">ID: ${escapeHtml(sub.id || 'N/A')}</div>
-                </div>
-            </div>
-        `;
+        const avatarWrap = document.createElement('div');
+        avatarWrap.style.cssText = 'display:flex;align-items:center;gap:10px;';
+        const avatarCircle = document.createElement('div');
+        avatarCircle.style.cssText = 'width:32px;height:32px;border-radius:50%;background:#E8F5E9;color:#2E7D32;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;border:1.5px solid #C8E6C9;flex-shrink:0;';
+        avatarCircle.textContent = initial;
+        const emailTextWrap = document.createElement('div');
+        const emailDiv = document.createElement('div');
+        emailDiv.style.cssText = 'font-weight:800;color:var(--dark);font-size:0.88rem;';
+        emailDiv.textContent = sub.email || '';
+        const idDiv = document.createElement('div');
+        idDiv.style.cssText = 'font-size:0.72rem;color:#8C7A68;';
+        idDiv.textContent = 'ID: ' + (sub.id || 'N/A');
+        emailTextWrap.replaceChildren(emailDiv, idDiv);
+        avatarWrap.replaceChildren(avatarCircle, emailTextWrap);
+        tdEmail.appendChild(avatarWrap);
         tr.appendChild(tdEmail);
 
         // Source
         const tdSource = document.createElement('td');
         const isFooter = sub.source === 'storefront_footer';
-        tdSource.innerHTML = `
-            <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;padding:3px 9px;border-radius:12px;background:${isFooter ? '#E8F5E9' : '#FFF3E0'};color:${isFooter ? '#1D552C' : '#E65100'};border:1px solid ${isFooter ? '#A5D6A7' : '#FFE082'};	e;">
-                ${isFooter ? '🌿 Storefront Footer' : '⚙️ ' + escapeHtml(sub.source || 'Manual')}
-            </span>
-        `;
+        const badgeSource = document.createElement('span');
+        badgeSource.style.cssText = `display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;padding:3px 9px;border-radius:12px;background:${isFooter ? '#E8F5E9' : '#FFF3E0'};color:${isFooter ? '#1D552C' : '#E65100'};border:1px solid ${isFooter ? '#A5D6A7' : '#FFE082'};`;
+        badgeSource.textContent = isFooter ? '🌿 Storefront Footer' : ('⚙️ ' + (sub.source || 'Manual'));
+        tdSource.appendChild(badgeSource);
         tr.appendChild(tdSource);
 
         // Date & Time
@@ -3866,17 +3997,19 @@ export async function renderSubscribersView() {
             hour: '2-digit',
             minute: '2-digit'
         }) : 'Recently';
-        tdDate.innerHTML = `<span style="font-size:0.82rem;color:#55483D;">${dateStr}</span>`;
+        const spanDate = document.createElement('span');
+        spanDate.style.cssText = 'font-size:0.82rem;color:#55483D;';
+        spanDate.textContent = dateStr;
+        tdDate.appendChild(spanDate);
         tr.appendChild(tdDate);
 
         // Status
         const tdStatus = document.createElement('td');
         const isActive = sub.status !== 'unsubscribed';
-        tdStatus.innerHTML = `
-            <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;padding:2px 8px;border-radius:10px;background:${isActive ? '#E8F5E9' : '#ECEFF1'};color:${isActive ? '#2E7D32' : '#607D8B'};	e;">
-                ● ${isActive ? 'Active' : 'Unsubscribed'}
-            </span>
-        `;
+        const badgeStatus = document.createElement('span');
+        badgeStatus.style.cssText = `display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:800;padding:2px 8px;border-radius:10px;background:${isActive ? '#E8F5E9' : '#ECEFF1'};color:${isActive ? '#2E7D32' : '#607D8B'};`;
+        badgeStatus.textContent = `● ${isActive ? 'Active' : 'Unsubscribed'}`;
+        tdStatus.appendChild(badgeStatus);
         tr.appendChild(tdStatus);
 
         // Actions
@@ -3892,15 +4025,15 @@ export async function renderSubscribersView() {
         btnCopy.style.fontSize = '0.75rem';
         btnCopy.style.marginRight = '6px';
         btnCopy.title = 'Copy email address';
-        btnCopy.innerHTML = '📋 Copy';
+        btnCopy.textContent = '📋 Copy';
         btnCopy.addEventListener('click', () => {
             copyTextToClipboard(sub.email, () => {
-                btnCopy.innerHTML = '✅ Copied!';
+                btnCopy.textContent = '✅ Copied!';
                 btnCopy.style.background = '#E8F5E9';
                 btnCopy.style.color = '#2E7D32';
                 showAdminToast(`Copied ${sub.email} to clipboard!`, 'success');
                 setTimeout(() => {
-                    btnCopy.innerHTML = '📋 Copy';
+                    btnCopy.textContent = '📋 Copy';
                     btnCopy.style.background = '';
                     btnCopy.style.color = '';
                 }, 2000);
@@ -3916,7 +4049,7 @@ export async function renderSubscribersView() {
         aMail.style.marginRight = '6px';
         aMail.style.textDecoration = 'none';
         aMail.title = 'Send email';
-        aMail.innerHTML = '✉️ Mail';
+        aMail.textContent = '✉️ Mail';
 
         // Delete button
         const btnDelete = document.createElement('button');
@@ -3928,7 +4061,7 @@ export async function renderSubscribersView() {
         btnDelete.style.borderColor = '#FCA5A5';
         btnDelete.style.background = '#FFF5F5';
         btnDelete.title = 'Remove subscriber';
-        btnDelete.innerHTML = '🗑️';
+        btnDelete.textContent = '🗑️';
         btnDelete.addEventListener('click', () => {
             if (confirm(`Remove "${sub.email}" from newsletter subscribers?`)) {
                 adminDataAdapter.deleteSubscriber(sub.id);
@@ -3965,9 +4098,9 @@ export function initSubscribersManagementEvents() {
         copyTextToClipboard(text, () => {
             showAdminToast(`📋 Copied ${activeCount} subscriber email addresses to clipboard! Ready to paste into Gmail BCC.`, 'success');
             if (btn) {
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = '✅ Copied to Clipboard!';
-                setTimeout(() => { btn.innerHTML = originalHtml; }, 2500);
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied to Clipboard!';
+                setTimeout(() => { btn.textContent = originalText; }, 2500);
             }
         });
     };

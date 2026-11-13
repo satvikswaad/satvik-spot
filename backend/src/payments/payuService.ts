@@ -517,6 +517,20 @@ export async function processPayUResponse(body: any): Promise<{
         return;
       }
 
+      // STATE-5 & Section 4.3 rule 4: CANCELLED orders are terminal and cannot be revived
+      if (orderData.status === 'Cancelled' || orderData.status === 'CANCELLED') {
+        logger.warn('Payment received for CANCELLED order - marking REFUND_PENDING, cannot revive', { orderId: resolvedOrderId, txnid });
+        transaction.update(orderRef!, {
+          paymentStatus: 'REFUND_PENDING',
+          payuMoneyId: payuMoneyId || null,
+          bankRefNum: bank_ref_num || null,
+          paidAt: admin.firestore.FieldValue.serverTimestamp(),
+          refundReason: 'Payment received on cancelled order',
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        return;
+      }
+
       // Deduct stock upon successful payment
       if (Array.isArray(orderData.items)) {
         for (const item of orderData.items) {
