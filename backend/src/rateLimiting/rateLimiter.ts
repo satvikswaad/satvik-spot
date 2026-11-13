@@ -155,4 +155,12 @@ export const discountRateLimiter = createRouteRateLimiter({
   routeIdentifier: 'discounts'
 });
 
+// Newsletter subscription rate limiter: 5 attempts per 15 minutes per IP
+export const newsletterRateLimiter = createRouteRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 5,
+  routeIdentifier: 'newsletter'
+});
+
+
 

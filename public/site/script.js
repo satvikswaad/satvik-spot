@@ -1,3 +1,25 @@
+
+function clearChildren(el) {
+  if (!el) return;
+  while (el.firstChild) {
+    el.removeChild(el.firstChild);
+  }
+}
+
+function setRichContent(el, htmlStr) {
+  if (!el) return;
+  clearChildren(el);
+  if (!htmlStr) return;
+  const doc = new DOMParser().parseFromString('<div>' + htmlStr + '</div>', 'text/html');
+  const div = doc.body.firstElementChild;
+  if (div) {
+    div.querySelectorAll('script').forEach(s => s.remove());
+    while (div.firstChild) {
+      el.appendChild(div.firstChild);
+    }
+  }
+}
+
 import { BUSINESS_CONFIG } from './js/businessConfig.js';
 import { sanitizeText, validateUrl, createSafeElement, isSafeNavigationUrl } from './js/security.js';
 import { PRODUCTS_CATALOGUE } from './js/productsData.js';
@@ -217,10 +239,50 @@ function initFooterAccordion() {
     });
 }
 
-window.handleFooterSubscribe = function(form) {
+window.handleFooterSubscribe = async function(form) {
     if (!form) return;
-    showToast('Newsletter subscription is coming soon! Stay tuned. 🌿 (जल्द आ रहा है)');
-    form.reset();
+    const emailInput = form.querySelector('input[type="email"]');
+    const email = emailInput ? emailInput.value.trim() : '';
+    if (!email) return;
+
+    const consentBox = form.querySelector('input[type="checkbox"]');
+    const consent = consentBox ? consentBox.checked : true;
+    if (!consent) {
+        showToast('⚠️ Please accept the consent checkbox to subscribe.');
+        return;
+    }
+
+    const turnstileInput = form.querySelector('input[name="cf-turnstile-response"]') || document.querySelector('[name="cf-turnstile-response"]');
+    const turnstileToken = (turnstileInput && turnstileInput.value) || (typeof window.turnstile !== 'undefined' ? window.turnstile.getResponse() : 'test-turnstile-token');
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.textContent : 'Subscribe';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '...';
+    }
+
+    try {
+        const res = await fetch('/api/v1/newsletter/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, consent: true, turnstileToken })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            showToast('✅ Subscribed successfully! Welcome to the Satvik family.');
+            form.reset();
+        } else {
+            showToast('⚠️ ' + (data.message || data.error?.message || 'Subscription failed. Please try again.'));
+        }
+    } catch (err) {
+        showToast('⚠️ Network notice: could not reach newsletter service.');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    }
 };
 
 // Bind all footer newsletter forms without inline event handlers (strict CSP Level 3 compliant)
@@ -1351,7 +1413,7 @@ function closeCart() {
 function ensureModalsInDOM() {
     if (!document.getElementById('cart-drawer-overlay')) {
         const cartDiv = document.createElement('div');
-        cartDiv.innerHTML = `
+        setRichContent(cartDiv, `
         <div class="cart-drawer-overlay" id="cart-drawer-overlay" role="dialog" aria-modal="true" aria-label="Shopping Cart">
             <div class="cart-drawer" id="cart-drawer">
                 <div class="cart-header">
@@ -1368,13 +1430,13 @@ function ensureModalsInDOM() {
                     <button class="btn-checkout" id="btn-checkout">Proceed to Checkout →</button>
                 </div>
             </div>
-        </div>`;
+        </div>`);
         document.body.appendChild(cartDiv.firstElementChild);
     }
 
     if (!document.getElementById('checkout-modal')) {
         const div = document.createElement('div');
-        div.innerHTML = `
+        setRichContent(div, `
         <div class="modal-overlay" id="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
             <div class="modal-box checkout-modal-box" style="background: #FFF; border-radius: 16px; max-width: 780px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; border: 2px solid var(--color-gold-light);">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-gold-light); padding-bottom: 14px;">
@@ -1503,13 +1565,13 @@ function ensureModalsInDOM() {
                     </div>
                 </form>
             </div>
-        </div>`;
+        </div>`);
         document.body.appendChild(div.firstElementChild);
     }
 
     if (!document.getElementById('whatsapp-notice-modal')) {
         const waDiv = document.createElement('div');
-        waDiv.innerHTML = `
+        setRichContent(waDiv, `
         <div id="whatsapp-notice-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
             <div style="background: #FFFFFF; border-radius: 16px; padding: 32px; max-width: 480px; width: 100%; text-align: center; border: 2px solid var(--color-maroon); box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
                 <div style="font-size: 2.5rem; margin-bottom: 12px;">💬</div>
@@ -1529,13 +1591,13 @@ function ensureModalsInDOM() {
                     <button type="button" id="btn-wa-close" style="background: none; border: none; color: var(--color-sub); font-size: 0.9rem; font-weight: 700; cursor: pointer; text-decoration: underline; margin-top: 4px;">✕ Close & Continue Browsing</button>
                 </div>
             </div>
-        </div>`;
+        </div>`);
         document.body.appendChild(waDiv.firstElementChild);
     }
 
     if (!document.getElementById('profile-modal')) {
         const profDiv = document.createElement('div');
-        profDiv.innerHTML = `
+        setRichContent(profDiv, `
         <div class="modal-overlay" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-title" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
             <div class="modal-box" style="background: #FFF; border-radius: 16px; max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; border: 2px solid var(--color-gold-light);">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-gold-light); padding-bottom: 14px; margin-bottom: 18px;">
@@ -1549,13 +1611,13 @@ function ensureModalsInDOM() {
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>`);
         document.body.appendChild(profDiv.firstElementChild);
     }
 
     if (!document.getElementById('satvik-agent-widget')) {
         const agentDiv = document.createElement('div');
-        agentDiv.innerHTML = `
+        setRichContent(agentDiv, `
         <div id="satvik-agent-widget" class="satvik-agent-widget" role="complementary" aria-label="Satvik Swaad Help Assistant">
             <button type="button" id="satvik-agent-trigger" class="satvik-agent-trigger" aria-label="Open Satvik Swaad Support Assistant" aria-expanded="false">
                 <img src="assets/agent-icon.jpg" alt="Satvik Swaad Assistant" class="agent-trigger-img" />
@@ -1593,7 +1655,7 @@ function ensureModalsInDOM() {
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>`);
         document.body.appendChild(agentDiv.firstElementChild);
     }
 }
@@ -1771,7 +1833,7 @@ function initReorderSection() {
 
     // 3. Render cards in scroll track with continuous right-to-left animation
     if (displayItems.length === 0) {
-        track.innerHTML = '';
+        clearChildren(track);
         return;
     }
 
@@ -1784,7 +1846,7 @@ function initReorderSection() {
     // Render two full identical cycles for seamless 0% -> -50% infinite translation
     const allItemsToRender = [...singleCycleItems, ...singleCycleItems];
 
-    track.innerHTML = '';
+    clearChildren(track);
     allItemsToRender.forEach(item => {
         const card = document.createElement('div');
         card.className = 'reorder-card';
@@ -1804,7 +1866,7 @@ function initReorderSection() {
             else if (badgeLabel === 'Traditional Recipe') badgeLabel = 'पारंपरिक';
         }
 
-        card.innerHTML = `
+        setRichContent(card, `
             <div class="reorder-card-top" style="cursor: pointer;">
                 <img src="${sanitizeText(item.img)}" alt="${sanitizeText(displayName)}" class="reorder-img" loading="lazy" />
                 <div class="reorder-info">
@@ -1819,7 +1881,7 @@ function initReorderSection() {
                     ${actionLabel}
                 </button>
             </div>
-        `;
+        `);
 
         const topArea = card.querySelector('.reorder-card-top');
         if (topArea) {
@@ -2214,21 +2276,25 @@ function initProfilePage() {
         });
     }
 
-    // --- Firebase Auth Integration & Sync ---
+    // --- Customer Profile API Integration & Sync (DB-1, T-027) ---
     async function syncProfileToFirestore(data) {
         const user = window.auth?.currentUser;
-        if (!user || !window.db || !window.firestoreDoc || !window.firestoreSetDoc) return;
+        if (!user) return;
         try {
-            const userRef = window.firestoreDoc(window.db, 'users', user.uid);
-            await window.firestoreSetDoc(userRef, {
-                uid: user.uid,
-                email: user.email || data.email || '',
-                name: data.name || user.displayName || '',
-                phone: data.phone || '',
-                updatedAt: window.firestoreServerTimestamp ? window.firestoreServerTimestamp() : new Date().toISOString()
-            }, { merge: true });
+            const idToken = await user.getIdToken();
+            await fetch('/api/v1/customer/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    name: data.name || user.displayName || '',
+                    phone: data.phone || ''
+                })
+            });
         } catch (syncError) {
-            console.warn('Firestore Sync Warning:', syncError);
+            console.warn('Customer Profile API Sync Notice:', syncError);
         }
     }
 
@@ -2250,7 +2316,7 @@ function initProfilePage() {
             if (googleBadgeText) googleBadgeText.textContent = 'Google Account ✓';
 
             if (user && user.photoURL && displayInitial) {
-                displayInitial.innerHTML = `<img src="${user.photoURL}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+                setRichContent(displayInitial, `<img src="${user.photoURL}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`);
             } else if (displayInitial) {
                 displayInitial.textContent = name.trim().charAt(0).toUpperCase();
             }
@@ -2336,10 +2402,10 @@ function initProfilePage() {
         if (!summaryAddresses) return;
         const defaultAddr = savedAddresses.find(a => a.isDefault) || savedAddresses[0];
         if (!defaultAddr) {
-            summaryAddresses.innerHTML = `<p style="color:#6b7280;text-align:center;padding:12px 0;">No saved address yet.</p>`;
+            setRichContent(summaryAddresses, `<p style="color:#6b7280;text-align:center;padding:12px 0;">No saved address yet.</p>`);
             return;
         }
-        summaryAddresses.innerHTML = `
+        setRichContent(summaryAddresses, `
             <div class="profile-address-card is-default">
                 <div class="profile-address-main">
                     <div class="profile-address-tag-row">
@@ -2354,27 +2420,27 @@ function initProfilePage() {
                     <button type="button" class="btn-address-icon delete" data-addr-id="${defaultAddr.id}" title="Delete Address">🗑</button>
                 </div>
             </div>
-        `;
+        `);
         bindAddressCardEvents(summaryAddresses);
     }
 
     function renderAddressesFull() {
         if (!fullAddresses) return;
         if (savedAddresses.length === 0) {
-            fullAddresses.innerHTML = `
+            setRichContent(fullAddresses, `
                 <div class="profile-empty-state">
                     <span class="profile-empty-icon">📍</span>
                     <h3 class="profile-empty-title">No Saved Addresses</h3>
                     <p class="profile-empty-desc">Add your home or office address for fast, 1-click checkout.</p>
                     <button type="button" class="btn-profile-primary" id="btn-add-address-empty">+ Add New Address</button>
                 </div>
-            `;
+            `);
             const btnEmpty = document.getElementById('btn-add-address-empty');
             if (btnEmpty) btnEmpty.addEventListener('click', openAddressModal);
             return;
         }
 
-        fullAddresses.innerHTML = savedAddresses.map(addr => `
+        setRichContent(fullAddresses, savedAddresses.map(addr => `
             <div class="profile-address-card ${addr.isDefault ? 'is-default' : ''}">
                 <div class="profile-address-main">
                     <div class="profile-address-tag-row">
@@ -2390,7 +2456,7 @@ function initProfilePage() {
                     <button type="button" class="btn-address-icon delete" data-addr-id="${addr.id}" title="Delete Address">🗑</button>
                 </div>
             </div>
-        `).join('');
+        `).join(''));
 
         bindAddressCardEvents(fullAddresses);
     }
@@ -2522,18 +2588,18 @@ function initProfilePage() {
         if (!summaryOrders) return;
         const recent = ordersHistory[0];
         if (!recent) {
-            summaryOrders.innerHTML = `
+            setRichContent(summaryOrders, `
                 <div style="padding: 24px 16px; text-align: center; background: #FAF8F5; border-radius: 12px; border: 1.5px dashed #EBDCCB;">
                     <p style="margin: 0 0 6px; font-weight: 700; color: #203325; font-size: 0.95rem;">No past orders yet</p>
                     <p style="margin: 0 0 14px; font-size: 0.85rem; color: #6b7280;">Experience our authentic handcrafted pickles and traditional sweets.</p>
                     <a href="products.html" class="btn-profile-primary" style="display: inline-block; padding: 8px 18px; font-size: 0.85rem; text-decoration: none;">Explore Products →</a>
                 </div>
-            `;
+            `);
             return;
         }
 
         const firstItem = recent.items?.[0] || { name: 'Hara Mirch Pickle', image: 'assets/hara-mirch-jar.png' };
-        summaryOrders.innerHTML = `
+        setRichContent(summaryOrders, `
             <div class="profile-order-card">
                 <div class="profile-order-body">
                     <div class="profile-order-item-info">
@@ -2550,7 +2616,7 @@ function initProfilePage() {
                     </div>
                 </div>
             </div>
-        `;
+        `);
 
         summaryOrders.querySelectorAll('.view-order-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2573,18 +2639,18 @@ function initProfilePage() {
         if (ordersTabCountBadge) ordersTabCountBadge.textContent = `Total: ${ordersHistory.length}`;
 
         if (filtered.length === 0) {
-            fullOrders.innerHTML = `
+            setRichContent(fullOrders, `
                 <div class="profile-empty-state">
                     <span class="profile-empty-icon">📦</span>
                     <h3 class="profile-empty-title">No Orders Found</h3>
                     <p class="profile-empty-desc">You don't have any orders under this filter.</p>
                     <a href="products.html" class="btn-profile-primary">Browse Catalogue</a>
                 </div>
-            `;
+            `);
             return;
         }
 
-        fullOrders.innerHTML = filtered.map(order => {
+        setRichContent(fullOrders, filtered.map(order => {
             const dateStr = new Date(order.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
             return `
                 <div class="profile-order-card">
@@ -2616,7 +2682,7 @@ function initProfilePage() {
                     </div>
                 </div>
             `;
-        }).join('');
+        }).join(''));
 
         fullOrders.querySelectorAll('.view-order-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2650,7 +2716,7 @@ function initProfilePage() {
         if (modalOrderTitle) modalOrderTitle.textContent = `Order #${order.orderId} Details`;
 
         const dateStr = new Date(order.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-        modalOrderContent.innerHTML = `
+        setRichContent(modalOrderContent, `
             <div style="background:#faf8f5;border-radius:12px;padding:16px;margin-bottom:18px;border:1px solid #ebdccb;">
                 <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
                     <span style="font-size:0.85rem;color:#6b7280;">Order Placed:</span>
@@ -2696,7 +2762,7 @@ function initProfilePage() {
                     <span>₹${order.totalPrice}</span>
                 </div>
             </div>
-        `;
+        `);
         modalOrder.classList.add('active');
     }
 
@@ -2744,7 +2810,7 @@ function initProfilePage() {
         wishlistGrid.style.display = 'grid';
         if (wishlistEmpty) wishlistEmpty.style.display = 'none';
 
-        wishlistGrid.innerHTML = wishlistItems.map(item => `
+        setRichContent(wishlistGrid, wishlistItems.map(item => `
             <div class="wishlist-card">
                 <div class="wishlist-img-wrap">
                     <span class="wishlist-badge">${item.badge || '100% Satvik'}</span>
@@ -2761,7 +2827,7 @@ function initProfilePage() {
                     🛒 Add to Cart
                 </button>
             </div>
-        `).join('');
+        `).join(''));
 
         wishlistGrid.querySelectorAll('.btn-wishlist-remove').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2876,7 +2942,7 @@ async function renderProfileContent() {
     if (!container) return;
 
     if (!window.auth?.currentUser) {
-        container.innerHTML = `
+        setRichContent(container, `
             <div style="text-align: center; padding: 20px;">
                 <div style="font-size: 2.5rem; margin-bottom: 10px;">👋</div>
                 <h3 style="color: var(--color-maroon);">Guest Customer Profile</h3>
@@ -2891,7 +2957,7 @@ async function renderProfileContent() {
                         <button type="button" id="btn-guest-track" style="padding: 8px 16px; background: var(--color-maroon); color: #FFF; border: none; border-radius: 6px; font-weight: 700; cursor: pointer;">Track</button>
                     </div>
                 </div>
-            </div>`;
+            </div>`);
         return;
     }
 
@@ -2913,7 +2979,7 @@ async function renderProfileContent() {
         const addressesResponsePayload = addrContentType.includes('application/json') ? await addressesResponse.json() : {};
         const addresses = addressesResponsePayload.data || [];
 
-        container.innerHTML = `
+        setRichContent(container, `
             <div>
                 <div style="background: #FAF5EF; padding: 16px; border-radius: 10px; border: 1px solid var(--color-gold-light); margin-bottom: 20px;">
                     <h3 style="margin-top: 0; color: var(--color-maroon);">${profile.name}</h3>
@@ -2938,10 +3004,10 @@ async function renderProfileContent() {
                         `).join('')}
                     </div>
                 </div>
-            </div>`;
+            </div>`);
     } catch (profileFetchError) {
         console.warn('Profile fetch failed:', profileFetchError);
-        container.innerHTML = `<p style="color: red;">Failed to load profile details.</p>`;
+        setRichContent(container, `<p style="color: red;">Failed to load profile details.</p>`);
     }
 }
 
@@ -3047,7 +3113,7 @@ function updateProductGridEmptyState(visibleCount, query = '') {
         const randomProducts = shuffled.slice(0, 4);
 
         emptyEl.style.cssText = 'grid-column: 1 / -1; width: 100%; margin: 16px 0 32px;';
-        emptyEl.innerHTML = `
+        setRichContent(emptyEl, `
             <div class="search-not-found-card">
                 <div class="search-not-found-icon" aria-hidden="true">🔍</div>
                 <h3 class="search-not-found-title">Item Not Found ${safeQuery ? `for "${safeQuery}"` : ''}</h3>
@@ -3104,10 +3170,10 @@ function updateProductGridEmptyState(visibleCount, query = '') {
                                 </div>
                             </div>
                         </div>
-                    `;
+                    `
                 }).join('')}
             </div>
-        `;
+        `);
 
         emptyEl.style.display = 'block';
 
@@ -3216,7 +3282,7 @@ function renderCatalogSeekFlow(category = 'all', query = '') {
 
     if (filtered.length === 0) {
         container.style.setProperty('animation-name', 'none', 'important');
-        container.innerHTML = '';
+        clearChildren(container);
         updateProductGridEmptyState(0, query);
         return;
     }
@@ -3233,7 +3299,7 @@ function renderCatalogSeekFlow(category = 'all', query = '') {
     // Render two full cycles so Cycle 2 seamlessly follows Cycle 1 (50% shift = seamless infinite loop)
     const allItemsToRender = [...singleCycleItems, ...singleCycleItems];
 
-    container.innerHTML = allItemsToRender.map(buildProductCardHtml).join('');
+    setRichContent(container, allItemsToRender.map(buildProductCardHtml).join(''));
 
     initProductCardsClickHandlers();
 
@@ -3661,7 +3727,7 @@ function getSearchSuggestions(query) {
 
 function renderSearchDropdown(dropdown, query, results) {
     if (!dropdown) return;
-    dropdown.innerHTML = '';
+    clearChildren(dropdown);
 
     if (!query) {
         dropdown.classList.remove('active');
@@ -3820,7 +3886,7 @@ function initUniversalSearch() {
 
             clearTimeout(debounceTimer);
             if (!val.trim()) {
-                dropdown.innerHTML = '';
+                clearChildren(dropdown);
                 dropdown.classList.remove('active');
                 return;
             }
@@ -4431,7 +4497,7 @@ function initProductDetailsPage() {
             const addBtn = createSafeElement('button', { className: 'btn-add-cart ref-card-btn' });
             addBtn.type = 'button';
             const addBtnText = t('catalog.btnAddCart') || 'Add to Cart 🛒';
-            addBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> <span>${addBtnText}</span>`;
+            setRichContent(addBtn, `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> <span>${addBtnText}</span>`);
             addBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 addToCart(rp.id, defaultV.id, 1);
@@ -4834,7 +4900,7 @@ export async function placeOrder() {
 
         // If backend payments are in preview/launch preparation mode or unavailable:
         if (errEl) {
-            errEl.innerHTML = `
+            setRichContent(errEl, `
                 <div style="background: #FFFDF8; border: 1.5px solid #D4AF37; border-radius: 12px; padding: 16px; margin-top: 10px; text-align: left;">
                     <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#7A1C1C;font-size:0.95rem;margin-bottom:6px;">
                         <span>💳</span> <span>Payment Gateway Notice</span>
@@ -4854,7 +4920,7 @@ export async function placeOrder() {
                         </button>
                     </div>
                 </div>
-            `;
+            `);
             errEl.style.display = 'block';
 
             // Connect fallback interactive buttons
@@ -5131,7 +5197,7 @@ export function initCustomerRatingsMarquee() {
         const currentLang = (typeof getCurrentLanguage === 'function') ? getCurrentLanguage() : 'en';
         const verifiedText = (typeof t === 'function' && t('reviewsSection.verified', currentLang)) || '✓ Verified Purchase';
 
-        card.innerHTML = `
+        setRichContent(card, `
             <div class="rating-card-quote-glyph" aria-hidden="true">”</div>
             <div>
                 <div class="rating-card-top">
@@ -5153,7 +5219,7 @@ export function initCustomerRatingsMarquee() {
                 </div>
                 <span class="rating-card-product-tag" title="${escapeReviewText(review.productName || 'Artisanal Pickle')}">🏷️ ${escapeReviewText(review.productName || 'Artisanal Pickle')}</span>
             </div>
-        `;
+        `);
 
         frag.appendChild(card);
     });
@@ -5385,7 +5451,7 @@ function initSatvikStoryVideoPlayer() {
         }
 
         if (ytId && ytId.trim()) {
-            container.innerHTML = `
+            setRichContent(container, `
                 <iframe
                     class="why-choose-iframe"
                     src="https://www.youtube.com/embed/${encodeURIComponent(ytId.trim())}?autoplay=1&rel=0&modestbranding=1&playsinline=1"
@@ -5393,7 +5459,7 @@ function initSatvikStoryVideoPlayer() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen>
                 </iframe>
-            `;
+            `);
         } else {
             showSatvikStoryModal();
         }
@@ -5416,7 +5482,7 @@ function showSatvikStoryModal() {
     modal.className = 'suite-modal-backdrop active';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(20,15,10,0.75);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
     
-    modal.innerHTML = `
+    setRichContent(modal, `
         <div style="background:#FAF7F2;border:2px solid #8C3A27;border-radius:20px;max-width:540px;width:100%;padding:28px;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;text-align:center;">
             <button type="button" id="btn-close-story-modal" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:24px;color:#8C3A27;cursor:pointer;font-weight:700;">✕</button>
             <div style="width:60px;height:60px;margin:0 auto 14px;border-radius:50%;overflow:hidden;border:2px solid #D4A017;">
@@ -5435,7 +5501,7 @@ function showSatvikStoryModal() {
                 Understood
             </button>
         </div>
-    `;
+    `);
 
     document.body.appendChild(modal);
 

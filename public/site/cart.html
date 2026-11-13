@@ -391,18 +391,24 @@
 
                 if (items.length === 0) {
                     if (clearBtn) clearBtn.style.display = 'none';
-                    container.innerHTML = `
+                    const emptyDoc = new DOMParser().parseFromString(`<div>
                         <div style="background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 18px; padding: 42px 20px; text-align: center; box-shadow: 0 4px 16px rgba(60,50,20,0.06); margin-top: 10px;">
                             <div style="font-size: 3.5rem; margin-bottom: 12px;">🏺</div>
-                            <h2 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.5rem; margin: 0 0 8px;">${tDict.emptyTitle}</h2>
+                            <h2 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.5rem; margin: 0 0 8px;">${escapeHtml(tDict.emptyTitle)}</h2>
                             <p style="color: #6B7280; font-size: 0.92rem; max-width: 380px; margin: 0 auto 24px; line-height: 1.5;">
-                                ${tDict.emptyDesc}
+                                ${escapeHtml(tDict.emptyDesc)}
                             </p>
                             <a href="products.html" style="display: inline-block; background: #164328; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(22,67,40,0.25);">
-                                ${tDict.exploreBtn}
+                                ${escapeHtml(tDict.exploreBtn)}
                             </a>
                         </div>
-                    `;
+                    </div>`, 'text/html');
+                    while (container.firstChild) container.removeChild(container.firstChild);
+                    if (emptyDoc.body.firstElementChild) {
+                        while (emptyDoc.body.firstElementChild.firstChild) {
+                            container.appendChild(emptyDoc.body.firstElementChild.firstChild);
+                        }
+                    }
                     return;
                 }
 
@@ -443,7 +449,7 @@
                     `;
                 }).join('');
 
-                container.innerHTML = `
+                const cartDoc = new DOMParser().parseFromString(`<div>
                     <div style="display: grid; grid-template-columns: 1fr; gap: 18px;">
                         <!-- ITEMS LIST -->
                         <div>
@@ -452,30 +458,36 @@
 
                         <!-- BILLING SUMMARY CARD -->
                         <div style="background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 16px; padding: 18px; box-shadow: 0 4px 16px rgba(60,50,20,0.06);">
-                            <h3 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.2rem; margin: 0 0 14px; border-bottom: 1px dashed #E6DEC8; padding-bottom: 8px;">${tDict.summaryTitle}</h3>
+                            <h3 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.2rem; margin: 0 0 14px; border-bottom: 1px dashed #E6DEC8; padding-bottom: 8px;">${escapeHtml(tDict.summaryTitle)}</h3>
                             
                             <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #4B5563; margin-bottom: 8px;">
-                                <span>${tDict.subtotalLabel}</span>
+                                <span>${escapeHtml(tDict.subtotalLabel)}</span>
                                 <span style="font-weight: 700; color: #164328;">₹${subtotal}</span>
                             </div>
 
                             <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #4B5563; margin-bottom: 12px;">
-                                <span>${tDict.deliveryLabel}</span>
-                                <span style="color: #1D552C; font-weight: 700;">${tDict.freeDeliveryText}</span>
+                                <span>${escapeHtml(tDict.deliveryLabel)}</span>
+                                <span style="color: #1D552C; font-weight: 700;">${escapeHtml(tDict.freeDeliveryText)}</span>
                             </div>
 
                             <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; color: #164328; border-top: 2px solid #E6DEC8; padding-top: 12px; margin-bottom: 18px;">
-                                <span>${tDict.totalPayableLabel}</span>
+                                <span>${escapeHtml(tDict.totalPayableLabel)}</span>
                                 <span>₹${subtotal}</span>
                             </div>
 
                             <button type="button" id="btn-proceed-to-checkout" style="width: 100%; background: #164328; color: #FFFFFF; border: none; padding: 14px 20px; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(22,67,40,0.3); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <span>${tDict.checkoutBtn}</span>
+                                <span>${escapeHtml(tDict.checkoutBtn)}</span>
                                 <span>🔒</span>
                             </button>
                         </div>
                     </div>
-                `;
+                </div>`, 'text/html');
+                while (container.firstChild) container.removeChild(container.firstChild);
+                if (cartDoc.body.firstElementChild) {
+                    while (cartDoc.body.firstElementChild.firstChild) {
+                        container.appendChild(cartDoc.body.firstElementChild.firstChild);
+                    }
+                }
 
                 // Bind handlers
                 container.querySelectorAll('.btn-qty-plus').forEach(btn => {

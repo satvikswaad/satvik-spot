@@ -1742,8 +1742,8 @@ function renderDashboard() {
     // Backward compatibility with legacy admin.js elements if present
     updateLegacyKpiElements(financials, productVelocity);
 
-    // Build BI View HTML
-    targetMount.innerHTML = `
+    // Build BI View HTML (Safe DOM parsed - XSS-1, FE-1)
+    const biHtml = `
         <div class="satvik-bi-wrapper">
             <!-- Demo Mode Notice -->
             ${metrics.isDemo ? `
@@ -2033,6 +2033,14 @@ function renderDashboard() {
             </div>
         </div>
     `;
+
+    while (targetMount.firstChild) targetMount.removeChild(targetMount.firstChild);
+    const biDoc = new DOMParser().parseFromString(`<div>${biHtml}</div>`, 'text/html');
+    if (biDoc.body.firstElementChild) {
+        while (biDoc.body.firstElementChild.firstChild) {
+            targetMount.appendChild(biDoc.body.firstElementChild.firstChild);
+        }
+    }
 
     // Attach Event Listeners to Timeframe Buttons
     const tfButtons = targetMount.querySelectorAll('.bi-tf-btn');

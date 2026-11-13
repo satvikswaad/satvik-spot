@@ -964,3 +964,215 @@ export async function getAuditLogs(req: AuthenticatedRequest, res: Response, nex
     return next(error);
   }
 }
+
+// ── 7. ADMIN LISTINGS WITH CURSOR PAGINATION (UI-4, UI-5) ──────────────────
+
+/**
+ * Lists orders with cursor pagination (UI-4). Max 50 per page.
+ */
+export async function getAdminOrders(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    checkPermission(req, 'order_manager');
+
+    const limitNum = Math.min(parseInt(req.query.limit as string || '50', 10), 50);
+    const startAfterId = req.query.startAfter as string | undefined;
+    const statusFilter = req.query.status as string | undefined;
+
+    let query: FirebaseFirestore.Query = db.collection('orders').orderBy('createdAt', 'desc');
+
+    if (statusFilter) {
+      query = query.where('status', '==', statusFilter);
+    }
+
+    if (startAfterId) {
+      const cursorDoc = await db.collection('orders').doc(startAfterId).get();
+      if (cursorDoc.exists) {
+        query = query.startAfter(cursorDoc);
+      }
+    }
+
+    query = query.limit(limitNum);
+    const snap = await query.get();
+    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const lastDoc = snap.docs[snap.docs.length - 1];
+    const nextCursor = lastDoc ? lastDoc.id : null;
+
+    return res.status(200).json({
+      success: true,
+      orders,
+      nextCursor
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Gets a single order's details.
+ */
+export async function getAdminOrderById(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    checkPermission(req, 'order_manager');
+    const { orderId } = req.params;
+
+    const doc = await db.collection('orders').doc(orderId).get();
+    if (!doc.exists) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      order: { id: doc.id, ...doc.data() }
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Gets the event timeline for an order from orders/{orderId}/events (UI-5).
+ */
+export async function getAdminOrderEvents(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    checkPermission(req, 'order_manager');
+    const { orderId } = req.params;
+
+    const snap = await db.collection('orders').doc(orderId).collection('events')
+      .orderBy('timestamp', 'desc')
+      .limit(50)
+      .get();
+
+    const events = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    return res.status(200).json({
+      success: true,
+      events
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Lists products for admin with unmasked stock.
+ */
+export async function getAdminProducts(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    checkPermission(req, 'catalog_editor');
+
+    const snap = await db.collection('products').get();
+    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    return res.status(200).json({
+      success: true,
+      products
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Lists contact messages with cursor pagination (UI-4).
+ */
+export async function getAdminMessages(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    checkPermission(req, 'support');
+
+    const limitNum = Math.min(parseInt(req.query.limit as string || '50', 10), 50);
+    const startAfterId = req.query.startAfter as string | undefined;
+
+    let query: FirebaseFirestore.Query = db.collection('contactMessages').orderBy('createdAt', 'desc');
+
+    if (startAfterId) {
+      const cursorDoc = await db.collection('contactMessages').doc(startAfterId).get();
+      if (cursorDoc.exists) {
+        query = query.startAfter(cursorDoc);
+      }
+    }
+
+    query = query.limit(limitNum);
+    const snap = await query.get();
+    const messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const lastDoc = snap.docs[snap.docs.length - 1];
+    const nextCursor = lastDoc ? lastDoc.id : null;
+
+    return res.status(200).json({
+      success: true,
+      messages,
+      nextCursor
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Lists reviews for moderation with cursor pagination (UI-4).
+ */
+export async function getAdminReviews(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    checkPermission(req, 'support');
+
+    const limitNum = Math.min(parseInt(req.query.limit as string || '50', 10), 50);
+    const startAfterId = req.query.startAfter as string | undefined;
+
+    let query: FirebaseFirestore.Query = db.collection('reviews').orderBy('createdAt', 'desc');
+
+    if (startAfterId) {
+      const cursorDoc = await db.collection('reviews').doc(startAfterId).get();
+      if (cursorDoc.exists) {
+        query = query.startAfter(cursorDoc);
+      }
+    }
+
+    query = query.limit(limitNum);
+    const snap = await query.get();
+    const reviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const lastDoc = snap.docs[snap.docs.length - 1];
+    const nextCursor = lastDoc ? lastDoc.id : null;
+
+    return res.status(200).json({
+      success: true,
+      reviews,
+      nextCursor
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+/**
+ * Lists POS shifts with cursor pagination (UI-4).
+ */
+export async function getAdminShifts(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    checkPermission(req, 'staff');
+
+    const limitNum = Math.min(parseInt(req.query.limit as string || '50', 10), 50);
+    const startAfterId = req.query.startAfter as string | undefined;
+
+    let query: FirebaseFirestore.Query = db.collection('shifts').orderBy('openedAt', 'desc');
+
+    if (startAfterId) {
+      const cursorDoc = await db.collection('shifts').doc(startAfterId).get();
+      if (cursorDoc.exists) {
+        query = query.startAfter(cursorDoc);
+      }
+    }
+
+    query = query.limit(limitNum);
+    const snap = await query.get();
+    const shifts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const lastDoc = snap.docs[snap.docs.length - 1];
+    const nextCursor = lastDoc ? lastDoc.id : null;
+
+    return res.status(200).json({
+      success: true,
+      shifts,
+      nextCursor
+    });
+  } catch (error) {
+    return next(error);
+  }
+}

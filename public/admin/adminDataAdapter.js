@@ -28,21 +28,6 @@ export const STORAGE_KEYS = {
     SEED_VERSION: 'satvik_admin_seed_version_v6'
 };
 
-// Lazy / Dynamic Firestore Module Loader (Enables offline dev mode and Node.js testing compatibility)
-let _fsModule = null;
-async function getFirestoreLib() {
-    if (_fsModule) return _fsModule;
-    if (typeof window !== 'undefined') {
-        try {
-            _fsModule = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-            return _fsModule;
-        } catch (e) {
-            console.warn("[AdminDataAdapter] Firestore CDN module unavailable (dev fallback active):", e.message);
-        }
-    }
-    return null;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. RICH SEED DATA DEFINITIONS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2521,21 +2506,15 @@ export class AdminDataAdapter {
         // Update in getStorage()
         getStorage().setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
 
-        // If in Cloud Firestore mode, sync if authenticated
-        if (!this.isDevMode && typeof window !== 'undefined' && window.db) {
-            try {
-                const fs = await getFirestoreLib();
-                if (fs) {
-                    const orderRef = fs.doc(window.db, 'orders', orderId);
-                    await fs.updateDoc(orderRef, {
-                        ...meta,
-                        ...(newStatus ? { status: targetStatus } : {}),
-                        updatedAt: fs.serverTimestamp()
-                    });
-                }
-            } catch (err) {
-                console.warn("[AdminDataAdapter] Cloud Firestore sync skipped or restricted; retained in local dev storage.", err.message);
-            }
+        // Sync via Backend Admin API if authenticated (DB-1, T-031)
+        if (!this.isDevMode && typeof window !== 'undefined' && window.auth && window.auth.currentUser) {
+            window.auth.currentUser.getIdToken().then(token => {
+                fetch(`${window.API_BASE_URL || ''}/api/v1/admin/orders/${orderId}/transition`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ targetStatus, reason: meta.reason || 'Admin status update' })
+                }).catch(err => console.warn("[AdminDataAdapter] Backend sync notice:", err.message));
+            }).catch(() => {});
         }
 
         // Notify subscribers
@@ -2625,21 +2604,15 @@ export class AdminDataAdapter {
         prod.updatedAt = new Date().toISOString();
         getStorage().setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
 
-        // Firestore sync fallback
-        if (!this.isDevMode && typeof window !== 'undefined' && window.db) {
-            try {
-                const fs = await getFirestoreLib();
-                if (fs) {
-                    const prodRef = fs.doc(window.db, 'products', productId);
-                    await fs.updateDoc(prodRef, {
-                        stock: prod.stock,
-                        variants: prod.variants || [],
-                        updatedAt: fs.serverTimestamp()
-                    });
-                }
-            } catch (err) {
-                console.warn("[AdminDataAdapter] Firestore product update skipped or restricted:", err.message);
-            }
+        // Sync product stock via Admin API (DB-1, T-031)
+        if (!this.isDevMode && typeof window !== 'undefined' && window.auth && window.auth.currentUser) {
+            window.auth.currentUser.getIdToken().then(token => {
+                fetch(`${window.API_BASE_URL || ''}/api/v1/admin/products/${productId}/stock`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ stock: prod.stock })
+                }).catch(err => console.warn("[AdminDataAdapter] Backend stock sync notice:", err.message));
+            }).catch(() => {});
         }
 
         this._emit('products', products);
@@ -2691,16 +2664,15 @@ export class AdminDataAdapter {
 
         getStorage().setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
 
-        if (!this.isDevMode && typeof window !== 'undefined' && window.db) {
-            try {
-                const fs = await getFirestoreLib();
-                if (fs) {
-                    const prodRef = fs.doc(window.db, 'products', target.id);
-                    await fs.setDoc(prodRef, { ...target, updatedAt: fs.serverTimestamp() }, { merge: true });
-                }
-            } catch (err) {
-                console.warn("[AdminDataAdapter] Firestore saveProduct skipped/restricted:", err.message);
-            }
+        // Sync product via Admin API (DB-1, T-031)
+        if (!this.isDevMode && typeof window !== 'undefined' && window.auth && window.auth.currentUser) {
+            window.auth.currentUser.getIdToken().then(token => {
+                fetch(`${window.API_BASE_URL || ''}/api/v1/admin/products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(target)
+                }).catch(err => console.warn("[AdminDataAdapter] Backend product sync notice:", err.message));
+            }).catch(() => {});
         }
 
         this._emit('products', products);
@@ -2747,20 +2719,6 @@ export class AdminDataAdapter {
         entries.unshift(entry);
         getStorage().setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(entries));
 
-        if (!this.isDevMode && typeof window !== 'undefined' && window.db) {
-            try {
-                const fs = await getFirestoreLib();
-                if (fs) {
-                    await fs.addDoc(fs.collection(window.db, 'offline_finances'), {
-                        ...entry,
-                        createdAt: fs.serverTimestamp()
-                    });
-                }
-            } catch (err) {
-                console.warn("[AdminDataAdapter] Firestore addOfflineExpense skipped:", err.message);
-            }
-        }
-
         this._emit('offline_finances', entries);
         return entry;
     }
@@ -2772,17 +2730,6 @@ export class AdminDataAdapter {
         let entries = this.getOfflineFinances();
         entries = entries.filter(e => e.id !== id);
         getStorage().setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(entries));
-
-        if (!this.isDevMode && typeof window !== 'undefined' && window.db) {
-            try {
-                const fs = await getFirestoreLib();
-                if (fs) {
-                    await fs.deleteDoc(fs.doc(window.db, 'offline_finances', id));
-                }
-            } catch (err) {
-                console.warn("[AdminDataAdapter] Firestore deleteOfflineExpense skipped:", err.message);
-            }
-        }
 
         this._emit('offline_finances', entries);
         return true;

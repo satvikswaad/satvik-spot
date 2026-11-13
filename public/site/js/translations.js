@@ -3507,6 +3507,21 @@ export function t(path, lang = null) {
 /**
  * Apply translations to all DOM elements across the page.
  */
+
+function setRichText(el, htmlStr) {
+  if (!el) return;
+  while (el.firstChild) el.removeChild(el.firstChild);
+  if (!htmlStr) return;
+  const doc = new DOMParser().parseFromString('<div>' + htmlStr + '</div>', 'text/html');
+  const div = doc.body.firstElementChild;
+  if (div) {
+    div.querySelectorAll('script').forEach(s => s.remove());
+    while (div.firstChild) {
+      el.appendChild(div.firstChild);
+    }
+  }
+}
+
 export function applyTranslations(lang = null) {
   if (typeof document === 'undefined') return;
 
@@ -3529,7 +3544,7 @@ export function applyTranslations(lang = null) {
     if (textSpan) {
       textSpan.textContent = dict.langToggleText;
     } else {
-      btn.innerHTML = `<span class="lang-icon">🌐</span> <span class="lang-toggle-text">${dict.langToggleText}</span>`;
+      setRichText(btn, `<span class="lang-icon">🌐</span> <span class="lang-toggle-text">${dict.langToggleText}</span>`);
     }
     btn.setAttribute('aria-label', dict.langToggleAria || `Switch Language`);
     btn.title = dict.langToggleAria || `Switch Language`;
@@ -4029,7 +4044,7 @@ export function applyTranslations(lang = null) {
   const agentTitle = document.querySelector('.agent-header-name');
   if (agentTitle) agentTitle.textContent = dict.assistant.title;
   const agentStatus = document.querySelector('.agent-header-status');
-  if (agentStatus) agentStatus.innerHTML = `<span class="agent-online-dot" aria-hidden="true"></span> ${dict.assistant.status}`;
+  if (agentStatus) setRichText(agentStatus, `<span class="agent-online-dot" aria-hidden="true"></span> ${dict.assistant.status}`);
   const agentWelcome = document.querySelector('.agent-msg-bot p');
   if (agentWelcome) agentWelcome.textContent = dict.assistant.welcome;
   const agentChips = document.querySelectorAll('.agent-chip');
@@ -4171,7 +4186,7 @@ export function applyTranslations(lang = null) {
 
     const wcTitle = document.querySelector('.why-choose-title');
     if (wcTitle) {
-      wcTitle.innerHTML = `${dict.home.whyChoose.titlePrefix}<br/><span class="brush-underline">${dict.home.whyChoose.titleHighlight}</span> <svg class="heart-doodle" viewBox="0 0 32 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 27C16 27 3 19 3 10.5C3 6 6.5 3 10.5 3C13 3 15 4.5 16 6.5C17 4.5 19 3 21.5 3C25.5 3 29 6 29 10.5C29 19 16 27 16 27Z" /></svg>`;
+      setRichText(wcTitle, `${dict.home.whyChoose.titlePrefix}<br/><span class="brush-underline">${dict.home.whyChoose.titleHighlight}</span> <svg class="heart-doodle" viewBox="0 0 32 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 27C16 27 3 19 3 10.5C3 6 6.5 3 10.5 3C13 3 15 4.5 16 6.5C17 4.5 19 3 21.5 3C25.5 3 29 6 29 10.5C29 19 16 27 16 27Z" /></svg>`);
     }
 
     const wcDesc = document.querySelector('.why-choose-desc');
@@ -4261,7 +4276,7 @@ export function applyTranslations(lang = null) {
   // 23. Transparent Compliance Section (index.html)
   if (dict.home?.comparison) {
     const compNote = document.querySelector('.compliance-section .paper-note-text');
-    if (compNote) compNote.innerHTML = (activeLang === 'hi') ? "असली सामग्री।<br/>सच्चा विश्वास।" : (activeLang === 'ur' ? "خالص اجزاء۔<br/>سچا اعتماد۔" : "Real Ingredients.<br/>Real Trust.");
+    if (compNote) setRichText(compNote, (activeLang === 'hi') ? "असली सामग्री।<br/>सच्चा विश्वास।" : (activeLang === 'ur' ? "خالص اجزاء۔<br/>سچا اعتماد۔" : "Real Ingredients.<br/>Real Trust."));
 
     const complianceHeading = document.querySelector('.compliance-section h2 .brush-underline');
     if (complianceHeading) complianceHeading.textContent = dict.home.comparison.complianceTitle;
@@ -4351,7 +4366,7 @@ export function applyTranslations(lang = null) {
 
     const storyLearnBtn = document.querySelector('.ref-story-learn-more-btn');
     if (storyLearnBtn) {
-      storyLearnBtn.innerHTML = `${dict.ourStory.heritageValues.learnMore} <span class="ref-btn-arrow">${activeLang === 'ur' ? '←' : '→'}</span>`;
+      setRichText(storyLearnBtn, `${dict.ourStory.heritageValues.learnMore} <span class="ref-btn-arrow">${activeLang === 'ur' ? '←' : '→'}</span>`);
     }
 
     const storyBadges = document.querySelectorAll('.ref-story-badge-item');
@@ -4426,14 +4441,14 @@ export function applyTranslations(lang = null) {
 
     const thBrandTitle = document.querySelector('.hp-th-brand-title');
     if (thBrandTitle) {
-      thBrandTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 21C7 15 13 9 21 6C19 14 13 19 7 21L5 21Z" fill="#A5D6A7"/></svg> ${dict.home.comparison.colSatvikTitle}`;
+      setRichText(thBrandTitle, `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 21C7 15 13 9 21 6C19 14 13 19 7 21L5 21Z" fill="#A5D6A7"/></svg> ${dict.home.comparison.colSatvikTitle}`);
     }
     const thBrandSub = document.querySelector('.hp-th-brand-sub');
     if (thBrandSub) thBrandSub.textContent = dict.home.comparison.colSatvikSub;
 
     const thMarketTitle = document.querySelector('.hp-th-market-title');
     if (thMarketTitle) {
-      thMarketTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h20"/><path d="M6 20V10l6 4V8l6 4V4h2v16"/></svg> ${dict.home.comparison.colMarketTitle}`;
+      setRichText(thMarketTitle, `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h20"/><path d="M6 20V10l6 4V8l6 4V4h2v16"/></svg> ${dict.home.comparison.colMarketTitle}`);
     }
     const thMarketSub = document.querySelector('.hp-th-market-sub');
     if (thMarketSub) thMarketSub.textContent = dict.home.comparison.colMarketSub;
@@ -4461,9 +4476,9 @@ export function applyTranslations(lang = null) {
         const dimTitle = row.querySelector('.hp-dim-title');
         if (dimTitle) {
           if (idx === 4) {
-            dimTitle.innerHTML = `${d.dim}<br/><small style="font-weight: 500; font-size: 11.5px; color: #64748B;">${activeLang === 'hi' ? '(मुरब्बा व मिठाई)' : (activeLang === 'ur' ? '(مربے اور مٹھائیاں)' : '(Murabbas & Sweets)')}</small>`;
+            setRichText(dimTitle, `${d.dim}<br/><small style="font-weight: 500; font-size: 11.5px; color: #64748B;">${activeLang === 'hi' ? '(मुरब्बा व मिठाई)' : (activeLang === 'ur' ? '(مربے اور مٹھائیاں)' : '(Murabbas & Sweets)')}</small>`);
           } else if (idx === 6) {
-            dimTitle.innerHTML = `${d.dim}<br/><small style="font-weight: 500; font-size: 11.5px; color: #64748B;">${activeLang === 'hi' ? 'परीक्षण' : (activeLang === 'ur' ? 'ویریفکیشن' : 'Verification')}</small>`;
+            setRichText(dimTitle, `${d.dim}<br/><small style="font-weight: 500; font-size: 11.5px; color: #64748B;">${activeLang === 'hi' ? 'परीक्षण' : (activeLang === 'ur' ? 'ویریفکیشن' : 'Verification')}</small>`);
           } else {
             dimTitle.textContent = d.dim;
           }
@@ -4472,12 +4487,12 @@ export function applyTranslations(lang = null) {
         const tagSatvik = row.querySelector('.hp-tag-satvik');
         if (tagSatvik) tagSatvik.textContent = d.satvikTag;
         const textSatvik = row.querySelector('.hp-content-text');
-        if (textSatvik) textSatvik.innerHTML = `<strong>${d.satvikTag}.</strong> ${d.satvikText}`;
+        if (textSatvik) setRichText(textSatvik, `<strong>${d.satvikTag}.</strong> ${d.satvikText}`);
 
         const tagMarket = row.querySelector('.hp-tag-market');
         if (tagMarket) tagMarket.textContent = d.marketTag;
         const textMarket = row.querySelector('.hp-market-text');
-        if (textMarket) textMarket.innerHTML = `<strong>${d.marketTag}.</strong> ${d.marketText}`;
+        if (textMarket) setRichText(textMarket, `<strong>${d.marketTag}.</strong> ${d.marketText}`);
       }
     });
 
@@ -4508,9 +4523,9 @@ export function applyTranslations(lang = null) {
 
     const hpCompItems = document.querySelectorAll('.hp-compliance-list .hp-compliance-item');
     if (hpCompItems.length >= 3) {
-      hpCompItems[0].innerHTML = `• <strong>${dict.home.comparison.fssaiLabel}</strong> <span class="hp-status-pending">${dict.home.comparison.fssaiStatus}</span>`;
-      hpCompItems[1].innerHTML = `• <strong>${dict.home.comparison.gstinLabel}</strong> <span class="hp-status-pending">${dict.home.comparison.gstinStatus}</span>`;
-      hpCompItems[2].innerHTML = `• <strong>${dict.home.comparison.pkgLabel}</strong> ${dict.home.comparison.pkgStatus}`;
+      setRichText(hpCompItems[0], `• <strong>${dict.home.comparison.fssaiLabel}</strong> <span class="hp-status-pending">${dict.home.comparison.fssaiStatus}</span>`);
+      setRichText(hpCompItems[1], `• <strong>${dict.home.comparison.gstinLabel}</strong> <span class="hp-status-pending">${dict.home.comparison.gstinStatus}</span>`);
+      setRichText(hpCompItems[2], `• <strong>${dict.home.comparison.pkgLabel}</strong> ${dict.home.comparison.pkgStatus}`);
     }
 
     // Action Buttons
@@ -4518,7 +4533,7 @@ export function applyTranslations(lang = null) {
     if (hpBtnExplore) hpBtnExplore.textContent = dict.home.comparison.btnExplore;
     const hpBtnStory = document.querySelector('.hp-btn-story');
     if (hpBtnStory) {
-      hpBtnStory.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 21C7 15 13 9 21 6C19 14 13 19 7 21L5 21Z" fill="#2E7D32"/></svg> ${dict.home.comparison.btnStory}`;
+      setRichText(hpBtnStory, `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 21C7 15 13 9 21 6C19 14 13 19 7 21L5 21Z" fill="#2E7D32"/></svg> ${dict.home.comparison.btnStory}`);
     }
 
     // Purity trust badge in checkout modal notice
@@ -4609,12 +4624,12 @@ export function translateContactPage(dict, activeLang) {
     if (mTitle) mTitle.textContent = c.merchant.title;
     const mDivs = merchantCard.querySelectorAll('div > div');
     if (mDivs.length >= 6) {
-      mDivs[0].innerHTML = `<strong>${c.merchant.legalLabel}:</strong> ${c.merchant.legalValue}`;
-      mDivs[1].innerHTML = `<strong>${c.merchant.addressLabel}:</strong> ${c.merchant.addressValue}`;
-      mDivs[2].innerHTML = `<strong>${c.merchant.fssaiLabel}:</strong> ${c.merchant.fssaiValue}`;
-      mDivs[3].innerHTML = `<strong>${c.merchant.helplineLabel}:</strong> +91 92365 87600 | <strong>${c.merchant.emailLabel}:</strong> satvikswaad.care@gmail.com`;
-      mDivs[4].innerHTML = `<strong>${c.merchant.gatewayLabel}:</strong> ${c.merchant.gatewayValue}`;
-      mDivs[5].innerHTML = `<strong>${c.merchant.redressalLabel}:</strong> ${c.merchant.redressalValue}`;
+      setRichText(mDivs[0], `<strong>${c.merchant.legalLabel}:</strong> ${c.merchant.legalValue}`);
+      setRichText(mDivs[1], `<strong>${c.merchant.addressLabel}:</strong> ${c.merchant.addressValue}`);
+      setRichText(mDivs[2], `<strong>${c.merchant.fssaiLabel}:</strong> ${c.merchant.fssaiValue}`);
+      setRichText(mDivs[3], `<strong>${c.merchant.helplineLabel}:</strong> +91 92365 87600 | <strong>${c.merchant.emailLabel}:</strong> satvikswaad.care@gmail.com`);
+      setRichText(mDivs[4], `<strong>${c.merchant.gatewayLabel}:</strong> ${c.merchant.gatewayValue}`);
+      setRichText(mDivs[5], `<strong>${c.merchant.redressalLabel}:</strong> ${c.merchant.redressalValue}`);
     }
   }
 
@@ -4623,7 +4638,7 @@ export function translateContactPage(dict, activeLang) {
     const sTitle = securityCard.querySelector('h4');
     if (sTitle) sTitle.textContent = c.guarantee.title;
     const sDesc = securityCard.querySelector('p');
-    if (sDesc) sDesc.innerHTML = `<strong>${c.guarantee.spamPolicyLabel}:</strong> ${c.guarantee.spamPolicyText}`;
+    if (sDesc) setRichText(sDesc, `<strong>${c.guarantee.spamPolicyLabel}:</strong> ${c.guarantee.spamPolicyText}`);
   }
 
   const formTitle = document.querySelector('.contact-form-area .script-title');
@@ -4638,19 +4653,19 @@ export function translateContactPage(dict, activeLang) {
     if (!input || !label) return;
 
     if (input.id === 'contact-name') {
-      label.innerHTML = `${c.labels.name} <span class="required">*</span>`;
+      setRichText(label, `${c.labels.name} <span class="required">*</span>`);
       input.placeholder = c.placeholders.name;
     } else if (input.id === 'contact-email') {
-      label.innerHTML = `${c.labels.email} <span class="required">*</span>`;
+      setRichText(label, `${c.labels.email} <span class="required">*</span>`);
       input.placeholder = c.placeholders.email;
     } else if (input.id === 'contact-phone') {
-      label.innerHTML = `${c.labels.phone} <span class="required">*</span>`;
+      setRichText(label, `${c.labels.phone} <span class="required">*</span>`);
       input.placeholder = c.placeholders.phone;
     } else if (input.id === 'contact-order-id') {
-      label.innerHTML = `${c.labels.orderId}`;
+      setRichText(label, `${c.labels.orderId}`);
       input.placeholder = c.placeholders.orderId;
     } else if (input.id === 'contact-subject') {
-      label.innerHTML = `${c.labels.subject} <span class="required">*</span>`;
+      setRichText(label, `${c.labels.subject} <span class="required">*</span>`);
       const opts = input.querySelectorAll('option');
       if (opts.length >= 6) {
         opts[0].textContent = c.subjectOptions.default;
@@ -4661,7 +4676,7 @@ export function translateContactPage(dict, activeLang) {
         opts[5].textContent = c.subjectOptions.partnership;
       }
     } else if (input.id === 'contact-message') {
-      label.innerHTML = `${c.labels.message} <span class="required">*</span>`;
+      setRichText(label, `${c.labels.message} <span class="required">*</span>`);
       input.placeholder = c.placeholders.message;
     }
   });
@@ -4669,7 +4684,7 @@ export function translateContactPage(dict, activeLang) {
   const btnSubmit = document.getElementById('btn-submit-contact');
   if (btnSubmit) {
     const svg = btnSubmit.querySelector('svg');
-    btnSubmit.innerHTML = '';
+    setRichText(btnSubmit, '');
     if (svg) btnSubmit.appendChild(svg);
     btnSubmit.appendChild(document.createTextNode(' ' + c.btnSubmit));
   }
@@ -4741,7 +4756,7 @@ export function translateFaqPage(dict, activeLang) {
     const sTitle = sidebarGuarantee.querySelector('strong');
     if (sTitle) sTitle.textContent = f.guaranteeTitle;
     const sText = sidebarGuarantee.querySelector('p');
-    if (sText) sText.innerHTML = `<strong>${f.guaranteeTitle}:</strong> ${f.guaranteeText}`;
+    if (sText) setRichText(sText, `<strong>${f.guaranteeTitle}:</strong> ${f.guaranteeText}`);
   }
 
   const accTitle = document.querySelector('.faq-accordion-area .script-title');
@@ -4765,12 +4780,12 @@ export function translateFaqPage(dict, activeLang) {
         const content = item.querySelector('.faq-content');
         if (summary) {
           const chevron = summary.querySelector('.chevron');
-          summary.innerHTML = '';
+          setRichText(summary, '');
           summary.appendChild(document.createTextNode(data.q + ' '));
           if (chevron) summary.appendChild(chevron);
         }
         if (content) {
-          content.innerHTML = data.a;
+          setRichText(content, data.a);
         }
       });
     });
@@ -4893,7 +4908,7 @@ export function translateReviewsPage(dict, activeLang) {
 
   const btnMore = document.querySelector('.reviews-content-section .brand-button.gold');
   if (btnMore) {
-    btnMore.innerHTML = `${r.btnViewMore} <span class="arrow ml-2">→</span>`;
+    setRichText(btnMore, `${r.btnViewMore} <span class="arrow ml-2">→</span>`);
   }
 
   const loadingP = document.querySelector('#public-reviews-container p');
@@ -4950,7 +4965,7 @@ export function translateProfilePage(dict, activeLang) {
   if (googleBadge) googleBadge.textContent = p.sidebar.googleAccount;
 
   const sidebarDoodle = document.querySelector('.profile-sidebar-doodle-text');
-  if (sidebarDoodle) sidebarDoodle.innerHTML = p.sidebar.doodleText.replace(' ↴ ♡', '<br><span>Happy You ↴ ♡</span>');
+  if (sidebarDoodle) setRichText(sidebarDoodle, p.sidebar.doodleText.replace(' ↴ ♡', '<br><span>Happy You ↴ ♡</span>'));
 
   const profCardTitle = document.querySelector('#tab-panel-profile .profile-card:first-child .profile-card-title');
   if (profCardTitle) profCardTitle.textContent = p.personalInfo.title;
@@ -5153,9 +5168,9 @@ export function translatePolicyPages(dict, activeLang) {
 
     const metaSpans = document.querySelectorAll('.policy-meta-row span');
     if (metaSpans.length >= 5) {
-      metaSpans[0].innerHTML = `<strong>${cr.meta.effectiveDate.split(':')[0]}:</strong> ${cr.meta.effectiveDate.split(':')[1]}`;
-      metaSpans[2].innerHTML = `<strong>${cr.meta.lastUpdated.split(':')[0]}:</strong> ${cr.meta.lastUpdated.split(':')[1]}`;
-      metaSpans[4].innerHTML = `<strong>${cr.meta.scope.split(':')[0]}:</strong> ${cr.meta.scope.split(':')[1]}`;
+      setRichText(metaSpans[0], `<strong>${cr.meta.effectiveDate.split(':')[0]}:</strong> ${cr.meta.effectiveDate.split(':')[1]}`);
+      setRichText(metaSpans[2], `<strong>${cr.meta.lastUpdated.split(':')[0]}:</strong> ${cr.meta.lastUpdated.split(':')[1]}`);
+      setRichText(metaSpans[4], `<strong>${cr.meta.scope.split(':')[0]}:</strong> ${cr.meta.scope.split(':')[1]}`);
     }
 
     const hlCards = document.querySelectorAll('.policy-highlights-grid .policy-highlight-card');
@@ -5163,17 +5178,17 @@ export function translatePolicyPages(dict, activeLang) {
       const h0 = hlCards[0].querySelector('.policy-highlight-title');
       if (h0) h0.textContent = cr.highlight1Title;
       const d0 = hlCards[0].querySelector('.policy-highlight-desc');
-      if (d0) d0.innerHTML = cr.highlight1Desc;
+      if (d0) setRichText(d0, cr.highlight1Desc);
 
       const h1 = hlCards[1].querySelector('.policy-highlight-title');
       if (h1) h1.textContent = cr.highlight2Title;
       const d1 = hlCards[1].querySelector('.policy-highlight-desc');
-      if (d1) d1.innerHTML = cr.highlight2Desc;
+      if (d1) setRichText(d1, cr.highlight2Desc);
 
       const h2 = hlCards[2].querySelector('.policy-highlight-title');
       if (h2) h2.textContent = cr.highlight3Title;
       const d2 = hlCards[2].querySelector('.policy-highlight-desc');
-      if (d2) d2.innerHTML = cr.highlight3Desc;
+      if (d2) setRichText(d2, cr.highlight3Desc);
     }
 
     const tocTitle = document.querySelector('.policy-toc-title');
@@ -5250,9 +5265,9 @@ export function translatePolicyPages(dict, activeLang) {
 
     const metaSpans = document.querySelectorAll('.policy-meta-row span');
     if (metaSpans.length >= 5) {
-      metaSpans[0].innerHTML = `<strong>${sd.meta.effectiveDate.split(':')[0]}:</strong> ${sd.meta.effectiveDate.split(':')[1]}`;
-      metaSpans[2].innerHTML = `<strong>${sd.meta.dispatchWindow.split(':')[0]}:</strong> ${sd.meta.dispatchWindow.split(':')[1]}`;
-      metaSpans[4].innerHTML = `<strong>${sd.meta.coverage.split(':')[0]}:</strong> ${sd.meta.coverage.split(':')[1]}`;
+      setRichText(metaSpans[0], `<strong>${sd.meta.effectiveDate.split(':')[0]}:</strong> ${sd.meta.effectiveDate.split(':')[1]}`);
+      setRichText(metaSpans[2], `<strong>${sd.meta.dispatchWindow.split(':')[0]}:</strong> ${sd.meta.dispatchWindow.split(':')[1]}`);
+      setRichText(metaSpans[4], `<strong>${sd.meta.coverage.split(':')[0]}:</strong> ${sd.meta.coverage.split(':')[1]}`);
     }
 
     const hlCards = document.querySelectorAll('.policy-highlights-grid .policy-highlight-card');
@@ -5260,17 +5275,17 @@ export function translatePolicyPages(dict, activeLang) {
       const h0 = hlCards[0].querySelector('.policy-highlight-title');
       if (h0) h0.textContent = sd.highlight1Title;
       const d0 = hlCards[0].querySelector('.policy-highlight-desc');
-      if (d0) d0.innerHTML = sd.highlight1Desc;
+      if (d0) setRichText(d0, sd.highlight1Desc);
 
       const h1 = hlCards[1].querySelector('.policy-highlight-title');
       if (h1) h1.textContent = sd.highlight2Title;
       const d1 = hlCards[1].querySelector('.policy-highlight-desc');
-      if (d1) d1.innerHTML = sd.highlight2Desc;
+      if (d1) setRichText(d1, sd.highlight2Desc);
 
       const h2 = hlCards[2].querySelector('.policy-highlight-title');
       if (h2) h2.textContent = sd.highlight3Title;
       const d2 = hlCards[2].querySelector('.policy-highlight-desc');
-      if (d2) d2.innerHTML = sd.highlight3Desc;
+      if (d2) setRichText(d2, sd.highlight3Desc);
     }
 
     const clauseTitles = document.querySelectorAll('.policy-clause .policy-clause-title');
@@ -5310,9 +5325,9 @@ export function translatePolicyPages(dict, activeLang) {
 
     const metaSpans = document.querySelectorAll('.policy-meta-row span');
     if (metaSpans.length >= 5) {
-      metaSpans[0].innerHTML = `<strong>${pp.meta.effectiveDate.split(':')[0]}:</strong> ${pp.meta.effectiveDate.split(':')[1]}`;
-      metaSpans[2].innerHTML = `<strong>${pp.meta.scope.split(':')[0]}:</strong> ${pp.meta.scope.split(':')[1]}`;
-      metaSpans[4].innerHTML = `<strong>${pp.meta.dataSelling.split(':')[0]}:</strong> ${pp.meta.dataSelling.split(':')[1]}`;
+      setRichText(metaSpans[0], `<strong>${pp.meta.effectiveDate.split(':')[0]}:</strong> ${pp.meta.effectiveDate.split(':')[1]}`);
+      setRichText(metaSpans[2], `<strong>${pp.meta.scope.split(':')[0]}:</strong> ${pp.meta.scope.split(':')[1]}`);
+      setRichText(metaSpans[4], `<strong>${pp.meta.dataSelling.split(':')[0]}:</strong> ${pp.meta.dataSelling.split(':')[1]}`);
     }
 
     const pillarCards = document.querySelectorAll('.privacy-pillars-grid .pillar-card, .policy-highlights-grid .policy-highlight-card, div[style*="repeat(auto-fit, minmax(180px, 1fr))"] > div');
@@ -5379,9 +5394,9 @@ export function translatePolicyPages(dict, activeLang) {
 
     const metaSpans = document.querySelectorAll('.policy-meta-row span');
     if (metaSpans.length >= 5) {
-      metaSpans[0].innerHTML = `<strong>${tc.meta.effectiveDate.split(':')[0]}:</strong> ${tc.meta.effectiveDate.split(':')[1]}`;
-      metaSpans[2].innerHTML = `<strong>${tc.meta.kitchen.split(':')[0]}:</strong> ${tc.meta.kitchen.split(':')[1]}`;
-      metaSpans[4].innerHTML = `<strong>${tc.meta.transparency.split(':')[0]}:</strong> ${tc.meta.transparency.split(':')[1]}`;
+      setRichText(metaSpans[0], `<strong>${tc.meta.effectiveDate.split(':')[0]}:</strong> ${tc.meta.effectiveDate.split(':')[1]}`);
+      setRichText(metaSpans[2], `<strong>${tc.meta.kitchen.split(':')[0]}:</strong> ${tc.meta.kitchen.split(':')[1]}`);
+      setRichText(metaSpans[4], `<strong>${tc.meta.transparency.split(':')[0]}:</strong> ${tc.meta.transparency.split(':')[1]}`);
     }
 
     const hlCards = document.querySelectorAll('.policy-highlights-grid .policy-highlight-card');
@@ -5389,17 +5404,17 @@ export function translatePolicyPages(dict, activeLang) {
       const h0 = hlCards[0].querySelector('.policy-highlight-title');
       if (h0) h0.textContent = tc.highlight1Title;
       const d0 = hlCards[0].querySelector('.policy-highlight-desc');
-      if (d0) d0.innerHTML = tc.highlight1Desc;
+      if (d0) setRichText(d0, tc.highlight1Desc);
 
       const h1 = hlCards[1].querySelector('.policy-highlight-title');
       if (h1) h1.textContent = tc.highlight2Title;
       const d1 = hlCards[1].querySelector('.policy-highlight-desc');
-      if (d1) d1.innerHTML = tc.highlight2Desc;
+      if (d1) setRichText(d1, tc.highlight2Desc);
 
       const h2 = hlCards[2].querySelector('.policy-highlight-title');
       if (h2) h2.textContent = tc.highlight3Title;
       const d2 = hlCards[2].querySelector('.policy-highlight-desc');
-      if (d2) d2.innerHTML = tc.highlight3Desc;
+      if (d2) setRichText(d2, tc.highlight3Desc);
     }
 
     const pointTitles = document.querySelectorAll('.terms-point-title, .policy-clause-title');
@@ -5439,9 +5454,9 @@ export function translatePolicyPages(dict, activeLang) {
 
     const metaSpans = document.querySelectorAll('.policy-meta-row span');
     if (metaSpans.length >= 5) {
-      metaSpans[0].innerHTML = `<strong>${ck.meta.effectiveDate.split(':')[0]}:</strong> ${ck.meta.effectiveDate.split(':')[1]}`;
-      metaSpans[2].innerHTML = `<strong>${ck.meta.trackers.split(':')[0]}:</strong> ${ck.meta.trackers.split(':')[1]}`;
-      metaSpans[4].innerHTML = `<strong>${ck.meta.promise.split(':')[0]}:</strong> ${ck.meta.promise.split(':')[1]}`;
+      setRichText(metaSpans[0], `<strong>${ck.meta.effectiveDate.split(':')[0]}:</strong> ${ck.meta.effectiveDate.split(':')[1]}`);
+      setRichText(metaSpans[2], `<strong>${ck.meta.trackers.split(':')[0]}:</strong> ${ck.meta.trackers.split(':')[1]}`);
+      setRichText(metaSpans[4], `<strong>${ck.meta.promise.split(':')[0]}:</strong> ${ck.meta.promise.split(':')[1]}`);
     }
 
     const hlCards = document.querySelectorAll('.policy-highlights-grid .policy-highlight-card');
@@ -5449,12 +5464,12 @@ export function translatePolicyPages(dict, activeLang) {
       const h0 = hlCards[0].querySelector('.policy-highlight-title');
       if (h0) h0.textContent = ck.highlight1Title;
       const d0 = hlCards[0].querySelector('.policy-highlight-desc');
-      if (d0) d0.innerHTML = ck.highlight1Desc;
+      if (d0) setRichText(d0, ck.highlight1Desc);
 
       const h1 = hlCards[1].querySelector('.policy-highlight-title');
       if (h1) h1.textContent = ck.highlight2Title;
       const d1 = hlCards[1].querySelector('.policy-highlight-desc');
-      if (d1) d1.innerHTML = ck.highlight2Desc;
+      if (d1) setRichText(d1, ck.highlight2Desc);
 
       if (hlCards.length >= 3) {
         const h2 = hlCards[2].querySelector('.policy-highlight-title');
@@ -5704,15 +5719,15 @@ export function translateGlobalFooter(dict, activeLang) {
     // Direct care guarantee box (e.g. cart.html)
     if (activeLang === 'hi') {
       nlTitle.textContent = '🛡️ सुरक्षित व सीधा संपर्क';
-      nlDesc.innerHTML = '<strong>शून्य स्पैम गारंटी:</strong> सात्विक स्वाद किसी भी तीसरे पक्ष की प्रचार सामग्री या मैसेज सेवा का उपयोग नहीं करता है। सभी बातचीत हमारे सत्यापित व्हाट्सएप (+91 92365 87600) और आधिकारिक ईमेल (satvikswaad.care@gmail.com) पर सीधे और 100% सुरक्षित रूप से होती है।';
+      setRichText(nlDesc, '<strong>शून्य स्पैम गारंटी:</strong> सात्विक स्वाद किसी भी तीसरे पक्ष की प्रचार सामग्री या मैसेज सेवा का उपयोग नहीं करता है। सभी बातचीत हमारे सत्यापित व्हाट्सएप (+91 92365 87600) और आधिकारिक ईमेल (satvikswaad.care@gmail.com) पर सीधे और 100% सुरक्षित रूप से होती है।');
       if (nlFoot) nlFoot.textContent = '100% सीधा संपर्क • शून्य अनचाहे संदेश';
     } else if (activeLang === 'ur') {
       nlTitle.textContent = '🛡️ محفوظ براہ راست رابطہ';
-      nlDesc.innerHTML = '<strong>زیرو اسپام گارنٹی:</strong> ساٹوک سواد کسی بھی تھرڈ پارٹی میسج یا پروموشنل ای میل سروسز کا استعمال نہیں کرتا۔ تمام بات چیت ہمارے تصدیق شدہ واٹس ایپ (+91 92365 87600) اور آفیشل ای میل (satvikswaad.care@gmail.com) کے ذریعے براہ راست اور محفوظ طریقے سے ہوتی ہے۔';
+      setRichText(nlDesc, '<strong>زیرو اسپام گارنٹی:</strong> ساٹوک سواد کسی بھی تھرڈ پارٹی میسج یا پروموشنل ای میل سروسز کا استعمال نہیں کرتا۔ تمام بات چیت ہمارے تصدیق شدہ واٹس ایپ (+91 92365 87600) اور آفیشل ای میل (satvikswaad.care@gmail.com) کے ذریعے براہ راست اور محفوظ طریقے سے ہوتی ہے۔');
       if (nlFoot) nlFoot.textContent = '100% براہ راست • بلا ملاوٹ و اسپام';
     } else {
       nlTitle.textContent = '🛡️ Secure Direct Care';
-      nlDesc.innerHTML = '<strong>Zero Spam Guarantee:</strong> Satvik Swaad does not send or provide third-party message or promotional mail services. All communication is 100% direct and secured via our verified WhatsApp (+91 92365 87600) and official care inbox (satvikswaad.care@gmail.com).';
+      setRichText(nlDesc, '<strong>Zero Spam Guarantee:</strong> Satvik Swaad does not send or provide third-party message or promotional mail services. All communication is 100% direct and secured via our verified WhatsApp (+91 92365 87600) and official care inbox (satvikswaad.care@gmail.com).');
       if (nlFoot) nlFoot.textContent = '100% Direct • Zero Marketing Blasts';
     }
   }

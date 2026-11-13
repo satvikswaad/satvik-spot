@@ -5,20 +5,6 @@ import {
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-import {
-    collection,
-    doc,
-    query,
-    orderBy,
-    onSnapshot,
-    updateDoc,
-    setDoc,
-    addDoc,
-    deleteDoc,
-    increment,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 import adminDataAdapter from "./adminDataAdapter.js";
 import { initAdminAnalytics, refreshAdminAnalytics } from "./adminAnalytics.js";
 
@@ -830,25 +816,31 @@ function subscribeToOrdersStream() {
         }
     });
 
-    // 3. If in production / non-localhost with live Firestore credentials, also bind Firestore snapshot
-    if (!isLocalhost && window.db) {
-        try {
-            const q = query(collection(window.db, 'orders'), orderBy('createdAt', 'desc'));
-            onSnapshot(q, (snap) => {
-                const firestoreOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                if (firestoreOrders.length > 0) {
-                    adminState.orders = firestoreOrders;
-                    updateOrdersKpi();
-                    renderDashboardOrdersFeed(adminState.orders.slice(0, 6));
-                    renderOrdersView();
-                    renderAnalyticsView();
+    // 3. Admin API Live Sync (DB-1, T-031, UI-4: cursor pagination limit 50)
+    if (window.auth) {
+        const syncRemoteOrders = async () => {
+            const user = window.auth.currentUser;
+            if (!user) return;
+            try {
+                const token = await user.getIdToken();
+                const res = await fetch(`${window.API_BASE_URL || ''}/api/v1/admin/orders?limit=50`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.orders && data.orders.length > 0) {
+                        adminState.orders = data.orders;
+                        updateOrdersKpi();
+                        renderDashboardOrdersFeed(adminState.orders.slice(0, 6));
+                        renderOrdersView();
+                        renderAnalyticsView();
+                    }
                 }
-            }, (err) => {
-                console.warn("[Admin] Firestore orders stream permission notice (using local adapter):", err.message);
-            });
-        } catch (e) {
-            console.warn("[Admin] Stream init error (local adapter active):", e);
-        }
+            } catch (err) {
+                console.warn("[Admin] Orders API sync notice (adapter active):", err.message);
+            }
+        };
+        syncRemoteOrders();
     }
 }
 
@@ -1338,45 +1330,15 @@ async function updateOrderStatus(orderId, newStatus) {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const isOffline = String(orderId).startsWith('SS-OFF-') || adminState.orders.some(o => o.id === orderId && o.source === 'offline');
 
-    if (isOffline || isLocalhost) {
-        adminDataAdapter.updateOrderStatus(orderId, newStatus);
-        console.log(`[Adapter] Order ${orderId} transitioned to ${newStatus}`);
-    }
-
-    if (window.db && !isOffline) {
-        try {
-            const orderRef = doc(window.db, 'orders', orderId);
-            await updateDoc(orderRef, {
-                status: newStatus,
-                updatedAt: serverTimestamp()
-            });
-            console.log(`[Firestore] Order ${orderId} transitioned to ${newStatus}`);
-        } catch (err) {
-            console.warn("Firestore status update skipped or failed (local adapter active):", err.message);
-        }
-    }
+    adminDataAdapter.updateOrderStatus(orderId, newStatus);
+    console.log(`[Adapter/API] Order ${orderId} transitioned to ${newStatus}`);
 }
 
 // Admin decision control reference: /api/v1/admin/orders/:id/verify-payment
 async function verifyOrderPayment(orderId) {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isOffline = String(orderId).startsWith('SS-OFF-') || adminState.orders.some(o => o.id === orderId && o.source === 'offline');
-
-    if (isOffline || isLocalhost) {
-        adminDataAdapter.updateOrderStatus(orderId, undefined, 'paid');
-        console.log(`[Adapter] Payment for order ${orderId} verified.`);
-    }
-
-    if (window.db && !isOffline) {
-        try {
-            const orderRef = doc(window.db, 'orders', orderId);
-            await updateDoc(orderRef, {
-                paymentStatus: 'paid',
-                paymentVerified: true,
-                verifiedAt: serverTimestamp()
-            });
-            console.log(`Payment for order ${orderId} verified successfully.`);
-        } catch (err) {
+    adminDataAdapter.updateOrderStatus(orderId, undefined, 'paid');
+    console.log(`[Adapter/API] Payment for order ${orderId} verified.`);
+}
             console.warn("Firestore verify payment skipped (local adapter active):", err.message);
         }
     }
@@ -1411,14 +1373,7 @@ async function handleShippingDispatchSubmit(e) {
     }
 
     try {
-        const orderRef = doc(window.db, 'orders', orderId);
-        await updateDoc(orderRef, {
-            status: 'shipped',
-            courierPartner: courier,
-            trackingNumber: trackingNumber,
-            dispatchedAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-        });
+        adminDataAdapter.updateOrderStatus(orderId, 'shipped', undefined, { courierPartner: courier, trackingNumber });
         closeShippingModal();
     } catch (err) {
         console.error("Dispatch update failed:", err);
@@ -1430,23 +1385,19 @@ async function handleShippingDispatchSubmit(e) {
 // 2. PRODUCTS REAL-TIME STREAM & INVENTORY EDITING (ZERO innerHTML concatenation)
 // ─────────────────────────────────────────────────────────────────────────────
 function subscribeToProductsStream() {
-    if (!window.db) return;
-
-    try {
-        const q = query(collection(window.db, 'products'));
-        adminState.unsubProducts = onSnapshot(q, (snap) => {
-            adminState.products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-            // Update Low Stock counters & Badges
-            updateStockKpi();
-
-            // Render Products View
-            renderProductsView();
-        }, (err) => {
-            console.error("Products stream error:", err);
-        });
-    } catch (e) {
-        console.error("Products stream init error:", e);
+    // Products stream handled through adminDataAdapter and admin API
+    if (window.auth && window.auth.currentUser) {
+        window.auth.currentUser.getIdToken().then(token => {
+            fetch(`${window.API_BASE_URL || ''}/api/v1/admin/products`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(r => r.json()).then(data => {
+                if (data.products) {
+                    adminState.products = data.products;
+                    updateStockKpi();
+                    renderProductsView();
+                }
+            }).catch(() => {});
+        }).catch(() => {});
     }
 }
 
@@ -1620,14 +1571,11 @@ function renderProductsView() {
 
 // Quick Restock Function
 async function quickRestockProduct(productId, amount) {
-    if (!window.db) return;
     try {
-        const prodRef = doc(window.db, 'products', productId);
-        await updateDoc(prodRef, {
-            stock: increment(amount),
-            updatedAt: serverTimestamp()
-        });
-        console.log(`Restocked product ${productId} by +${amount}`);
+        const prod = adminState.products.find(p => p.id === productId);
+        const curStock = Number(prod ? prod.stock : 0);
+        adminDataAdapter.updateProductStock(productId, curStock + amount);
+        console.log(`[Adapter/API] Restocked product ${productId} by +${amount}`);
     } catch (err) {
         console.error("Restock failed:", err);
         alert("Failed to restock product: " + err.message);
@@ -2010,18 +1958,6 @@ async function handleProductFormSubmit(e) {
             savedProd = await adminDataAdapter.saveProduct({ ...payload, id: prodId || undefined });
         }
 
-        // Firestore live sync if active
-        if (window.db) {
-            try {
-                const targetId = prodId || (savedProd ? savedProd.id : ('prod_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 20) + '_' + Date.now().toString().slice(-4)));
-                const prodRef = doc(window.db, 'products', targetId);
-                await setDoc(prodRef, { ...payload, updatedAt: serverTimestamp() }, { merge: true });
-                console.log(`[Firestore] Product ${targetId} synchronized with ${payload.images.length} photos.`);
-            } catch (fsErr) {
-                console.warn("[Firestore] Sync notice (local adapter active):", fsErr.message);
-            }
-        }
-
         showAdminToast(`✅ Product "${name}" saved with ${payload.images.length} photo(s) — storefront synced in real time!`, 'success');
         closeProductModal();
         renderProductsView();
@@ -2035,22 +1971,8 @@ async function handleProductFormSubmit(e) {
 // 3. OFFLINE BUSINESS & EXPENSE TRACKER (ZERO innerHTML concatenation)
 // ─────────────────────────────────────────────────────────────────────────────
 function subscribeToOfflineFinancesStream() {
-    if (!window.db) return;
-
-    try {
-        const q = query(collection(window.db, 'offline_finances'), orderBy('date', 'desc'));
-        adminState.unsubOffline = onSnapshot(q, (snap) => {
-            adminState.offlineFinances = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-            // Update Offline Financial KPIs
-            updateOfflineKpi();
-
-            // Render Offline Ledger Table
-            renderOfflineLedgerView();
-        }, (err) => {
-            console.error("Offline finances stream error:", err);
-        });
-    } catch (e) {
+    // Offline ledger stream handled through adminDataAdapter and POS shifts
+}
         console.error("Offline finances stream init error:", e);
     }
 }
@@ -2187,42 +2109,14 @@ async function handleOfflineEntrySubmit(e) {
         createdAt: new Date().toISOString()
     };
 
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isLocalhost || !window.db) {
-        adminDataAdapter.addOfflineExpense(payload);
-        closeModal('modal-offline');
-        document.getElementById('off-amount').value = '';
-        document.getElementById('off-desc').value = '';
-        return;
-    }
-
-    try {
-        await addDoc(collection(window.db, 'offline_finances'), {
-            ...payload,
-            createdAt: serverTimestamp()
-        });
-        closeModal('modal-offline');
-        // Reset form inputs
-        document.getElementById('off-amount').value = '';
-        document.getElementById('off-desc').value = '';
-    } catch (err) {
-        console.error("Failed to add offline entry:", err);
-        alert("Error adding entry: " + err.message);
-    }
+    adminDataAdapter.addOfflineExpense(payload);
+    closeModal('modal-offline');
+    document.getElementById('off-amount').value = '';
+    document.getElementById('off-desc').value = '';
 }
 
 async function deleteOfflineEntry(docId) {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isLocalhost || !window.db) {
-        adminDataAdapter.deleteOfflineExpense(docId);
-        return;
-    }
-    try {
-        await deleteDoc(doc(window.db, 'offline_finances', docId));
-    } catch (err) {
-        console.error("Delete failed:", err);
-        alert("Failed to delete entry: " + err.message);
-    }
+    adminDataAdapter.deleteOfflineExpense(docId);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

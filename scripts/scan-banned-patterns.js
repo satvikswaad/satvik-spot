@@ -75,7 +75,7 @@ for (const [name, data] of Object.entries(results)) {
 console.log(`----------------------------------------`);
 console.log(`Total Banned Pattern Hits: ${grandTotal} (backend/shared: ${backendOrSharedTotal})`);
 
-const BASELINE_PUBLIC_MAX = 101;
+const BASELINE_PUBLIC_MAX = 0;
 const enforce = process.argv.includes('--enforce');
 
 if (backendOrSharedTotal > 0) {

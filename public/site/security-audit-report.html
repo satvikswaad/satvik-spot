@@ -445,11 +445,7 @@ Every single requirement defined in the **Satvik Swaad Web Production Security &
 
     <script>
         const raw = document.getElementById('raw-markdown').textContent;
-        if (window.marked) {
-            document.getElementById('rendered-report').innerHTML = marked.parse(raw);
-        } else {
-            document.getElementById('rendered-report').innerText = raw;
-        }
+        document.getElementById('rendered-report').textContent = raw;
 
         const btnPrint = document.getElementById('btn-print-audit');
         if (btnPrint) {

@@ -11,7 +11,8 @@ import {
   guestLookupRateLimiter,
   adminRateLimiter,
   customerRateLimiter,
-  quoteRateLimiter
+  quoteRateLimiter,
+  newsletterRateLimiter
 } from './rateLimiting/rateLimiter';
 import { enforceSecureCookieHeaders } from './auth/cookieSecurity';
 import { originGateMiddleware } from './auth/securityGateService';
@@ -37,8 +38,20 @@ import {
   moderateReview,
   updateAdminVariants,
   verifyPaymentAdmin,
-  getAuditLogs
+  getAuditLogs,
+  getAdminOrders,
+  getAdminOrderById,
+  getAdminOrderEvents,
+  getAdminProducts,
+  getAdminMessages,
+  getAdminReviews,
+  getAdminShifts
 } from './admin/adminController';
+
+import {
+  subscribeNewsletterHandler,
+  getNewsletterSubscribersHandler
+} from './newsletter/newsletterController';
 
 import {
   startShiftHandler,
@@ -186,6 +199,9 @@ app.post('/api/v1/messages', messageRateLimiter, handleCreateMessage);
 app.get('/api/v1/reviews', handleGetApprovedReviews);
 app.post('/api/v1/reviews', reviewRateLimiter, handleCreateReview);
 
+// Public Newsletter Subscription Endpoint (POST /api/v1/newsletter/subscribe)
+app.post('/api/v1/newsletter/subscribe', newsletterRateLimiter, subscribeNewsletterHandler);
+
 // PayU Live / Test Payment Gateway Endpoints (Blueprint Specification)
 app.post('/api/v1/payments/payu/create-order', payuPaymentRateLimiter, createPayUOrderHandler);
 app.post('/api/billing/payu/create-order', payuPaymentRateLimiter, createPayUOrderHandler);
@@ -213,6 +229,10 @@ app.get('/api/v1/customer/orders', handleGetCustomerOrders);
 // ── PROTECTED ADMIN DASHBOARD API ENDPOINTS ────────────────────────────────
 app.use(['/api/v1/admin', '/api/v1/admin/*'], adminRateLimiter, requireCloudflareAccess, requireAdminIpAllowlist);
 app.get('/api/v1/admin/dashboard-summary', requireAdmin, getDashboardSummary);
+app.get('/api/v1/admin/orders', requireAdmin, getAdminOrders);
+app.get('/api/v1/admin/orders/:orderId', requireAdmin, getAdminOrderById);
+app.get('/api/v1/admin/orders/:orderId/events', requireAdmin, getAdminOrderEvents);
+app.get('/api/v1/admin/products', requireAdmin, getAdminProducts);
 app.post('/api/v1/admin/products', requireAdmin, createAdminProduct);
 app.post('/api/v1/admin/products/:productId/archive', requireAdmin, requireRecentAuthentication(300), archiveAdminProduct);
 app.patch('/api/v1/admin/products/:productId/stock', requireAdmin, updateAdminStock);
@@ -220,9 +240,13 @@ app.put('/api/v1/admin/products/:productId/variants', requireAdmin, requireRecen
 app.post('/api/v1/admin/orders/:orderId/transition', requireAdmin, requireRecentAuthentication(300), transitionOrderStatus);
 app.post('/api/v1/admin/orders/:orderId/verify-payment', requireAdmin, requireRecentAuthentication(300), verifyPaymentAdmin);
 app.post('/api/v1/admin/refunds', requireAdmin, requireRecentAuthentication(300), refundHandler);
+app.get('/api/v1/admin/messages', requireAdmin, getAdminMessages);
 app.post('/api/v1/admin/messages/:messageId/status', requireAdmin, updateMessageStatus);
+app.get('/api/v1/admin/reviews', requireAdmin, getAdminReviews);
 app.post('/api/v1/admin/reviews/:reviewId/moderate', requireAdmin, moderateReview);
 app.get('/api/v1/admin/audit-events', requireAdmin, requireRecentAuthentication(300), getAuditLogs);
+app.get('/api/v1/admin/pos/shifts', requireAdmin, getAdminShifts);
+app.get('/api/v1/admin/newsletter/subscribers', requireAdmin, getNewsletterSubscribersHandler);
 
 // POS Retail & Counter Management (POS-1 to POS-8, TAX-2, TAX-3)
 app.post('/api/v1/admin/pos/shifts/start', requireAdmin, startShiftHandler);

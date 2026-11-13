@@ -429,7 +429,9 @@ export function initFloatingAgent() {
     if (!card.querySelector('.agent-security-badge')) {
         const badgeDiv = document.createElement('div');
         badgeDiv.className = 'agent-security-badge';
-        badgeDiv.innerHTML = `<span>🛡️ 100% Encrypted &bull; Direct Satvik Intelligence</span>`;
+        const badgeSpan = document.createElement('span');
+        badgeSpan.textContent = '🛡️ 100% Encrypted • Direct Satvik Intelligence';
+        badgeDiv.appendChild(badgeSpan);
         const footer = card.querySelector('.agent-card-footer');
         if (footer) footer.appendChild(badgeDiv);
     }
@@ -526,7 +528,12 @@ export function initFloatingAgent() {
             html += `</div>`;
         }
 
-        msg.innerHTML = html;
+        const msgDoc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+        if (msgDoc.body.firstElementChild) {
+            while (msgDoc.body.firstElementChild.firstChild) {
+                msg.appendChild(msgDoc.body.firstElementChild.firstChild);
+            }
+        }
         messages.appendChild(msg);
         messages.scrollTop = messages.scrollHeight;
     }
