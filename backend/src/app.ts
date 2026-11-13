@@ -10,14 +10,18 @@ import {
   reviewRateLimiter,
   guestLookupRateLimiter,
   adminRateLimiter,
-  customerRateLimiter
+  customerRateLimiter,
+  quoteRateLimiter
 } from './rateLimiting/rateLimiter';
 import { enforceSecureCookieHeaders } from './auth/cookieSecurity';
 import { originGateMiddleware } from './auth/securityGateService';
 import { verifyAuth } from './auth/verifyAuth';
 import { requireAdmin, requireRecentAuthentication, requireAuthenticatedUser } from './auth/adminMiddleware';
 import { requireAdminIpAllowlist } from './auth/adminIpFilter';
+import { requireCloudflareAccess } from './auth/cloudflareAccess';
 import { handleCreateOrder, handleCreateWhatsAppOrder, handleGuestLookup, submitUtrHandler } from './orders/orderController';
+import { createQuoteHandler } from './orders/quotesController';
+import { getPublicProducts, getPublicProductById } from './products/productController';
 import { handleCreateMessage } from './messages/messageController';
 import { handleCreateReview, handleGetApprovedReviews } from './reviews/reviewController';
 import { healthRouter } from './routes/healthRoutes';
@@ -108,10 +112,9 @@ app.use('/admin', express.static(publicAdminDir, { extensions: ['html'] }));
 app.use((_req: Request, res: Response, next: NextFunction) => {
   const nonce = crypto.randomBytes(16).toString('base64');
   res.locals.cspNonce = nonce;
-  res.setHeader(
-    'Content-Security-Policy',
-    `default-src 'self'; script-src 'self' 'nonce-${nonce}' https://checkout.payu.in https://secure.payu.in https://test.payu.in https://www.gstatic.com https://apis.google.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.firebaseapp.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://secure.payu.in https://test.payu.in https://info.payu.in https://satvik-spot-backend-staging.onrender.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.gstatic.com https://api.razorpay.com https://lumberjack.razorpay.com http://127.0.0.1:*; frame-src 'self' https://secure.payu.in https://test.payu.in https://checkout.payu.in https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://recaptcha.google.com/ https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://secure.payu.in https://test.payu.in; object-src 'none'; upgrade-insecure-requests;`
-  );
+  const cspPolicy = `default-src 'self'; script-src 'self' 'nonce-${nonce}' https://checkout.payu.in https://secure.payu.in https://test.payu.in https://www.gstatic.com https://apis.google.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.firebaseapp.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://secure.payu.in https://test.payu.in https://info.payu.in https://satvik-spot-backend-staging.onrender.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.gstatic.com https://api.razorpay.com https://lumberjack.razorpay.com http://127.0.0.1:*; frame-src 'self' https://secure.payu.in https://test.payu.in https://checkout.payu.in https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://recaptcha.google.com/ https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://secure.payu.in https://test.payu.in; object-src 'none'; upgrade-insecure-requests;`;
+  res.setHeader('Content-Security-Policy', cspPolicy);
+  res.setHeader('Content-Security-Policy-Report-Only', cspPolicy);
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -156,6 +159,10 @@ import {
 } from './customer/customerController';
 
 // Authoritative Order & Public Endpoints
+app.get('/api/v1/products', getPublicProducts);
+app.get('/api/v1/products/:productId', getPublicProductById);
+app.post('/api/v1/quotes', quoteRateLimiter, createQuoteHandler);
+app.get('/api/v1/quotes', quoteRateLimiter, createQuoteHandler);
 app.post('/api/v1/orders/create', orderRateLimiter, handleCreateOrder);
 app.post('/api/v1/orders/create-whatsapp-request', orderRateLimiter, handleCreateWhatsAppOrder);
 app.post('/api/v1/orders/submit-utr', submitUtrHandler);
@@ -186,14 +193,14 @@ app.delete('/api/v1/customer/addresses/:addressId', handleDeleteSavedAddress);
 app.get('/api/v1/customer/orders', handleGetCustomerOrders);
 
 // ── PROTECTED ADMIN DASHBOARD API ENDPOINTS ────────────────────────────────
-app.use(['/api/v1/admin', '/api/v1/admin/*'], adminRateLimiter, requireAdminIpAllowlist);
+app.use(['/api/v1/admin', '/api/v1/admin/*'], adminRateLimiter, requireCloudflareAccess, requireAdminIpAllowlist);
 app.get('/api/v1/admin/dashboard-summary', requireAdmin, getDashboardSummary);
 app.post('/api/v1/admin/products', requireAdmin, createAdminProduct);
 app.post('/api/v1/admin/products/:productId/archive', requireAdmin, requireRecentAuthentication(300), archiveAdminProduct);
 app.patch('/api/v1/admin/products/:productId/stock', requireAdmin, updateAdminStock);
 app.put('/api/v1/admin/products/:productId/variants', requireAdmin, requireRecentAuthentication(300), updateAdminVariants);
 app.post('/api/v1/admin/orders/:orderId/transition', requireAdmin, requireRecentAuthentication(300), transitionOrderStatus);
-app.post('/api/v1/admin/orders/:orderId/verify-payment', requireAdmin, requireRecentAuthentication(900), verifyPaymentAdmin);
+app.post('/api/v1/admin/orders/:orderId/verify-payment', requireAdmin, requireRecentAuthentication(300), verifyPaymentAdmin);
 app.post('/api/v1/admin/refunds', requireAdmin, requireRecentAuthentication(300), refundHandler);
 app.post('/api/v1/admin/messages/:messageId/status', requireAdmin, updateMessageStatus);
 app.post('/api/v1/admin/reviews/:reviewId/moderate', requireAdmin, moderateReview);

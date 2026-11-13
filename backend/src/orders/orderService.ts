@@ -6,6 +6,10 @@ import { generateGuestAccessSecret, hashGuestSecret } from '../guest/guestServic
 import { OutOfStockError, AppError, ValidationError, AuthorizationError } from '../errors/AppError';
 import { logger } from '../utils/logger';
 import { logInventoryChangeInTransaction } from '../inventory/inventoryService';
+import { priceOrder, OrderLineInput, DiscountDoc, DeliveryZoneConfig } from '../pricing/pricingEngine';
+import { generateOrderId } from '../shared';
+import { validateAndRedeemCouponInTransaction } from '../coupons/couponService';
+import { recordSaleInDailyStatsInTransaction } from '../db/statsDailyService';
 
 export interface ProcessOrderParams {
   payload: CreateOrderPayload;
@@ -14,11 +18,18 @@ export interface ProcessOrderParams {
 
 export interface OrderCreationResult {
   orderId: string;
+  totalPaise: number;
+  subtotalPaise: number;
+  deliveryFeePaise: number;
+  taxPaise: number;
+  discountPaise: number;
   total: number;
   subtotal: number;
   shippingFee: number;
   status: string;
+  orderStatus: string;
   paymentStatus: string;
+  needsReview?: boolean;
   guestAccessSecret?: string;
   createdAt: string;
 }
@@ -46,9 +57,18 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
   const requestHash = computePayloadHash(payload);
 
   return db.runTransaction(async (transaction) => {
-    // 1. Idempotency Binding Check
-    const idempotencyRef = db.collection('idempotency').doc(payload.idempotencyKey);
-    const idempotencySnap = await transaction.get(idempotencyRef);
+    // 1. Idempotency Binding Check (Collection: idempotencyKeys per Decision D13)
+    let idempotencyRef = db.collection('idempotencyKeys').doc(payload.idempotencyKey);
+    let idempotencySnap = await transaction.get(idempotencyRef);
+
+    if (!idempotencySnap.exists) {
+      const legacyRef = db.collection('idempotency').doc(payload.idempotencyKey);
+      const legacySnap = await transaction.get(legacyRef);
+      if (legacySnap.exists) {
+        idempotencyRef = legacyRef;
+        idempotencySnap = legacySnap;
+      }
+    }
 
     if (idempotencySnap.exists) {
       const cached = idempotencySnap.data()!;
@@ -67,15 +87,17 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       return cached.result as OrderCreationResult;
     }
 
-    // 2. Fetch Authoritative Products & Validate Stock
-    let subtotal = 0;
+    // 2. Fetch Authoritative Products & Validate Stock (PRICE-1, STOCK-1)
+    const orderLineInputs: OrderLineInput[] = [];
     const verifiedOrderItems: Array<{
       productId: string;
       variantId?: string;
       name: string;
       qty: number;
       unitPrice: number;
+      unitPricePaise: number;
       lineTotal: number;
+      lineTotalPaise: number;
     }> = [];
 
     const productUpdates: Array<{
@@ -96,20 +118,32 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
         );
       }
 
-      const lineTotal = product.price * itemInput.qty;
-      subtotal += lineTotal;
-
+      const unitPricePaise = product.pricePaise || Math.round(product.price * 100);
+      const lineTotalPaise = unitPricePaise * itemInput.qty;
       const itemName = product.selectedVariant
         ? `${product.name} (${product.selectedVariant.label})`
         : product.name;
+      const variantId = itemInput.variantId || (product.selectedVariant ? product.selectedVariant.id : product.id);
+
+      orderLineInputs.push({
+        productId: product.id,
+        variantId,
+        title: itemName,
+        unitPricePaise,
+        qty: itemInput.qty,
+        taxRatePercent: product.taxRatePercent || 12,
+        hsn: product.hsn || '20019000'
+      });
 
       verifiedOrderItems.push({
         productId: product.id,
-        ...(itemInput.variantId ? { variantId: itemInput.variantId } : {}),
+        ...(variantId ? { variantId } : {}),
         name: itemName,
         qty: itemInput.qty,
-        unitPrice: product.price,
-        lineTotal
+        unitPrice: unitPricePaise / 100,
+        unitPricePaise,
+        lineTotal: lineTotalPaise / 100,
+        lineTotalPaise
       });
 
       const productRef = db.collection('products').doc(product.id);
@@ -123,25 +157,64 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       });
     }
 
-    // 3. Authoritative Price Calculations (Server Set)
-    const shippingFee = subtotal >= 500 ? 0 : 50; // Free shipping above ₹500
-    const total = subtotal + shippingFee;
+    // 3. Fetch delivery zones configuration from config/deliveryZones (Decision D5, D17)
+    let deliveryZones: DeliveryZoneConfig | undefined = undefined;
+    try {
+      const zonesSnap = await transaction.get(db.collection('config').doc('deliveryZones'));
+      if (zonesSnap.exists) {
+        deliveryZones = zonesSnap.data() as DeliveryZoneConfig;
+      }
+    } catch {
+      // Fallback
+    }
 
-    // 4. Guest Secret Generation if Guest Checkout
+    // 4. Fetch discount code if provided (DISC-1, collection: discounts)
+    let discountCodeDoc: DiscountDoc | null = null;
+    if (payload.discountCode) {
+      const codeUpper = payload.discountCode.toUpperCase();
+      const discSnap = await transaction.get(db.collection('discounts').doc(codeUpper));
+      if (discSnap.exists) {
+        discountCodeDoc = discSnap.data() as DiscountDoc;
+      }
+    }
+
+    // 5. Authoritative Pricing via priceOrder (PRICE-1 to PRICE-9, MONEY-1)
+    const priced = priceOrder({
+      items: orderLineInputs,
+      pincode: payload.pincode || '',
+      discountCodeDoc,
+      deliveryZones
+    });
+
+    // 6. Generate Cryptographic Order ID (SS- + 12 Crockford base32 per Section 2.2)
+    const orderId = generateOrderId();
+    const newOrderRef = db.collection('orders').doc(orderId);
+
+    // 7. Atomic Coupon Redemption in Transaction (DISC-2, DISC-3, DISC-4)
+    if (payload.discountCode && priced.discountPaise > 0) {
+      await validateAndRedeemCouponInTransaction(
+        transaction,
+        payload.discountCode,
+        orderId,
+        priced.subtotalPaise,
+        userId,
+        payload.phone
+      );
+    }
+
+    // 8. Guest Secret Generation if Guest Checkout
     let guestSecretDetails;
     if (!userId) {
       guestSecretDetails = generateGuestAccessSecret();
     }
 
-    // 5. Order Document Construction
-    const newOrderRef = db.collection('orders').doc();
-    const orderId = newOrderRef.id;
+    // 9. Canonical Statuses per Section 4.5
+    const isCod = payload.paymentMethod === 'Cash on Delivery' || payload.paymentMethod === 'COD';
+    const initialOrderStatus = 'PLACED';
+    const initialPaymentStatus = isCod ? 'COD_DUE' : 'UNPAID';
 
-    const initialPaymentStatus = 'Unpaid';
-    const initialOrderStatus = 'Pending';
-
-    const itemNames = verifiedOrderItems.map(item => item.name);
-    const itemSummary = verifiedOrderItems.map(item => `${item.name} × ${item.qty}`).join(', ');
+    const itemNames = priced.lines.map(item => item.title);
+    const itemSummary = priced.lines.map(item => `${item.title} × ${item.qty}`).join(', ');
 
     const orderDocData: Record<string, any> = {
       orderId,
@@ -153,18 +226,31 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       itemNames,
       itemSummary,
       address: payload.address,
+      pincode: payload.pincode || null,
       items: verifiedOrderItems,
-      subtotal,
-      shippingFee,
-      total,
+      lines: priced.lines,          // Complete frozen line snapshot (PRICE-8, PRICE-9)
+      subtotalPaise: priced.subtotalPaise,
+      discountPaise: priced.discountPaise,
+      deliveryFeePaise: priced.shippingPaise,
+      taxPaise: priced.taxPaise,
+      totalPaise: priced.totalPaise,
+      // Float mirrors for legacy storefront backward compatibility
+      subtotal: priced.subtotalPaise / 100,
+      shippingFee: priced.shippingPaise / 100,
+      total: priced.totalPaise / 100,
+      discount: priced.discountPaise / 100,
+      needsReview: priced.needsReview,
       paymentMethod: payload.paymentMethod,
       paymentStatus: initialPaymentStatus,
       status: initialOrderStatus,
+      orderStatus: initialOrderStatus,
+      version: 1,
       guestSecretHash: guestSecretDetails ? guestSecretDetails.hashedSecret : null,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: new Date().toISOString()
     };
 
-    // 6. Write Order Document & Deduct Inventory in Transaction
+    // 10. Write Order Document & Deduct Inventory in Transaction
     transaction.set(newOrderRef, orderDocData);
 
     for (const update of productUpdates) {
@@ -181,14 +267,29 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       });
     }
 
-    // 7. Store Idempotency Record Bound to ownerId, action, and requestHash
+    // 10b. Update stats_daily atomically in transaction (INV-5, DB-5)
+    const totalUnits = priced.lines.reduce((acc, l) => acc + l.qty, 0);
+    await recordSaleInDailyStatsInTransaction(transaction, {
+      totalPaise: priced.totalPaise,
+      channel: 'ONLINE',
+      unitsCount: totalUnits
+    });
+
+    // 11. Store Idempotency Record Bound to ownerId, action, and requestHash
     const resultPayload: OrderCreationResult = {
       orderId,
-      total,
-      subtotal,
-      shippingFee,
+      totalPaise: priced.totalPaise,
+      subtotalPaise: priced.subtotalPaise,
+      deliveryFeePaise: priced.shippingPaise,
+      taxPaise: priced.taxPaise,
+      discountPaise: priced.discountPaise,
+      total: priced.totalPaise / 100,
+      subtotal: priced.subtotalPaise / 100,
+      shippingFee: priced.shippingPaise / 100,
       status: initialOrderStatus,
+      orderStatus: initialOrderStatus,
       paymentStatus: initialPaymentStatus,
+      needsReview: priced.needsReview,
       ...(guestSecretDetails ? { guestAccessSecret: guestSecretDetails.plainSecret } : {}),
       createdAt: new Date().toISOString()
     };
@@ -201,10 +302,21 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
       result: resultPayload
     });
 
+    if (idempotencyRef.parent.id !== 'idempotencyKeys') {
+      const primaryKeyRef = db.collection('idempotencyKeys').doc(payload.idempotencyKey);
+      transaction.set(primaryKeyRef, {
+        ownerId,
+        action,
+        requestHash,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        result: resultPayload
+      });
+    }
+
     logger.info('Authoritative order processed successfully', {
       orderId,
       userId: userId || 'GUEST',
-      total
+      totalPaise: priced.totalPaise
     });
 
     return resultPayload;
@@ -212,9 +324,8 @@ export async function processAuthoritativeOrder(params: ProcessOrderParams): Pro
 }
 
 /**
- * Creates an order for Razorpay online checkout flow.
- * Status starts as PAYMENT_INITIATED. Stock is validated but NOT deducted
- * until payment is confirmed via webhook/verification callback.
+ * Creates an order for online checkout flow.
+ * Status starts as PLACED + UNPAID. Stock is validated.
  */
 export async function processCheckoutOrder(params: ProcessOrderParams): Promise<OrderCreationResult> {
   const { payload, userId } = params;
@@ -223,9 +334,18 @@ export async function processCheckoutOrder(params: ProcessOrderParams): Promise<
   const requestHash = computePayloadHash(payload);
 
   return db.runTransaction(async (transaction) => {
-    // 1. Idempotency Binding Check
-    const idempotencyRef = db.collection('idempotency').doc(payload.idempotencyKey);
-    const idempotencySnap = await transaction.get(idempotencyRef);
+    // 1. Idempotency Binding Check (Collection: idempotencyKeys per Decision D13)
+    let idempotencyRef = db.collection('idempotencyKeys').doc(payload.idempotencyKey);
+    let idempotencySnap = await transaction.get(idempotencyRef);
+
+    if (!idempotencySnap.exists) {
+      const legacyRef = db.collection('idempotency').doc(payload.idempotencyKey);
+      const legacySnap = await transaction.get(legacyRef);
+      if (legacySnap.exists) {
+        idempotencyRef = legacyRef;
+        idempotencySnap = legacySnap;
+      }
+    }
 
     if (idempotencySnap.exists) {
       const cached = idempotencySnap.data()!;
@@ -243,15 +363,17 @@ export async function processCheckoutOrder(params: ProcessOrderParams): Promise<
       return cached.result as OrderCreationResult;
     }
 
-    // 2. Fetch Authoritative Products & Validate Stock (no deduction yet)
-    let subtotal = 0;
+    // 2. Fetch Authoritative Products & Validate Stock (PRICE-1, STOCK-1)
+    const orderLineInputs: OrderLineInput[] = [];
     const verifiedOrderItems: Array<{
       productId: string;
       variantId?: string;
       name: string;
       qty: number;
       unitPrice: number;
+      unitPricePaise: number;
       lineTotal: number;
+      lineTotalPaise: number;
     }> = [];
 
     for (const itemInput of payload.items) {
@@ -263,39 +385,88 @@ export async function processCheckoutOrder(params: ProcessOrderParams): Promise<
         );
       }
 
-      const lineTotal = product.price * itemInput.qty;
-      subtotal += lineTotal;
-
+      const unitPricePaise = product.pricePaise || Math.round(product.price * 100);
+      const lineTotalPaise = unitPricePaise * itemInput.qty;
       const itemName = product.selectedVariant
         ? `${product.name} (${product.selectedVariant.label})`
         : product.name;
+      const variantId = itemInput.variantId || (product.selectedVariant ? product.selectedVariant.id : product.id);
+
+      orderLineInputs.push({
+        productId: product.id,
+        variantId,
+        title: itemName,
+        unitPricePaise,
+        qty: itemInput.qty,
+        taxRatePercent: product.taxRatePercent || 12,
+        hsn: product.hsn || '20019000'
+      });
 
       verifiedOrderItems.push({
         productId: product.id,
-        ...(itemInput.variantId ? { variantId: itemInput.variantId } : {}),
+        ...(variantId ? { variantId } : {}),
         name: itemName,
         qty: itemInput.qty,
-        unitPrice: product.price,
-        lineTotal
+        unitPrice: unitPricePaise / 100,
+        unitPricePaise,
+        lineTotal: lineTotalPaise / 100,
+        lineTotalPaise
       });
     }
 
-    // 3. Server-Side Pricing
-    const shippingFee = subtotal >= 500 ? 0 : 50;
-    const total = subtotal + shippingFee;
+    // 3. Fetch delivery zones configuration from config/deliveryZones
+    let deliveryZones: DeliveryZoneConfig | undefined = undefined;
+    try {
+      const zonesSnap = await transaction.get(db.collection('config').doc('deliveryZones'));
+      if (zonesSnap.exists) {
+        deliveryZones = zonesSnap.data() as DeliveryZoneConfig;
+      }
+    } catch {
+      // Fallback
+    }
 
-    // 4. Guest Secret
+    // 4. Fetch discount code if provided (DISC-1, collection: discounts)
+    let discountCodeDoc: DiscountDoc | null = null;
+    if (payload.discountCode) {
+      const codeUpper = payload.discountCode.toUpperCase();
+      const discSnap = await transaction.get(db.collection('discounts').doc(codeUpper));
+      if (discSnap.exists) {
+        discountCodeDoc = discSnap.data() as DiscountDoc;
+      }
+    }
+
+    // 5. Authoritative Pricing via priceOrder (PRICE-1..9, MONEY-1)
+    const priced = priceOrder({
+      items: orderLineInputs,
+      pincode: payload.pincode || '',
+      discountCodeDoc,
+      deliveryZones
+    });
+
+    // 6. Guest Secret
     let guestSecretDetails;
     if (!userId) {
       guestSecretDetails = generateGuestAccessSecret();
     }
 
-    // 5. Create Order with PAYMENT_INITIATED status
-    const newOrderRef = db.collection('orders').doc();
-    const orderId = newOrderRef.id;
+    // 7. Generate Cryptographic Order ID
+    const orderId = generateOrderId();
+    const newOrderRef = db.collection('orders').doc(orderId);
 
-    const initialPaymentStatus = 'PAYMENT_INITIATED';
-    const initialOrderStatus = 'AwaitingPayment';
+    // 8. Redeem Coupon in Transaction if present (DISC-2)
+    if (payload.discountCode && priced.discountPaise > 0) {
+      await validateAndRedeemCouponInTransaction(
+        transaction,
+        payload.discountCode,
+        orderId,
+        priced.subtotalPaise,
+        userId,
+        payload.phone
+      );
+    }
+
+    const initialPaymentStatus = 'UNPAID';
+    const initialOrderStatus = 'PLACED';
 
     const itemNames = verifiedOrderItems.map(item => item.name);
     const itemSummary = verifiedOrderItems.map(item => `${item.name} × ${item.qty}`).join(', ');
@@ -310,27 +481,46 @@ export async function processCheckoutOrder(params: ProcessOrderParams): Promise<
       itemNames,
       itemSummary,
       address: payload.address,
+      pincode: payload.pincode || null,
       items: verifiedOrderItems,
-      subtotal,
-      shippingFee,
-      total,
-      paymentMethod: 'Online Payment',
+      lines: priced.lines,          // Complete frozen line snapshot
+      subtotalPaise: priced.subtotalPaise,
+      discountPaise: priced.discountPaise,
+      deliveryFeePaise: priced.shippingPaise,
+      taxPaise: priced.taxPaise,
+      totalPaise: priced.totalPaise,
+      subtotal: priced.subtotalPaise / 100,
+      shippingFee: priced.shippingPaise / 100,
+      total: priced.totalPaise / 100,
+      discount: priced.discountPaise / 100,
+      needsReview: priced.needsReview,
+      paymentMethod: payload.paymentMethod || 'Online Payment',
       paymentStatus: initialPaymentStatus,
       status: initialOrderStatus,
+      orderStatus: initialOrderStatus,
+      version: 1,
       guestSecretHash: guestSecretDetails ? guestSecretDetails.hashedSecret : null,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: new Date().toISOString()
     };
 
     transaction.set(newOrderRef, orderDocData);
 
-    // 6. Store Idempotency Record
+    // 9. Store Idempotency Record
     const resultPayload: OrderCreationResult = {
       orderId,
-      total,
-      subtotal,
-      shippingFee,
+      totalPaise: priced.totalPaise,
+      subtotalPaise: priced.subtotalPaise,
+      deliveryFeePaise: priced.shippingPaise,
+      taxPaise: priced.taxPaise,
+      discountPaise: priced.discountPaise,
+      total: priced.totalPaise / 100,
+      subtotal: priced.subtotalPaise / 100,
+      shippingFee: priced.shippingPaise / 100,
       status: initialOrderStatus,
+      orderStatus: initialOrderStatus,
       paymentStatus: initialPaymentStatus,
+      needsReview: priced.needsReview,
       ...(guestSecretDetails ? { guestAccessSecret: guestSecretDetails.plainSecret } : {}),
       createdAt: new Date().toISOString()
     };
@@ -343,7 +533,18 @@ export async function processCheckoutOrder(params: ProcessOrderParams): Promise<
       result: resultPayload
     });
 
-    logger.info('Checkout order created, awaiting payment', { orderId, userId: userId || 'GUEST', total });
+    if (idempotencyRef.parent.id !== 'idempotencyKeys') {
+      const primaryKeyRef = db.collection('idempotencyKeys').doc(payload.idempotencyKey);
+      transaction.set(primaryKeyRef, {
+        ownerId,
+        action,
+        requestHash,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        result: resultPayload
+      });
+    }
+
+    logger.info('Checkout order created, awaiting payment', { orderId, userId: userId || 'GUEST', totalPaise: priced.totalPaise });
 
     return resultPayload;
   });
@@ -470,9 +671,18 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
   const requestHash = computePayloadHash(payload);
 
   return db.runTransaction(async (transaction) => {
-    // 1. Idempotency Check
-    const idempotencyRef = db.collection('idempotency').doc(payload.idempotencyKey);
-    const idempotencySnap = await transaction.get(idempotencyRef);
+    // 1. Idempotency Check (Collection: idempotencyKeys per Decision D13)
+    let idempotencyRef = db.collection('idempotencyKeys').doc(payload.idempotencyKey);
+    let idempotencySnap = await transaction.get(idempotencyRef);
+
+    if (!idempotencySnap.exists) {
+      const legacyRef = db.collection('idempotency').doc(payload.idempotencyKey);
+      const legacySnap = await transaction.get(legacyRef);
+      if (legacySnap.exists) {
+        idempotencyRef = legacyRef;
+        idempotencySnap = legacySnap;
+      }
+    }
 
     if (idempotencySnap.exists) {
       const cached = idempotencySnap.data()!;
@@ -484,15 +694,17 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
       return cached.result as WhatsAppOrderResult;
     }
 
-    // 2. Fetch Authoritative Products & Validate Stock
-    let subtotal = 0;
+    // 2. Fetch Authoritative Products & Validate Stock (PRICE-1, STOCK-1)
+    const orderLineInputs: OrderLineInput[] = [];
     const verifiedOrderItems: Array<{
       productId: string;
       variantId?: string;
       name: string;
       qty: number;
       unitPrice: number;
+      unitPricePaise: number;
       lineTotal: number;
+      lineTotalPaise: number;
     }> = [];
 
     for (const itemInput of payload.items) {
@@ -504,39 +716,76 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
         );
       }
 
-      const lineTotal = product.price * itemInput.qty;
-      subtotal += lineTotal;
-
+      const unitPricePaise = product.pricePaise || Math.round(product.price * 100);
+      const lineTotalPaise = unitPricePaise * itemInput.qty;
       const itemName = product.selectedVariant
         ? `${product.name} (${product.selectedVariant.label})`
         : product.name;
+      const variantId = itemInput.variantId || (product.selectedVariant ? product.selectedVariant.id : product.id);
+
+      orderLineInputs.push({
+        productId: product.id,
+        variantId,
+        title: itemName,
+        unitPricePaise,
+        qty: itemInput.qty,
+        taxRatePercent: product.taxRatePercent || 12,
+        hsn: product.hsn || '20019000'
+      });
 
       verifiedOrderItems.push({
         productId: product.id,
-        ...(itemInput.variantId ? { variantId: itemInput.variantId } : {}),
+        ...(variantId ? { variantId } : {}),
         name: itemName,
         qty: itemInput.qty,
-        unitPrice: product.price,
-        lineTotal
+        unitPrice: unitPricePaise / 100,
+        unitPricePaise,
+        lineTotal: lineTotalPaise / 100,
+        lineTotalPaise
       });
     }
 
-    // 3. Authoritative Pricing
-    const shippingFee = subtotal >= 500 ? 0 : 50;
-    const total = subtotal + shippingFee;
+    // 3. Fetch delivery zones configuration
+    let deliveryZones: DeliveryZoneConfig | undefined = undefined;
+    try {
+      const zonesSnap = await transaction.get(db.collection('config').doc('deliveryZones'));
+      if (zonesSnap.exists) {
+        deliveryZones = zonesSnap.data() as DeliveryZoneConfig;
+      }
+    } catch {
+      // Fallback
+    }
 
-    // 4. Guest Secret
+    // 4. Fetch discount code if provided (DISC-1, collection: discounts)
+    let discountCodeDoc: DiscountDoc | null = null;
+    if (payload.discountCode) {
+      const codeUpper = payload.discountCode.toUpperCase();
+      const discSnap = await transaction.get(db.collection('discounts').doc(codeUpper));
+      if (discSnap.exists) {
+        discountCodeDoc = discSnap.data() as DiscountDoc;
+      }
+    }
+
+    // 5. Authoritative Pricing via priceOrder
+    const priced = priceOrder({
+      items: orderLineInputs,
+      pincode: payload.pincode || '',
+      discountCodeDoc,
+      deliveryZones
+    });
+
+    // 6. Guest Secret
     let guestSecretDetails;
     if (!userId) {
       guestSecretDetails = generateGuestAccessSecret();
     }
 
-    // 5. Construct Order Document
-    const newOrderRef = db.collection('orders').doc();
-    const orderId = newOrderRef.id;
+    // 7. Generate Cryptographic Order ID
+    const orderId = generateOrderId();
+    const newOrderRef = db.collection('orders').doc(orderId);
 
-    const initialPaymentStatus = 'PAYMENT_PENDING';
-    const initialOrderStatus = 'AWAITING_PAYMENT';
+    const initialPaymentStatus = 'UNPAID';
+    const initialOrderStatus = 'PLACED';
 
     const itemNames = verifiedOrderItems.map(item => item.name);
     const itemSummary = verifiedOrderItems.map(item => `${item.name} × ${item.qty}`).join(', ');
@@ -560,14 +809,25 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
       pincode: payload.pincode || null,
       note: payload.note || null,
       items: verifiedOrderItems,
-      subtotal,
-      shippingFee,
-      total,
+      lines: priced.lines,
+      subtotalPaise: priced.subtotalPaise,
+      discountPaise: priced.discountPaise,
+      deliveryFeePaise: priced.shippingPaise,
+      taxPaise: priced.taxPaise,
+      totalPaise: priced.totalPaise,
+      subtotal: priced.subtotalPaise / 100,
+      shippingFee: priced.shippingPaise / 100,
+      total: priced.totalPaise / 100,
+      discount: priced.discountPaise / 100,
+      needsReview: priced.needsReview,
       paymentMethod: payload.paymentMethod || 'WhatsApp-Assisted Ordering',
       paymentStatus: initialPaymentStatus,
       status: initialOrderStatus,
+      orderStatus: initialOrderStatus,
+      version: 1,
       guestSecretHash: guestSecretDetails ? guestSecretDetails.hashedSecret : null,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: new Date().toISOString()
     };
 
     // Write Order Document
@@ -577,9 +837,9 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
     const whatsappMessage = generateWhatsAppPrefilledMessage({
       publicOrderId: orderId,
       items: verifiedOrderItems,
-      subtotal,
-      shippingFee,
-      total,
+      subtotal: priced.subtotalPaise / 100,
+      shippingFee: priced.shippingPaise / 100,
+      total: priced.totalPaise / 100,
       customerName: payload.name,
       phone: payload.phone,
       email: payload.email,
@@ -599,11 +859,18 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
 
     const resultPayload: WhatsAppOrderResult = {
       orderId,
-      total,
-      subtotal,
-      shippingFee,
+      totalPaise: priced.totalPaise,
+      subtotalPaise: priced.subtotalPaise,
+      deliveryFeePaise: priced.shippingPaise,
+      taxPaise: priced.taxPaise,
+      discountPaise: priced.discountPaise,
+      total: priced.totalPaise / 100,
+      subtotal: priced.subtotalPaise / 100,
+      shippingFee: priced.shippingPaise / 100,
       status: initialOrderStatus,
+      orderStatus: initialOrderStatus,
       paymentStatus: initialPaymentStatus,
+      needsReview: priced.needsReview,
       whatsappUrl,
       whatsappMessage,
       ...(guestSecretDetails ? { guestAccessSecret: guestSecretDetails.plainSecret } : {}),
@@ -618,10 +885,21 @@ export async function processWhatsAppOrderRequest(params: ProcessOrderParams): P
       result: resultPayload
     });
 
+    if (idempotencyRef.parent.id !== 'idempotencyKeys') {
+      const primaryKeyRef = db.collection('idempotencyKeys').doc(payload.idempotencyKey);
+      transaction.set(primaryKeyRef, {
+        ownerId,
+        action,
+        requestHash,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        result: resultPayload
+      });
+    }
+
     logger.info('WhatsApp order request created successfully', {
       orderId,
       userId: userId || 'GUEST',
-      total
+      totalPaise: priced.totalPaise
     });
 
     return resultPayload;

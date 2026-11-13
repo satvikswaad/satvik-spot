@@ -10,6 +10,8 @@
  */
 
 import { Channel } from '../shared';
+import { db, admin } from '../config/firebase';
+import { Transaction } from 'firebase-admin/firestore';
 
 export interface DailyStatsByChannel {
   revenuePaise: number;
@@ -115,4 +117,69 @@ export function applyRefundToDailyStats(
   updated.revenuePaise = Math.max(0, updated.revenuePaise - refundPaise);
   updated.refundedPaise = (updated.refundedPaise || 0) + refundPaise;
   return updated;
+}
+
+/**
+ * Updates stats_daily atomically in a Firestore transaction when a sale is placed/settled. (INV-5, DB-5)
+ */
+export async function recordSaleInDailyStatsInTransaction(
+  transaction: Transaction,
+  sale: {
+    totalPaise: number;
+    channel: Channel;
+    unitsCount: number;
+    timestamp?: Date;
+  }
+): Promise<void> {
+  const dateObj = sale.timestamp || new Date();
+  const dateKey = formatDailyDateKey(dateObj);
+  // IST hour (UTC + 5.5 hours)
+  const istOffsetMs = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(dateObj.getTime() + istOffsetMs);
+  const hour = istDate.getUTCHours();
+
+  const statsDocRef = db.collection('stats_daily').doc(dateKey);
+  const snap = await transaction.get(statsDocRef);
+
+  let currentStats: DailyStatsRecord;
+  if (!snap.exists) {
+    currentStats = createInitialDailyStatsRecord(dateKey);
+  } else {
+    currentStats = snap.data() as DailyStatsRecord;
+  }
+
+  const updatedStats = applySaleToDailyStats(currentStats, {
+    totalPaise: sale.totalPaise,
+    channel: sale.channel,
+    hour,
+    unitsCount: sale.unitsCount
+  });
+
+  transaction.set(statsDocRef, {
+    ...updatedStats,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+/**
+ * Updates stats_daily atomically in a Firestore transaction when a refund is processed. (INV-5, DB-7)
+ */
+export async function recordRefundInDailyStatsInTransaction(
+  transaction: Transaction,
+  refundPaise: number,
+  dateKey?: string
+): Promise<void> {
+  const targetKey = dateKey || formatDailyDateKey();
+  const statsDocRef = db.collection('stats_daily').doc(targetKey);
+  const snap = await transaction.get(statsDocRef);
+
+  if (snap.exists) {
+    const currentStats = snap.data() as DailyStatsRecord;
+    const updatedStats = applyRefundToDailyStats(currentStats, refundPaise);
+    transaction.update(statsDocRef, {
+      revenuePaise: updatedStats.revenuePaise,
+      refundedPaise: updatedStats.refundedPaise,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+  }
 }

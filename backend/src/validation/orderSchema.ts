@@ -222,3 +222,84 @@ export function validateGuestLookupPayload(body: any): GuestLookupPayload {
     guestAccessSecret: guestAccessSecret.trim()
   };
 }
+
+export interface QuotePayload {
+  items: OrderItemInput[];
+  pincode?: string;
+  discountCode?: string;
+}
+
+const ALLOWED_QUOTE_KEYS = new Set(['items', 'pincode', 'discountCode']);
+
+/**
+ * Validates payload for calculating authoritative quotes. (PRICE-1..9, MONEY-6)
+ * Strictly disallows unexpected/unknown keys (such as client-supplied prices, totals, or discounts).
+ */
+export function validateQuotePayload(body: any): QuotePayload {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new ValidationError('Invalid request payload format');
+  }
+
+  // Reject client-supplied price, total, discount, etc. (MONEY-6)
+  const keys = Object.keys(body);
+  for (const k of keys) {
+    if (!ALLOWED_QUOTE_KEYS.has(k)) {
+      throw new ValidationError(`Forbidden or unexpected field in quote request: '${k}'. Client must not supply financial fields (MONEY-6).`);
+    }
+  }
+
+  const { items, pincode, discountCode } = body;
+
+  if (!Array.isArray(items) || items.length === 0 || items.length > 20) {
+    throw new ValidationError('Quote must contain between 1 and 20 items');
+  }
+
+  const validatedItems: OrderItemInput[] = [];
+  for (const item of items) {
+    if (!item || typeof item !== 'object') {
+      throw new ValidationError('Invalid item object in quote list');
+    }
+    const itemKeys = Object.keys(item);
+    for (const ik of itemKeys) {
+      if (ik !== 'productId' && ik !== 'qty' && ik !== 'variantId') {
+        throw new ValidationError(`Forbidden field in quote item object: '${ik}'. Client must not supply financial fields (MONEY-6).`);
+      }
+    }
+
+    if (typeof item.productId !== 'string' || item.productId.trim().length === 0) {
+      throw new ValidationError('Each item must specify a valid productId');
+    }
+
+    if (typeof item.qty !== 'number' || !Number.isInteger(item.qty) || item.qty < 1 || item.qty > 10) {
+      throw new ValidationError('Item quantity must be an integer between 1 and 10');
+    }
+
+    let variantId: string | undefined = undefined;
+    if (item.variantId !== undefined && item.variantId !== null) {
+      if (typeof item.variantId !== 'string' || item.variantId.trim().length === 0 || item.variantId.trim().length > 64 || !/^[a-zA-Z0-9_-]+$/.test(item.variantId.trim())) {
+        throw new ValidationError("Invalid 'variantId' format");
+      }
+      variantId = item.variantId.trim();
+    }
+
+    validatedItems.push({
+      productId: item.productId.trim(),
+      qty: item.qty,
+      ...(variantId ? { variantId } : {})
+    });
+  }
+
+  if (pincode !== undefined && typeof pincode !== 'string') {
+    throw new ValidationError('Invalid pincode format');
+  }
+
+  if (discountCode !== undefined && (typeof discountCode !== 'string' || discountCode.trim().length > 32)) {
+    throw new ValidationError('Invalid discountCode format');
+  }
+
+  return {
+    items: validatedItems,
+    pincode: pincode ? pincode.trim() : undefined,
+    discountCode: discountCode ? discountCode.trim() : undefined
+  };
+}

@@ -1228,7 +1228,7 @@ header.site-header {
     margin: 0 auto;
     padding: 24px 60px;
     display: grid;
-    grid-template-columns: 440px 1fr;
+    grid-template-columns: 480px 1fr;
     gap: 48px;
     align-items: center;
     box-sizing: border-box;
@@ -1269,6 +1269,7 @@ header.site-header {
 .hero-diwali-img {
     width: 100%;
     height: auto;
+    max-height: 380px;
     aspect-ratio: 4 / 3;
     object-fit: cover;
     display: block;
@@ -1395,6 +1396,7 @@ header.site-header {
 .hero-diwali-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 16px;
     flex-wrap: wrap;
 }
@@ -1402,14 +1404,15 @@ header.site-header {
 .hero-diwali-cart-btn {
     background: linear-gradient(135deg, #1F4A2C 0%, #2A683E 100%) !important;
     color: #FFFFFF !important;
-    padding: 12px 26px !important;
-    font-size: 1rem !important;
+    padding: 10px 22px !important;
+    font-size: 0.95rem !important;
     font-weight: 800 !important;
-    border-radius: 12px !important;
+    border-radius: 20px !important;
     border: none !important;
     display: inline-flex !important;
+    width: auto !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 8px !important;
     cursor: pointer !important;
     box-shadow: 0 4px 14px rgba(31, 74, 44, 0.28) !important;
     transition: all 0.22s ease !important;
@@ -2221,6 +2224,28 @@ html, body {
 /* MOBILE BOTTOM NAVIGATION BAR */
 .mobile-bottom-nav {
     display: none; /* Hidden on desktop */
+    transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.mobile-bottom-nav.footer-theme {
+    background: rgba(21, 58, 33, 0.98) !important;
+    border-top: 2px solid #D4A017 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+.mobile-bottom-nav.footer-theme .bottom-nav-item {
+    color: #E5DEC9 !important;
+}
+.mobile-bottom-nav.footer-theme .bottom-nav-item.active {
+    color: #D4A017 !important;
+}
+.mobile-bottom-nav.footer-theme .bottom-nav-label {
+    color: inherit !important;
+}
+.mobile-bottom-nav.footer-theme .bottom-nav-item .bottom-nav-icon {
+    color: inherit !important;
+}
+.mobile-bottom-nav.footer-theme .bottom-nav-item:hover {
+    color: #F8E7BE !important;
 }
 
 @media (max-width: 1200px) {
@@ -2232,7 +2257,21 @@ html, body {
 
 @media (max-width: 768px) {
     body {
-        padding-bottom: 70px !important; /* Reserve space for bottom navigation bar */
+        padding-bottom: 0 !important; /* Space above fixed bottom navigation handled by footer padding */
+    }
+
+    footer.site-footer {
+        padding-bottom: calc(75px + env(safe-area-inset-bottom)) !important;
+    }
+
+    footer.site-footer .footer-bottom-bar {
+        padding-bottom: calc(15px + env(safe-area-inset-bottom)) !important;
+    }
+
+    body:not(:has(footer.site-footer)) main,
+    body:not(:has(footer.site-footer)) .main-content,
+    body:not(:has(footer.site-footer)) .container:last-of-type {
+        padding-bottom: calc(75px + env(safe-area-inset-bottom)) !important;
     }
 
     header.site-header {
@@ -2321,9 +2360,9 @@ html, body {
     .hero-slider-container {
         display: block !important;
         width: 100% !important;
-        height: 250px !important;
-        min-height: 240px !important;
-        max-height: 260px !important;
+        height: 275px !important;
+        min-height: 270px !important;
+        max-height: 285px !important;
         aspect-ratio: unset !important;
         position: relative !important;
         overflow: hidden !important;
@@ -2338,8 +2377,8 @@ html, body {
     }
     .hero-diwali-slide-inner {
         display: grid !important;
-        grid-template-columns: 125px 1fr !important;
-        gap: 10px !important;
+        grid-template-columns: 145px 1fr !important;
+        gap: 12px !important;
         padding: 8px 12px !important;
         height: 100% !important;
         align-items: center !important;
@@ -2356,14 +2395,16 @@ html, body {
         display: none !important;
     }
     .hero-diwali-img-card {
-        border-radius: 12px !important;
+        border-radius: 14px !important;
         border-width: 1.5px !important;
-        max-height: 155px !important;
+        height: 165px !important;
+        max-height: 165px !important;
         box-shadow: 0 4px 12px rgba(212, 160, 23, 0.2) !important;
+        overflow: hidden !important;
     }
     .hero-diwali-img {
         width: 100% !important;
-        height: 145px !important;
+        height: 100% !important;
         aspect-ratio: unset !important;
         object-fit: cover !important;
     }
@@ -2405,20 +2446,31 @@ html, body {
     }
     .hero-diwali-actions {
         width: 100% !important;
-        gap: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
     }
     .hero-diwali-cart-btn {
-        width: 100% !important;
-        padding: 7px 10px !important;
-        font-size: 0.78rem !important;
-        min-height: 34px !important;
-        justify-content: center !important;
-        border-radius: 8px !important;
+        display: inline-flex !important;
+        width: auto !important;
+        padding: 8px 18px !important;
+        font-size: 0.85rem !important;
+        font-weight: 800 !important;
+        border-radius: 20px !important;
+        background: linear-gradient(135deg, #1F4A2C 0%, #2A683E 100%) !important;
+        box-shadow: 0 4px 12px rgba(31, 74, 44, 0.25) !important;
+        color: #FFFFFF !important;
         gap: 6px !important;
+        min-height: 34px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: none !important;
+        cursor: pointer !important;
     }
     .hero-diwali-cart-btn svg {
-        width: 15px !important;
-        height: 15px !important;
+        width: 16px !important;
+        height: 16px !important;
     }
     .mobile-hero-card {
         display: none !important;
@@ -2751,6 +2803,7 @@ html, body {
         align-items: center !important;
         padding: 2px 0 !important;
         box-sizing: border-box !important;
+        transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
     }
 
     .bottom-nav-item {
@@ -6135,10 +6188,11 @@ footer.site-footer {
     z-index: 10;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     footer.site-footer {
         margin-top: 20px !important;
-        padding: 18px 0 76px !important; /* Extra bottom padding so mobile bottom nav doesn't cover content */
+        padding: 18px 0 calc(75px + env(safe-area-inset-bottom)) !important; /* Extra bottom padding so mobile bottom nav doesn't cover content */
+        padding-bottom: calc(75px + env(safe-area-inset-bottom)) !important;
     }
 }
 
@@ -6630,6 +6684,7 @@ footer.site-footer .footer-grid {
     .footer-bottom-bar {
         margin-top: 10px;
         padding-top: 8px;
+        padding-bottom: calc(15px + env(safe-area-inset-bottom)) !important;
         gap: 3px;
     }
     .footer-bottom-copy {
@@ -6659,7 +6714,8 @@ body.shop-page,
 .ref-shop-section {
     background-color: #FAF5EB;
     position: relative;
-    padding: 32px 0 60px 0;
+    padding: 10px 0 60px 0;
+    padding-top: 10px !important;
     overflow: hidden;
 }
 
@@ -6685,19 +6741,16 @@ body.shop-page,
 }
 
 .ref-shop-pick-favourite {
-    margin-bottom: 8px;
-    padding-left: 2px;
-    display: block;
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
 }
 
 .ref-favourite-doodle-img {
-    width: 125px;
-    height: auto;
-    display: block;
-    user-select: none;
-    pointer-events: none;
-    animation: doodleBounce 3.2s ease-in-out infinite;
-    transform-origin: top left;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
 @keyframes doodleBounce {
@@ -7371,10 +7424,12 @@ body.shop-page,
 @media (max-width: 960px) {
     .ref-shop-layout {
         flex-direction: column;
-        gap: 20px;
+        gap: 12px;
     }
     .ref-shop-left-col {
         width: 100%;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
     }
     .ref-sidebar-bottom-leaf {
         display: none;
@@ -9871,7 +9926,21 @@ input:checked + .slider:before {
     }
 
     body {
-        padding-bottom: 76px !important; /* Space above fixed bottom navigation */
+        padding-bottom: 0 !important; /* Space above fixed bottom navigation handled by footer padding */
+    }
+
+    footer.site-footer {
+        padding-bottom: calc(75px + env(safe-area-inset-bottom)) !important;
+    }
+
+    footer.site-footer .footer-bottom-bar {
+        padding-bottom: calc(15px + env(safe-area-inset-bottom)) !important;
+    }
+
+    body:not(:has(footer.site-footer)) main,
+    body:not(:has(footer.site-footer)) .main-content,
+    body:not(:has(footer.site-footer)) .container:last-of-type {
+        padding-bottom: calc(75px + env(safe-area-inset-bottom)) !important;
     }
 
     img, svg, video {
@@ -10019,10 +10088,10 @@ input:checked + .slider:before {
 
     .hero-slider-container {
         width: 100% !important;
-        aspect-ratio: 16 / 9 !important;
-        height: auto !important;
-        max-height: unset !important;
-        min-height: unset !important;
+        height: 275px !important;
+        min-height: 270px !important;
+        max-height: 285px !important;
+        aspect-ratio: unset !important;
     }
 
     .hero-slide-img {
@@ -10314,8 +10383,9 @@ input:checked + .slider:before {
 
     /* 8. Dedicated Catalog Grid & Horizontal Filters (products.html) */
     .ref-sidebar {
-        padding: 8px 10px !important;
-        margin-bottom: 12px !important;
+        padding: 0 8px !important;
+        margin-top: 0 !important;
+        margin-bottom: 8px !important;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
@@ -10328,7 +10398,7 @@ input:checked + .slider:before {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         gap: 8px !important;
-        padding: 4px 2px 10px !important;
+        padding: 2px 2px 6px !important;
         scrollbar-width: none !important;
         width: 100% !important;
         align-items: center !important;
@@ -10673,6 +10743,29 @@ input:checked + .slider:before {
         align-items: center !important;
         justify-content: space-around !important;
         padding: 0 4px calc(env(safe-area-inset-bottom, 0px)) !important;
+        transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    /* DYNAMIC MOBILE BOTTOM NAVIGATION FOOTER THEME */
+    .mobile-bottom-nav.footer-theme {
+        background: rgba(21, 58, 33, 0.98) !important;
+        border-top: 2px solid #D4A017 !important;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+    .mobile-bottom-nav.footer-theme .bottom-nav-item {
+        color: #E5DEC9 !important;
+    }
+    .mobile-bottom-nav.footer-theme .bottom-nav-item.active {
+        color: #D4A017 !important;
+    }
+    .mobile-bottom-nav.footer-theme .bottom-nav-label {
+        color: inherit !important;
+    }
+    .mobile-bottom-nav.footer-theme .bottom-nav-item .bottom-nav-icon {
+        color: inherit !important;
+    }
+    .mobile-bottom-nav.footer-theme .bottom-nav-item:hover {
+        color: #F8E7BE !important;
     }
 
     .bottom-nav-item {
@@ -12269,7 +12362,8 @@ input:checked + .slider:before {
    ========================================================================== */
 .breadcrumb-container {
     background: #FAF5EB;
-    padding: 14px 24px;
+    padding: 10px 24px;
+    margin-bottom: 8px !important;
     position: relative;
     z-index: 10;
     border-bottom: 1px solid rgba(139, 69, 19, 0.08);
@@ -12286,6 +12380,10 @@ input:checked + .slider:before {
     padding-left: 72px;
 }
 @media (max-width: 768px) {
+    .breadcrumb-container {
+        padding: 8px 16px;
+        margin-bottom: 6px !important;
+    }
     .breadcrumb-inner {
         padding-left: 54px;
     }

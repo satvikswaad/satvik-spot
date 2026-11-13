@@ -29,7 +29,7 @@ export function createRouteRateLimiter(options: { windowMs: number; maxRequests:
     const windowBucket = Math.floor(now / windowMs);
 
     const docId = `${clientIp}_${routeIdentifier}_${windowBucket}`;
-    const rateLimitRef = db.collection('rate_limits').doc(docId);
+    const rateLimitRef = db.collection('rateLimits').doc(docId);
 
     try {
       let currentCount = 0;
@@ -140,6 +140,19 @@ export const authRateLimiter = createRouteRateLimiter({
   windowMs: 60 * 1000,
   maxRequests: 20,
   routeIdentifier: 'auth'
+});
+
+export const quoteRateLimiter = createRouteRateLimiter({
+  windowMs: 60 * 1000,
+  maxRequests: 30,
+  routeIdentifier: 'quotes'
+});
+
+// DISC-5: Max 10 attempts per 10 minutes per IP/user
+export const discountRateLimiter = createRouteRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  maxRequests: 10,
+  routeIdentifier: 'discounts'
 });
 
 

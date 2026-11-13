@@ -175,6 +175,7 @@ function runInitializers() {
     safeRun(() => initScrollReveal(), 'initScrollReveal');
     safeRun(() => initScrollToTop(), 'initScrollToTop');
     safeRun(() => initMobileNav(), 'initMobileNav');
+    safeRun(() => initDynamicBottomNav(), 'initDynamicBottomNav');
     safeRun(() => initFaqSearch(), 'initFaqSearch');
     safeRun(() => initProductsSort(), 'initProductsSort');
     safeRun(() => initReviewsData(), 'initReviewsData');
@@ -729,6 +730,40 @@ function initMobileNav() {
 
         const links = navOverlay.querySelectorAll('a:not(#mobile-nav-profile)');
         links.forEach(l => l.addEventListener('click', closeMobileMenu));
+    }
+}
+
+/* DYNAMIC BOTTOM NAVIGATION BAR THEME DETECTION */
+function initDynamicBottomNav() {
+    const bottomNav = document.querySelector('.mobile-bottom-nav');
+    const footer = document.querySelector('footer.site-footer') || document.querySelector('footer');
+    if (!bottomNav || !footer) return;
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    bottomNav.classList.add('footer-theme');
+                } else {
+                    bottomNav.classList.remove('footer-theme');
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0.05
+        });
+        observer.observe(footer);
+    } else {
+        const checkFooterScroll = () => {
+            const rect = footer.getBoundingClientRect();
+            if (rect.top < window.innerHeight) {
+                bottomNav.classList.add('footer-theme');
+            } else {
+                bottomNav.classList.remove('footer-theme');
+            }
+        };
+        window.addEventListener('scroll', checkFooterScroll, { passive: true });
+        checkFooterScroll();
     }
 }
 
