@@ -2,7 +2,7 @@
 
 > **Branch**: `staging`  
 > **Base Commit**: `2f9578b` (`before-remediation`)  
-> **Current Status**: In Progress — Wave A: Containment Initiated  
+> **Current Status**: In Progress — Wave B Verified; Initiating Wave C: Wiring (Tickets T-016 to T-021)  
 
 ---
 
@@ -16,7 +16,7 @@
 | **T-012** | A | Payments | Verified | `STATE-5, 4.3: CANCELLED order cannot be revived on payment - sets REFUND_PENDING with PAYMENT_AFTER_CANCEL` | `backend/tests/paymentsSettlement.spec.ts:262-293` | Terminal state CANCELLED preserved; REFUND_PENDING recorded |
 | **T-013** | A | Orders | Verified | `AUTH-3: Express App POST /api/v1/orders/guest-lookup rejects invalid secret with HTTP 404 (NEVER 403)`, `AUTH-3: Express App POST /api/v1/orders/submit-utr rejects invalid secret on guest order with HTTP 404` | `backend/tests/securityAuth.spec.ts:135-245` | Real Express integration tests; assertOrderOwnership wired; timingSafeEqual enforced |
 | **T-014** | A | Security | Verified | `ARCH-6: Express App drops requests to /api missing X-Origin-Auth when ORIGIN_GATE_ENABLED=true`, `PAY-11: Rejects Razorpay test key in production` | `backend/tests/securityAuth.spec.ts:72-94, 260-295` | Real Express integration tests; validateStartupConfig tests; ResourceNotFoundError extends AppError |
-| **T-015** | B | Architect | Verified | `STATE-1..6: Table-Driven Transitions & Canonical transition() Function (40/40 passed)` | `backend/tests/sharedFoundation.spec.ts:167-278` | Spec v2.6, SHA-256 verified, transition() with compare-and-set & orders/{id}/events append-only log |
+| **T-015** | B | Architect | Verified | `STATE-1..6: Table-Driven Transitions & Canonical transition() Function (43/43 passed)`, `sharedFoundation.spec.ts:342-430` | Independent QA Review (`docs/WAVE_B_REVIEW.md`) | Spec v2.6, SHA-256 verified, transition() with compare-and-set & orders/{id}/events append-only log; BUG-B-01/02/03 resolved |
 | **T-016** | C | Orders | Pending | - | - | Quotes API, priceOrder wiring, paise enforcement, MONEY-6 |
 | **T-017** | C | Orders | Pending | - | - | DISC-2..5 redemption transactions & limits |
 | **T-018** | C | Orders | Pending | - | - | Public catalog stock concealment & batch fields |

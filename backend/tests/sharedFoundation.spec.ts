@@ -371,6 +371,142 @@ describe('Wave 1 — Shared Foundation & Domain Rules (Architect)', () => {
           })
         ).rejects.toThrow(TransitionError);
       });
+
+      it('STATE-6, AUTH-5: transition() and validateAndCalculateTransition() throw 403 when authTimestampSeconds is undefined on privileged transition (BUG-B-01)', async () => {
+        const storedOrder = {
+          orderStatus: 'CONFIRMED',
+          paymentStatus: 'PAID',
+          version: 2
+        };
+
+        const mockTxn = {
+          get: async () => ({
+            exists: true,
+            data: () => ({ ...storedOrder })
+          }),
+          update: jest.fn(),
+          create: jest.fn()
+        };
+
+        const mockDb = {
+          collection: () => ({ doc: () => ({ collection: () => ({ doc: () => ({}) }) }) }),
+          runTransaction: async (fn: any) => fn(mockTxn)
+        };
+
+        // 1. Privileged CONFIRMED -> CANCELLED without authTimestampSeconds throws 403
+        await expect(
+          transition(mockDb, {
+            orderId: 'SS-ORDER-1234',
+            targetOrderStatus: 'CANCELLED',
+            actor: { uid: 'admin_1', role: 'admin_owner' }, // missing authTimestampSeconds
+            reason: 'Missing auth timestamp'
+          })
+        ).rejects.toThrow(TransitionError);
+
+        expect(() => {
+          validateAndCalculateTransition({
+            currentOrderStatus: 'CONFIRMED',
+            targetOrderStatus: 'CANCELLED',
+            actor: { uid: 'admin_1', role: 'admin_owner' }
+          });
+        }).toThrow(TransitionError);
+
+        // 2. Privileged DELIVERED -> RETURNED without authTimestampSeconds throws 403
+        expect(() => {
+          validateAndCalculateTransition({
+            currentOrderStatus: 'DELIVERED',
+            targetOrderStatus: 'RETURNED',
+            actor: { uid: 'admin_1', role: 'admin_owner' }
+          });
+        }).toThrow(TransitionError);
+      });
+
+      it('STATE-2: transition() throws 404 TransitionError when target order does not exist (BUG-B-02)', async () => {
+        const mockTxn = {
+          get: async () => ({
+            exists: false,
+            data: () => null
+          }),
+          update: jest.fn(),
+          create: jest.fn()
+        };
+
+        const mockDb = {
+          collection: () => ({ doc: () => ({ collection: () => ({ doc: () => ({}) }) }) }),
+          runTransaction: async (fn: any) => fn(mockTxn)
+        };
+
+        await expect(
+          transition(mockDb, {
+            orderId: 'SS-NONEXISTENT-ORDER',
+            targetOrderStatus: 'CONFIRMED',
+            actor: { uid: 'staff_1', role: 'staff' }
+          })
+        ).rejects.toThrow(TransitionError);
+
+        try {
+          await transition(mockDb, {
+            orderId: 'SS-NONEXISTENT-ORDER',
+            targetOrderStatus: 'CONFIRMED',
+            actor: { uid: 'staff_1', role: 'staff' }
+          });
+          fail('Expected transition() to throw 404 TransitionError');
+        } catch (err: any) {
+          expect(err).toBeInstanceOf(TransitionError);
+          expect(err.statusCode).toBe(404);
+          expect(err.message).toContain('does not exist');
+        }
+      });
+
+      it('STATE-1..3: transition() transitions paymentStatus (and orderStatus pair), increments version, and appends payment statuses to events (BUG-B-03)', async () => {
+        let storedOrder: any = {
+          orderStatus: 'PLACED',
+          paymentStatus: 'UNPAID',
+          version: 1
+        };
+        const eventsAppended: any[] = [];
+
+        const mockTxn = {
+          get: async () => ({
+            exists: true,
+            data: () => ({ ...storedOrder })
+          }),
+          update: (_ref: any, data: any) => {
+            storedOrder = { ...storedOrder, ...data };
+          },
+          create: (_ref: any, data: any) => {
+            eventsAppended.push(data);
+          }
+        };
+
+        const mockDb = {
+          collection: () => ({ doc: () => ({ collection: () => ({ doc: () => ({}) }) }) }),
+          runTransaction: async (fn: any) => fn(mockTxn)
+        };
+
+        // Transition PLACED + UNPAID -> CONFIRMED + PAID
+        const result = await transition(mockDb, {
+          orderId: 'SS-ORDER-PAIR-TEST',
+          targetOrderStatus: 'CONFIRMED',
+          targetPaymentStatus: 'PAID',
+          actor: { uid: 'webhook_payu', role: 'system' },
+          reason: 'PayU webhook settlement verified'
+        });
+
+        expect(result.success).toBe(true);
+        expect(result.newOrderStatus).toBe('CONFIRMED');
+        expect(result.newPaymentStatus).toBe('PAID');
+        expect(result.version).toBe(2);
+        expect(storedOrder.orderStatus).toBe('CONFIRMED');
+        expect(storedOrder.paymentStatus).toBe('PAID');
+        expect(storedOrder.version).toBe(2);
+        expect(eventsAppended.length).toBe(1);
+        expect(eventsAppended[0].fromOrderStatus).toBe('PLACED');
+        expect(eventsAppended[0].toOrderStatus).toBe('CONFIRMED');
+        expect(eventsAppended[0].fromPaymentStatus).toBe('UNPAID');
+        expect(eventsAppended[0].toPaymentStatus).toBe('PAID');
+        expect(eventsAppended[0].actor.uid).toBe('webhook_payu');
+      });
     });
   });
 });

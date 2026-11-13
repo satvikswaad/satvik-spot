@@ -105,6 +105,9 @@ export function assertStepUpFreshness(
   authTimestampSeconds: number,
   nowSeconds = Math.floor(Date.now() / 1000)
 ): void {
+  if (typeof authTimestampSeconds !== 'number' || !Number.isFinite(authTimestampSeconds)) {
+    throw new TransitionError('Step-up authentication required. Missing or invalid authentication timestamp.', 403);
+  }
   const elapsed = nowSeconds - authTimestampSeconds;
   if (elapsed < 0 || elapsed > 300) {
     throw new TransitionError(
