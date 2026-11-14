@@ -579,6 +579,34 @@ function initUI() {
         if (btn) {
             e.preventDefault();
             openCheckout();
+            return;
+        }
+        if (e.target.closest('#btn-close-cart, .btn-close-cart, .btn-close-drawer')) {
+            e.preventDefault();
+            closeCart();
+            return;
+        }
+        if (e.target.id === 'cart-drawer-overlay' || (e.target.classList && e.target.classList.contains('cart-drawer-overlay'))) {
+            e.preventDefault();
+            closeCart();
+            return;
+        }
+        if (e.target.closest('#btn-close-checkout, #btn-close-checkout-icon, .btn-close-checkout')) {
+            e.preventDefault();
+            closeCheckout();
+            return;
+        }
+        if (e.target.id === 'checkout-modal') {
+            e.preventDefault();
+            closeCheckout();
+            return;
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeCart();
+            closeCheckout();
         }
     });
     if (btnCloseCheckout) btnCloseCheckout.addEventListener('click', closeCheckout);
@@ -2115,7 +2143,8 @@ export function openCheckout() {
     populateCheckoutAddresses();
     const modal = document.getElementById('checkout-modal');
     if (modal) {
-        modal.style.display = 'flex';
+        modal.classList.add('active');
+        modal.style.setProperty('display', 'flex', 'important');
         const closeBtn = document.getElementById('btn-close-checkout');
         const closeIcon = document.getElementById('btn-close-checkout-icon');
         if (closeBtn) closeBtn.onclick = closeCheckout;
@@ -3284,7 +3313,10 @@ function renderCheckoutSummary() {
 
 function closeCheckout() {
     const modal = document.getElementById('checkout-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.setProperty('display', 'none', 'important');
+    }
 }
 
 function updateProductGridEmptyState(visibleCount, query = '') {

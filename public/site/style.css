@@ -3185,10 +3185,19 @@ html, body {
     /* MOBILE CHECKOUT MODAL PERFECT 1-COLUMN RESPONSIVE LAYOUT (SCREENSHOT 3 FIX) */
     #checkout-modal {
         padding: 0 !important;
-        display: flex !important;
         align-items: flex-end !important;
         justify-content: center !important;
         overflow: hidden !important;
+    }
+    #checkout-modal.active,
+    #checkout-modal[style*="display: flex"],
+    #checkout-modal[style*="display:flex"] {
+        display: flex !important;
+    }
+    #checkout-modal[style*="display: none"],
+    #checkout-modal[style*="display:none"],
+    #checkout-modal:not(.active):not([style*="display: flex"]):not([style*="display:flex"]) {
+        display: none !important;
     }
     .checkout-modal-box, #checkout-modal .modal-box {
         width: 100% !important;

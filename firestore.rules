@@ -23,24 +23,28 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Inventory Logs: Backend Admin SDK only (DB-1)
+    // Inventory Logs: Read only by verified admin, client writes strictly denied
     match /inventory_logs/{logId} {
-      allow read, write: if false;
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
     }
 
-    // Payment Transactions: Backend Admin SDK only (DB-1)
+    // Payment Transactions: Read only by admin, client writes strictly denied
     match /payment_transactions/{txnId} {
-      allow read, write: if false;
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
     }
 
-    // Refunds: Backend Admin SDK only (DB-1, REFUND-1)
+    // Refunds: Read only by admin, client writes strictly denied (REFUND-1)
     match /refunds/{refundId} {
-      allow read, write: if false;
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
     }
 
-    // Audit Logs: Backend Admin SDK only (DB-1, LOG-2)
+    // Audit Logs: Read only by admin, client writes strictly denied (LOG-2)
     match /audit_logs/{logId} {
-      allow read, write: if false;
+      allow read: if isAdmin();
+      allow create, update, delete: if false;
     }
 
     // Idempotency Records: Backend Admin SDK only
