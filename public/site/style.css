@@ -2793,10 +2793,6 @@ html, body {
     .slider-dot.active {
         width: 22px !important;
     }
-    }
-    .slider-dot.active {
-        width: 20px !important;
-    }
     .m-hero-badge-row {
         display: flex;
         align-items: center;
