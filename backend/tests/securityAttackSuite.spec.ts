@@ -637,8 +637,7 @@ describe('Wave F — Section 16.3 Master Security Attack Suite (All 37 Attacks)'
 
     it('Attack #28: Universal default-deny security rules present in firestore.rules (DB-1)', () => {
       const rules = fs.readFileSync(path.join(__dirname, '../../firestore.rules'), 'utf8');
-      expect(rules).toContain('match /{document=**} {');
-      expect(rules).toContain('allow read, write: if false;');
+      expect(rules).toMatch(/match\s*\/\{document=\*\*\s*\}\s*\{\s*allow\s+read,\s*write:\s*if\s+false;\s*\}/);
     });
   });
 

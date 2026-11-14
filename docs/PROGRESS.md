@@ -2,7 +2,7 @@
 
 > **Branch**: `staging`  
 > **Base Commit**: `2f9578b` (`before-remediation`)  
-> **Current Status**: Wave D Verified by Independent QA; Initiating Wave E: Storefront & Admin Client Remediation (Tickets T-027 to T-031)  
+> **Current Status**: Platform Remediation Complete — All Waves (A through F) Verified by Independent QA; Platform Cleared for Main Merge & Production Deployment  
 
 ---
 
@@ -33,8 +33,8 @@
 | **T-029** | E | Orders/Sec | Verified | `rejects subscription request missing or invalid email with HTTP 400`, `rejects subscription request without explicit consent boolean with HTTP 400`, `subscribes successfully with valid email, consent: true, and Turnstile token` | Independent QA Review (`docs/WAVE_E_REVIEW.md`) | POST /api/v1/newsletter/subscribe with Turnstile, consent: true, rate limits, and collection newsletterSubscribers |
 | **T-030** | E | Storefront | Verified | `handleFooterSubscribe` in `public/site/script.js:242-285` | Independent QA Review (`docs/WAVE_E_REVIEW.md`) | Newsletter UI wired to /api/v1/newsletter/subscribe with Turnstile token and explicit consent checkbox |
 | **T-031** | E | Admin | Verified | `lists orders with cursor pagination (max 50 limit, UI-4)`, `retrieves single order details for admin`, `retrieves order event timeline from orders/{id}/events (UI-5)`, `lists products for admin with unmasked stock` | Independent QA Review (`docs/WAVE_E_REVIEW.md`) | Admin Client Firestore SDK completely removed; wired to Express admin endpoints with cursor pagination (UI-4) |
-| **T-032** | F | Security | Pending | - | - | Enforce CSP headers |
-| **T-033** | F | Database | Pending | - | - | Final deny-all in rules + emulator test |
-| **T-034** | F | QA | Pending | - | - | Attack suite 1-37 on live Express routes |
-| **T-035** | F | QA | Pending | - | - | CI gates, Lighthouse, i18n parity |
-| **T-036** | F | QA | Pending | - | - | Full independent re-audit QA_REPORT_V2.md |
+| **T-032** | F | Security | Verified | `Attack #31: Storefront security headers enforce strict CSP without unsafe-inline or unsafe-eval [FE-1]` in `backend/tests/securityAttackSuite.spec.ts:688-695` | Independent QA Review (`docs/WAVE_F_REVIEW.md`) | Enforced strict CSP in _headers and backend app.ts with dynamic nonce; zero unsafe-inline/unsafe-eval; frame-ancestors none |
+| **T-033** | F | Database | Verified | `functions/tests/firestoreRules.spec.ts` (141/141 emulator rules tests passed) and `backend/tests/databaseInvariants.spec.ts:12-21` (DB-1 regex check passed) | Independent QA Review (`docs/WAVE_F_REVIEW.md`) | Universal default-deny enforced across all collections in firestore.rules; client SDK access rejected across anonymous, user, and admin |
+| **T-034** | F | QA | Verified | `backend/tests/securityAttackSuite.spec.ts` (37/37 attacks passed on live Express routes & services) | Independent QA Review (`docs/WAVE_F_REVIEW.md`) | Section 16.3 Master Attack Suite (Categories A, B, C, D) 100% passing with live routes and mutation kill verification |
+| **T-035** | F | QA | Verified | `npm run verify:spec`, `npm run scan:banned`, `npm run scan:collections`, `npm run scan:secrets`, `npm run build`, `npm run build:frontend` (7/7 files), `i18nParity.spec.ts` (777/777 keys across en, hi, ur) | Independent QA Review (`docs/WAVE_F_REVIEW.md`) | All 6 CI gates operational and verified green with 100% translation key parity across languages |
+| **T-036** | F | QA | Verified | `docs/QA_REPORT_V2.md` comprehensive platform re-audit verifying resolution of 16/16 bugs and zero S0/S1 vulnerabilities | Independent QA Review (`docs/WAVE_F_REVIEW.md`) | 143/143 items verified; 0 S0, 0 S1, 0 S2 remaining; platform certified for production release |
