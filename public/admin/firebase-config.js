@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -10,8 +10,8 @@ const firebaseConfig = {
   appId: "1:1006538799897:web:22635763b8678b1aa3e388"
 };
 
-const app = window._firebaseApp = initializeApp(firebaseConfig);
-window.auth = getAuth(app);
+export const app = window._firebaseApp = (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig));
+export const auth = window.auth = getAuth(app);
 
 window.API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:8080'
@@ -20,3 +20,6 @@ window.API_BASE_URL = (window.location.hostname === 'localhost' || window.locati
 // Use session persistence for private admin portal
 setPersistence(window.auth, browserSessionPersistence).catch(e => console.warn("Admin Auth persistence:", e));
 window.firebaseLoaded = true;
+
+export default auth;
+

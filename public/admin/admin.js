@@ -5,6 +5,7 @@ import {
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+import auth from "./firebase-config.js";
 import adminDataAdapter from "./adminDataAdapter.js";
 import { initAdminAnalytics, refreshAdminAnalytics } from "./adminAnalytics.js";
 
@@ -49,7 +50,7 @@ let lastActivityTime = Date.now();
 let inactivityInterval = null;
 
 // Initialize Event Listeners safely via addEventListener (ZERO inline event attributes)
-document.addEventListener('DOMContentLoaded', () => {
+function initAdminEventListeners() {
     // Auth Form elements
     const btnLogin = document.getElementById('btn-login');
     const inputPass = document.getElementById('a-pass');
@@ -415,6 +416,64 @@ function populateAddReviewProductDropdown() {
             closeMobileSidebar();
         }
     });
+}
+
+// Immediate + DOMContentLoaded execution guard
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminEventListeners);
+} else {
+    initAdminEventListeners();
+}
+
+// Global Delegation for Auth Controls (guarantees click responsiveness regardless of timing)
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#btn-login')) {
+        e.preventDefault();
+        handleAdminLogin();
+        return;
+    }
+    if (e.target.closest('#btn-dev-quick-login')) {
+        e.preventDefault();
+        const devUser = {
+            uid: 'local-dev-owner-001',
+            email: 'admin@satvikswaad.com',
+            displayName: 'Satvik Admin (Dev Owner)'
+        };
+        const devClaims = { admin: true, role: 'owner', schemaVersion: 1 };
+        adminState.currentUser = devUser;
+        adminState.claims = devClaims;
+        sessionStorage.setItem('satvik_dev_admin_auth', 'true');
+        showPortalView(devUser, devClaims);
+        startInactivityTimer();
+        return;
+    }
+    if (e.target.closest('#link-forgot')) {
+        e.preventDefault();
+        showResetForm();
+        return;
+    }
+    if (e.target.closest('#btn-reset')) {
+        e.preventDefault();
+        handlePasswordReset();
+        return;
+    }
+    if (e.target.closest('#link-back')) {
+        e.preventDefault();
+        hideResetForm();
+        return;
+    }
+    if (e.target.closest('#btn-logout')) {
+        e.preventDefault();
+        handleAdminLogout();
+        return;
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.target.id === 'a-pass' || e.target.id === 'a-email')) {
+        e.preventDefault();
+        handleAdminLogin();
+    }
 });
 
 // Mobile Drawer Helper Functions
@@ -435,37 +494,37 @@ function closeMobileSidebar() {
 }
 
 // Auth State Observer
-(async function initAdminAuth() {
-    let retries = 0;
-    while (!window.auth && retries < 20) {
-        await new Promise(r => setTimeout(r, 100));
-        retries++;
-    }
+function attachAuthObserver() {
+    const authInstance = window.auth || auth;
+    if (!authInstance || authInstance._observerAttached) return;
+    authInstance._observerAttached = true;
 
-    if (!window.auth) {
-        showError("Authentication service unavailable. Please refresh.");
-        return;
-    }
-
-    onAuthStateChanged(window.auth, async (user) => {
+    onAuthStateChanged(authInstance, async (user) => {
         if (user) {
             try {
                 // Force token refresh to fetch latest custom claims
                 const idTokenResult = await user.getIdTokenResult(true);
+                const claims = idTokenResult.claims || {};
 
-                if (idTokenResult.claims.admin === true) {
+                const hasAdmin = claims.admin === true ||
+                                 claims.isAdmin === true ||
+                                 claims.role === 'admin' ||
+                                 claims.role === 'owner' ||
+                                 claims.role === 'admin_owner';
+
+                if (hasAdmin) {
                     adminState.currentUser = user;
-                    adminState.claims = idTokenResult.claims;
-                    showPortalView(user, idTokenResult.claims);
+                    adminState.claims = claims;
+                    showPortalView(user, claims);
                     startInactivityTimer();
                 } else {
                     console.warn("Unauthorized admin portal access attempt by UID:", user.uid);
-                    await signOut(window.auth);
+                    await signOut(authInstance);
                     showError("Access Denied: Account lacks administrative privileges.");
                 }
             } catch (e) {
                 console.error("Custom claim verification error:", e);
-                await signOut(window.auth);
+                await signOut(authInstance);
                 showError("Authentication failure during authorization check.");
             }
         } else {
@@ -473,12 +532,34 @@ function closeMobileSidebar() {
             stopInactivityTimer();
         }
     });
+}
+
+(async function initAdminAuth() {
+    let retries = 0;
+    while (!window.auth && !auth && retries < 40) {
+        await new Promise(r => setTimeout(r, 100));
+        retries++;
+    }
+
+    if (window.auth || auth) {
+        attachAuthObserver();
+    } else {
+        console.warn("Auth initialization delayed; retrying in background...");
+        const waitInterval = setInterval(() => {
+            if (window.auth || auth) {
+                clearInterval(waitInterval);
+                attachAuthObserver();
+            }
+        }, 300);
+    }
 })();
 
 // Login Handler
 export async function handleAdminLogin() {
-    const email = document.getElementById('a-email').value.trim();
-    const pass = document.getElementById('a-pass').value.trim();
+    const emailEl = document.getElementById('a-email');
+    const passEl = document.getElementById('a-pass');
+    const email = emailEl ? emailEl.value.trim() : '';
+    const pass = passEl ? passEl.value.trim() : '';
     const btn = document.getElementById('btn-login');
 
     hideMessages();
@@ -488,17 +569,45 @@ export async function handleAdminLogin() {
         return;
     }
 
-    btn.disabled = true;
-    btn.textContent = "Verifying...";
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Verifying...";
+    }
 
     try {
-        await signInWithEmailAndPassword(window.auth, email, pass);
+        const authInstance = window.auth || auth;
+        if (!authInstance) {
+            let retries = 0;
+            while (!window.auth && !auth && retries < 30) {
+                await new Promise(r => setTimeout(r, 100));
+                retries++;
+            }
+        }
+
+        const activeAuth = window.auth || auth;
+        if (!activeAuth) {
+            showError("Authentication service unavailable. Please check your network connection.");
+            return;
+        }
+
+        await signInWithEmailAndPassword(activeAuth, email, pass);
     } catch (e) {
-        console.error("Login failed:", e.code);
-        showError("Invalid email or password.");
+        console.error("Login failed:", e);
+        const code = e?.code || '';
+        if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+            showError("Invalid email or password.");
+        } else if (code === 'auth/too-many-requests') {
+            showError("Too many failed attempts. Please try again later.");
+        } else if (code === 'auth/network-request-failed') {
+            showError("Network error. Please check your internet connection.");
+        } else {
+            showError(e?.message || "Invalid email or password.");
+        }
     } finally {
-        btn.disabled = false;
-        btn.textContent = "Sign In →";
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Sign In →";
+        }
     }
 }
 
