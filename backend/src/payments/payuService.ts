@@ -881,6 +881,43 @@ export async function settlePayuPayment(
       }
     }
 
+    // Check if order is already PAID (Attack #12: Customer pays same order twice)
+    if (order.paymentStatus === 'PAID') {
+      logger.warn('Payment received for already PAID order - marking duplicate payment for refund (Attack #12)', {
+        orderId: order.orderId,
+        gatewayPaymentId,
+        txnid: payload.txnid
+      });
+
+      const duplicateRefundData = {
+        orderId: order.orderId,
+        paymentStatus: 'REFUND_PENDING',
+        refundReason: 'DUPLICATE_PAYMENT',
+        gatewayPaymentId,
+        txnid: payload.txnid
+      };
+
+      if (options?.recordPayment) {
+        await options.recordPayment(duplicateRefundData);
+      } else {
+        await db.runTransaction(async (txn) => {
+          const pRef = db.collection('payments').doc(gatewayPaymentId);
+          txn.create(pRef, {
+            paymentId: gatewayPaymentId,
+            orderId: order.orderId,
+            txnid: payload.txnid,
+            amountPaise: order.totalPaise || Math.round(Number(payload.amount) * 100),
+            status: 'REFUND_PENDING',
+            refundReason: 'DUPLICATE_PAYMENT',
+            gateway: 'PAYU',
+            source,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        });
+      }
+      return { settled: true, duplicate: true, orderId: order.orderId };
+    }
+
     // Verified payment success
     const paymentData = {
       orderId: order.orderId,

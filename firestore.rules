@@ -11,6 +11,8 @@ service cloud.firestore {
     }
 
     // DB-1: Universal Default Deny All Client Reads and Writes
+    // Client SDKs (web and admin) MUST NOT have direct read or write access to Firestore.
+    // All access goes through the backend API via Firebase Admin SDK.
     match /{document=**} {
       allow read, write: if false;
     }
@@ -55,34 +57,25 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // TEMPORARY PATCH (Expires: 2026-11-27 - 14 days): Allow authenticated users to read/write ONLY their own profile with strict field whitelist and type/length validation until Wave E client API migration completes (DB-1, AUTH-4)
+    // Users: Client direct read/write strictly denied under DB-1, handled exclusively via backend API (AUTH-4)
     match /users/{userId} {
-      allow read: if isSignedIn() && request.auth.uid == userId;
-      allow create, update: if isSignedIn() && request.auth.uid == userId &&
-        request.resource.data.keys().hasOnly(['uid', 'name', 'phone', 'email', 'address', 'addresses', 'language', 'house', 'street', 'city', 'pincode', 'updatedAt', 'createdAt']) &&
-        (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() >= 2)) &&
-        (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() >= 10)) &&
-        (!('email' in request.resource.data) || (request.resource.data.email is string && request.resource.data.email.matches('^[^@]+@[^@]+\\.[^@]+$'))) &&
+      allow read: if false;
+      allow create, update: if false &&
         !('admin' in request.resource.data) &&
         !('role' in request.resource.data) &&
         !('roles' in request.resource.data) &&
-        !('claims' in request.resource.data) &&
-        !('permissions' in request.resource.data);
+        !('claims' in request.resource.data);
       allow delete: if false;
     }
 
+    // Customers: Client direct read/write strictly denied under DB-1, handled exclusively via backend API (AUTH-4)
     match /customers/{userId} {
-      allow read: if isSignedIn() && request.auth.uid == userId;
-      allow create, update: if isSignedIn() && request.auth.uid == userId &&
-        request.resource.data.keys().hasOnly(['uid', 'name', 'phone', 'email', 'address', 'addresses', 'language', 'house', 'street', 'city', 'pincode', 'updatedAt', 'createdAt']) &&
-        (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() >= 2)) &&
-        (!('phone' in request.resource.data) || (request.resource.data.phone is string && request.resource.data.phone.size() >= 10)) &&
-        (!('email' in request.resource.data) || (request.resource.data.email is string && request.resource.data.email.matches('^[^@]+@[^@]+\\.[^@]+$'))) &&
+      allow read: if false;
+      allow create, update: if false &&
         !('admin' in request.resource.data) &&
         !('role' in request.resource.data) &&
         !('roles' in request.resource.data) &&
-        !('claims' in request.resource.data) &&
-        !('permissions' in request.resource.data);
+        !('claims' in request.resource.data);
       allow delete: if false;
     }
   }

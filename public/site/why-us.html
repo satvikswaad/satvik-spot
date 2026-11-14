@@ -487,7 +487,7 @@
     <!-- DEDICATED CHECKOUT MODAL -->
     <div class="modal-overlay" id="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
         <div class="modal-box checkout-modal-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-gold-light); padding-bottom: 14px;">
+            <div class="checkout-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-gold-light); padding-bottom: 14px;">
                 <div>
                     <h2 id="checkout-title" style="color: var(--color-maroon); font-size: 1.6rem; margin: 0;">Checkout & Shipping</h2>
                     <span style="font-size: 0.85rem; color: var(--color-sub); font-weight: 700;">🔒 TLS Encrypted Secure Checkout</span>
@@ -525,37 +525,37 @@
                             <div class="co-payment-options" id="co-payment-options">
                                 <label class="co-pm-card active" for="pm-online-why">
                                     <input type="radio" name="payment-method" id="pm-online-why" value="Online Payment" checked />
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">⚡ Instant Online Payment</span>
-                                            <span style="font-size: 0.72rem; font-weight: 800; background: #D4AF37; color: #FFF; padding: 2px 7px; border-radius: 12px; letter-spacing: 0.5px;">RECOMMENDED</span>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div class="co-pm-title-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                            <span class="co-pm-title" style="font-weight: 800; font-size: 0.92rem; color: #203325;">⚡ Instant Online Payment</span>
+                                            <span class="co-pm-badge-rec" style="font-size: 0.68rem; font-weight: 800; background: #D4AF37; color: #FFF; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px;">RECOMMENDED</span>
                                         </div>
-                                        <p style="margin: 4px 0 6px; font-size: 0.8rem; color: #555; line-height: 1.35;">UPI (GPay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking via Razorpay.</p>
-                                        <div style="display: flex; gap: 6px; font-size: 0.75rem; color: #1F4A2C; font-weight: 700;">
-                                            <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">UPI</span>
-                                            <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">Cards</span>
-                                            <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">NetBanking</span>
-                                            <span style="margin-left: auto; color: #7A1C1C; font-size: 0.72rem;">🔒 256-bit TLS</span>
+                                        <p class="co-pm-desc" style="margin: 4px 0 6px; font-size: 0.8rem; color: #555; line-height: 1.35;">UPI (GPay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking via Razorpay.</p>
+                                        <div class="co-pm-sub-badges" style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 6px; font-size: 0.72rem; color: #1F4A2C; font-weight: 700;">
+                                            <span class="co-pm-sub-badge" style="background: #E8F5E9; padding: 2px 8px; border-radius: 4px;">UPI</span>
+                                            <span class="co-pm-sub-badge" style="background: #E8F5E9; padding: 2px 8px; border-radius: 4px;">Cards</span>
+                                            <span class="co-pm-sub-badge" style="background: #E8F5E9; padding: 2px 8px; border-radius: 4px;">NetBanking</span>
+                                            <span class="co-pm-badge-tls" style="margin-left: auto; color: #7A1C1C; font-size: 0.72rem; font-weight: 600;">🔒 256-bit TLS</span>
                                         </div>
                                     </div>
                                 </label>
 
                                 <label class="co-pm-card" for="pm-cod-why">
                                     <input type="radio" name="payment-method" id="pm-cod-why" value="Cash on Delivery" />
-                                    <div style="flex: 1;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">📦 Cash on Delivery (COD)</span>
-                                            <span style="font-size: 0.72rem; font-weight: 700; background: #E5E7EB; color: #374151; padding: 2px 7px; border-radius: 12px;">Pay on Arrival</span>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div class="co-pm-title-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                            <span class="co-pm-title" style="font-weight: 800; font-size: 0.92rem; color: #203325;">📦 Cash on Delivery (COD)</span>
+                                            <span class="co-pm-badge-cod" style="font-size: 0.68rem; font-weight: 700; background: #E5E7EB; color: #374151; padding: 2px 7px; border-radius: 10px;">Pay on Arrival</span>
                                         </div>
-                                        <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
+                                        <p class="co-pm-desc" style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
                                     </div>
                                 </label>
-                                </div>
+                            </div>
                         </div>
                         <div style="margin-top: 24px;">
                             <button type="submit" id="btn-submit-order" class="btn-add-cart" style="font-size: 1.05rem; padding: 15px;">Proceed to Pay 💳</button>
                             <a href="https://wa.me/919236587600?text=Namaste!%20I%20have%20a%20question%20regarding%20an%20order%20on%20Satvik%20Swaad." target="_blank" rel="noopener noreferrer" id="btn-wa-support" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; padding: 12px; border: 1.5px solid #25D366; color: #128C7E; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.92rem; background: #F0FFF4;">Need Help? Chat on WhatsApp 💬</a>
-                            <button type="button" id="btn-close-checkout" style="width: 100%; margin-top: 10px; background: none; border: none; color: var(--color-sub); cursor: pointer;">Cancel</button>
+                            <button type="button" id="btn-close-checkout" style="width: 100%; margin-top: 10px; background: none; border: none; color: var(--color-sub); cursor: pointer; font-size: 0.9rem; font-weight: 700;">Cancel & Return to Store</button>
                         </div>
                     </div>
                 </div>

@@ -207,6 +207,7 @@ describe('Phase 2 Architecture & Network Boundary Security Tests', () => {
       expect(csp).toContain("frame-ancestors 'none'");
       expect(csp).toContain("object-src 'none'");
       expect(csp).toContain('upgrade-insecure-requests');
+      expect(res.headers['content-security-policy-report-only']).toBeUndefined();
     });
 
     it('Generates unique cryptographic nonces across consecutive requests', async () => {

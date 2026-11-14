@@ -142,7 +142,6 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
   res.locals.cspNonce = nonce;
   const cspPolicy = `default-src 'self'; script-src 'self' 'nonce-${nonce}' https://checkout.payu.in https://secure.payu.in https://test.payu.in https://www.gstatic.com https://apis.google.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://*.firebaseapp.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https://secure.payu.in https://test.payu.in https://info.payu.in https://satvik-spot-backend-staging.onrender.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.gstatic.com https://api.razorpay.com https://lumberjack.razorpay.com http://127.0.0.1:*; frame-src 'self' https://secure.payu.in https://test.payu.in https://checkout.payu.in https://*.firebaseapp.com https://accounts.google.com https://*.google.com https://www.google.com/recaptcha/ https://recaptcha.google.com/ https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://secure.payu.in https://test.payu.in; object-src 'none'; upgrade-insecure-requests;`;
   res.setHeader('Content-Security-Policy', cspPolicy);
-  res.setHeader('Content-Security-Policy-Report-Only', cspPolicy);
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -275,6 +274,9 @@ app.use('/api', (_req: Request, res: Response) => {
 // Centralized Non-Leaking Error Handler
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof AppError) {
+    if (err.statusCode === 429) {
+      res.setHeader('Retry-After', '60');
+    }
     logger.warn(`AppError [${err.errorCode}]: ${err.message}`, { statusCode: err.statusCode });
     return res.status(err.statusCode).json({
       success: false,

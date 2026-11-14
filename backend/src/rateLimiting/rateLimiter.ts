@@ -17,9 +17,10 @@ export interface RouteRateLimiterOptions {
 export function createRouteRateLimiter(options: { windowMs: number; maxRequests: number; routeIdentifier: string }) {
   const { windowMs, maxRequests, routeIdentifier } = options;
 
-  return async function routeRateLimiter(req: Request, _res: Response, next: NextFunction) {
-    // Bypass rate limit DB network latency in local test runs
-    if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined) {
+  return async function routeRateLimiter(req: Request, res: Response, next: NextFunction) {
+    // Bypass rate limit DB network latency in local test runs unless explicitly testing rate limits
+    if ((process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined) &&
+        req.headers?.['x-test-rate-limit-enforce'] !== 'true') {
       return next();
     }
 
@@ -73,6 +74,9 @@ export function createRouteRateLimiter(options: { windowMs: number; maxRequests:
           ip: clientIp,
           details: violationDetails
         });
+        if (res && typeof res.setHeader === 'function') {
+          res.setHeader('Retry-After', Math.ceil(options.windowMs / 1000).toString());
+        }
         return next(new AppError('Too many requests. Please try again later.', 429, 'RATE_LIMIT_EXCEEDED'));
       }
 

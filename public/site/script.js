@@ -116,7 +116,21 @@ function loadAndMigrateCart() {
     let raw = localStorage.getItem(CART_STORAGE_KEY);
     if (raw) {
         try {
-            return JSON.parse(raw);
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+                for (const item of Object.values(parsed)) {
+                    if (item && typeof item === 'object') {
+                        const prod = PRODUCTS_CATALOGUE.find(p => p.id === (item.productId || item.id));
+                        const variant = prod ? (prod.variants || []).find(v => v.id === item.variantId) : null;
+                        if (!item.img) item.img = (prod?.images && prod.images[0]) || 'assets/satvik_logo_round.png';
+                        if (!item.mrp) {
+                            const p = Number(item.price) || 0;
+                            item.mrp = Number(variant?.mrp || prod?.mrp || Math.round(p * 1.25));
+                        }
+                    }
+                }
+            }
+            return parsed;
         } catch (cartJsonParseError) {
             console.error('Failed to parse cart JSON:', cartJsonParseError);
         }
@@ -203,6 +217,7 @@ function runInitializers() {
     safeRun(() => initReviewsData(), 'initReviewsData');
     safeRun(() => syncProductsWithStorage(), 'syncProductsWithStorage');
     safeRun(() => initCustomerRatingsMarquee(), 'initCustomerRatingsMarquee');
+    safeRun(() => initProductMarqueeSwipeDrag(), 'initProductMarqueeSwipeDrag');
     safeRun(() => initSatvikStoryVideoPlayer(), 'initSatvikStoryVideoPlayer');
     safeRun(() => initContactForm(), 'initContactForm');
     safeRun(() => initProductDetailsPage(), 'initProductDetailsPage');
@@ -1250,7 +1265,9 @@ export function addToCart(productId, variantId, qty = 1) {
             name: prod.name,
             variantLabel: variant.label,
             price: variant.price,
-            qty: Math.min(validQty, maxQty)
+            qty: Math.min(validQty, maxQty),
+            img: (prod.images && prod.images[0]) || 'assets/satvik_logo_round.png',
+            mrp: Number(variant.mrp || Math.round(variant.price * 1.25))
         };
     } else {
         const newQty = cart[lineKey].qty + qty;
@@ -1301,18 +1318,21 @@ export function removeFromCart(lineKey) {
 
 function saveCart() {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(cart));
+    window.dispatchEvent(new Event('cartUpdated'));
 }
 
 function renderCart() {
     const container = document.getElementById('cart-items-container');
     const totalEl = document.getElementById('cart-total-display');
     const countBadge = document.getElementById('cart-count-badge');
+    const footerEl = document.querySelector('.cart-footer');
 
     if (!container) return;
 
     const items = Object.values(cart);
-    const totalQty = items.reduce((acc, item) => acc + item.qty, 0);
-    const totalPrice = items.reduce((acc, item) => acc + (item.qty * item.price), 0);
+    const totalQty = items.reduce((acc, item) => acc + (Number(item.qty) || 0), 0);
+    const totalPrice = items.reduce((acc, item) => acc + ((Number(item.qty) || 0) * (Number(item.price) || 0)), 0);
 
     const countBadges = document.querySelectorAll('#cart-count-badge, #header-cart-count, #bottom-cart-count-badge, .cart-count');
     countBadges.forEach(b => { if (b) b.textContent = String(totalQty); });
@@ -1320,66 +1340,238 @@ function renderCart() {
     const totalEls = document.querySelectorAll('#cart-total-display, #cart-total-price');
     totalEls.forEach(el => { if (el) el.textContent = `₹${totalPrice}`; });
 
-    if (items.length === 0) {
-        const emptyP = createSafeElement('p', {
-            className: 'text-center color-sub',
-            text: t('cart.emptyMsg')
-        });
-        emptyP.style.textAlign = 'center';
-        emptyP.style.color = 'var(--color-sub)';
-        emptyP.style.marginTop = '40px';
-        container.replaceChildren(emptyP);
-        return;
-    }
-
-    const listFragment = document.createDocumentFragment();
     const currLang = getCurrentLanguage();
     const isHi = currLang === 'hi';
     const isUr = currLang === 'ur';
 
+    const totalLabel = document.querySelector('.cart-footer .cart-total-row > span:first-child');
+    if (totalLabel) totalLabel.textContent = isUr ? 'کل رقم' : (isHi ? 'कुल राशि' : 'Grand Total');
+
+    if (footerEl) {
+        footerEl.style.display = items.length === 0 ? 'none' : 'flex';
+    }
+
+    if (items.length === 0) {
+        const emptyWrap = createSafeElement('div', {
+            className: 'cart-empty-wrap',
+            style: 'text-align: center; padding: 48px 16px; color: #6B7280;'
+        });
+        const iconEl = createSafeElement('div', {
+            text: '🏺',
+            style: 'font-size: 3.2rem; margin-bottom: 12px;'
+        });
+        const titleEl = createSafeElement('h4', {
+            text: t('cart.emptyMsg') || 'Your cart is currently empty',
+            style: 'font-family: \'Playfair Display\', serif; font-size: 1.25rem; color: #164328; margin: 0 0 6px;'
+        });
+        const subEl = createSafeElement('p', {
+            text: isUr ? 'اپنے پسندیدہ روایتی اچار شامل کریں۔' : (isHi ? 'शुरुआत करने के लिए अपने पसंदीदा अचार जोड़ें।' : 'Add your handcrafted artisanal pickles & sweet treats to get started!'),
+            style: 'font-size: 0.88rem; color: #9CA3AF; margin: 0;'
+        });
+        emptyWrap.appendChild(iconEl);
+        emptyWrap.appendChild(titleEl);
+        emptyWrap.appendChild(subEl);
+        container.replaceChildren(emptyWrap);
+        return;
+    }
+
+    const listFragment = document.createDocumentFragment();
+    let totalSavings = 0;
+
     items.forEach(item => {
-        const itemRow = createSafeElement('div', { className: 'cart-item-row' });
         const prod = PRODUCTS_CATALOGUE.find(p => p.id === (item.productId || item.id));
+        const variant = prod ? (prod.variants || []).find(v => v.id === item.variantId) : null;
         const displayName = isUr ? (prod?.urduName || item.name) : (isHi ? (prod?.hindiName || item.name) : item.name);
+        const price = Number(item.price) || 0;
+        const qty = Number(item.qty) || 1;
 
-        const infoDiv = createSafeElement('div', { className: 'cart-item-info' });
-        const nameEl = createSafeElement('span', { className: 'cart-item-name', text: `${displayName} (${item.variantLabel || 'Standard'})` });
-        const priceEl = createSafeElement('span', { className: 'cart-item-price', text: `₹${item.price} × ${item.qty} = ₹${item.price * item.qty}` });
-        infoDiv.appendChild(nameEl);
-        infoDiv.appendChild(priceEl);
+        let mrp = Number(item.mrp || variant?.mrp || (prod?.mrp) || Math.round(price * 1.25));
+        if (mrp <= price) {
+            mrp = Math.round(price * 1.25);
+        }
+        const unitSaving = Math.max(0, mrp - price);
+        totalSavings += unitSaving * qty;
 
-        const controlsDiv = createSafeElement('div', { className: 'cart-item-controls' });
+        // 1. Card Container
+        const itemRow = createSafeElement('div', {
+            className: 'cart-item-row modern-cart-card',
+            attributes: { 'data-line-key': item.lineKey || item.id },
+            style: 'background: #FFFFFF; border: 1.5px solid #E8DFD0; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.03);'
+        });
+
+        // 2. Product Thumbnail (Left)
+        const rawImg = item.img || (prod?.images && prod.images[0]) || 'assets/satvik_logo_round.png';
+        const imgEl = createSafeElement('img', {
+            className: 'cart-item-thumb modern-cart-thumb',
+            src: rawImg,
+            alt: displayName,
+            attributes: { loading: 'lazy' },
+            style: 'width: 62px; height: 62px; object-fit: cover; border-radius: 8px; background: #FAF5EB; flex-shrink: 0;'
+        });
+
+        // 3. Product Details (Center)
+        const detailsDiv = createSafeElement('div', {
+            className: 'cart-item-info modern-cart-details',
+            style: 'flex: 1; min-width: 0;'
+        });
+
+        const titleEl = createSafeElement('div', {
+            className: 'cart-item-name modern-cart-title',
+            text: displayName,
+            style: 'font-weight: 700; font-size: 0.95rem; color: #1F2937; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+        });
+
+        const variantText = item.variantLabel || item.weight || (variant ? variant.label : '500 g');
+        const variantEl = createSafeElement('div', {
+            className: 'cart-item-variant modern-cart-variant',
+            text: variantText,
+            style: 'font-size: 0.8rem; color: #6B7280; margin: 0 0 4px;'
+        });
+
+        const pricingDiv = createSafeElement('div', {
+            className: 'cart-item-pricing modern-cart-pricing',
+            style: 'display: flex; align-items: baseline; gap: 6px;'
+        });
+
+        const priceEl = createSafeElement('span', {
+            className: 'cart-item-selling-price modern-cart-price',
+            text: `₹${price}`,
+            style: 'font-weight: 800; font-size: 0.98rem; color: #111827; margin-right: 6px;'
+        });
+
+        const mrpEl = createSafeElement('span', {
+            className: 'cart-item-mrp modern-cart-mrp',
+            text: `₹${mrp}`,
+            style: 'text-decoration: line-through; color: #9CA3AF; font-size: 0.82rem; font-weight: 500;'
+        });
+
+        pricingDiv.appendChild(priceEl);
+        pricingDiv.appendChild(mrpEl);
+
+        detailsDiv.appendChild(titleEl);
+        detailsDiv.appendChild(variantEl);
+        detailsDiv.appendChild(pricingDiv);
+
+        // 4. Quantity Stepper Pill (Right)
+        const controlsDiv = createSafeElement('div', {
+            className: 'cart-item-controls modern-qty-pill',
+            style: 'background: #166534; color: #FFFFFF; border-radius: 6px; display: inline-flex; align-items: center; justify-content: space-between; width: 78px; height: 32px; padding: 0 6px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(22, 101, 52, 0.2);'
+        });
 
         const btnMinus = createSafeElement('button', {
-            className: 'qty-btn',
-            text: '-',
+            className: 'qty-btn modern-qty-btn',
+            text: '−',
+            attributes: { type: 'button', 'aria-label': 'Decrease quantity' },
+            style: 'background: none; border: none; color: #FFFFFF; font-size: 1.15rem; font-weight: 700; cursor: pointer; padding: 0 4px; line-height: 1;',
             events: { click: () => changeQty(item.lineKey || item.id, -1) }
         });
 
-        const qtySpan = createSafeElement('span', { className: 'qty-val', text: String(item.qty) });
-
-        const btnPlus = createSafeElement('button', {
-            className: 'qty-btn',
-            text: '+',
-            events: { click: () => changeQty(item.lineKey || item.id, 1) }
+        const qtySpan = createSafeElement('span', {
+            className: 'qty-val modern-qty-val',
+            text: String(qty),
+            style: 'color: #FFFFFF; font-weight: 700; font-size: 0.88rem; text-align: center; min-width: 18px;'
         });
 
-        const btnRemove = createSafeElement('button', {
-            className: 'remove-btn',
-            text: '🗑️',
-            events: { click: () => removeFromCart(item.lineKey || item.id) }
+        const btnPlus = createSafeElement('button', {
+            className: 'qty-btn modern-qty-btn',
+            text: '+',
+            attributes: { type: 'button', 'aria-label': 'Increase quantity' },
+            style: 'background: none; border: none; color: #FFFFFF; font-size: 1.15rem; font-weight: 700; cursor: pointer; padding: 0 4px; line-height: 1;',
+            events: { click: () => changeQty(item.lineKey || item.id, 1) }
         });
 
         controlsDiv.appendChild(btnMinus);
         controlsDiv.appendChild(qtySpan);
         controlsDiv.appendChild(btnPlus);
-        controlsDiv.appendChild(btnRemove);
 
-        itemRow.appendChild(infoDiv);
+        itemRow.appendChild(imgEl);
+        itemRow.appendChild(detailsDiv);
         itemRow.appendChild(controlsDiv);
 
         listFragment.appendChild(itemRow);
     });
+
+    // 5. Blue savings banner (if totalSavings > 0)
+    if (totalSavings > 0) {
+        const savingsBanner = createSafeElement('div', {
+            className: 'cart-savings-banner',
+            style: 'background: #EDF4FE; color: #1D4ED8; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.88rem; margin-bottom: 12px;'
+        });
+        const savingsLeft = createSafeElement('span', {
+            text: isUr ? 'آپ کی کل بچت' : (isHi ? 'आपकी कुल बचत' : 'Your total savings'),
+            style: 'display: flex; align-items: center; gap: 6px;'
+        });
+        const savingsRight = createSafeElement('span', {
+            text: `₹${totalSavings}`
+        });
+        savingsBanner.appendChild(savingsLeft);
+        savingsBanner.appendChild(savingsRight);
+        listFragment.appendChild(savingsBanner);
+    }
+
+    // 6. Clean Bill Details section
+    const billDetailsCard = createSafeElement('div', {
+        className: 'cart-bill-details',
+        style: 'background: #FFFFFF; border: 1.5px solid #E8DFD0; border-radius: 12px; padding: 12px 14px; margin-bottom: 12px;'
+    });
+
+    const billTitle = createSafeElement('div', {
+        className: 'cart-bill-title',
+        text: isUr ? 'بل کی تفصیلات' : (isHi ? 'बिल विवरण' : 'Bill Details'),
+        style: 'font-weight: 700; font-size: 0.92rem; color: #1F2937; margin: 0 0 10px;'
+    });
+    billDetailsCard.appendChild(billTitle);
+
+    // Items total row
+    const itemsTotalRow = createSafeElement('div', {
+        className: 'cart-bill-row',
+        style: 'display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; color: #4B5563; margin-bottom: 6px;'
+    });
+    itemsTotalRow.appendChild(createSafeElement('span', {
+        text: isUr ? 'اشیاء کی کل رقم' : (isHi ? 'सामान का कुल मूल्य' : 'Items total')
+    }));
+    itemsTotalRow.appendChild(createSafeElement('span', {
+        text: `₹${totalPrice}`,
+        style: 'font-weight: 600; color: #1F2937;'
+    }));
+    billDetailsCard.appendChild(itemsTotalRow);
+
+    // Delivery charge row
+    const deliveryRow = createSafeElement('div', {
+        className: 'cart-bill-row',
+        style: 'display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; color: #4B5563; margin-bottom: 8px;'
+    });
+    deliveryRow.appendChild(createSafeElement('span', {
+        text: isUr ? 'ڈیلیوری چارج' : (isHi ? 'डिलीवरी शुल्क' : 'Delivery charge')
+    }));
+    deliveryRow.appendChild(createSafeElement('span', {
+        text: 'FREE',
+        className: 'cart-delivery-free',
+        style: 'color: #166534; font-weight: 700;'
+    }));
+    billDetailsCard.appendChild(deliveryRow);
+
+    // Divider
+    const billDivider = createSafeElement('div', {
+        className: 'cart-bill-divider',
+        style: 'border-top: 1px dashed #E8DFD0; margin: 8px 0;'
+    });
+    billDetailsCard.appendChild(billDivider);
+
+    // Grand total row
+    const grandTotalRow = createSafeElement('div', {
+        className: 'cart-bill-row cart-bill-total',
+        style: 'display: flex; justify-content: space-between; align-items: center; font-size: 1rem; font-weight: 800; color: #111827;'
+    });
+    grandTotalRow.appendChild(createSafeElement('span', {
+        text: isUr ? 'کل قابل ادا رقم' : (isHi ? 'कुल देय राशि' : 'Grand total')
+    }));
+    grandTotalRow.appendChild(createSafeElement('span', {
+        text: `₹${totalPrice}`
+    }));
+    billDetailsCard.appendChild(grandTotalRow);
+
+    listFragment.appendChild(billDetailsCard);
 
     container.replaceChildren(listFragment);
 }
@@ -1439,7 +1631,7 @@ function ensureModalsInDOM() {
         setRichContent(div, `
         <div class="modal-overlay" id="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
             <div class="modal-box checkout-modal-box" style="background: #FFF; border-radius: 16px; max-width: 780px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; border: 2px solid var(--color-gold-light);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-gold-light); padding-bottom: 14px;">
+                <div class="checkout-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-gold-light); padding-bottom: 14px;">
                     <div>
                         <h2 id="checkout-title" style="color: var(--color-maroon); font-size: 1.6rem; margin: 0;">Checkout & Shipping</h2>
                         <span style="font-size: 0.85rem; color: var(--color-sub); font-weight: 700;">🔒 TLS Encrypted Secure Checkout</span>
@@ -1528,29 +1720,29 @@ function ensureModalsInDOM() {
                                 <div class="co-payment-options" id="co-payment-options">
                                     <label class="co-pm-card active" for="pm-online-dom">
                                         <input type="radio" name="payment-method" id="pm-online-dom" value="Online Payment" checked />
-                                        <div style="flex: 1;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">⚡ Instant Online Payment (PayU)</span>
-                                                <span style="font-size: 0.72rem; font-weight: 800; background: #D4AF37; color: #FFF; padding: 2px 7px; border-radius: 12px; letter-spacing: 0.5px;">RECOMMENDED</span>
+                                        <div style="flex: 1; min-width: 0;">
+                                            <div class="co-pm-title-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                                <span class="co-pm-title" style="font-weight: 800; font-size: 0.92rem; color: #203325;">⚡ Instant Online Payment (PayU)</span>
+                                                <span class="co-pm-badge-rec" style="font-size: 0.68rem; font-weight: 800; background: #D4AF37; color: #FFF; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px;">RECOMMENDED</span>
                                             </div>
-                                            <p style="margin: 4px 0 6px; font-size: 0.8rem; color: #555; line-height: 1.35;">UPI (GPay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking via PayU Secure Gateway.</p>
-                                            <div style="display: flex; gap: 6px; font-size: 0.75rem; color: #1F4A2C; font-weight: 700;">
-                                                <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">UPI</span>
-                                                <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">Cards</span>
-                                                <span style="background: #E8F5E9; padding: 1px 6px; border-radius: 4px;">NetBanking</span>
-                                                <span style="margin-left: auto; color: #7A1C1C; font-size: 0.72rem;">🔒 256-bit TLS</span>
+                                            <p class="co-pm-desc" style="margin: 4px 0 6px; font-size: 0.8rem; color: #555; line-height: 1.35;">UPI (GPay, PhonePe, Paytm, BHIM), Debit/Credit Cards &amp; NetBanking via PayU Secure Gateway.</p>
+                                            <div class="co-pm-sub-badges" style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 6px; font-size: 0.72rem; color: #1F4A2C; font-weight: 700;">
+                                                <span class="co-pm-sub-badge" style="background: #E8F5E9; padding: 2px 8px; border-radius: 4px;">UPI</span>
+                                                <span class="co-pm-sub-badge" style="background: #E8F5E9; padding: 2px 8px; border-radius: 4px;">Cards</span>
+                                                <span class="co-pm-sub-badge" style="background: #E8F5E9; padding: 2px 8px; border-radius: 4px;">NetBanking</span>
+                                                <span class="co-pm-badge-tls" style="margin-left: auto; color: #7A1C1C; font-size: 0.72rem; font-weight: 600;">🔒 256-bit TLS</span>
                                             </div>
                                         </div>
                                     </label>
 
                                     <label class="co-pm-card" for="pm-cod-dom">
                                         <input type="radio" name="payment-method" id="pm-cod-dom" value="Cash on Delivery" />
-                                        <div style="flex: 1;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                <span style="font-weight: 800; font-size: 0.92rem; color: #203325;">📦 Cash on Delivery (COD)</span>
-                                                <span style="font-size: 0.72rem; font-weight: 700; background: #E5E7EB; color: #374151; padding: 2px 7px; border-radius: 12px;">Pay on Arrival</span>
+                                        <div style="flex: 1; min-width: 0;">
+                                            <div class="co-pm-title-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                                                <span class="co-pm-title" style="font-weight: 800; font-size: 0.92rem; color: #203325;">📦 Cash on Delivery (COD)</span>
+                                                <span class="co-pm-badge-cod" style="font-size: 0.68rem; font-weight: 700; background: #E5E7EB; color: #374151; padding: 2px 7px; border-radius: 10px;">Pay on Arrival</span>
                                             </div>
-                                            <p style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
+                                            <p class="co-pm-desc" style="margin: 4px 0 0; font-size: 0.8rem; color: #555; line-height: 1.35;">Pay cash or UPI to delivery agent when your artisanal parcel arrives.</p>
                                         </div>
                                     </label>
                                 </div>
@@ -5077,6 +5269,8 @@ function showToast(message) {
 
 // Expose public methods for global consumption across pages (e.g. payment-failed, cart modals, re-order flows)
 if (typeof window !== 'undefined') {
+    window.PRODUCTS_CATALOGUE = PRODUCTS_CATALOGUE;
+    window.renderCart = renderCart;
     window.openCheckout = openCheckout;
     window.closeCheckout = closeCheckout;
     window.placeOrder = placeOrder;
@@ -5088,6 +5282,12 @@ if (typeof window !== 'undefined') {
     window.applyAllProductFilters = applyAllProductFilters;
     window.searchProducts = searchProducts;
     window.initStickyHeader = initStickyHeader;
+    window.initProductMarqueeSwipeDrag = initProductMarqueeSwipeDrag;
+
+    window.addEventListener('cartUpdated', () => {
+        cart = loadAndMigrateCart() || {};
+        renderCart();
+    });
 }
 
 export {
@@ -5104,6 +5304,224 @@ export {
     initProductsSort,
     initStickyHeader
 };
+
+// ═════════════════════════════════════════════════════════════════════════════
+// PRODUCT MARQUEE SHOWCASE (SWIPEABLE, DRAGGABLE & CONTINUOUS RAF AUTO-SCROLL)
+// ═════════════════════════════════════════════════════════════════════════════
+
+export function initProductMarqueeSwipeDrag() {
+    const viewport = document.getElementById('product-marquee-viewport');
+    const track = document.getElementById('product-grid-container');
+    if (!viewport || !track) return;
+
+    if (viewport._marqueeSwipeInitialized) return;
+    viewport._marqueeSwipeInitialized = true;
+
+    if (window._satvikProductMarqueeRaf) {
+        cancelAnimationFrame(window._satvikProductMarqueeRaf);
+        window._satvikProductMarqueeRaf = null;
+    }
+
+    let isPaused = false;
+    let isInteracting = false;
+    let isDragging = false;
+    let resumeTimeout = null;
+
+    let dragStartX = 0;
+    let mouseScrollStart = 0;
+    let dragDistance = 0;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchScrollStart = 0;
+    let isVerticalScroll = false;
+    let touchDetermined = false;
+
+    const speed = 0.8; // Smooth automatic scroll speed (px per frame)
+
+    function getHalfWidth() {
+        return (track.scrollWidth || 0) / 2;
+    }
+
+    function checkWrap() {
+        const halfWidth = getHalfWidth();
+        if (halfWidth > 50) {
+            if (viewport.scrollLeft >= halfWidth) {
+                viewport.scrollLeft -= halfWidth;
+            } else if (viewport.scrollLeft < 0) {
+                viewport.scrollLeft += halfWidth;
+            }
+        }
+    }
+
+    function scheduleResume(delayMs = 2500) {
+        clearTimeout(resumeTimeout);
+        resumeTimeout = setTimeout(() => {
+            if (!isInteracting && !isDragging) {
+                try {
+                    if (viewport.matches(':hover')) {
+                        return; // Keep paused while mouse cursor hovers over viewport
+                    }
+                } catch (_) {}
+                isPaused = false;
+            }
+        }, delayMs);
+    }
+
+    // 1. Continuous Auto-Scroller via requestAnimationFrame
+    function step() {
+        if (!isPaused && !isInteracting && !isDragging) {
+            viewport.scrollLeft += speed;
+            const halfWidth = getHalfWidth();
+            if (halfWidth > 50 && viewport.scrollLeft >= halfWidth) {
+                viewport.scrollLeft -= halfWidth;
+            }
+        }
+        window._satvikProductMarqueeRaf = requestAnimationFrame(step);
+    }
+    window._satvikProductMarqueeRaf = requestAnimationFrame(step);
+
+    // 2. Pause on Mouse Hover
+    viewport.addEventListener('mouseenter', () => {
+        clearTimeout(resumeTimeout);
+        isPaused = true;
+    });
+
+    viewport.addEventListener('mouseleave', () => {
+        if (isDragging) {
+            isDragging = false;
+            viewport.classList.remove('is-dragging');
+            scheduleResume(2500);
+        } else if (!isInteracting) {
+            clearTimeout(resumeTimeout);
+            isPaused = false;
+        }
+    });
+
+    // 3. Touch Swiping (Mobile)
+    viewport.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches[0]) return;
+        clearTimeout(resumeTimeout);
+        isInteracting = true;
+        isPaused = true;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchScrollStart = viewport.scrollLeft;
+        dragDistance = 0;
+        isVerticalScroll = false;
+        touchDetermined = false;
+    }, { passive: true });
+
+    viewport.addEventListener('touchmove', (e) => {
+        if (!isInteracting || !e.touches || !e.touches[0]) return;
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = touchStartX - currentX;
+        const diffY = touchStartY - currentY;
+
+        if (!touchDetermined) {
+            if (Math.abs(diffX) > 6 || Math.abs(diffY) > 6) {
+                touchDetermined = true;
+                if (Math.abs(diffY) > Math.abs(diffX)) {
+                    isVerticalScroll = true;
+                }
+            }
+        }
+
+        if (isVerticalScroll) return; // Allow page to scroll vertically undisturbed
+
+        dragDistance = Math.max(dragDistance, Math.abs(diffX));
+        let targetScroll = touchScrollStart + diffX;
+        const halfWidth = getHalfWidth();
+        if (halfWidth > 50) {
+            while (targetScroll >= halfWidth) {
+                targetScroll -= halfWidth;
+                touchScrollStart -= halfWidth;
+            }
+            while (targetScroll < 0) {
+                targetScroll += halfWidth;
+                touchScrollStart += halfWidth;
+            }
+        }
+        viewport.scrollLeft = targetScroll;
+    }, { passive: true });
+
+    const handleTouchEnd = () => {
+        if (!isInteracting) return;
+        isInteracting = false;
+        checkWrap();
+        scheduleResume(2500);
+    };
+
+    viewport.addEventListener('touchend', handleTouchEnd, { passive: true });
+    viewport.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+
+    // 4. Mouse Dragging (Desktop / Laptop)
+    viewport.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return; // Only primary button
+        clearTimeout(resumeTimeout);
+        isDragging = true;
+        isPaused = true;
+        dragStartX = e.pageX;
+        mouseScrollStart = viewport.scrollLeft;
+        dragDistance = 0;
+        viewport.classList.add('is-dragging');
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const diff = e.pageX - dragStartX;
+        dragDistance = Math.max(dragDistance, Math.abs(diff));
+        if (dragDistance > 6) {
+            e.preventDefault();
+        }
+        let targetScroll = mouseScrollStart - diff;
+        const halfWidth = getHalfWidth();
+        if (halfWidth > 50) {
+            while (targetScroll >= halfWidth) {
+                targetScroll -= halfWidth;
+                mouseScrollStart -= halfWidth;
+            }
+            while (targetScroll < 0) {
+                targetScroll += halfWidth;
+                mouseScrollStart += halfWidth;
+            }
+        }
+        viewport.scrollLeft = targetScroll;
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        viewport.classList.remove('is-dragging');
+        checkWrap();
+        scheduleResume(2500);
+    });
+
+    // 5. Trackpad / Wheel Support
+    viewport.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaX) > 4) {
+            isPaused = true;
+            scheduleResume(2500);
+        }
+    }, { passive: true });
+
+    // 6. Native scroll listener to maintain infinite wrap
+    viewport.addEventListener('scroll', () => {
+        checkWrap();
+    }, { passive: true });
+
+    // 7. Prevent accidental clicks on product cards when a drag gesture was performed (>6px)
+    viewport.addEventListener('click', (e) => {
+        if (dragDistance > 6) {
+            e.preventDefault();
+            e.stopPropagation();
+            setTimeout(() => {
+                dragDistance = 0;
+            }, 60);
+        }
+    }, true);
+}
 
 
 

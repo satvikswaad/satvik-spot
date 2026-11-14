@@ -5,13 +5,13 @@ import { logger } from '../utils/logger';
  * Validates a Cloudflare Turnstile token server-side.
  */
 export async function verifyTurnstileToken(token: string | undefined, clientIp?: string): Promise<boolean> {
+  if (!token || typeof token !== 'string' || token.trim().length === 0) {
+    return false;
+  }
+
   // Test / Emulator environment bypass
   if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined) {
     return true;
-  }
-
-  if (!token || typeof token !== 'string' || token.trim().length === 0) {
-    return false;
   }
 
   // Cloudflare testing tokens & dev mock tokens

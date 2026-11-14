@@ -310,7 +310,9 @@
     <script type="module" src="./script.js"></script>
 
     <!-- INLINE REACTIVE CART HYDRATION -->
-    <script>
+    <script type="module">
+        import { PRODUCTS_CATALOGUE } from './js/productsData.js';
+
         (function() {
             const CART_KEY = 'satwikCart_v2';
             const LEGACY_KEY = 'satwikCart';
@@ -344,11 +346,11 @@
             }
 
             function safeUrl(url) {
-                if (!url || typeof url !== 'string') return 'assets/aam-ka-achar.png';
+                if (!url || typeof url !== 'string') return 'assets/satvik_logo_round.png';
                 const trimmed = url.trim();
                 const lower = trimmed.toLowerCase();
                 if (lower.startsWith('javascript:') || lower.startsWith('vbscript:') || lower.startsWith('data:')) {
-                    return 'assets/aam-ka-achar.png';
+                    return 'assets/satvik_logo_round.png';
                 }
                 return escapeHtml(trimmed);
             }
@@ -373,11 +375,11 @@
                     exploreBtn: "Explore Products Catalogue →",
                     eachLabel: "each",
                     removeAria: "Remove item",
-                    summaryTitle: "Order Summary",
-                    subtotalLabel: "Items Subtotal:",
-                    deliveryLabel: "Delivery Fee:",
-                    freeDeliveryText: "FREE (Inaugural Offer)",
-                    totalPayableLabel: "Total Payable:",
+                    summaryTitle: "Bill Details",
+                    subtotalLabel: "Items total",
+                    deliveryLabel: "Delivery charge",
+                    freeDeliveryText: "FREE",
+                    totalPayableLabel: "Grand total",
                     checkoutBtn: "Proceed to Checkout",
                     confirmClear: "Are you sure you want to clear your cart?"
                 };
@@ -392,13 +394,13 @@
                 if (items.length === 0) {
                     if (clearBtn) clearBtn.style.display = 'none';
                     const emptyDoc = new DOMParser().parseFromString(`<div>
-                        <div style="background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 18px; padding: 42px 20px; text-align: center; box-shadow: 0 4px 16px rgba(60,50,20,0.06); margin-top: 10px;">
+                        <div style="background: #FFFFFF; border: 1.5px solid #E8DFD0; border-radius: 18px; padding: 48px 20px; text-align: center; box-shadow: 0 4px 16px rgba(60,50,20,0.06); margin-top: 10px;">
                             <div style="font-size: 3.5rem; margin-bottom: 12px;">🏺</div>
                             <h2 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.5rem; margin: 0 0 8px;">${escapeHtml(tDict.emptyTitle)}</h2>
                             <p style="color: #6B7280; font-size: 0.92rem; max-width: 380px; margin: 0 auto 24px; line-height: 1.5;">
                                 ${escapeHtml(tDict.emptyDesc)}
                             </p>
-                            <a href="products.html" style="display: inline-block; background: #164328; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(22,67,40,0.25);">
+                            <a href="products.html" style="display: inline-block; background: #166534; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(22,101,52,0.25);">
                                 ${escapeHtml(tDict.exploreBtn)}
                             </a>
                         </div>
@@ -418,70 +420,123 @@
                 }
 
                 const subtotal = items.reduce((sum, item) => sum + (Number(item.price || 0) * (Number(item.qty || item.quantity) || 1)), 0);
+                const catalogue = (typeof PRODUCTS_CATALOGUE !== 'undefined' && Array.isArray(PRODUCTS_CATALOGUE)) ? PRODUCTS_CATALOGUE : (window.PRODUCTS_CATALOGUE || []);
 
-                let itemsHtml = items.map((item, idx) => {
+                let totalSavings = 0;
+
+                let itemsHtml = items.map((item) => {
                     const rawKey = item.lineKey || `${item.productId || item.id}::${item.variantId || 'default'}`;
                     const key = escapeHtml(rawKey);
                     const qty = Number(item.qty || item.quantity) || 1;
                     const price = Number(item.price) || 0;
-                    const lineTotal = price * qty;
-                    const img = safeUrl(item.img || item.image || 'assets/aam-ka-achar.png');
-                    const name = escapeHtml(item.name || 'Satvik Swaad Product');
-                    const variant = escapeHtml(item.variantLabel || item.weight || '500 g');
+
+                    const pId = item.productId || item.id;
+                    const prod = catalogue.find(p => p.id === pId);
+                    const variant = prod ? (prod.variants || []).find(v => v.id === item.variantId) : null;
+
+                    let mrp = Number(item.mrp || variant?.mrp || (prod && prod.mrp) || Math.round(price * 1.25));
+                    if (mrp <= price) mrp = Math.round(price * 1.25);
+                    const unitSaving = Math.max(0, mrp - price);
+                    totalSavings += unitSaving * qty;
+
+                    const displayName = (activeLang === 'ur' && prod?.urduName) ? prod.urduName : ((activeLang === 'hi' && prod?.hindiName) ? prod.hindiName : (item.name || prod?.name || 'Satvik Swaad Product'));
+                    const safeName = escapeHtml(displayName);
+
+                    const rawImg = item.img || (prod && prod.images && prod.images[0]) || 'assets/satvik_logo_round.png';
+                    const img = safeUrl(rawImg);
+
+                    const variantLabel = escapeHtml(item.variantLabel || item.weight || (variant ? variant.label : '500 g'));
 
                     return `
-                        <div class="cart-item-row" data-line-key="${key}" style="display: flex; gap: 14px; background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 14px; padding: 12px; margin-bottom: 12px; align-items: center; box-shadow: 0 2px 8px rgba(60,50,20,0.04);">
-                            <img src="${img}" alt="${name}" style="width: 72px; height: 72px; object-fit: contain; background: #FAF8F5; border-radius: 10px; padding: 4px; flex-shrink: 0;" />
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: 700; font-size: 0.95rem; color: #164328; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</div>
-                                <div style="font-size: 0.78rem; color: #6B7280; margin-bottom: 6px;">${variant} &bull; ₹${price} ${tDict.eachLabel}</div>
-                                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                                    <div style="display: inline-flex; align-items: center; border: 1.5px solid #DCD2BC; border-radius: 8px; overflow: hidden; background: #FAF8F5;">
-                                        <button type="button" class="btn-qty-minus" data-key="${key}" style="background: none; border: none; width: 30px; height: 30px; font-size: 1rem; cursor: pointer; color: #164328; font-weight: 800;">−</button>
-                                        <span style="width: 32px; text-align: center; font-size: 0.88rem; font-weight: 700; color: #164328;">${qty}</span>
-                                        <button type="button" class="btn-qty-plus" data-key="${key}" style="background: none; border: none; width: 30px; height: 30px; font-size: 1rem; cursor: pointer; color: #164328; font-weight: 800;">+</button>
-                                    </div>
-                                    <div style="font-weight: 800; font-size: 1.05rem; color: #164328;">₹${lineTotal}</div>
+                        <div class="cart-item-row modern-cart-card" data-line-key="${key}" style="background: #FFFFFF; border: 1.5px solid #E8DFD0; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.03);">
+                            <img src="${img}" alt="${safeName}" class="cart-item-thumb modern-cart-thumb" loading="lazy" style="width: 62px; height: 62px; object-fit: cover; border-radius: 8px; background: #FAF5EB; flex-shrink: 0;" />
+                            <div class="cart-item-info modern-cart-details" style="flex: 1; min-width: 0;">
+                                <div class="cart-item-name modern-cart-title" style="font-weight: 700; font-size: 0.95rem; color: #1F2937; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${safeName}</div>
+                                <div class="cart-item-variant modern-cart-variant" style="font-size: 0.8rem; color: #6B7280; margin: 0 0 4px;">${variantLabel}</div>
+                                <div class="cart-item-pricing modern-cart-pricing" style="display: flex; align-items: baseline; gap: 6px;">
+                                    <span class="cart-item-selling-price modern-cart-price" style="font-weight: 800; font-size: 0.98rem; color: #111827; margin-right: 6px;">₹${price}</span>
+                                    <span class="cart-item-mrp modern-cart-mrp" style="text-decoration: line-through; color: #9CA3AF; font-size: 0.82rem; font-weight: 500;">₹${mrp}</span>
                                 </div>
                             </div>
-                            <button type="button" class="btn-item-delete" data-key="${key}" aria-label="${tDict.removeAria}" style="background: none; border: none; color: #C53030; font-size: 1.2rem; cursor: pointer; padding: 6px; align-self: flex-start;">✕</button>
+                            <div class="cart-item-controls modern-qty-pill" style="background: #166534; color: #FFFFFF; border-radius: 6px; display: inline-flex; align-items: center; justify-content: space-between; width: 78px; height: 32px; padding: 0 6px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(22, 101, 52, 0.2);">
+                                <button type="button" class="btn-qty-minus modern-qty-btn" data-key="${key}" aria-label="Decrease quantity" style="background: none; border: none; color: #FFFFFF; font-size: 1.15rem; font-weight: 700; cursor: pointer; padding: 0 4px; line-height: 1;">−</button>
+                                <span class="qty-val modern-qty-val" style="color: #FFFFFF; font-weight: 700; font-size: 0.88rem; text-align: center; min-width: 18px;">${qty}</span>
+                                <button type="button" class="btn-qty-plus modern-qty-btn" data-key="${key}" aria-label="Increase quantity" style="background: none; border: none; color: #FFFFFF; font-size: 1.15rem; font-weight: 700; cursor: pointer; padding: 0 4px; line-height: 1;">+</button>
+                            </div>
                         </div>
                     `;
                 }).join('');
 
+                let savingsHtml = '';
+                if (totalSavings > 0) {
+                    const savingsLabel = (activeLang === 'ur') ? 'آپ کی کل بچت' : ((activeLang === 'hi') ? 'आपकी कुल बचत' : 'Your total savings');
+                    savingsHtml = `
+                        <div class="cart-savings-banner" style="background: #EDF4FE; color: #1D4ED8; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.88rem; margin-bottom: 12px;">
+                            <span style="display: flex; align-items: center; gap: 6px;">
+                                <span>🎉</span>
+                                <span>${escapeHtml(savingsLabel)}</span>
+                            </span>
+                            <span>₹${totalSavings}</span>
+                        </div>
+                    `;
+                }
+
+                const billTitle = (activeLang === 'ur') ? 'بل کی تفصیلات' : ((activeLang === 'hi') ? 'बिल विवरण' : 'Bill Details');
+                const itemsTotalLabel = (activeLang === 'ur') ? 'اشیاء کی کل رقم' : ((activeLang === 'hi') ? 'सामान का कुल मूल्य' : 'Items total');
+                const deliveryLabel = (activeLang === 'ur') ? 'ڈیلیوری چارج' : ((activeLang === 'hi') ? 'डिलीवरी शुल्क' : 'Delivery charge');
+                const grandTotalLabel = (activeLang === 'ur') ? 'کل قابل ادا رقم' : ((activeLang === 'hi') ? 'कुल देय राशि' : 'Grand total');
+                const checkoutBtnText = escapeHtml(tDict.checkoutBtn || 'Proceed to Checkout');
+
+                const billDetailsHtml = `
+                    <div class="cart-bill-details" style="background: #FFFFFF; border: 1.5px solid #E8DFD0; border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;">
+                        <div class="cart-bill-title" style="font-weight: 700; font-size: 0.95rem; color: #1F2937; margin: 0 0 10px;">${escapeHtml(billTitle)}</div>
+                        <div class="cart-bill-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; color: #4B5563; margin-bottom: 6px;">
+                            <span>${escapeHtml(itemsTotalLabel)}</span>
+                            <span style="font-weight: 600; color: #1F2937;">₹${subtotal}</span>
+                        </div>
+                        <div class="cart-bill-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; color: #4B5563; margin-bottom: 8px;">
+                            <span>${escapeHtml(deliveryLabel)}</span>
+                            <span class="cart-delivery-free" style="color: #166534; font-weight: 700;">FREE</span>
+                        </div>
+                        <div class="cart-bill-divider" style="border-top: 1px dashed #E8DFD0; margin: 8px 0;"></div>
+                        <div class="cart-bill-row cart-bill-total" style="display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; font-weight: 800; color: #111827;">
+                            <span>${escapeHtml(grandTotalLabel)}</span>
+                            <span>₹${subtotal}</span>
+                        </div>
+                    </div>
+                `;
+
+                const stickyBarHtml = `
+                    <div class="cart-sticky-checkout-bar" style="position: sticky; bottom: 0; background: #FFFFFF; border: 1.5px solid #E8DFD0; border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); z-index: 100; margin-top: 14px;">
+                        <div class="cart-footer-total-wrap" style="display: flex; flex-direction: column;">
+                            <span class="cart-footer-total-label" style="font-size: 0.75rem; color: #6B7280; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${escapeHtml(grandTotalLabel)}</span>
+                            <span class="cart-footer-total-val" style="font-size: 1.35rem; font-weight: 800; color: #111827; line-height: 1.1;">₹${subtotal}</span>
+                        </div>
+                        <button type="button" id="btn-proceed-to-checkout" class="btn-checkout btn-proceed-checkout" style="background: #166534; color: #FFFFFF; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 3px 10px rgba(22,101,52,0.25); display: flex; align-items: center; gap: 8px; transition: background 0.15s ease;">
+                            <span>${checkoutBtnText}</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                `;
+
                 const cartDoc = new DOMParser().parseFromString(`<div>
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 18px;">
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 14px;">
                         <!-- ITEMS LIST -->
                         <div>
                             ${itemsHtml}
                         </div>
 
+                        <!-- SAVINGS BANNER -->
+                        ${savingsHtml}
+
                         <!-- BILLING SUMMARY CARD -->
-                        <div style="background: #FFFFFF; border: 1.5px solid #E6DEC8; border-radius: 16px; padding: 18px; box-shadow: 0 4px 16px rgba(60,50,20,0.06);">
-                            <h3 style="font-family: 'Playfair Display', serif; color: #164328; font-size: 1.2rem; margin: 0 0 14px; border-bottom: 1px dashed #E6DEC8; padding-bottom: 8px;">${escapeHtml(tDict.summaryTitle)}</h3>
-                            
-                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #4B5563; margin-bottom: 8px;">
-                                <span>${escapeHtml(tDict.subtotalLabel)}</span>
-                                <span style="font-weight: 700; color: #164328;">₹${subtotal}</span>
-                            </div>
+                        ${billDetailsHtml}
 
-                            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #4B5563; margin-bottom: 12px;">
-                                <span>${escapeHtml(tDict.deliveryLabel)}</span>
-                                <span style="color: #1D552C; font-weight: 700;">${escapeHtml(tDict.freeDeliveryText)}</span>
-                            </div>
-
-                            <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; color: #164328; border-top: 2px solid #E6DEC8; padding-top: 12px; margin-bottom: 18px;">
-                                <span>${escapeHtml(tDict.totalPayableLabel)}</span>
-                                <span>₹${subtotal}</span>
-                            </div>
-
-                            <button type="button" id="btn-proceed-to-checkout" style="width: 100%; background: #164328; color: #FFFFFF; border: none; padding: 14px 20px; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(22,67,40,0.3); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <span>${escapeHtml(tDict.checkoutBtn)}</span>
-                                <span>🔒</span>
-                            </button>
-                        </div>
+                        <!-- STICKY CHECKOUT BAR -->
+                        ${stickyBarHtml}
                     </div>
                 </div>`, 'text/html');
+
                 while (container.firstChild) container.removeChild(container.firstChild);
                 if (cartDoc.body.firstElementChild) {
                     while (cartDoc.body.firstElementChild.firstChild) {
@@ -516,16 +571,6 @@
                             saveStoredCart(c);
                             renderCartPage();
                         }
-                    });
-                });
-
-                container.querySelectorAll('.btn-item-delete').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const k = btn.getAttribute('data-key');
-                        const c = getStoredCart();
-                        delete c[k];
-                        saveStoredCart(c);
-                        renderCartPage();
                     });
                 });
 
@@ -566,6 +611,5 @@
             window.addEventListener('languageChanged', renderCartPage);
         })();
     </script>
-    <script type="module" src="./script.js"></script>
 </body>
 </html>
