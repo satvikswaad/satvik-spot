@@ -1448,10 +1448,6 @@ async function verifyOrderPayment(orderId) {
     adminDataAdapter.updateOrderStatus(orderId, undefined, 'paid');
     console.log(`[Adapter/API] Payment for order ${orderId} verified.`);
 }
-            console.warn("Firestore verify payment skipped (local adapter active):", err.message);
-        }
-    }
-}
 
 // Shipping Modal Logic
 function openShippingModal(orderId) {
@@ -2081,9 +2077,6 @@ async function handleProductFormSubmit(e) {
 // ─────────────────────────────────────────────────────────────────────────────
 function subscribeToOfflineFinancesStream() {
     // Offline ledger stream handled through adminDataAdapter and POS shifts
-}
-        console.error("Offline finances stream init error:", e);
-    }
 }
 
 function updateOfflineKpi() {
